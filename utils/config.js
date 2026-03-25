@@ -95,6 +95,11 @@ export const UPDATE_CHECK_CURRENT_VERSION = readString(
   'UPDATE_CHECK_CURRENT_VERSION',
   String(packageJson.version || '').trim(),
 );
+export const ENTRY_PATH_ENABLED = readBoolean('ENTRY_PATH_ENABLED', true);
+export const ENTRY_PATH_FIXED = readString('ENTRY_PATH_FIXED', '');
+export const ENTRY_PATH_TOKEN_LENGTH = readNumber('ENTRY_PATH_TOKEN_LENGTH', 24, { min: 8, max: 128 });
+export const ENTRY_PATH_ROTATE_INTERVAL_MIN = readNumber('ENTRY_PATH_ROTATE_INTERVAL_MIN', 60, { min: 1, max: 24 * 60 });
+export const ENTRY_PATH_GRACE_MIN = readNumber('ENTRY_PATH_GRACE_MIN', 120, { min: 1, max: 24 * 60 });
 export const QR_OVERLAY_ENABLED = readBoolean('QR_OVERLAY_ENABLED', true);
 export const QR_OVERLAY_SIZE = readNumber('QR_OVERLAY_SIZE', 75, { min: 32, max: 800 });
 export const QR_OVERLAY_MARGIN = readNumber('QR_OVERLAY_MARGIN', 14, { min: 0, max: 400 });

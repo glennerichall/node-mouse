@@ -65,9 +65,9 @@ npm start
 
 Le serveur affiche:
 
-- l'URL mobile (ex: `http://192.168.x.x:3000`)
+- l'URL mobile avec point d'entrée random (ex: `http://192.168.x.x:3000/AbCdEf...`)
 - le QR code à scanner
-- une page QR: `http://<ip>:3000/qr`
+- une page QR: `http://<ip>:3000/<token>/qr`
 
 ## Variables utiles
 
@@ -79,6 +79,11 @@ Le serveur affiche:
 - `HTTPS` (`true` pour activer HTTPS)
 - `SSL_KEY_PATH` (chemin de la clé privée PEM)
 - `SSL_CERT_PATH` (chemin du certificat PEM)
+- `ENTRY_PATH_ENABLED` (point d'entrée aléatoire, défaut `true`)
+- `ENTRY_PATH_FIXED` (chemin fixe optionnel, vide par défaut)
+- `ENTRY_PATH_TOKEN_LENGTH` (longueur token, défaut `24`)
+- `ENTRY_PATH_ROTATE_INTERVAL_MIN` (rotation token en minutes, défaut `60`)
+- `ENTRY_PATH_GRACE_MIN` (grâce anciens tokens en minutes, défaut `120`)
 - `TOP_BAR_OFFSET_PX` (offset vertical pour l'overlay QR `yad`, défaut `32`)
 - `QR_OVERLAY_ENABLED` (`true`/`false`, défaut `true`)
 - `QR_OVERLAY_SIZE` (taille du QR `yad`, défaut `75`)
@@ -108,6 +113,17 @@ SERVER_HOST=192.168.1.10
 MOUSE_SPEED=1.3
 SCROLL_SPEED=0.25
 ```
+
+Avec token d'entrée fixe (si tu veux éviter la rotation):
+
+```env
+ENTRY_PATH_ENABLED=true
+ENTRY_PATH_FIXED=remote-control-secret
+```
+
+Note securite:
+- Si `ENTRY_PATH_ENABLED=true`, l'application n'est accessible que via `/<token>/...`.
+- Les routes `qr`, `state`, `health` et l'UI ne sont plus accessibles directement à la racine.
 
 Exemple HTTPS (certificat local):
 

@@ -1,4 +1,21 @@
-export function registerSocketHandlers(io, { mouse, keyboard, browser, preview, notifier }) {
+export function registerSocketHandlers(io, {
+  mouse,
+  keyboard,
+  browser,
+  preview,
+  notifier,
+  entryTokenManager,
+  getEntryUrl,
+}) {
+  io.use((socket, next) => {
+    const token = socket.handshake.auth && socket.handshake.auth.entryToken;
+    if (entryTokenManager.isValid(token)) {
+      next();
+      return;
+    }
+    next(new Error('unauthorized'));
+  });
+
   io.on('connection', (socket) => {
     console.log(`Client connecté: ${socket.id}`);
     notifier.notify({
@@ -7,6 +24,12 @@ export function registerSocketHandlers(io, { mouse, keyboard, browser, preview, 
       message: `Client ${socket.id.slice(0, 8)} connecte.`,
     });
     const previewSession = preview.startForSocket(socket);
+
+    socket.emit('entry:update', {
+      token: entryTokenManager.getCurrentToken(),
+      path: entryTokenManager.getEntryPath(),
+      url: getEntryUrl(),
+    });
 
     socket.on('mouse:move', (payload = {}) => {
       const dx = Number(payload.dx) || 0;

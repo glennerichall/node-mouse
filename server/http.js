@@ -11,6 +11,14 @@ export function registerHttpRoutes({ publicDir, clientDir, getPublicUrl, getQrDa
     res.json({ ok: true });
   });
 
+  router.get('/state', (_req, res) => {
+    res.json({
+      ok: true,
+      publicUrl: getPublicUrl(),
+      ts: Date.now(),
+    });
+  });
+
   router.get('/qr', (_req, res) => {
     res.type('html').send(
       renderQrPage({
