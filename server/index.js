@@ -1,22 +1,34 @@
 import http from 'http';
+import https from 'https';
+import fs from 'fs';
 import express from 'express';
 import { Server } from 'socket.io';
 import qrcodeTerminal from 'qrcode-terminal';
 import QRCode from 'qrcode';
-import { PORT, MOUSE_SPEED, SCROLL_SPEED } from '../utils/config.js';
+import {
+  PORT,
+  MOUSE_SPEED,
+  SCROLL_SPEED,
+  HTTPS_ENABLED,
+  SSL_KEY_PATH,
+  SSL_CERT_PATH,
+} from '../utils/config.js';
 import { publicDir, clientDir } from '../utils/paths.js';
 import { getPublicUrl } from '../utils/network.js';
 import { loadRobotOrExit } from '../utils/robot.js';
 import { createMouseController } from '../mouse/index.js';
 import { createKeyboardController } from '../keyboard/index.js';
 import { createBrowserController } from './browser.js';
+import { createPreviewStreamer } from './preview.js';
 import { startQrOverlay } from './qr-overlay.js';
 import { registerHttpRoutes } from './http.js';
 import { registerSocketHandlers } from './socket.js';
 
 export async function startServer() {
   const app = express();
-  const server = http.createServer(app);
+  const server = HTTPS_ENABLED
+    ? createHttpsServer(app)
+    : http.createServer(app);
   const io = new Server(server);
 
   const robot = loadRobotOrExit();
@@ -26,8 +38,10 @@ export async function startServer() {
   });
   const keyboard = createKeyboardController(robot);
   const browser = createBrowserController();
+  const preview = createPreviewStreamer(robot, { width: 128, height: 84, fps: 6 });
 
-  const publicUrl = getPublicUrl(PORT);
+  const protocol = HTTPS_ENABLED ? 'https' : 'http';
+  const publicUrl = getPublicUrl(PORT, protocol);
   const qrDataUrl = await QRCode.toDataURL(publicUrl);
   await startQrOverlay({ url: publicUrl, robot });
 
@@ -39,7 +53,7 @@ export async function startServer() {
   });
   app.use(router);
 
-  registerSocketHandlers(io, { mouse, keyboard, browser });
+  registerSocketHandlers(io, { mouse, keyboard, browser, preview });
 
   server.listen(PORT, () => {
     console.log('Remote Mouse server démarré');
@@ -48,4 +62,16 @@ export async function startServer() {
     console.log('\nScanner ce QR avec le mobile:\n');
     qrcodeTerminal.generate(publicUrl, { small: true });
   });
+}
+
+function createHttpsServer(app) {
+  if (!SSL_KEY_PATH || !SSL_CERT_PATH) {
+    throw new Error(
+      'HTTPS=true exige SSL_KEY_PATH et SSL_CERT_PATH.',
+    );
+  }
+
+  const key = fs.readFileSync(SSL_KEY_PATH, 'utf8');
+  const cert = fs.readFileSync(SSL_CERT_PATH, 'utf8');
+  return https.createServer({ key, cert }, app);
 }

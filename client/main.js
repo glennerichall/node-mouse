@@ -5,6 +5,7 @@ import { bindKeyboardPanel } from './keyboard.js';
 import { bindMouseButtons } from './mouse.js';
 import { bindActionButtons } from './actions.js';
 import { bindConnectionOverlay } from './connection.js';
+import { bindPreviewStream } from './preview.js';
 
 function initClient() {
   const socket = io();
@@ -16,6 +17,7 @@ function initClient() {
   bindMouseButtons(socket, dom);
   bindActionButtons(socket, dom);
   bindConnectionOverlay(socket, dom.connectionOverlay);
+  bindPreviewStream(socket, dom);
 
   window.addEventListener('resize', canvasUI.resize);
   canvasUI.resize();

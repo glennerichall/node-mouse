@@ -53,11 +53,26 @@ Le serveur affiche:
 - `SERVER_HOST` (forcer l'IP/host exposé dans le QR)
 - `MOUSE_SPEED` (défaut `1.3`)
 - `SCROLL_SPEED` (défaut `0.25`)
+- `HTTPS` (`true` pour activer HTTPS)
+- `SSL_KEY_PATH` (chemin de la clé privée PEM)
+- `SSL_CERT_PATH` (chemin du certificat PEM)
 
 Exemple:
 
 ```bash
 PORT=3000 SERVER_HOST=192.168.1.10 npm start
+```
+
+Exemple HTTPS (certificat local):
+
+```bash
+openssl req -x509 -newkey rsa:2048 -nodes \
+  -keyout ./certs/key.pem \
+  -out ./certs/cert.pem \
+  -days 365 \
+  -subj "/CN=localhost"
+
+HTTPS=true SSL_KEY_PATH=./certs/key.pem SSL_CERT_PATH=./certs/cert.pem npm start
 ```
 
 ## Démarrage auto à l'ouverture de session (Linux, systemd user)
