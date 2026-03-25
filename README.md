@@ -35,6 +35,14 @@ Installation globale (CLI):
 npm install -g .
 ```
 
+Configuration via `.env`:
+
+```bash
+cp .env.example .env
+```
+
+Le chargement des variables est fait via `dotenv`.
+
 ## Lancement
 
 ```bash
@@ -50,17 +58,33 @@ Le serveur affiche:
 ## Variables utiles
 
 - `PORT` (défaut `3000`)
+- `ENV_FILE_PATH` (chemin explicite du fichier `.env`)
 - `SERVER_HOST` (forcer l'IP/host exposé dans le QR)
 - `MOUSE_SPEED` (défaut `1.3`)
 - `SCROLL_SPEED` (défaut `0.25`)
 - `HTTPS` (`true` pour activer HTTPS)
 - `SSL_KEY_PATH` (chemin de la clé privée PEM)
 - `SSL_CERT_PATH` (chemin du certificat PEM)
+- `TOP_BAR_OFFSET_PX` (offset vertical pour l'overlay QR `yad`, défaut `32`)
+- `QR_OVERLAY_SIZE` (taille du QR `yad`, défaut `75`)
+- `QR_OVERLAY_MARGIN` (marge droite du QR `yad`, défaut `14`)
+- `PREVIEW_WIDTH` (largeur de la preview souris, défaut `128`)
+- `PREVIEW_HEIGHT` (hauteur de la preview souris, défaut `84`)
+- `PREVIEW_FPS` (fréquence preview, défaut `6`)
 
 Exemple:
 
 ```bash
 PORT=3000 SERVER_HOST=192.168.1.10 npm start
+```
+
+Ou en `.env`:
+
+```env
+PORT=3000
+SERVER_HOST=192.168.1.10
+MOUSE_SPEED=1.3
+SCROLL_SPEED=0.25
 ```
 
 Exemple HTTPS (certificat local):

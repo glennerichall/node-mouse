@@ -1,7 +1,8 @@
 import os from 'os';
+import { SERVER_HOST } from './config.js';
 
 export function getLanIp() {
-  const forcedHost = process.env.SERVER_HOST;
+  const forcedHost = SERVER_HOST;
   if (forcedHost) {
     return forcedHost;
   }

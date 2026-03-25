@@ -2,6 +2,12 @@ import os from 'os';
 import path from 'path';
 import { execFile, spawn } from 'child_process';
 import QRCode from 'qrcode';
+import {
+  TOP_BAR_OFFSET_PX,
+  QR_OVERLAY_SIZE,
+  QR_OVERLAY_MARGIN,
+  HAS_GRAPHICAL_DISPLAY,
+} from '../utils/config.js';
 
 function runExecFile(command, args) {
   return new Promise((resolve) => {
@@ -20,7 +26,7 @@ export async function startQrOverlay({ url, robot }) {
     return null;
   }
 
-  if (!process.env.DISPLAY && !process.env.WAYLAND_DISPLAY) {
+  if (!HAS_GRAPHICAL_DISPLAY) {
     return null;
   }
 
@@ -30,14 +36,15 @@ export async function startQrOverlay({ url, robot }) {
     return null;
   }
 
-  const size = 75;
-  const margin = 14;
+  const size = QR_OVERLAY_SIZE;
+  const margin = QR_OVERLAY_MARGIN;
+  const topBarOffset = TOP_BAR_OFFSET_PX;
   const qrPath = path.join(os.tmpdir(), 'remote-mouse-qr-overlay.png');
   await QRCode.toFile(qrPath, url, { width: size, margin: 1 });
 
   const screen = robot.getScreenSize();
   const posX = Math.max(0, screen.width - size - margin);
-  const posY = margin;
+  const posY = Math.max(0, margin + topBarOffset);
 
   const args = [
     '--class=remote-mouse-qr-overlay',
