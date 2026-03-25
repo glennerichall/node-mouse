@@ -10,6 +10,7 @@ import { loadRobotOrExit } from '../utils/robot.js';
 import { createMouseController } from '../mouse/index.js';
 import { createKeyboardController } from '../keyboard/index.js';
 import { createBrowserController } from './browser.js';
+import { startQrOverlay } from './qr-overlay.js';
 import { registerHttpRoutes } from './http.js';
 import { registerSocketHandlers } from './socket.js';
 
@@ -28,6 +29,7 @@ export async function startServer() {
 
   const publicUrl = getPublicUrl(PORT);
   const qrDataUrl = await QRCode.toDataURL(publicUrl);
+  await startQrOverlay({ url: publicUrl, robot });
 
   const router = registerHttpRoutes({
     publicDir,

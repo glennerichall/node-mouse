@@ -17,6 +17,7 @@ export function getDom() {
   const btnAddressBar = document.getElementById('btn-address-bar');
   const btnHardReload = document.getElementById('btn-hard-reload');
   const btnFullscreen = document.getElementById('btn-fullscreen');
+  const connectionOverlay = document.getElementById('connection-overlay');
 
   return {
     touchpad,
@@ -36,5 +37,6 @@ export function getDom() {
     btnAddressBar,
     btnHardReload,
     btnFullscreen,
+    connectionOverlay,
   };
 }

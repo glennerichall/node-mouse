@@ -4,7 +4,7 @@
   --bg-2: #1a2228;
   --fg: #f0f4f7;
   --accent: #4bd4ff;
-  --menu-h: 74px;
+  --menu-h: 58px;
 }
 
 * {
@@ -81,7 +81,7 @@ body {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 6px;
-  padding: 8px;
+  padding: 6px;
   background: color-mix(in srgb, var(--bg-2) 85%, black);
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
@@ -93,7 +93,7 @@ body {
   border-radius: 10px;
   color: var(--fg);
   background: #2c3943;
-  font-size: 0.95rem;
+  font-size: 0.86rem;
   font-weight: 600;
 }
 
@@ -121,7 +121,7 @@ body {
 
 #text-input {
   width: 100%;
-  min-height: 88px;
+  min-height: 44px;
   padding: 10px;
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -137,12 +137,46 @@ body {
   color: #062231;
 }
 
+#connection-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  background: rgba(8, 12, 16, 0.55);
+  backdrop-filter: blur(3px) saturate(0.8);
+}
+
+#connection-overlay.hidden {
+  display: none;
+}
+
+.connection-card {
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(19, 27, 33, 0.88);
+  text-align: center;
+}
+
+.connection-card h2 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.connection-card p {
+  margin: 0;
+  opacity: 0.85;
+  font-size: 0.9rem;
+}
+
 @media (min-width: 820px) {
   #touchpad {
-    height: calc(100% - 88px);
+    height: calc(100% - 72px);
   }
 
   #menu {
-    height: 88px;
+    height: 72px;
   }
 }

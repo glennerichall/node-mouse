@@ -1,5 +1,5 @@
 import os from 'os';
-import { execFile } from 'child_process';
+import { execFile, spawn } from 'child_process';
 
 function execFileAsync(command, args) {
   return new Promise((resolve) => {
@@ -16,6 +16,33 @@ function sleep(ms) {
 async function commandExists(command) {
   const result = await execFileAsync('which', [command]);
   return result.ok;
+}
+
+function spawnDetached(command, args) {
+  return new Promise((resolve) => {
+    try {
+      const child = spawn(command, args, {
+        detached: true,
+        stdio: 'ignore',
+      });
+
+      let settled = false;
+      const done = (value) => {
+        if (!settled) {
+          settled = true;
+          resolve(value);
+        }
+      };
+
+      child.once('error', () => done(false));
+      child.once('spawn', () => {
+        child.unref();
+        done(true);
+      });
+    } catch (_error) {
+      resolve(false);
+    }
+  });
 }
 
 async function isBraveRunningLinux() {
@@ -132,8 +159,8 @@ export function createBrowserController() {
     ];
 
     for (const [command, args] of launchers) {
-      const result = await execFileAsync(command, args);
-      if (result.ok) {
+      const launched = await spawnDetached(command, args);
+      if (launched) {
         return true;
       }
     }

@@ -20,13 +20,19 @@ Exemple Debian/Ubuntu:
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y build-essential libx11-dev libxtst-dev libpng++-dev
+sudo apt-get install -y build-essential libx11-dev libxtst-dev libpng++-dev wmctrl yad
 ```
 
 ## Installation
 
 ```bash
 npm install
+```
+
+Installation globale (CLI):
+
+```bash
+npm install -g .
 ```
 
 ## Lancement
@@ -52,5 +58,40 @@ Exemple:
 
 ```bash
 PORT=3000 SERVER_HOST=192.168.1.10 npm start
+```
+
+## Démarrage auto à l'ouverture de session (Linux, systemd user)
+
+Après installation globale (`npm install -g .` ou paquet publié):
+
+```bash
+NPM_PREFIX="$(npm prefix -g)"
+mkdir -p ~/.config/systemd/user
+cat > ~/.config/systemd/user/remote-mouse.service <<EOF
+[Unit]
+Description=Remote Mouse Server
+After=graphical-session.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=${NPM_PREFIX}/bin/remote-mouse
+Restart=on-failure
+RestartSec=2
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=default.target
+EOF
+
+systemctl --user daemon-reload
+systemctl --user enable --now remote-mouse.service
+systemctl --user status remote-mouse.service
+```
+
+Voir les logs:
+
+```bash
+journalctl --user -u remote-mouse.service -f
 ```
 # node-mouse

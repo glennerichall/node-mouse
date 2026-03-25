@@ -4,7 +4,9 @@
   "type": "module",
   "description": "Remote mouse and keyboard with mobile client",
   "main": "index.js",
-  "private": true,
+  "bin": {
+    "remote-mouse": "./bin/remote-mouse.js"
+  },
   "scripts": {
     "start": "node index.js",
     "dev": "node index.js"
