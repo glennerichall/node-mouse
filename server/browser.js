@@ -1,48 +1,8 @@
 import os from 'os';
-import { execFile, spawn } from 'child_process';
-
-function execFileAsync(command, args) {
-  return new Promise((resolve) => {
-    execFile(command, args, { timeout: 3000 }, (error, stdout = '', stderr = '') => {
-      resolve({ ok: !error, stdout, stderr });
-    });
-  });
-}
+import { commandExists, execFileAsync, spawnDetached } from '../utils/process.js';
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function commandExists(command) {
-  const result = await execFileAsync('which', [command]);
-  return result.ok;
-}
-
-function spawnDetached(command, args) {
-  return new Promise((resolve) => {
-    try {
-      const child = spawn(command, args, {
-        detached: true,
-        stdio: 'ignore',
-      });
-
-      let settled = false;
-      const done = (value) => {
-        if (!settled) {
-          settled = true;
-          resolve(value);
-        }
-      };
-
-      child.once('error', () => done(false));
-      child.once('spawn', () => {
-        child.unref();
-        done(true);
-      });
-    } catch (_error) {
-      resolve(false);
-    }
-  });
 }
 
 async function isBraveRunningLinux() {

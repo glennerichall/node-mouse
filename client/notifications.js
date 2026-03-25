@@ -3,7 +3,7 @@ export function bindClientNotifications(socket, root) {
     return;
   }
 
-  socket.on('notification', (payload = {}) => {
+  function pushToast(payload = {}) {
     const title = String(payload.title || 'Notification');
     const message = String(payload.message || '').trim();
     if (!message) {
@@ -37,6 +37,19 @@ export function bindClientNotifications(socket, root) {
         root.removeChild(toast);
       }
     }, ttlMs);
+  }
+
+  socket.on('notification', (payload = {}) => {
+    pushToast(payload);
+  });
+
+  socket.on('admin:result', (payload = {}) => {
+    console.log('Admin: result', payload);
+    // pushToast({
+    //   level: payload.ok ? 'info' : 'error',
+    //   title: `Admin: ${payload.action || 'action'}`,
+    //   message: String(payload.message || '').trim() || (payload.ok ? 'OK' : 'Echec'),
+    //   ttlMs: payload.ok ? 2200 : 3800,
+    // });
   });
 }
-

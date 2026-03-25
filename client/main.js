@@ -7,6 +7,7 @@ import { bindActionButtons } from './actions.js';
 import { bindConnectionOverlay } from './connection.js';
 import { bindPreviewStream } from './preview.js';
 import { bindClientNotifications } from './notifications.js';
+import { bindAdminDrawer } from './admin-menu.js';
 
 function getEntryTokenFromLocation() {
   const parts = window.location.pathname.split('/').filter(Boolean);
@@ -30,6 +31,11 @@ function initClient() {
   bindConnectionOverlay(socket, dom.connectionOverlay);
   bindPreviewStream(socket, dom);
   bindClientNotifications(socket, dom.notificationsRoot);
+  bindAdminDrawer({
+    app: dom.app,
+    touchpad: dom.touchpad,
+    scrim: dom.adminDrawerScrim,
+  });
 
   socket.on('entry:update', (payload = {}) => {
     const token = String(payload.token || '').trim();

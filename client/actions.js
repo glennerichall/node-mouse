@@ -4,6 +4,8 @@ export function bindActionButtons(
     btnEnter,
     btnBackspace,
     btnOpenBrave,
+    btnBrowserBack,
+    btnBrowserForward,
     btnPrevTab,
     btnNextTab,
     btnNewTab,
@@ -11,11 +13,20 @@ export function bindActionButtons(
     btnAddressBar,
     btnHardReload,
     btnFullscreen,
+    btnForceUpdateCheck,
+    btnInstallUpdate,
+    btnRestartService,
   },
 ) {
   btnEnter.addEventListener('click', () => socket.emit('keyboard:key', { key: 'enter' }));
   btnBackspace.addEventListener('click', () => socket.emit('keyboard:key', { key: 'backspace' }));
   btnOpenBrave.addEventListener('click', () => socket.emit('browser:brave'));
+  btnBrowserBack.addEventListener('click', () =>
+    socket.emit('keyboard:key', { key: 'left', modifiers: ['alt'] }),
+  );
+  btnBrowserForward.addEventListener('click', () =>
+    socket.emit('keyboard:key', { key: 'right', modifiers: ['alt'] }),
+  );
   btnPrevTab.addEventListener('click', () =>
     socket.emit('keyboard:key', { key: 'tab', modifiers: ['control', 'shift'] }),
   );
@@ -35,4 +46,8 @@ export function bindActionButtons(
     socket.emit('keyboard:key', { key: 'f5', modifiers: ['control'] }),
   );
   btnFullscreen.addEventListener('click', () => socket.emit('keyboard:key', { key: 'f11' }));
+
+  btnForceUpdateCheck.addEventListener('click', () => socket.emit('admin:update-check'));
+  btnInstallUpdate.addEventListener('click', () => socket.emit('admin:update-install'));
+  btnRestartService.addEventListener('click', () => socket.emit('admin:service-restart'));
 }

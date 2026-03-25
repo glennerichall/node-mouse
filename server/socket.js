@@ -4,6 +4,7 @@ export function registerSocketHandlers(io, {
   browser,
   preview,
   notifier,
+  adminActions,
   entryTokenManager,
   getEntryUrl,
 }) {
@@ -55,7 +56,38 @@ export function registerSocketHandlers(io, {
     });
 
     socket.on('browser:brave', async () => {
+      console.log(`Client ${socket.id.slice(0, 8)} demande Brave.`);
       await browser.focusOrLaunchBrave();
+    });
+
+    socket.on('admin:update-check', async () => {
+      console.log(`Client ${socket.id.slice(0, 8)} demande update check.`);
+      const result = await adminActions.forceUpdateCheck();
+      socket.emit('admin:result', {
+        action: 'update-check',
+        ok: result.ok,
+        message: result.message,
+      });
+    });
+
+    socket.on('admin:update-install', async () => {
+      console.log(`Client ${socket.id.slice(0, 8)} demande update install.`);
+      const result = await adminActions.installUpdate();
+      socket.emit('admin:result', {
+        action: 'update-install',
+        ok: result.ok,
+        message: result.message,
+      });
+    });
+
+    socket.on('admin:service-restart', async () => {
+      console.log(`Client ${socket.id.slice(0, 8)} demande service restart.`);
+      const result = await adminActions.restartService();
+      socket.emit('admin:result', {
+        action: 'service-restart',
+        ok: result.ok,
+        message: result.message,
+      });
     });
 
     socket.on('disconnect', () => {

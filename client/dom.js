@@ -1,5 +1,8 @@
 export function getDom() {
+  const app = document.getElementById('app');
   const touchpad = document.getElementById('touchpad');
+  const adminDrawerScrim = document.getElementById('admin-drawer-scrim');
+  const leftMenu = document.getElementById('left-menu');
   const keyboardPanel = document.getElementById('keyboard-panel');
   const textInput = document.getElementById('text-input');
 
@@ -10,6 +13,8 @@ export function getDom() {
   const btnBackspace = document.getElementById('btn-backspace');
   const btnSendText = document.getElementById('send-text');
   const btnOpenBrave = document.getElementById('btn-open-brave');
+  const btnBrowserBack = document.getElementById('btn-browser-back');
+  const btnBrowserForward = document.getElementById('btn-browser-forward');
   const btnPrevTab = document.getElementById('btn-prev-tab');
   const btnNextTab = document.getElementById('btn-next-tab');
   const btnNewTab = document.getElementById('btn-new-tab');
@@ -17,13 +22,18 @@ export function getDom() {
   const btnAddressBar = document.getElementById('btn-address-bar');
   const btnHardReload = document.getElementById('btn-hard-reload');
   const btnFullscreen = document.getElementById('btn-fullscreen');
+  const btnForceUpdateCheck = document.getElementById('btn-force-update-check');
+  const btnInstallUpdate = document.getElementById('btn-install-update');
+  const btnRestartService = document.getElementById('btn-restart-service');
   const connectionOverlay = document.getElementById('connection-overlay');
   const notificationsRoot = document.getElementById('client-notifications');
   const previewCanvas = document.getElementById('preview-canvas');
-  const previewLabel = document.getElementById('preview-label');
 
   return {
+    app,
     touchpad,
+    adminDrawerScrim,
+    leftMenu,
     keyboardPanel,
     textInput,
     btnKeyboard,
@@ -33,6 +43,8 @@ export function getDom() {
     btnBackspace,
     btnSendText,
     btnOpenBrave,
+    btnBrowserBack,
+    btnBrowserForward,
     btnPrevTab,
     btnNextTab,
     btnNewTab,
@@ -40,9 +52,11 @@ export function getDom() {
     btnAddressBar,
     btnHardReload,
     btnFullscreen,
+    btnForceUpdateCheck,
+    btnInstallUpdate,
+    btnRestartService,
     connectionOverlay,
     notificationsRoot,
     previewCanvas,
-    previewLabel,
   };
 }

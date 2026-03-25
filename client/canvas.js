@@ -1,4 +1,4 @@
-import { getRightScrollZoneWidth } from './gesture-zone.js';
+import { getRightScrollZoneLayout } from './gesture-zone.js';
 
 export function createCanvasUI(touchpad) {
   const ctx = touchpad.getContext('2d');
@@ -6,19 +6,18 @@ export function createCanvasUI(touchpad) {
   function drawHint() {
     const width = touchpad.clientWidth;
     const height = touchpad.clientHeight;
-    const scrollZoneWidth = getRightScrollZoneWidth(width);
-    const scrollZoneX = width - scrollZoneWidth;
+    const layout = getRightScrollZoneLayout(width, height);
 
     ctx.clearRect(0, 0, width, height);
 
     ctx.fillStyle = 'rgba(75, 212, 255, 0.16)';
-    ctx.fillRect(scrollZoneX, 0, scrollZoneWidth, height);
+    ctx.fillRect(layout.x, layout.y, layout.width, layout.height);
     ctx.strokeStyle = 'rgba(75, 212, 255, 0.5)';
     ctx.lineWidth = 1;
-    ctx.strokeRect(scrollZoneX + 0.5, 0.5, scrollZoneWidth - 1, height - 1);
+    ctx.strokeRect(layout.x + 0.5, layout.y + 0.5, layout.width - 1, layout.height - 1);
 
     ctx.save();
-    ctx.translate(scrollZoneX + scrollZoneWidth / 2, height / 2);
+    ctx.translate(layout.x + layout.width / 2, layout.y + layout.height / 2);
     ctx.rotate(-Math.PI / 2);
     ctx.fillStyle = 'rgba(75, 212, 255, 0.85)';
     ctx.font = '700 12px system-ui';
@@ -42,6 +41,11 @@ export function createCanvasUI(touchpad) {
     touchpad.width = Math.round(rect.width * ratio);
     touchpad.height = Math.round(rect.height * ratio);
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+    const layout = getRightScrollZoneLayout(touchpad.clientWidth, touchpad.clientHeight);
+    document.documentElement.style.setProperty('--scroll-zone-width', `${layout.width}px`);
+    document.documentElement.style.setProperty('--scroll-zone-edge-gap', `${layout.edgeGap}px`);
+
     drawHint();
   }
 

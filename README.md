@@ -84,6 +84,7 @@ Le serveur affiche:
 - `ENTRY_PATH_TOKEN_LENGTH` (longueur token, défaut `24`)
 - `ENTRY_PATH_ROTATE_INTERVAL_MIN` (rotation token en minutes, défaut `60`)
 - `ENTRY_PATH_GRACE_MIN` (grâce anciens tokens en minutes, défaut `120`)
+- `ENTRY_PATH_STATE_FILE` (fichier JSON de persistance du token + horodatage de rotation)
 - `TOP_BAR_OFFSET_PX` (offset vertical pour l'overlay QR `yad`, défaut `32`)
 - `QR_OVERLAY_ENABLED` (`true`/`false`, défaut `true`)
 - `QR_OVERLAY_SIZE` (taille du QR `yad`, défaut `75`)
@@ -94,10 +95,21 @@ Le serveur affiche:
 - `DESKTOP_NOTIFICATIONS_ENABLED` (notifications système serveur, défaut `true`)
 - `CLIENT_NOTIFICATIONS_ENABLED` (notifications push vers clients, défaut `true`)
 - `NOTIFICATION_TTL_MS` (durée d'affichage des notifications, défaut `2200`)
+- `ADMIN_ACTIONS_ENABLED` (autorise les actions admin depuis client, défaut `true`)
+- `SERVICE_NAME` (service systemd --user à redémarrer, défaut `remote-mouse.service`)
 - `UPDATE_CHECK_ENABLED` (vérif de nouvelle version, défaut `false`)
+- `UPDATE_CHECK_SOURCE` (`auto`, `npm`, `git`; défaut `auto`)
 - `UPDATE_CHECK_INTERVAL_MIN` (intervalle de vérif en minutes, défaut `360`)
 - `UPDATE_CHECK_PACKAGE` (package npm cible pour update check, défaut nom local)
 - `UPDATE_CHECK_CURRENT_VERSION` (version courante forcée, défaut version locale)
+- `UPDATE_CHECK_GIT_REMOTE` (remote git pour update check, défaut `origin`)
+- `UPDATE_CHECK_GIT_REF` (ref git à vérifier, défaut `HEAD`)
+- `UPDATE_INSTALL_COMMAND` (commande shell d'installation update, vide par défaut; fallback auto via source update)
+- `UPDATE_INSTALL_TIMEOUT_SEC` (timeout installation update, défaut `600`)
+
+Fallback install update:
+- Si `UPDATE_INSTALL_COMMAND` est vide, le serveur utilise une commande déduite de la source d'update.
+- Pour `npm` et `git`, la commande construite est `npm update -g <UPDATE_CHECK_PACKAGE> --force`.
 
 Exemple:
 
@@ -124,6 +136,10 @@ ENTRY_PATH_FIXED=remote-control-secret
 Note securite:
 - Si `ENTRY_PATH_ENABLED=true`, l'application n'est accessible que via `/<token>/...`.
 - Les routes `qr`, `state`, `health` et l'UI ne sont plus accessibles directement à la racine.
+
+Persistance du token:
+- Par défaut, le token d'entrée aléatoire et son timestamp de rotation sont sauvegardés sur disque.
+- Après redémarrage du serveur, le même token est réutilisé et la rotation conserve son échéance.
 
 Exemple HTTPS (certificat local):
 

@@ -1,6 +1,6 @@
 import os from 'os';
 import path from 'path';
-import { execFile, spawn } from 'child_process';
+import { spawn } from 'child_process';
 import QRCode from 'qrcode';
 import {
   QR_OVERLAY_ENABLED,
@@ -9,18 +9,7 @@ import {
   QR_OVERLAY_MARGIN,
   HAS_GRAPHICAL_DISPLAY,
 } from '../utils/config.js';
-
-function runExecFile(command, args) {
-  return new Promise((resolve) => {
-    execFile(command, args, { timeout: 3000 }, (error) => {
-      resolve(!error);
-    });
-  });
-}
-
-async function commandExists(command) {
-  return runExecFile('which', [command]);
-}
+import { commandExists } from '../utils/process.js';
 
 export async function startQrOverlay({ url, robot }) {
   if (!QR_OVERLAY_ENABLED) {

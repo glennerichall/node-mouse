@@ -8,21 +8,32 @@
 </head>
 <body>
   <main id="app">
-    <nav id="browser-shortcuts" aria-label="Raccourcis navigateur">
-      <button id="btn-open-brave" type="button" aria-label="Ouvrir ou focus Brave" title="Brave">Br</button>
-      <button id="btn-prev-tab" type="button" aria-label="Onglet précédent" title="Ctrl+Shift+Tab">◀</button>
-      <button id="btn-next-tab" type="button" aria-label="Onglet suivant" title="Ctrl+Tab">▶</button>
-      <button id="btn-new-tab" type="button" aria-label="Nouvel onglet" title="Ctrl+T">＋</button>
-      <button id="btn-close-tab" type="button" aria-label="Fermer onglet" title="Ctrl+W">✕</button>
-      <button id="btn-address-bar" type="button" aria-label="Barre d'adresse" title="Ctrl+L">⌕</button>
-      <button id="btn-hard-reload" type="button" aria-label="Recharger" title="Ctrl+F5">↻</button>
-      <button id="btn-fullscreen" type="button" aria-label="Plein écran" title="F11">⛶</button>
-    </nav>
+    <section id="workspace" aria-label="Remote workspace">
+      <aside id="left-menu" aria-label="Actions serveur">
+        <button id="btn-force-update-check" type="button" title="Forcer la vérification de mise à jour" aria-label="Forcer la vérification de mise à jour">Vérifier MAJ</button>
+        <button id="btn-install-update" type="button" title="Installer la mise à jour" aria-label="Installer la mise à jour">Installer MAJ</button>
+        <button id="btn-restart-service" type="button" title="Redémarrer le service" aria-label="Redémarrer le service">Redémarrer service</button>
+      </aside>
 
-    <canvas id="touchpad"></canvas>
-    <section id="cursor-preview" aria-label="Aperçu sous curseur">
-      <canvas id="preview-canvas" width="128" height="84"></canvas>
-      <span id="preview-label">Preview</span>
+      <section id="touch-area">
+        <div id="admin-drawer-scrim" aria-hidden="true"></div>
+        <nav id="browser-shortcuts" aria-label="Raccourcis navigateur">
+          <button id="btn-open-brave" type="button" aria-label="Ouvrir ou focus Brave" title="Brave">Br</button>
+          <button id="btn-browser-back" type="button" aria-label="Page précédente" title="Alt+Left">⟵</button>
+          <button id="btn-browser-forward" type="button" aria-label="Page suivante" title="Alt+Right">⟶</button>
+          <button id="btn-prev-tab" type="button" aria-label="Onglet précédent" title="Ctrl+Shift+Tab">◀</button>
+          <button id="btn-next-tab" type="button" aria-label="Onglet suivant" title="Ctrl+Tab">▶</button>
+          <button id="btn-new-tab" type="button" aria-label="Nouvel onglet" title="Ctrl+T">＋</button>
+          <button id="btn-close-tab" type="button" aria-label="Fermer onglet" title="Ctrl+W">✕</button>
+          <button id="btn-address-bar" type="button" aria-label="Barre d'adresse" title="Ctrl+L">⌕</button>
+          <button id="btn-hard-reload" type="button" aria-label="Recharger" title="Ctrl+F5">↻</button>
+          <button id="btn-fullscreen" type="button" aria-label="Plein écran" title="F11">⛶</button>
+        </nav>
+        <canvas id="touchpad"></canvas>
+        <section id="cursor-preview" aria-label="Aperçu sous curseur">
+          <canvas id="preview-canvas" width="128" height="84"></canvas>
+        </section>
+      </section>
     </section>
 
     <section id="keyboard-panel" class="hidden" aria-label="Clavier">

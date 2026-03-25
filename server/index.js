@@ -20,14 +20,22 @@ import {
   DESKTOP_NOTIFICATIONS_ENABLED,
   CLIENT_NOTIFICATIONS_ENABLED,
   UPDATE_CHECK_ENABLED,
+  UPDATE_CHECK_SOURCE,
   UPDATE_CHECK_INTERVAL_MIN,
   UPDATE_CHECK_PACKAGE,
   UPDATE_CHECK_CURRENT_VERSION,
+  UPDATE_CHECK_GIT_REMOTE,
+  UPDATE_CHECK_GIT_REF,
+  ADMIN_ACTIONS_ENABLED,
+  SERVICE_NAME,
+  UPDATE_INSTALL_COMMAND,
+  UPDATE_INSTALL_TIMEOUT_SEC,
   ENTRY_PATH_ENABLED,
   ENTRY_PATH_FIXED,
   ENTRY_PATH_TOKEN_LENGTH,
   ENTRY_PATH_ROTATE_INTERVAL_MIN,
   ENTRY_PATH_GRACE_MIN,
+  ENTRY_PATH_STATE_FILE,
   QR_OVERLAY_SIZE,
   QR_OVERLAY_MARGIN,
   HAS_GRAPHICAL_DISPLAY,
@@ -41,6 +49,7 @@ import { createBrowserController } from './browser.js';
 import { createPreviewStreamer } from './preview.js';
 import { createNotifier } from './notifier.js';
 import { startUpdateChecker } from './update-check.js';
+import { createAdminActions, notifyIfRestarted } from './admin-actions.js';
 import { startQrOverlay } from './qr-overlay.js';
 import { createEntryTokenManager } from './entry-token.js';
 import { registerHttpRoutes } from './http.js';
@@ -59,6 +68,7 @@ export async function startServer() {
     tokenLength: ENTRY_PATH_TOKEN_LENGTH,
     rotateIntervalMin: ENTRY_PATH_ROTATE_INTERVAL_MIN,
     graceMin: ENTRY_PATH_GRACE_MIN,
+    stateFilePath: ENTRY_PATH_STATE_FILE,
   });
 
   const robot = loadRobotOrExit();
@@ -88,16 +98,20 @@ export async function startServer() {
   });
   app.use(entryTokenManager.makeHttpGuardMiddleware(), router);
 
+  const updateChecker = await startUpdateChecker(notifier);
+  const adminActions = createAdminActions({ notifier, updateChecker });
+
   registerSocketHandlers(io, {
     mouse,
     keyboard,
     browser,
     preview,
     notifier,
+    adminActions,
     entryTokenManager,
     getEntryUrl: () => entryUrl,
   });
-  startUpdateChecker(notifier);
+  notifyIfRestarted(notifier);
   entryTokenManager.startAutoRotation(async () => {
     entryUrl = entryTokenManager.getEntryUrl(basePublicUrl);
     qrDataUrl = await QRCode.toDataURL(entryUrl);
@@ -145,12 +159,17 @@ function logStartupConfig({ protocol, entryTokenManager, entryUrl }) {
   console.log(`- entryUrl: ${entryUrl}`);
   console.log(`- entryPathRotateMin: ${ENTRY_PATH_ROTATE_INTERVAL_MIN}`);
   console.log(`- entryPathGraceMin: ${ENTRY_PATH_GRACE_MIN}`);
+  console.log(`- entryPathStateFile: ${ENTRY_PATH_STATE_FILE}`);
   console.log(`- mouseSpeed: ${MOUSE_SPEED}`);
   console.log(`- scrollSpeed: ${SCROLL_SPEED}`);
   console.log(`- preview: ${PREVIEW_WIDTH}x${PREVIEW_HEIGHT} @ ${PREVIEW_FPS}fps`);
   console.log(`- desktopNotifications: ${DESKTOP_NOTIFICATIONS_ENABLED}`);
   console.log(`- clientNotifications: ${CLIENT_NOTIFICATIONS_ENABLED}`);
-  console.log(`- updateCheck: enabled=${UPDATE_CHECK_ENABLED} every=${UPDATE_CHECK_INTERVAL_MIN}min package=${UPDATE_CHECK_PACKAGE || '(none)'} current=${UPDATE_CHECK_CURRENT_VERSION || '(none)'}`);
+  console.log(`- adminActionsEnabled: ${ADMIN_ACTIONS_ENABLED}`);
+  console.log(`- serviceName: ${SERVICE_NAME}`);
+  console.log(`- updateInstallCommand: ${UPDATE_INSTALL_COMMAND || '(unset)'}`);
+  console.log(`- updateInstallTimeoutSec: ${UPDATE_INSTALL_TIMEOUT_SEC}`);
+  console.log(`- updateCheck: enabled=${UPDATE_CHECK_ENABLED} source=${UPDATE_CHECK_SOURCE} every=${UPDATE_CHECK_INTERVAL_MIN}min package=${UPDATE_CHECK_PACKAGE || '(none)'} current=${UPDATE_CHECK_CURRENT_VERSION || '(none)'} git=${UPDATE_CHECK_GIT_REMOTE}/${UPDATE_CHECK_GIT_REF}`);
   console.log(`- qrOverlay: size=${QR_OVERLAY_SIZE}px margin=${QR_OVERLAY_MARGIN}px topOffset=${TOP_BAR_OFFSET_PX}px`);
   console.log(`- graphicalDisplay: ${HAS_GRAPHICAL_DISPLAY}`);
   console.log(`- httpsEnabled: ${HTTPS_ENABLED}`);

@@ -1,5 +1,5 @@
 import { createAccumulatedThrottle } from './throttle.js';
-import { getRightScrollZoneWidth } from './gesture-zone.js';
+import { getRightScrollZoneLayout } from './gesture-zone.js';
 
 function distance(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
@@ -57,8 +57,14 @@ export function bindTouchpad(socket, touchpad) {
     if (touches.length === 1) {
       const t = touches[0];
       const rect = touchpad.getBoundingClientRect();
-      const zoneWidth = getRightScrollZoneWidth(rect.width);
-      const inRightZone = t.clientX >= rect.right - zoneWidth;
+      const layout = getRightScrollZoneLayout(rect.width, rect.height);
+      const localX = t.clientX - rect.left;
+      const localY = t.clientY - rect.top;
+      const inRightZone =
+        localX >= layout.x
+        && localX <= layout.x + layout.width
+        && localY >= layout.y
+        && localY <= layout.y + layout.height;
       state.oneFinger = { x: t.clientX, y: t.clientY };
       state.oneFingerMode = inRightZone ? 'scroll' : 'move';
       state.twoFinger = null;
