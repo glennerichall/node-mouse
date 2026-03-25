@@ -6,6 +6,7 @@ import { bindMouseButtons } from './mouse.js';
 import { bindActionButtons } from './actions.js';
 import { bindConnectionOverlay } from './connection.js';
 import { bindPreviewStream } from './preview.js';
+import { bindClientNotifications } from './notifications.js';
 
 function initClient() {
   const socket = io();
@@ -18,6 +19,7 @@ function initClient() {
   bindActionButtons(socket, dom);
   bindConnectionOverlay(socket, dom.connectionOverlay);
   bindPreviewStream(socket, dom);
+  bindClientNotifications(socket, dom.notificationsRoot);
 
   window.addEventListener('resize', canvasUI.resize);
   canvasUI.resize();

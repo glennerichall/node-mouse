@@ -1,6 +1,11 @@
-export function registerSocketHandlers(io, { mouse, keyboard, browser, preview }) {
+export function registerSocketHandlers(io, { mouse, keyboard, browser, preview, notifier }) {
   io.on('connection', (socket) => {
     console.log(`Client connecté: ${socket.id}`);
+    notifier.notify({
+      level: 'info',
+      title: 'Client connecte',
+      message: `Client ${socket.id.slice(0, 8)} connecte.`,
+    });
     const previewSession = preview.startForSocket(socket);
 
     socket.on('mouse:move', (payload = {}) => {
@@ -33,6 +38,11 @@ export function registerSocketHandlers(io, { mouse, keyboard, browser, preview }
     socket.on('disconnect', () => {
       previewSession.stop();
       console.log(`Client déconnecté: ${socket.id}`);
+      notifier.notify({
+        level: 'info',
+        title: 'Client deconnecte',
+        message: `Client ${socket.id.slice(0, 8)} deconnecte.`,
+      });
     });
   });
 }

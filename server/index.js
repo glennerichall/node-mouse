@@ -17,6 +17,12 @@ import {
   PREVIEW_WIDTH,
   PREVIEW_HEIGHT,
   PREVIEW_FPS,
+  DESKTOP_NOTIFICATIONS_ENABLED,
+  CLIENT_NOTIFICATIONS_ENABLED,
+  UPDATE_CHECK_ENABLED,
+  UPDATE_CHECK_INTERVAL_MIN,
+  UPDATE_CHECK_PACKAGE,
+  UPDATE_CHECK_CURRENT_VERSION,
   QR_OVERLAY_SIZE,
   QR_OVERLAY_MARGIN,
   HAS_GRAPHICAL_DISPLAY,
@@ -28,6 +34,8 @@ import { createMouseController } from '../mouse/index.js';
 import { createKeyboardController } from '../keyboard/index.js';
 import { createBrowserController } from './browser.js';
 import { createPreviewStreamer } from './preview.js';
+import { createNotifier } from './notifier.js';
+import { startUpdateChecker } from './update-check.js';
 import { startQrOverlay } from './qr-overlay.js';
 import { registerHttpRoutes } from './http.js';
 import { registerSocketHandlers } from './socket.js';
@@ -38,6 +46,7 @@ export async function startServer() {
     ? createHttpsServer(app)
     : http.createServer(app);
   const io = new Server(server);
+  const notifier = createNotifier(io);
 
   const robot = loadRobotOrExit();
   const mouse = createMouseController(robot, {
@@ -65,7 +74,8 @@ export async function startServer() {
   });
   app.use(router);
 
-  registerSocketHandlers(io, { mouse, keyboard, browser, preview });
+  registerSocketHandlers(io, { mouse, keyboard, browser, preview, notifier });
+  startUpdateChecker(notifier);
 
   server.listen(PORT, () => {
     logStartupConfig({ protocol });
@@ -85,6 +95,9 @@ function logStartupConfig({ protocol }) {
   console.log(`- mouseSpeed: ${MOUSE_SPEED}`);
   console.log(`- scrollSpeed: ${SCROLL_SPEED}`);
   console.log(`- preview: ${PREVIEW_WIDTH}x${PREVIEW_HEIGHT} @ ${PREVIEW_FPS}fps`);
+  console.log(`- desktopNotifications: ${DESKTOP_NOTIFICATIONS_ENABLED}`);
+  console.log(`- clientNotifications: ${CLIENT_NOTIFICATIONS_ENABLED}`);
+  console.log(`- updateCheck: enabled=${UPDATE_CHECK_ENABLED} every=${UPDATE_CHECK_INTERVAL_MIN}min package=${UPDATE_CHECK_PACKAGE || '(none)'} current=${UPDATE_CHECK_CURRENT_VERSION || '(none)'}`);
   console.log(`- qrOverlay: size=${QR_OVERLAY_SIZE}px margin=${QR_OVERLAY_MARGIN}px topOffset=${TOP_BAR_OFFSET_PX}px`);
   console.log(`- graphicalDisplay: ${HAS_GRAPHICAL_DISPLAY}`);
   console.log(`- httpsEnabled: ${HTTPS_ENABLED}`);

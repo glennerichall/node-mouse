@@ -198,6 +198,44 @@ body {
   font-size: 0.9rem;
 }
 
+#client-notifications {
+  position: fixed;
+  right: 10px;
+  top: calc(58px + env(safe-area-inset-top));
+  z-index: 50;
+  display: grid;
+  gap: 8px;
+  max-width: min(88vw, 360px);
+}
+
+.toast {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(17, 24, 29, 0.92);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.toast.warning {
+  border-color: rgba(255, 201, 107, 0.6);
+}
+
+.toast.error {
+  border-color: rgba(255, 111, 111, 0.65);
+}
+
+.toast .toast-title {
+  margin: 0 0 4px;
+  font-weight: 700;
+}
+
+.toast .toast-msg {
+  margin: 0;
+  opacity: 0.92;
+}
+
 @media (min-width: 820px) {
   #touchpad {
     height: calc(100% - 72px);

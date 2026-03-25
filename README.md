@@ -80,11 +80,19 @@ Le serveur affiche:
 - `SSL_KEY_PATH` (chemin de la clé privée PEM)
 - `SSL_CERT_PATH` (chemin du certificat PEM)
 - `TOP_BAR_OFFSET_PX` (offset vertical pour l'overlay QR `yad`, défaut `32`)
+- `QR_OVERLAY_ENABLED` (`true`/`false`, défaut `true`)
 - `QR_OVERLAY_SIZE` (taille du QR `yad`, défaut `75`)
 - `QR_OVERLAY_MARGIN` (marge droite du QR `yad`, défaut `14`)
 - `PREVIEW_WIDTH` (largeur de la preview souris, défaut `128`)
 - `PREVIEW_HEIGHT` (hauteur de la preview souris, défaut `84`)
 - `PREVIEW_FPS` (fréquence preview, défaut `6`)
+- `DESKTOP_NOTIFICATIONS_ENABLED` (notifications système serveur, défaut `true`)
+- `CLIENT_NOTIFICATIONS_ENABLED` (notifications push vers clients, défaut `true`)
+- `NOTIFICATION_TTL_MS` (durée d'affichage des notifications, défaut `2200`)
+- `UPDATE_CHECK_ENABLED` (vérif de nouvelle version, défaut `false`)
+- `UPDATE_CHECK_INTERVAL_MIN` (intervalle de vérif en minutes, défaut `360`)
+- `UPDATE_CHECK_PACKAGE` (package npm cible pour update check, défaut nom local)
+- `UPDATE_CHECK_CURRENT_VERSION` (version courante forcée, défaut version locale)
 
 Exemple:
 

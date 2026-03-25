@@ -3,6 +3,7 @@ import path from 'path';
 import { execFile, spawn } from 'child_process';
 import QRCode from 'qrcode';
 import {
+  QR_OVERLAY_ENABLED,
   TOP_BAR_OFFSET_PX,
   QR_OVERLAY_SIZE,
   QR_OVERLAY_MARGIN,
@@ -22,6 +23,10 @@ async function commandExists(command) {
 }
 
 export async function startQrOverlay({ url, robot }) {
+  if (!QR_OVERLAY_ENABLED) {
+    return null;
+  }
+
   if (os.platform() !== 'linux') {
     return null;
   }

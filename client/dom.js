@@ -18,6 +18,7 @@ export function getDom() {
   const btnHardReload = document.getElementById('btn-hard-reload');
   const btnFullscreen = document.getElementById('btn-fullscreen');
   const connectionOverlay = document.getElementById('connection-overlay');
+  const notificationsRoot = document.getElementById('client-notifications');
   const previewCanvas = document.getElementById('preview-canvas');
   const previewLabel = document.getElementById('preview-label');
 
@@ -40,6 +41,7 @@ export function getDom() {
     btnHardReload,
     btnFullscreen,
     connectionOverlay,
+    notificationsRoot,
     previewCanvas,
     previewLabel,
   };
