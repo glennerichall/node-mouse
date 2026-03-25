@@ -14,6 +14,20 @@ Application de télécommande souris/clavier depuis un appareil mobile.
 
 ## Prérequis système (Linux)
 
+Node.js est requis (version 20+ recommandée):
+
+```bash
+node -v
+npm -v
+```
+
+Si Node.js n'est pas installé (Debian/Ubuntu):
+
+```bash
+sudo apt-get update
+sudo apt-get install -y nodejs npm
+```
+
 `@hurdlegroup/robotjs` nécessite des bibliothèques natives X11.
 
 Exemple Debian/Ubuntu:
@@ -105,6 +119,7 @@ Après installation globale (`npm install -g .` ou paquet publié):
 
 ```bash
 NPM_PREFIX="$(npm prefix -g)"
+NODE_BIN_DIR="$(dirname "$(command -v node)")"
 mkdir -p ~/.config/systemd/user
 cat > ~/.config/systemd/user/remote-mouse.service <<EOF
 [Unit]
@@ -118,15 +133,21 @@ ExecStart=${NPM_PREFIX}/bin/remote-mouse
 Restart=on-failure
 RestartSec=2
 Environment=NODE_ENV=production
+Environment=XDG_RUNTIME_DIR=/run/user/%U
+Environment=PATH=${NODE_BIN_DIR}:${NPM_PREFIX}/bin:/usr/local/bin:/usr/bin:/bin
+PassEnvironment=DISPLAY WAYLAND_DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS
 
 [Install]
 WantedBy=default.target
 EOF
 
+systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS
 systemctl --user daemon-reload
 systemctl --user enable --now remote-mouse.service
 systemctl --user status remote-mouse.service
 ```
+
+Note: sans ces variables de session graphique, l'overlay QR `yad` peut ne pas apparaître quand le serveur est lancé via `systemd --user`.
 
 Voir les logs:
 
