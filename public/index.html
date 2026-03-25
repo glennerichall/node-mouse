@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Remote Mouse</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main id="app">
+    <nav id="browser-shortcuts" aria-label="Raccourcis navigateur">
+      <button id="btn-open-brave" type="button" aria-label="Ouvrir ou focus Brave" title="Brave">Br</button>
+      <button id="btn-prev-tab" type="button" aria-label="Onglet précédent" title="Ctrl+Shift+Tab">◀</button>
+      <button id="btn-next-tab" type="button" aria-label="Onglet suivant" title="Ctrl+Tab">▶</button>
+      <button id="btn-new-tab" type="button" aria-label="Nouvel onglet" title="Ctrl+T">＋</button>
+      <button id="btn-close-tab" type="button" aria-label="Fermer onglet" title="Ctrl+W">✕</button>
+      <button id="btn-address-bar" type="button" aria-label="Barre d'adresse" title="Ctrl+L">⌕</button>
+      <button id="btn-hard-reload" type="button" aria-label="Recharger" title="Ctrl+F5">↻</button>
+      <button id="btn-fullscreen" type="button" aria-label="Plein écran" title="F11">⛶</button>
+    </nav>
+
+    <canvas id="touchpad"></canvas>
+
+    <section id="keyboard-panel" class="hidden" aria-label="Clavier">
+      <textarea id="text-input" placeholder="Saisir du texte à envoyer"></textarea>
+      <button id="send-text" type="button">Envoyer</button>
+    </section>
+
+    <nav id="menu" aria-label="Actions">
+      <button id="btn-keyboard" type="button">Clavier</button>
+      <button id="btn-left" type="button">Clic G</button>
+      <button id="btn-right" type="button">Clic D</button>
+      <button id="btn-enter" type="button">Entrée</button>
+      <button id="btn-backspace" type="button">⌫</button>
+    </nav>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="/client/main.js"></script>
+</body>
+</html>
