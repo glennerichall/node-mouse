@@ -1,4 +1,4 @@
-import { getRightScrollZoneLayout } from './gesture-zone.js';
+import { getRightScrollZoneLayout } from '../touch/gesture-zone.js';
 
 export function createCanvasUI(touchpad) {
   const ctx = touchpad.getContext('2d');

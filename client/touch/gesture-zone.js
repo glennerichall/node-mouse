@@ -1,6 +1,4 @@
-function clamp(value, min, max) {
-  return Math.min(Math.max(value, min), max);
-}
+import { clamp } from '../../utils/math.js';
 
 export function getRightScrollZoneWidth(width) {
   return clamp(Math.round(width * 0.11), 36, 64);

@@ -1,11 +1,12 @@
 import express from 'express';
 import { renderQrPage } from '../utils/qr.js';
 
-export function registerHttpRoutes({ publicDir, clientDir, getPublicUrl, getQrDataUrl }) {
+export function registerHttpRoutes({ publicDir, clientDir, utilsDir, getPublicUrl, getQrDataUrl }) {
   const router = express.Router();
 
   router.use(express.static(publicDir));
   router.use('/client', express.static(clientDir));
+  router.use('/utils', express.static(utilsDir));
 
   router.get('/health', (_req, res) => {
     res.json({ ok: true });

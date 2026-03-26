@@ -1,62 +1,9 @@
-import { getDom } from './dom.js';
-import { createCanvasUI } from './canvas.js';
-import { bindTouchpad } from './touchpad.js';
-import { bindKeyboardPanel } from './keyboard.js';
-import { bindMouseButtons } from './mouse.js';
-import { bindActionButtons } from './actions.js';
-import { bindConnectionOverlay } from './connection.js';
-import { bindPreviewStream } from './preview.js';
-import { bindClientNotifications } from './notifications.js';
-import { bindAdminDrawer } from './admin-menu.js';
-
-function getEntryTokenFromLocation() {
-  const parts = window.location.pathname.split('/').filter(Boolean);
-  return parts[0] || '';
-}
+import { initSocketIo } from './core/init-socket-io.js';
+import { initUi } from './core/init-ui.js';
 
 function initClient() {
-  let entryToken = getEntryTokenFromLocation();
-  const socket = io({
-    auth: {
-      entryToken,
-    },
-  });
-  const dom = getDom();
-
-  const canvasUI = createCanvasUI(dom.touchpad);
-  bindTouchpad(socket, dom.touchpad);
-  bindKeyboardPanel(socket, dom);
-  bindMouseButtons(socket, dom);
-  bindActionButtons(socket, dom);
-  bindConnectionOverlay(socket, dom.connectionOverlay);
-  bindPreviewStream(socket, dom);
-  bindClientNotifications(socket, dom.notificationsRoot);
-  bindAdminDrawer({
-    app: dom.app,
-    touchpad: dom.touchpad,
-    scrim: dom.adminDrawerScrim,
-  });
-
-  socket.on('entry:update', (payload = {}) => {
-    const token = String(payload.token || '').trim();
-    if (!token) {
-      return;
-    }
-
-    entryToken = token;
-    socket.auth = {
-      ...(socket.auth || {}),
-      entryToken,
-    };
-
-    const nextPath = `/${token}/`;
-    if (window.location.pathname !== nextPath) {
-      window.history.replaceState({}, '', nextPath);
-    }
-  });
-
-  window.addEventListener('resize', canvasUI.resize);
-  canvasUI.resize();
+  const socket = initSocketIo();
+  initUi(socket);
 }
 
 initClient();

@@ -1,4 +1,4 @@
-import { clamp } from '../utils/math.js';
+import { clamp } from '../../utils/math.js';
 
 export function createMouseController(robot, { mouseSpeed, scrollSpeed }) {
   let scrollRemainder = 0;

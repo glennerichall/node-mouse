@@ -40,20 +40,23 @@ import {
   QR_OVERLAY_MARGIN,
   HAS_GRAPHICAL_DISPLAY,
 } from '../utils/config.js';
-import { publicDir, clientDir } from '../utils/paths.js';
+import { publicDir, clientDir, utilsDir } from '../utils/paths.js';
 import { getPublicUrl } from '../utils/network.js';
 import { loadRobotOrExit } from '../utils/robot.js';
-import { createMouseController } from '../mouse/index.js';
-import { createKeyboardController } from '../keyboard/index.js';
+import { createMouseController } from './controllers/mouse-controller.js';
+import { createKeyboardController } from './controllers/keyboard-controller.js';
 import { createBrowserController } from './browser.js';
 import { createPreviewStreamer } from './preview.js';
 import { createNotifier } from './notifier.js';
-import { startUpdateChecker } from './update-check.js';
-import { createAdminActions, notifyIfRestarted } from './admin-actions.js';
+import { startUpdateChecker } from './update-check/index.js';
 import { startQrOverlay } from './qr-overlay.js';
 import { createEntryTokenManager } from './entry-token.js';
 import { registerHttpRoutes } from './http.js';
 import { registerSocketHandlers } from './socket.js';
+import {
+  createAdminActions,
+  notifyIfRestarted
+} from "./admin-actions/index.js";
 
 export async function startServer() {
   const app = express();
@@ -93,6 +96,7 @@ export async function startServer() {
   const router = registerHttpRoutes({
     publicDir,
     clientDir,
+    utilsDir,
     getPublicUrl: () => entryUrl,
     getQrDataUrl: () => qrDataUrl,
   });
