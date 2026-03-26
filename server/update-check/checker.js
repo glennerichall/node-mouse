@@ -12,6 +12,7 @@ export class UpdateChecker {
     try {
       const result = await this.source.check();
       if (!result || !result.hasUpdate || !result.key || result.key === this.lastKey) {
+        console.log('Update check: no update');
         return {
           checked: true,
           hasUpdate: false,
@@ -31,6 +32,7 @@ export class UpdateChecker {
         key: result.key,
       };
     } catch (_error) {
+      console.error('Update check: error', _error);
       return {
         checked: false,
         hasUpdate: false,

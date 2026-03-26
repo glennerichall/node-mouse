@@ -8,8 +8,8 @@ import {
   QR_OVERLAY_SIZE,
   QR_OVERLAY_MARGIN,
   HAS_GRAPHICAL_DISPLAY,
-} from '../utils/config.js';
-import { commandExists } from '../utils/process.js';
+} from '../config.js';
+import { commandExists } from '../../utils/process.js';
 
 export async function startQrOverlay({ url, robot }) {
   if (!QR_OVERLAY_ENABLED) {

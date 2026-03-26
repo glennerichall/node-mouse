@@ -1,5 +1,4 @@
-import os from 'os';
-import { commandExists, execFileAsync, spawnDetached } from '../utils/process.js';
+import { commandExists, execFileAsync, spawnDetached } from '../../../utils/process.js';
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -75,8 +74,6 @@ async function focusBraveWithXdotool() {
   }
 
   await execFileAsync('xdotool', ['windowraise', target]);
-
-  // Maximize when possible via wmctrl if installed.
   if (await commandExists('wmctrl')) {
     await execFileAsync('wmctrl', ['-ir', target, '-b', 'add,maximized_vert,maximized_horz']);
   }
@@ -88,16 +85,13 @@ async function focusOrMaximizeBraveLinux() {
   if (await focusBraveWithWmctrl()) {
     return true;
   }
-
   if (await focusBraveWithXdotool()) {
     return true;
   }
-
   return false;
 }
 
 async function ensureFocusedAndMaximizedAfterLaunch() {
-  // Au demarrage, la fenetre peut apparaitre apres plusieurs centaines de ms.
   for (let attempt = 0; attempt < 10; attempt += 1) {
     const done = await focusOrMaximizeBraveLinux();
     if (done) {
@@ -108,64 +102,33 @@ async function ensureFocusedAndMaximizedAfterLaunch() {
   return false;
 }
 
-export function createBrowserController() {
-  let inFlight = false;
+async function tryLaunchBrave() {
+  const launchers = [
+    ['brave-browser', []],
+    ['brave', []],
+    ['flatpak', ['run', 'com.brave.Browser']],
+  ];
 
-  async function tryLaunchBrave() {
-    const launchers = [
-      ['brave-browser', []],
-      ['brave', []],
-      ['flatpak', ['run', 'com.brave.Browser']],
-    ];
-
-    for (const [command, args] of launchers) {
-      const launched = await spawnDetached(command, args);
-      if (launched) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  async function focusOrLaunchBrave() {
-    if (inFlight) {
-      return;
-    }
-    inFlight = true;
-
-    try {
-      const platform = os.platform();
-
-      if (platform === 'linux') {
-        const running = await isBraveRunningLinux();
-
-        if (running) {
-          await focusOrMaximizeBraveLinux();
-          // Brave deja lance: on ne cree jamais une deuxieme instance ici.
-          return;
-        }
-
-        const launched = await tryLaunchBrave();
-        if (launched) {
-          await sleep(400);
-          await ensureFocusedAndMaximizedAfterLaunch();
-        }
-        return;
-      }
-
-      if (platform === 'darwin') {
-        await execFileAsync('open', ['-a', 'Brave Browser']);
-        return;
-      }
-
-      if (platform === 'win32') {
-        await execFileAsync('powershell', ['-NoProfile', '-Command', 'Start-Process brave']);
-      }
-    } finally {
-      inFlight = false;
+  for (const [command, args] of launchers) {
+    const launched = await spawnDetached(command, args);
+    if (launched) {
+      return true;
     }
   }
 
-  return { focusOrLaunchBrave };
+  return false;
+}
+
+export async function focusOrLaunchBraveLinux() {
+  const running = await isBraveRunningLinux();
+  if (running) {
+    await focusOrMaximizeBraveLinux();
+    return;
+  }
+
+  const launched = await tryLaunchBrave();
+  if (launched) {
+    await sleep(400);
+    await ensureFocusedAndMaximizedAfterLaunch();
+  }
 }

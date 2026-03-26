@@ -13,12 +13,14 @@ export function initUi(socket) {
   const dom = getDom();
   const canvasUI = createCanvasUI(dom.touchpad);
 
-  bindTouchpad(socket, dom.touchpad);
+  const preview = bindPreviewStream(socket, dom);
+  bindTouchpad(socket, dom.touchpad, {
+    onMouseMove: preview.onMouseMoveActivity,
+  });
   bindKeyboardPanel(socket, dom);
   bindMouseButtons(socket, dom);
   bindActionButtons(socket, dom);
   bindConnectionOverlay(socket, dom.connectionOverlay);
-  bindPreviewStream(socket, dom);
   bindClientNotifications(socket, dom.notificationsRoot);
   bindAdminDrawer({
     app: dom.app,

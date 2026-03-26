@@ -28,6 +28,7 @@ export function getDom() {
   const connectionOverlay = document.getElementById('connection-overlay');
   const notificationsRoot = document.getElementById('client-notifications');
   const previewCanvas = document.getElementById('preview-canvas');
+  const cursorPreview = document.getElementById('cursor-preview');
 
   return {
     app,
@@ -58,5 +59,6 @@ export function getDom() {
     connectionOverlay,
     notificationsRoot,
     previewCanvas,
+    cursorPreview,
   };
 }

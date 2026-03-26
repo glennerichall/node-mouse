@@ -2,7 +2,7 @@ import {
   ADMIN_ACTIONS_ENABLED,
   UPDATE_INSTALL_COMMAND,
   UPDATE_INSTALL_TIMEOUT_SEC,
-} from '../../utils/config.js';
+} from '../config.js';
 import { execShell, truncateText } from './helpers.js';
 
 export function createInstallUpdateAction({ notifier, updateChecker }) {

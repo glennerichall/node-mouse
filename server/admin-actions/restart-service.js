@@ -1,5 +1,5 @@
 import { spawn } from 'child_process';
-import { ADMIN_ACTIONS_ENABLED, SERVICE_NAME } from '../../utils/config.js';
+import { ADMIN_ACTIONS_ENABLED, SERVICE_NAME } from '../config.js';
 import { commandExists } from './helpers.js';
 import { writeRestartMarker } from './restart-marker.js';
 

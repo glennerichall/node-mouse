@@ -159,6 +159,15 @@ body {
   display: grid;
   gap: 4px;
   justify-items: end;
+  opacity: 0;
+  transform: translateY(8px) scale(0.96);
+  transition: opacity 180ms ease, transform 220ms ease;
+  pointer-events: none;
+}
+
+#cursor-preview.is-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 #preview-canvas {

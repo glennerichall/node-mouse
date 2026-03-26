@@ -1,7 +1,7 @@
 import express from 'express';
-import { renderQrPage } from '../utils/qr.js';
+import { renderQrPage } from '../../utils/qr.js';
 
-export function registerHttpRoutes({ publicDir, clientDir, utilsDir, getPublicUrl, getQrDataUrl }) {
+export function createApiRouter({ publicDir, clientDir, utilsDir, getPublicUrl, getQrDataUrl }) {
   const router = express.Router();
 
   router.use(express.static(publicDir));

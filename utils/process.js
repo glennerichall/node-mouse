@@ -1,4 +1,4 @@
-import { exec, execFile, spawn } from 'child_process';
+import { exec, execFile, spawn } from 'node:child_process';
 
 export function execFileAsync(command, args = [], options = {}) {
   const timeout = options.timeout ?? 3000;

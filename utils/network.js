@@ -1,8 +1,6 @@
-import os from 'os';
-import { SERVER_HOST } from './config.js';
+import os from 'node:os';
 
-export function getLanIp() {
-  const forcedHost = SERVER_HOST;
+export function getLanIp(forcedHost = '') {
   if (forcedHost) {
     return forcedHost;
   }
@@ -24,6 +22,6 @@ export function getLanIp() {
   return '127.0.0.1';
 }
 
-export function getPublicUrl(port, protocol = 'http') {
-  return `${protocol}://${getLanIp()}:${port}`;
+export function getPublicUrl(port, protocol = 'http', forcedHost = '') {
+  return `${protocol}://${getLanIp(forcedHost)}:${port}`;
 }
