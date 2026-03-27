@@ -18,8 +18,7 @@ export async function startServer() {
     instances = await createSocket(instances);
     
     const {server, getEntryUrl} = instances;
-
-
+    
     server.listen(PORT, () => {
         logStartupConfig();
 

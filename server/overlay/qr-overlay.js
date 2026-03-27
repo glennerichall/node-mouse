@@ -12,56 +12,75 @@ import {
 import { commandExists } from '../../utils/server/process.js';
 
 export async function startQrOverlay({ getUrl, robot }) {
-  if (!QR_OVERLAY_ENABLED) {
-    return null;
-  }
+  const isSupported = QR_OVERLAY_ENABLED
+    && os.platform() === 'linux'
+    && HAS_GRAPHICAL_DISPLAY;
 
-  if (os.platform() !== 'linux') {
-    return null;
-  }
-
-  if (!HAS_GRAPHICAL_DISPLAY) {
-    return null;
+  if (!isSupported) {
+    return {
+      close: () => {},
+      refresh: async () => {},
+    };
   }
 
   const hasYad = await commandExists('yad');
   if (!hasYad) {
     console.warn('Overlay QR non lancé: "yad" est introuvable.');
-    return null;
+    return {
+      close: () => {},
+      refresh: async () => {},
+    };
   }
 
   const size = QR_OVERLAY_SIZE;
   const margin = QR_OVERLAY_MARGIN;
   const topBarOffset = TOP_BAR_OFFSET_PX;
   const qrPath = path.join(os.tmpdir(), 'remote-mouse-qr-overlay.png');
-  await QRCode.toFile(qrPath, getUrl(), { width: size, margin: 1 });
-
-  const screen = robot.getScreenSize();
-  const posX = Math.max(0, screen.width - size - margin);
-  const posY = Math.max(0, margin + topBarOffset);
-
-  const args = [
-    '--class=remote-mouse-qr-overlay',
-    '--undecorated',
-    '--skip-taskbar',
-    '--sticky',
-    '--on-top',
-    '--no-buttons',
-    '--fixed',
-    `--width=${size}`,
-    `--height=${size}`,
-    `--posx=${posX}`,
-    `--posy=${posY}`,
-    `--image=${qrPath}`,
-    '--text=',
-  ];
-
-  const child = spawn('yad', args, { stdio: 'ignore' });
+  let child = null;
+  let refreshChain = Promise.resolve();
 
   const close = () => {
-    if (!child.killed) {
+    if (child && !child.killed) {
       child.kill('SIGTERM');
     }
+    child = null;
+  };
+
+  async function spawnOverlay() {
+    await QRCode.toFile(qrPath, getUrl(), { width: size, margin: 1 });
+
+    const screen = robot.getScreenSize();
+    const posX = Math.max(0, screen.width - size - margin);
+    const posY = Math.max(0, margin + topBarOffset);
+
+    const args = [
+      '--class=remote-mouse-qr-overlay',
+      '--undecorated',
+      '--skip-taskbar',
+      '--sticky',
+      '--on-top',
+      '--no-buttons',
+      '--fixed',
+      `--width=${size}`,
+      `--height=${size}`,
+      `--posx=${posX}`,
+      `--posy=${posY}`,
+      `--image=${qrPath}`,
+      '--text=',
+    ];
+
+    child = spawn('yad', args, { stdio: 'ignore' });
+  }
+
+  const refresh = async () => {
+    refreshChain = refreshChain
+      .then(async () => {
+        close();
+        await spawnOverlay();
+      })
+      .catch((_error) => {});
+
+    await refreshChain;
   };
 
   const handleSigint = () => {
@@ -78,7 +97,10 @@ export async function startQrOverlay({ getUrl, robot }) {
   process.once('SIGINT', handleSigint);
   process.once('SIGTERM', handleSigterm);
 
-  return { 
+  await refresh();
+
+  return {
     close,
+    refresh,
   };
 }

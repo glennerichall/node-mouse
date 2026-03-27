@@ -84,6 +84,7 @@ export function createTokenManager({
     const gateEnabled = effectiveEnabled || Boolean(normalizedFixedPath);
     const persistenceEnabled = effectiveEnabled && !normalizedFixedPath;
     const tokens = new Map();
+    const tokenChangeListeners = new Set();
 
     function persistState() {
         if (!persistenceEnabled) {
@@ -101,7 +102,17 @@ export function createTokenManager({
                 latestToken = token;
             }
         }
-        return latestToken ?? createToken();
+        return latestToken;
+    }
+
+    function notifyTokenChanged(nextToken) {
+        for (const listener of tokenChangeListeners) {
+            try {
+                listener(nextToken);
+            } catch (_error) {
+                // Best effort: keep other listeners alive.
+            }
+        }
     }
 
     function loadTokens() {
@@ -160,6 +171,9 @@ export function createTokenManager({
         tokens.set(token, Date.now());
         cleanupExpired({persist: false});
         persistState();
+        if (token !== currentToken) {
+            notifyTokenChanged(token);
+        }
         return token;
     }
 
@@ -189,6 +203,16 @@ export function createTokenManager({
         createToken,
         cleanupExpired,
         loadTokens,
-        getToken: resolveLatestToken
+        getToken: resolveLatestToken,
+        onTokenChanged(listener) {
+            if (typeof listener !== 'function') {
+                return () => {
+                };
+            }
+            tokenChangeListeners.add(listener);
+            return () => {
+                tokenChangeListeners.delete(listener);
+            };
+        },
     };
 }
