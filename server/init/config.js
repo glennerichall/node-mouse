@@ -73,6 +73,7 @@ export const ENTRY_PATH_STATE_FILE = expandHomePath(
 export const SESSION_COOKIE_NAME = readString('SESSION_COOKIE_NAME', 'remote_mouse_session');
 export const SESSION_COOKIE_SECRET = readString('SESSION_COOKIE_SECRET', 'change-me');
 export const SESSION_COOKIE_MAX_AGE_DAYS = readNumber('SESSION_COOKIE_MAX_AGE_DAYS', 7, { min: 1, max: 365 });
+export const SOCKET_EVENT_MAX_AGE_MS = readNumber('SOCKET_EVENT_MAX_AGE_MS', 1200, { min: 50, max: 60_000 });
 export const QR_OVERLAY_ENABLED = readBoolean('QR_OVERLAY_ENABLED', true);
 export const QR_OVERLAY_SIZE = readNumber('QR_OVERLAY_SIZE', 75, { min: 32, max: 800 });
 export const QR_OVERLAY_MARGIN = readNumber('QR_OVERLAY_MARGIN', 14, { min: 0, max: 400 });
@@ -94,6 +95,7 @@ export function logStartupConfig() {
   console.log(`- sessionCookieMaxAgeDays: ${SESSION_COOKIE_MAX_AGE_DAYS}`);
   console.log(`- sessionCookieSecure: ${HTTPS_ENABLED}`);
   console.log(`- sessionCookieSecretSet: ${SESSION_COOKIE_SECRET !== 'change-me'}`);
+  console.log(`- socketEventMaxAgeMs: ${SOCKET_EVENT_MAX_AGE_MS}`);
   console.log(`- mouseSpeed: ${MOUSE_SPEED}`);
   console.log(`- scrollSpeed: ${SCROLL_SPEED}`);
   console.log(`- preview: ${PREVIEW_WIDTH}x${PREVIEW_HEIGHT} @ ${PREVIEW_FPS}fps`);

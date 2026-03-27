@@ -1,4 +1,5 @@
 import {createAccumulatedThrottle} from './throttle.js';
+import {emitWithTimestamp} from '../core/socket-emit.js';
 import {
     handleTouchEnd,
     handleTouchMove,
@@ -46,14 +47,14 @@ export function createSocketTouchHandler(socket, options = {}) {
     const moveEmitter = createAccumulatedThrottle(
         (payload) => {
             onMouseMove(payload);
-            socket.emit('mouse:move', payload)
+            emitWithTimestamp(socket, 'mouse:move', payload);
         },
         16,
     );
     const scrollEmitter = createAccumulatedThrottle(
         (payload) => {
             onMouseMove(payload);
-            socket.emit('mouse:scroll', {dy: payload.dy})
+            emitWithTimestamp(socket, 'mouse:scroll', {dy: payload.dy});
         },
         12,
     );
@@ -66,7 +67,7 @@ export function createSocketTouchHandler(socket, options = {}) {
             scrollEmitter.addDelta(0, dy);
         },
         click: (button) => {
-            socket.emit('mouse:click', {button})
+            emitWithTimestamp(socket, 'mouse:click', {button});
         },
         flush: () => {
             moveEmitter.flushNow();

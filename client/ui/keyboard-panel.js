@@ -1,3 +1,5 @@
+import { emitWithTimestamp } from '../core/socket-emit.js';
+
 export function bindKeyboardPanel(socket, { keyboardPanel, textInput, btnKeyboard, btnSendText }) {
   function toggleKeyboard() {
     const hidden = keyboardPanel.classList.toggle('hidden');
@@ -12,7 +14,7 @@ export function bindKeyboardPanel(socket, { keyboardPanel, textInput, btnKeyboar
       return;
     }
 
-    socket.emit('keyboard:text', { text });
+    emitWithTimestamp(socket, 'keyboard:text', { text });
     textInput.value = '';
     textInput.focus();
   }

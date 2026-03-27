@@ -1,3 +1,5 @@
+import { emitWithTimestamp } from '../core/socket-emit.js';
+
 export function bindActionButtons(
   socket,
   {
@@ -18,36 +20,36 @@ export function bindActionButtons(
     btnRestartService,
   },
 ) {
-  btnEnter.addEventListener('click', () => socket.emit('keyboard:key', { key: 'enter' }));
-  btnBackspace.addEventListener('click', () => socket.emit('keyboard:key', { key: 'backspace' }));
-  btnOpenBrave.addEventListener('click', () => socket.emit('browser:brave'));
+  btnEnter.addEventListener('click', () => emitWithTimestamp(socket, 'keyboard:key', { key: 'enter' }));
+  btnBackspace.addEventListener('click', () => emitWithTimestamp(socket, 'keyboard:key', { key: 'backspace' }));
+  btnOpenBrave.addEventListener('click', () => emitWithTimestamp(socket, 'browser:brave'));
   btnBrowserBack.addEventListener('click', () =>
-    socket.emit('keyboard:key', { key: 'left', modifiers: ['alt'] }),
+    emitWithTimestamp(socket, 'keyboard:key', { key: 'left', modifiers: ['alt'] }),
   );
   btnBrowserForward.addEventListener('click', () =>
-    socket.emit('keyboard:key', { key: 'right', modifiers: ['alt'] }),
+    emitWithTimestamp(socket, 'keyboard:key', { key: 'right', modifiers: ['alt'] }),
   );
   btnPrevTab.addEventListener('click', () =>
-    socket.emit('keyboard:key', { key: 'tab', modifiers: ['control', 'shift'] }),
+    emitWithTimestamp(socket, 'keyboard:key', { key: 'tab', modifiers: ['control', 'shift'] }),
   );
   btnNextTab.addEventListener('click', () =>
-    socket.emit('keyboard:key', { key: 'tab', modifiers: ['control'] }),
+    emitWithTimestamp(socket, 'keyboard:key', { key: 'tab', modifiers: ['control'] }),
   );
   btnNewTab.addEventListener('click', () =>
-    socket.emit('keyboard:key', { key: 't', modifiers: ['control'] }),
+    emitWithTimestamp(socket, 'keyboard:key', { key: 't', modifiers: ['control'] }),
   );
   btnCloseTab.addEventListener('click', () =>
-    socket.emit('keyboard:key', { key: 'w', modifiers: ['control'] }),
+    emitWithTimestamp(socket, 'keyboard:key', { key: 'w', modifiers: ['control'] }),
   );
   btnAddressBar.addEventListener('click', () =>
-    socket.emit('keyboard:key', { key: 'l', modifiers: ['control'] }),
+    emitWithTimestamp(socket, 'keyboard:key', { key: 'l', modifiers: ['control'] }),
   );
   btnHardReload.addEventListener('click', () =>
-    socket.emit('keyboard:key', { key: 'f5', modifiers: ['control'] }),
+    emitWithTimestamp(socket, 'keyboard:key', { key: 'f5', modifiers: ['control'] }),
   );
-  btnFullscreen.addEventListener('click', () => socket.emit('keyboard:key', { key: 'f11' }));
+  btnFullscreen.addEventListener('click', () => emitWithTimestamp(socket, 'keyboard:key', { key: 'f11' }));
 
-  btnForceUpdateCheck.addEventListener('click', () => socket.emit('admin:update-check'));
-  btnInstallUpdate.addEventListener('click', () => socket.emit('admin:update-install'));
-  btnRestartService.addEventListener('click', () => socket.emit('admin:service-restart'));
+  btnForceUpdateCheck.addEventListener('click', () => emitWithTimestamp(socket, 'admin:update-check'));
+  btnInstallUpdate.addEventListener('click', () => emitWithTimestamp(socket, 'admin:update-install'));
+  btnRestartService.addEventListener('click', () => emitWithTimestamp(socket, 'admin:service-restart'));
 }

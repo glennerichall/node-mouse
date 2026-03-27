@@ -1,4 +1,5 @@
 import {createPreviewFrameReceiver} from "./create-preview-frame-receiver.js";
+import {emitWithTimestamp} from "../core/socket-emit.js";
 
 export function bindPreviewStream(socket, { previewCanvas, previewLabel }) {
   if (!previewCanvas) {
@@ -36,7 +37,7 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }) {
   const stopPreview = () => {
     clearStopTimer();
     if (isPreviewActive) {
-      socket.emit('preview:stop');
+      emitWithTimestamp(socket, 'preview:stop');
       isPreviewActive = false;
     }
     hidePreview();
@@ -54,7 +55,7 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }) {
       return;
     }
     if (!isPreviewActive) {
-      socket.emit('preview:start');
+      emitWithTimestamp(socket, 'preview:start');
       isPreviewActive = true;
       showPreview();
     }

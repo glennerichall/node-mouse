@@ -1,5 +1,6 @@
 import {createWsSessionAuth} from "../connection/ws-session-auth.js";
 import {
+    SOCKET_EVENT_MAX_AGE_MS,
     SESSION_COOKIE_NAME,
 } from "./config.js";
 import {registerSocketHandlers} from "../connection/socket.js";
@@ -17,6 +18,7 @@ export async function createSocket(instances) {
     registerSocketHandlers({
         ...instances,
         actions,
+        maxEventAgeMs: SOCKET_EVENT_MAX_AGE_MS,
         prepareSocketAuth,
         authorizeSocket,
     });
