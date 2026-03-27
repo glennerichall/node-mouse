@@ -1,5 +1,5 @@
-import { fetchJson } from '../../../utils/http.js';
-import { isVersionGreater } from '../../../utils/semver.js';
+import { fetchJson } from '../../../utils/server/http.js';
+import { isVersionGreater } from '../../../utils/server/semver.js';
 import { buildNpmGlobalUpdateCommand } from '../install-command.js';
 
 export class NpmUpdateSource {

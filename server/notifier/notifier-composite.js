@@ -1,4 +1,4 @@
-import { NOTIFICATION_TTL_MS } from '../config.js';
+import { NOTIFICATION_TTL_MS } from '../init/config.js';
 
 export function createNotifierComposite({ clientNotifier, serverNotifier }) {
   return {

@@ -24,3 +24,4 @@ export function applyNonLinearAcceleration(dx, dy, elapsedMs) {
     dy: dy * gain,
   };
 }
+

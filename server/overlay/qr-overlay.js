@@ -1,6 +1,6 @@
-import os from 'os';
-import path from 'path';
-import { spawn } from 'child_process';
+import os from 'node:os';
+import path from 'node:path';
+import { spawn } from 'node:child_process';
 import QRCode from 'qrcode';
 import {
   QR_OVERLAY_ENABLED,
@@ -8,10 +8,10 @@ import {
   QR_OVERLAY_SIZE,
   QR_OVERLAY_MARGIN,
   HAS_GRAPHICAL_DISPLAY,
-} from '../config.js';
-import { commandExists } from '../../utils/process.js';
+} from '../init/config.js';
+import { commandExists } from '../../utils/server/process.js';
 
-export async function startQrOverlay({ url, robot }) {
+export async function startQrOverlay({ getUrl, robot }) {
   if (!QR_OVERLAY_ENABLED) {
     return null;
   }
@@ -34,7 +34,7 @@ export async function startQrOverlay({ url, robot }) {
   const margin = QR_OVERLAY_MARGIN;
   const topBarOffset = TOP_BAR_OFFSET_PX;
   const qrPath = path.join(os.tmpdir(), 'remote-mouse-qr-overlay.png');
-  await QRCode.toFile(qrPath, url, { width: size, margin: 1 });
+  await QRCode.toFile(qrPath, getUrl(), { width: size, margin: 1 });
 
   const screen = robot.getScreenSize();
   const posX = Math.max(0, screen.width - size - margin);
@@ -78,5 +78,7 @@ export async function startQrOverlay({ url, robot }) {
   process.once('SIGINT', handleSigint);
   process.once('SIGTERM', handleSigterm);
 
-  return { close };
+  return { 
+    close,
+  };
 }

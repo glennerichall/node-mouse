@@ -4,7 +4,7 @@ import {
   UPDATE_CHECK_CURRENT_VERSION,
   UPDATE_CHECK_GIT_REMOTE,
   UPDATE_CHECK_GIT_REF,
-} from '../config.js';
+} from '../init/config.js';
 import { GitUpdateSource } from './sources/git-update-source.js';
 import { NpmUpdateSource } from './sources/npm-update-source.js';
 

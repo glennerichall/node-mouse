@@ -1,4 +1,4 @@
-import { DESKTOP_NOTIFICATIONS_ENABLED } from '../config.js';
+import { DESKTOP_NOTIFICATIONS_ENABLED } from '../init/config.js';
 import { createHostNotifierByPlatform } from './host-notifier/index.js';
 
 export function createHostNotifier() {

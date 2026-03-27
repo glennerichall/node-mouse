@@ -1,4 +1,4 @@
-export { commandExists, execShell } from '../../utils/process.js';
+export { commandExists, execShell } from '../../utils/server/process.js';
 
 export function truncateText(value, max = 220) {
   const text = String(value || '').trim();

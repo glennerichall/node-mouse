@@ -1,4 +1,4 @@
-import { CLIENT_NOTIFICATIONS_ENABLED } from '../config.js';
+import { CLIENT_NOTIFICATIONS_ENABLED } from '../init/config.js';
 
 export function createClientNotifier(io) {
   return {

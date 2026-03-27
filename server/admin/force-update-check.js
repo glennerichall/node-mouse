@@ -1,4 +1,4 @@
-import { ADMIN_ACTIONS_ENABLED } from '../config.js';
+import { ADMIN_ACTIONS_ENABLED } from '../init/config.js';
 
 export function createForceUpdateCheckAction({ notifier, updateChecker }) {
   return async function forceUpdateCheck() {

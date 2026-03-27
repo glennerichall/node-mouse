@@ -3,7 +3,7 @@ import {
   applyNonLinearAcceleration,
   distance2D,
   scaleSigned,
-} from '../../utils/math.js';
+} from '../../utils/shared/math.js';
 
 export function handleTouchStart(event, { touchpad, state }) {
   event.preventDefault();

@@ -1,7 +1,7 @@
 import {
   UPDATE_CHECK_ENABLED,
   UPDATE_CHECK_INTERVAL_MIN,
-} from '../config.js';
+} from '../init/config.js';
 import { chooseUpdateSource } from './choose-source.js';
 import { UpdateChecker } from './checker.js';
 
