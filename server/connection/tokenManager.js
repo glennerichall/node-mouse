@@ -1,6 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {createRandomToken} from '../../utils/server/createRandomToken.js';
+import {createLogger} from '../log/logger.js';
+
+const log = createLogger('token-manager');
 
 function trimSlashes(value) {
     return String(value || '').replace(/^\/+|\/+$/g, '');
@@ -68,7 +71,7 @@ function savePersistedState(stateFilePath, {tokens}) {
         };
         fs.writeFileSync(stateFilePath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
     } catch (error) {
-        console.warn(`Token state save failed: ${error.message}`);
+        log.warn({ err: error }, 'Token state save failed');
     }
 }
 

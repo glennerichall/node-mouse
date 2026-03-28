@@ -1,12 +1,14 @@
-import { DESKTOP_NOTIFICATIONS_ENABLED } from '../init/config.js';
+import {getStartupConfigSnapshot} from '../init/config.js';
 import { createHostNotifierByPlatform } from './host-notifier/index.js';
+
+const config = getStartupConfigSnapshot();
 
 export function createHostNotifier() {
   const platformNotifier = createHostNotifierByPlatform();
 
   return {
     notify(payload) {
-      if (!DESKTOP_NOTIFICATIONS_ENABLED) {
+      if (!config.notifications.desktop) {
         return;
       }
       platformNotifier.notify(payload);

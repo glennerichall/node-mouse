@@ -1,22 +1,25 @@
-import {
-  ADMIN_ACTIONS_ENABLED,
-  UPDATE_INSTALL_COMMAND,
-  UPDATE_INSTALL_TIMEOUT_SEC,
-} from '../init/config.js';
+import {getStartupConfigSnapshot} from '../init/config.js';
 import { execShell, truncateText } from './helpers.js';
+import {createLogger} from '../log/logger.js';
+
+const config = getStartupConfigSnapshot();
+const log = createLogger('admin:install-update');
 
 export function createInstallUpdateAction({ notifier, updateChecker }) {
   return async function installUpdate() {
-    if (!ADMIN_ACTIONS_ENABLED) {
+    if (!config.adminActionsEnabled) {
+      log.warn('Install update refusé: admin actions désactivées');
       return { ok: false, message: 'Actions admin desactivees.' };
     }
 
+    log.info('Début install update');
     const inferredCommand = updateChecker && typeof updateChecker.getInstallCommand === 'function'
       ? String(updateChecker.getInstallCommand() || '').trim()
       : '';
-    const installCommand = String(UPDATE_INSTALL_COMMAND || '').trim() || inferredCommand;
+    const installCommand = String(config.updateCheck.installCommand || '').trim() || inferredCommand;
 
     if (!installCommand) {
+      log.warn('Install update impossible: aucune commande disponible');
       notifier.notify({
         level: 'error',
         title: 'Update install',
@@ -36,9 +39,11 @@ export function createInstallUpdateAction({ notifier, updateChecker }) {
       ttlMs: 2200,
     });
 
-    const timeoutMs = Math.max(10_000, UPDATE_INSTALL_TIMEOUT_SEC * 1000);
+    const timeoutMs = Math.max(10_000, config.updateCheck.installTimeoutSec * 1000);
+    log.info({ timeoutMs, installCommand }, 'Exécution commande install update');
     const result = await execShell(installCommand, timeoutMs);
     if (result.ok) {
+      log.info('Install update terminée avec succès');
       notifier.notify({
         level: 'info',
         title: 'Update install',
@@ -49,6 +54,7 @@ export function createInstallUpdateAction({ notifier, updateChecker }) {
     }
 
     const details = truncateText(result.stderr || result.stdout || 'Erreur inconnue');
+    log.error({ details }, 'Install update en échec');
     notifier.notify({
       level: 'error',
       title: 'Update install',

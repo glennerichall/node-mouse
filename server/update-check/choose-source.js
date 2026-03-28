@@ -1,23 +1,19 @@
-import {
-  UPDATE_CHECK_SOURCE,
-  UPDATE_CHECK_PACKAGE,
-  UPDATE_CHECK_CURRENT_VERSION,
-  UPDATE_CHECK_GIT_REMOTE,
-  UPDATE_CHECK_GIT_REF,
-} from '../init/config.js';
+import {getStartupConfigSnapshot} from '../init/config.js';
 import { GitUpdateSource } from './sources/git-update-source.js';
 import { NpmUpdateSource } from './sources/npm-update-source.js';
 
+const config = getStartupConfigSnapshot();
+
 export async function chooseUpdateSource() {
-  const requested = (UPDATE_CHECK_SOURCE || 'auto').toLowerCase();
+  const requested = (config.updateCheck.source || 'auto').toLowerCase();
   const gitSource = new GitUpdateSource({
-    remote: UPDATE_CHECK_GIT_REMOTE,
-    ref: UPDATE_CHECK_GIT_REF,
-    packageName: UPDATE_CHECK_PACKAGE,
+    remote: config.updateCheck.gitRemote,
+    ref: config.updateCheck.gitRef,
+    packageName: config.updateCheck.packageName,
   });
   const npmSource = new NpmUpdateSource({
-    packageName: UPDATE_CHECK_PACKAGE,
-    currentVersion: UPDATE_CHECK_CURRENT_VERSION,
+    packageName: config.updateCheck.packageName,
+    currentVersion: config.updateCheck.currentVersion,
   });
 
   if (requested === 'git') {

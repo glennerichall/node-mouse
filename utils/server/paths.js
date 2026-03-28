@@ -8,4 +8,3 @@ export const projectRoot = path.resolve(__dirname, '../..');
 export const publicDir = path.join(projectRoot, 'public');
 export const clientDir = path.join(projectRoot, 'client');
 export const sharedUtilsDir = path.join(projectRoot, 'utils', 'shared');
-export const clientUtilsDir = path.join(projectRoot, 'utils', 'client');

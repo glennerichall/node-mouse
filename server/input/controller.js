@@ -1,16 +1,15 @@
 import {createKeyboardController} from "./keyboard-controller.js";
-import {
-    MOUSE_SPEED,
-    SCROLL_SPEED
-} from "../init/config.js";
+import {getStartupConfigSnapshot} from "../init/config.js";
 import {createMouseController} from "./mouse-controller.js";
 import {loadRobot} from "../../utils/server/robot.js";
+
+const config = getStartupConfigSnapshot();
 
 export function createController(robot) {
     
     const mouse = createMouseController(robot, {
-        mouseSpeed: MOUSE_SPEED,
-        scrollSpeed: SCROLL_SPEED,
+        mouseSpeed: config.input.mouseSpeed,
+        scrollSpeed: config.input.scrollSpeed,
     });
 
     const keyboard = createKeyboardController(robot);

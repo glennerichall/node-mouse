@@ -1,9 +1,11 @@
-import { CLIENT_NOTIFICATIONS_ENABLED } from '../init/config.js';
+import {getStartupConfigSnapshot} from '../init/config.js';
+
+const config = getStartupConfigSnapshot();
 
 export function createClientNotifier(io) {
   return {
     notify(payload) {
-      if (!CLIENT_NOTIFICATIONS_ENABLED) {
+      if (!config.notifications.client) {
         return;
       }
       io.emit('notification', payload);

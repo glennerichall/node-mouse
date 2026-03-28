@@ -1,3 +1,7 @@
+import {createLogger} from '../log/logger.js';
+
+const log = createLogger('update-check');
+
 export class UpdateChecker {
   constructor({ notifier, source, intervalMin }) {
     this.notifier = notifier;
@@ -12,7 +16,7 @@ export class UpdateChecker {
     try {
       const result = await this.source.check();
       if (!result || !result.hasUpdate || !result.key || result.key === this.lastKey) {
-        console.log('Update check: no update');
+        log.debug('Update check: no update');
         return {
           checked: true,
           hasUpdate: false,
@@ -32,7 +36,7 @@ export class UpdateChecker {
         key: result.key,
       };
     } catch (_error) {
-      console.error('Update check: error', _error);
+      log.error({ err: _error }, 'Update check: error');
       return {
         checked: false,
         hasUpdate: false,

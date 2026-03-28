@@ -1,7 +1,6 @@
-import {createClientEndpointsRouter} from '../connection/client.router.js';
+import {createClientEndpointsRouter} from '../connection/api/client.router.js';
 import {
     clientDir,
-    clientUtilsDir,
     publicDir,
     sharedUtilsDir
 } from '../../utils/server/paths.js';
@@ -16,7 +15,10 @@ import {
     createEntryRouter,
     createSessionCreationMiddleware,
     createSessionValidationMiddleware
-} from '../connection/session.middleware.js';
+} from '../connection/api/session.middleware.js';
+import {createLogger} from '../log/logger.js';
+
+const log = createLogger('createApp');
 
 export async function createApp(instances) {
 
@@ -25,7 +27,7 @@ export async function createApp(instances) {
     const getEntryUrl = () => `${basePublicUrl}/entry/${tokenManager.getToken()}`;
 
     if (!HTTPS_ENABLED) {
-        console.warn('WARNING: HTTPS=false. Cookie session envoyé sans attribut Secure (moins sécuritaire).');
+        log.warn('HTTPS=false: cookie session envoyé sans attribut Secure (moins sécuritaire).');
     }
     
     const cookies = cookieParser(SESSION_COOKIE_SECRET);
@@ -57,8 +59,7 @@ export async function createApp(instances) {
     app.use(createClientEndpointsRouter({
         publicDir,
         clientDir,
-        sharedUtilsDir,
-        clientUtilsDir
+        sharedUtilsDir
     }));
 
     app.get('/health', (_req, res) => {

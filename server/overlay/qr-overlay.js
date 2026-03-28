@@ -2,19 +2,17 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import QRCode from 'qrcode';
-import {
-  QR_OVERLAY_ENABLED,
-  TOP_BAR_OFFSET_PX,
-  QR_OVERLAY_SIZE,
-  QR_OVERLAY_MARGIN,
-  HAS_GRAPHICAL_DISPLAY,
-} from '../init/config.js';
+import {getStartupConfigSnapshot} from '../init/config.js';
 import { commandExists } from '../../utils/server/process.js';
+import {createLogger} from '../log/logger.js';
+
+const log = createLogger('qr-overlay');
+const config = getStartupConfigSnapshot();
 
 export async function startQrOverlay({ getUrl, robot }) {
-  const isSupported = QR_OVERLAY_ENABLED
+  const isSupported = config.qrOverlay.enabled
     && os.platform() === 'linux'
-    && HAS_GRAPHICAL_DISPLAY;
+    && config.graphicalDisplay;
 
   if (!isSupported) {
     return {
@@ -25,16 +23,16 @@ export async function startQrOverlay({ getUrl, robot }) {
 
   const hasYad = await commandExists('yad');
   if (!hasYad) {
-    console.warn('Overlay QR non lancé: "yad" est introuvable.');
+    log.warn('Overlay QR non lancé: "yad" est introuvable.');
     return {
       close: () => {},
       refresh: async () => {},
     };
   }
 
-  const size = QR_OVERLAY_SIZE;
-  const margin = QR_OVERLAY_MARGIN;
-  const topBarOffset = TOP_BAR_OFFSET_PX;
+  const size = config.qrOverlay.size;
+  const margin = config.qrOverlay.margin;
+  const topBarOffset = config.qrOverlay.topOffsetPx;
   const qrPath = path.join(os.tmpdir(), 'remote-mouse-qr-overlay.png');
   let child = null;
   let refreshChain = Promise.resolve();
@@ -70,6 +68,7 @@ export async function startQrOverlay({ getUrl, robot }) {
     ];
 
     child = spawn('yad', args, { stdio: 'ignore' });
+    log.debug({ url: getUrl() }, 'QR overlay rafraîchi');
   }
 
   const refresh = async () => {

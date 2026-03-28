@@ -1,13 +1,12 @@
-import {
-  UPDATE_CHECK_ENABLED,
-  UPDATE_CHECK_INTERVAL_MIN,
-} from '../init/config.js';
+import {getStartupConfigSnapshot} from '../init/config.js';
 import { chooseUpdateSource } from './choose-source.js';
 import { UpdateChecker } from './checker.js';
 
+const config = getStartupConfigSnapshot();
+
 export async function startUpdateChecker(notifier) {
   const source = await chooseUpdateSource();
-  if (!UPDATE_CHECK_ENABLED) {
+  if (!config.updateCheck.enabled) {
     return {
       stop: () => {},
       runNow: async () => ({ checked: false, hasUpdate: false, disabled: true }),
@@ -22,7 +21,7 @@ export async function startUpdateChecker(notifier) {
   const checker = new UpdateChecker({
     notifier,
     source,
-    intervalMin: UPDATE_CHECK_INTERVAL_MIN,
+    intervalMin: config.updateCheck.intervalMin,
   });
   return checker.start();
 }

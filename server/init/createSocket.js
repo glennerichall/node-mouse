@@ -1,30 +1,31 @@
-import {createWsSessionAuth} from "../connection/ws-session-auth.js";
+import {createSocketSessionAuthMiddleware} from "../connection/socket/socket-session-auth.js";
 import {
-    SOCKET_EVENT_MAX_AGE_MS,
-    SESSION_COOKIE_NAME,
+    getStartupConfigSnapshot,
 } from "./config.js";
-import {registerSocketHandlers} from "../connection/socket.js";
-import {createActions} from "./createActions.js";
+import {buildSocketApi} from "../connection/socket/buildSocketApi.js";
+import {createSocketActionRegistrars} from "./createSocketActionRegistrars.js";
+
+const config = getStartupConfigSnapshot();
 
 export async function createSocket(instances) {
-    const {prepareSocketAuth, authorizeSocket} = createWsSessionAuth(
+    const {prepareSocketAuth, authorizeSocket} = createSocketSessionAuthMiddleware(
         instances,
         {
-            cookieName: SESSION_COOKIE_NAME,
+            cookieName: config.session.cookieName,
         });
 
-    const actions = await createActions(instances);
+    const socketActionRegistrars = await createSocketActionRegistrars(instances);
 
-    registerSocketHandlers({
+    buildSocketApi({
         ...instances,
-        actions,
-        maxEventAgeMs: SOCKET_EVENT_MAX_AGE_MS,
+        socketActionRegistrars,
+        maxEventAgeMs: config.session.socketEventMaxAgeMs,
         prepareSocketAuth,
         authorizeSocket,
     });
 
     return {
         ...instances,
-        actions
+        socketActionRegistrars
     };
 }

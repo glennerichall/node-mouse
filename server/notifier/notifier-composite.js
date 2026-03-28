@@ -1,4 +1,6 @@
-import { NOTIFICATION_TTL_MS } from '../init/config.js';
+import {getStartupConfigSnapshot} from '../init/config.js';
+
+const config = getStartupConfigSnapshot();
 
 export function createNotifierComposite({ clientNotifier, serverNotifier }) {
   return {
@@ -8,7 +10,7 @@ export function createNotifierComposite({ clientNotifier, serverNotifier }) {
       level = 'info',
       toDesktop = true,
       toClients = true,
-      ttlMs = NOTIFICATION_TTL_MS,
+      ttlMs = config.notifications.ttlMs,
     }) {
       if (!message) {
         return;

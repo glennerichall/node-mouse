@@ -1,8 +1,10 @@
-import { ADMIN_ACTIONS_ENABLED } from '../init/config.js';
+import {getStartupConfigSnapshot} from '../init/config.js';
+
+const config = getStartupConfigSnapshot();
 
 export function createForceUpdateCheckAction({ notifier, updateChecker }) {
   return async function forceUpdateCheck() {
-    if (!ADMIN_ACTIONS_ENABLED) {
+    if (!config.adminActionsEnabled) {
       notifier.notify({
         level: 'warning',
         title: 'Check update',

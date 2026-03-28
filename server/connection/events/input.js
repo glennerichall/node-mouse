@@ -1,4 +1,4 @@
-export function createControlEventRegister({ mouse, keyboard }) {
+export function createControlEventRegistrar({ mouse, keyboard }) {
   return function registerControlEvents(socket) {
     socket.on('mouse:move', (payload = {}) => {
       const dx = Number(payload.dx) || 0;

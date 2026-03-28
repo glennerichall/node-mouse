@@ -1,8 +1,8 @@
-export function createWsSessionAuth({
+export function createSocketSessionAuthMiddleware({
                                         tokenManager,
                                         cookies
                                     },
-                                    {
+                                                  {
                                         cookieName
                                     }) {
     function authorizeSocket(socket, next) {

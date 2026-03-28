@@ -1,11 +1,13 @@
 import { spawn } from 'child_process';
-import { ADMIN_ACTIONS_ENABLED, SERVICE_NAME } from '../init/config.js';
+import {getStartupConfigSnapshot} from '../init/config.js';
 import { commandExists } from './helpers.js';
 import { writeRestartMarker } from './restart-marker.js';
 
+const config = getStartupConfigSnapshot();
+
 export function createRestartServiceAction({ notifier }) {
   return async function restartService() {
-    if (!ADMIN_ACTIONS_ENABLED) {
+    if (!config.adminActionsEnabled) {
       return { ok: false, message: 'Actions admin desactivees.' };
     }
 
@@ -17,13 +19,13 @@ export function createRestartServiceAction({ notifier }) {
     notifier.notify({
       level: 'warning',
       title: 'Redemarrage service',
-      message: `Redemarrage de ${SERVICE_NAME} en cours...`,
+      message: `Redemarrage de ${config.serviceName} en cours...`,
       ttlMs: 2200,
     });
 
     const child = spawn(
       'bash',
-      ['-lc', `sleep 0.8; systemctl --user restart ${SERVICE_NAME}`],
+      ['-lc', `sleep 0.8; systemctl --user restart ${config.serviceName}`],
       {
         detached: true,
         stdio: 'ignore',
@@ -31,6 +33,6 @@ export function createRestartServiceAction({ notifier }) {
     );
     child.unref();
 
-    return { ok: true, message: `Redemarrage demande pour ${SERVICE_NAME}.` };
+    return { ok: true, message: `Redemarrage demande pour ${config.serviceName}.` };
   };
 }

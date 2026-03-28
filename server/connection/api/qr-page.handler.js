@@ -1,5 +1,5 @@
 import QRCode from "qrcode";
-import {renderQrPage} from "./renderQrPage.js";
+import {renderQrPage} from "../../overlay/renderQrPage.js";
 
 function createQrPageHandler(publicUrl) {
     return async (_req, res) => {

@@ -1,33 +1,31 @@
-export function createAdminEventRegister({ adminActions }) {
+import {createLogger} from '../../log/logger.js';
+import {createSocketActionResponder} from '../socket/socket-action-responder.js';
+
+const log = createLogger('events:admin');
+
+export function createAdminEventRegistrar({ adminActions }) {
   return function registerAdminEvents(socket) {
+    const respondAdminAction = createSocketActionResponder({
+      socket,
+      eventName: 'admin:result',
+    });
+
     socket.on('admin:update-check', async () => {
-      console.log(`Client ${socket.id.slice(0, 8)} demande update check.`);
+      log.info({ client: socket.id.slice(0, 8) }, 'Demande admin:update-check');
       const result = await adminActions.forceUpdateCheck();
-      socket.emit('admin:result', {
-        action: 'update-check',
-        ok: result.ok,
-        message: result.message,
-      });
+      respondAdminAction('update-check', result);
     });
 
     socket.on('admin:update-install', async () => {
-      console.log(`Client ${socket.id.slice(0, 8)} demande update install.`);
+      log.info({ client: socket.id.slice(0, 8) }, 'Demande admin:update-install');
       const result = await adminActions.installUpdate();
-      socket.emit('admin:result', {
-        action: 'update-install',
-        ok: result.ok,
-        message: result.message,
-      });
+      respondAdminAction('update-install', result);
     });
 
     socket.on('admin:service-restart', async () => {
-      console.log(`Client ${socket.id.slice(0, 8)} demande service restart.`);
+      log.info({ client: socket.id.slice(0, 8) }, 'Demande admin:service-restart');
       const result = await adminActions.restartService();
-      socket.emit('admin:result', {
-        action: 'service-restart',
-        ok: result.ok,
-        message: result.message,
-      });
+      respondAdminAction('service-restart', result);
     });
   };
 }

@@ -35,6 +35,8 @@ const packageJson = readPackageJson();
 
 export const PORT = readNumber('PORT', 3000, { min: 1, max: 65535 });
 export const SERVER_HOST = readString('SERVER_HOST', '');
+export const LOG_LEVEL = readString('LOG_LEVEL', 'info').toLowerCase();
+export const LOG_FORMAT = readString('LOG_FORMAT', 'json').toLowerCase();
 export const MOUSE_SPEED = readNumber('MOUSE_SPEED', 1.3, { min: 0.1, max: 10 });
 export const SCROLL_SPEED = readNumber('SCROLL_SPEED', 0.25, { min: 0.01, max: 10 });
 export const HTTPS_ENABLED = readBoolean('HTTPS', false);
@@ -79,39 +81,119 @@ export const QR_OVERLAY_SIZE = readNumber('QR_OVERLAY_SIZE', 75, { min: 32, max:
 export const QR_OVERLAY_MARGIN = readNumber('QR_OVERLAY_MARGIN', 14, { min: 0, max: 400 });
 export const HAS_GRAPHICAL_DISPLAY = Boolean(readString('DISPLAY') || readString('WAYLAND_DISPLAY'));
 
-export function logStartupConfig() {
+export function getStartupConfigSnapshot() {
   const protocol = HTTPS_ENABLED ? 'https' : 'http';
-  console.log('Configuration:');
-  console.log(`- protocol: ${protocol}`);
-  console.log(`- port: ${PORT}`);
-  console.log(`- serverHost: ${SERVER_HOST || '(auto LAN detection)'}`);
-  console.log(`- entryPathEnabled: ${ENTRY_PATH_ENABLED || Boolean(ENTRY_PATH_FIXED)}`);
-  console.log(`- entryPathFixed: ${ENTRY_PATH_FIXED || '(random)'}`);
-  console.log(`- entryPathTokenLength: ${ENTRY_PATH_TOKEN_LENGTH}`);
-  console.log(`- entryPathRotateMin: ${ENTRY_PATH_ROTATE_INTERVAL_MIN}`);
-  console.log(`- entryPathGraceMin: ${ENTRY_PATH_GRACE_MIN}`);
-  console.log(`- entryPathStateFile: ${ENTRY_PATH_STATE_FILE}`);
-  console.log(`- sessionCookieName: ${SESSION_COOKIE_NAME}`);
-  console.log(`- sessionCookieMaxAgeDays: ${SESSION_COOKIE_MAX_AGE_DAYS}`);
-  console.log(`- sessionCookieSecure: ${HTTPS_ENABLED}`);
-  console.log(`- sessionCookieSecretSet: ${SESSION_COOKIE_SECRET !== 'change-me'}`);
-  console.log(`- socketEventMaxAgeMs: ${SOCKET_EVENT_MAX_AGE_MS}`);
-  console.log(`- mouseSpeed: ${MOUSE_SPEED}`);
-  console.log(`- scrollSpeed: ${SCROLL_SPEED}`);
-  console.log(`- preview: ${PREVIEW_WIDTH}x${PREVIEW_HEIGHT} @ ${PREVIEW_FPS}fps`);
-  console.log(`- desktopNotifications: ${DESKTOP_NOTIFICATIONS_ENABLED}`);
-  console.log(`- clientNotifications: ${CLIENT_NOTIFICATIONS_ENABLED}`);
-  console.log(`- adminActionsEnabled: ${ADMIN_ACTIONS_ENABLED}`);
-  console.log(`- serviceName: ${SERVICE_NAME}`);
-  console.log(`- updateInstallCommand: ${UPDATE_INSTALL_COMMAND || '(unset)'}`);
-  console.log(`- updateInstallTimeoutSec: ${UPDATE_INSTALL_TIMEOUT_SEC}`);
-  console.log(`- updateCheck: enabled=${UPDATE_CHECK_ENABLED} source=${UPDATE_CHECK_SOURCE} every=${UPDATE_CHECK_INTERVAL_MIN}min package=${UPDATE_CHECK_PACKAGE || '(none)'} current=${UPDATE_CHECK_CURRENT_VERSION || '(none)'} git=${UPDATE_CHECK_GIT_REMOTE}/${UPDATE_CHECK_GIT_REF}`);
-  console.log(`- qrOverlay: size=${QR_OVERLAY_SIZE}px margin=${QR_OVERLAY_MARGIN}px topOffset=${TOP_BAR_OFFSET_PX}px`);
-  console.log(`- graphicalDisplay: ${HAS_GRAPHICAL_DISPLAY}`);
-  console.log(`- httpsEnabled: ${HTTPS_ENABLED}`);
-  if (HTTPS_ENABLED) {
-    console.log(`- sslKeyPath: ${SSL_KEY_PATH || '(missing)'}`);
-    console.log(`- sslCertPath: ${SSL_CERT_PATH || '(missing)'}`);
+  return {
+    protocol,
+    port: PORT,
+    serverHost: SERVER_HOST,
+    entryPath: {
+      enabled: ENTRY_PATH_ENABLED || Boolean(ENTRY_PATH_FIXED),
+      fixed: ENTRY_PATH_FIXED,
+      tokenLength: ENTRY_PATH_TOKEN_LENGTH,
+      rotateMin: ENTRY_PATH_ROTATE_INTERVAL_MIN,
+      graceMin: ENTRY_PATH_GRACE_MIN,
+      stateFile: ENTRY_PATH_STATE_FILE,
+    },
+    session: {
+      cookieName: SESSION_COOKIE_NAME,
+      cookieSecret: SESSION_COOKIE_SECRET,
+      cookieMaxAgeDays: SESSION_COOKIE_MAX_AGE_DAYS,
+      cookieSecure: HTTPS_ENABLED,
+      cookieSecretSet: SESSION_COOKIE_SECRET !== 'change-me',
+      socketEventMaxAgeMs: SOCKET_EVENT_MAX_AGE_MS,
+      logFormat: LOG_FORMAT,
+    },
+    input: {
+      mouseSpeed: MOUSE_SPEED,
+      scrollSpeed: SCROLL_SPEED,
+    },
+    preview: {
+      width: PREVIEW_WIDTH,
+      height: PREVIEW_HEIGHT,
+      fps: PREVIEW_FPS,
+    },
+    notifications: {
+      desktop: DESKTOP_NOTIFICATIONS_ENABLED,
+      client: CLIENT_NOTIFICATIONS_ENABLED,
+      ttlMs: NOTIFICATION_TTL_MS,
+    },
+    adminActionsEnabled: ADMIN_ACTIONS_ENABLED,
+    serviceName: SERVICE_NAME,
+    updateCheck: {
+      enabled: UPDATE_CHECK_ENABLED,
+      source: UPDATE_CHECK_SOURCE,
+      intervalMin: UPDATE_CHECK_INTERVAL_MIN,
+      packageName: UPDATE_CHECK_PACKAGE,
+      currentVersion: UPDATE_CHECK_CURRENT_VERSION,
+      gitRemote: UPDATE_CHECK_GIT_REMOTE,
+      gitRef: UPDATE_CHECK_GIT_REF,
+      installCommand: UPDATE_INSTALL_COMMAND,
+      installTimeoutSec: UPDATE_INSTALL_TIMEOUT_SEC,
+    },
+    qrOverlay: {
+      enabled: QR_OVERLAY_ENABLED,
+      size: QR_OVERLAY_SIZE,
+      margin: QR_OVERLAY_MARGIN,
+      topOffsetPx: TOP_BAR_OFFSET_PX,
+    },
+    graphicalDisplay: HAS_GRAPHICAL_DISPLAY,
+    https: {
+      enabled: HTTPS_ENABLED,
+      sslKeyPath: HTTPS_ENABLED ? SSL_KEY_PATH : undefined,
+      sslCertPath: HTTPS_ENABLED ? SSL_CERT_PATH : undefined,
+    },
+    logging: {
+      level: LOG_LEVEL,
+      format: LOG_FORMAT,
+    },
+  };
+}
+
+function emitConfigLine(logger, message, fields = {}) {
+  if (logger && typeof logger.info === 'function') {
+    logger.info(fields, message);
+    return;
   }
-  console.log('');
+  console.log(`${message} ${JSON.stringify(fields)}`);
+}
+
+export function logStartupConfig(logger) {
+  const payload = getStartupConfigSnapshot();
+  emitConfigLine(logger, 'Configuration');
+  emitConfigLine(logger, 'config.network', {
+    protocol: payload.protocol,
+    port: payload.port,
+    serverHost: payload.serverHost || '(auto LAN detection)',
+  });
+  emitConfigLine(logger, 'config.entryPath', {
+    ...payload.entryPath,
+    fixed: payload.entryPath.fixed || '(random)',
+  });
+  emitConfigLine(logger, 'config.session', {
+    ...payload.session,
+    cookieSecret: undefined,
+  });
+  emitConfigLine(logger, 'config.input', payload.input);
+  emitConfigLine(logger, 'config.preview', payload.preview);
+  emitConfigLine(logger, 'config.notifications', payload.notifications);
+  emitConfigLine(logger, 'config.admin', {
+    adminActionsEnabled: payload.adminActionsEnabled,
+    serviceName: payload.serviceName,
+  });
+  emitConfigLine(logger, 'config.update', {
+    ...payload.updateCheck,
+    packageName: payload.updateCheck.packageName || '(none)',
+    currentVersion: payload.updateCheck.currentVersion || '(none)',
+    installCommand: payload.updateCheck.installCommand || '(unset)',
+  });
+  emitConfigLine(logger, 'config.qrOverlay', payload.qrOverlay);
+  emitConfigLine(logger, 'config.runtime', {
+    graphicalDisplay: payload.graphicalDisplay,
+    https: {
+      ...payload.https,
+      sslKeyPath: payload.https.enabled ? (payload.https.sslKeyPath || '(missing)') : undefined,
+      sslCertPath: payload.https.enabled ? (payload.https.sslCertPath || '(missing)') : undefined,
+    },
+  });
 }

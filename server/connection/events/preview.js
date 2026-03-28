@@ -1,4 +1,4 @@
-export function createPreviewEventRegister({ preview }) {
+export function createPreviewEventRegistrar({ preview }) {
   return function registerPreviewEvents(socket) {
     let previewSession = null;
 
