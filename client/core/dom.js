@@ -25,6 +25,9 @@ export function getDom() {
   const btnForceUpdateCheck = document.getElementById('btn-force-update-check');
   const btnInstallUpdate = document.getElementById('btn-install-update');
   const btnRestartService = document.getElementById('btn-restart-service');
+  const btnOpenQrBrowser = document.getElementById('btn-open-qr-browser');
+  const btnOpenServerInfoBrowser = document.getElementById('btn-open-server-info-browser');
+  const adminAppVersion = document.getElementById('admin-app-version');
   const connectionOverlay = document.getElementById('connection-overlay');
   const notificationsRoot = document.getElementById('client-notifications');
   const previewCanvas = document.getElementById('preview-canvas');
@@ -56,6 +59,9 @@ export function getDom() {
     btnForceUpdateCheck,
     btnInstallUpdate,
     btnRestartService,
+    btnOpenQrBrowser,
+    btnOpenServerInfoBrowser,
+    adminAppVersion,
     connectionOverlay,
     notificationsRoot,
     previewCanvas,

@@ -1,5 +1,6 @@
 import { createBrowserReceiverState } from './state.js';
 import { createFocusOrLaunchBraveAction } from './actions/focus-or-launch-brave.js';
+import {openUrlOnHost} from './actions/open-url-on-host.js';
 
 export function createBrowserReceiver() {
   const state = createBrowserReceiverState();
@@ -18,5 +19,6 @@ export function createBrowserReceiver() {
       await focusOrLaunchBrave();
     },
     focusOrLaunchBrave,
+    openUrlOnHost,
   };
 }

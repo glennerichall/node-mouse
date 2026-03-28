@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Remote Mouse - Server Info</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0f1419;
+      --panel: #1a242d;
+      --text: #e9f1f8;
+      --muted: #9ab0c4;
+      --line: rgba(255,255,255,.12);
+      --accent: #5fd3ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: radial-gradient(circle at 10% 0, #1b2a35, var(--bg));
+      color: var(--text);
+    }
+    main { max-width: 1200px; margin: 0 auto; padding: 18px; display: grid; gap: 12px; }
+    h1 { margin: 0; font-size: 1.05rem; }
+    .meta { color: var(--muted); font-size: .9rem; display: flex; flex-wrap: wrap; gap: 12px; }
+    section {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    h2 { margin: 0 0 10px; font-size: .95rem; color: var(--accent); }
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    th, td { text-align: left; border-bottom: 1px solid var(--line); padding: 6px; }
+    pre {
+      margin: 0;
+      font-size: .8rem;
+      line-height: 1.35;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 360px;
+      overflow: auto;
+    }
+    #logs { max-height: 440px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Remote Mouse - Server Info</h1>
+    <div class="meta">
+      <span id="version">Version: -</span>
+      <span id="now">Now: -</span>
+      <span id="online-since">Online since: -</span>
+      <span id="uptime">Uptime: -</span>
+      <span id="clients-count">Clients: 0</span>
+    </div>
+
+    <section>
+      <h2>Clients connectes</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Connecte depuis</th>
+            <th>Adresse</th>
+            <th>Transport</th>
+          </tr>
+        </thead>
+        <tbody id="clients-table"></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Configuration</h2>
+      <pre id="config"></pre>
+    </section>
+
+    <section>
+      <h2>Logs recents</h2>
+      <pre id="logs"></pre>
+    </section>
+  </main>
+
+  <script>
+    const versionEl = document.getElementById('version');
+    const nowEl = document.getElementById('now');
+    const onlineSinceEl = document.getElementById('online-since');
+    const uptimeEl = document.getElementById('uptime');
+    const clientsCountEl = document.getElementById('clients-count');
+    const clientsTable = document.getElementById('clients-table');
+    const configEl = document.getElementById('config');
+    const logsEl = document.getElementById('logs');
+
+    function formatDuration(totalSec) {
+      const s = Math.max(0, Number(totalSec) || 0);
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      const sec = s % 60;
+      return `${h}h ${m}m ${sec}s`;
+    }
+
+    function renderClients(clients) {
+      clientsTable.innerHTML = '';
+      if (!Array.isArray(clients) || clients.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="4">Aucun client connecte.</td>';
+        clientsTable.appendChild(row);
+        return;
+      }
+
+      for (const client of clients) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${client.id || ''}</td>
+          <td>${client.connectedAt || '-'}</td>
+          <td>${client.address || '-'}</td>
+          <td>${client.transport || '-'}</td>
+        `;
+        clientsTable.appendChild(row);
+      }
+    }
+
+    function renderLogs(logs) {
+      if (!Array.isArray(logs) || logs.length === 0) {
+        logsEl.textContent = 'Aucun log.';
+        return;
+      }
+      logsEl.textContent = logs.map((entry) => {
+        const prefix = `[${entry.at}] [${entry.level}] [${entry.scope}]`;
+        const msg = entry.message || '';
+        const data = entry.data ? ` ${JSON.stringify(entry.data)}` : '';
+        return `${prefix} ${msg}${data}`;
+      }).join('\n');
+      logsEl.scrollTop = logsEl.scrollHeight;
+    }
+
+    async function refresh() {
+      try {
+        const response = await fetch('/admin/server-info/data', { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const data = await response.json();
+        versionEl.textContent = `Version: ${String(data.version || 'unknown')}`;
+        nowEl.textContent = `Now: ${data.now || '-'}`;
+        onlineSinceEl.textContent = `Online since: ${data.onlineSince || '-'}`;
+        uptimeEl.textContent = `Uptime: ${formatDuration(data.uptimeSec)}`;
+        clientsCountEl.textContent = `Clients: ${Number(data.clientsConnected) || 0}`;
+        renderClients(data.clients || []);
+        configEl.textContent = JSON.stringify(data.config || {}, null, 2);
+        renderLogs(data.logs || []);
+      } catch (error) {
+        logsEl.textContent = `Erreur de chargement: ${error?.message || error}`;
+      }
+    }
+
+    refresh();
+    setInterval(refresh, 2000);
+  </script>
+</body>
+</html>

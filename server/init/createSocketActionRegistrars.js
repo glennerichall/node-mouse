@@ -30,7 +30,7 @@ export async function createSocketActionRegistrars(instances) {
 
     const updateChecker = await startUpdateChecker(notifier);
 
-    const adminActions = createAdminActions({notifier, updateChecker});
+    const adminActions = createAdminActions({notifier, updateChecker, browser});
 
     return [
         createControlEventRegistrar({mouse, keyboard}),

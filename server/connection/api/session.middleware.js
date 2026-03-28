@@ -1,5 +1,29 @@
 import express from "express";
 
+function isLocalHostName(value) {
+    const host = String(value || '').toLowerCase();
+    return host === 'localhost' || host === '127.0.0.1' || host === '::1';
+}
+
+function isLocalAddress(value) {
+    const address = String(value || '').toLowerCase();
+    return (
+        address === '127.0.0.1'
+        || address === '::1'
+        || address === '::ffff:127.0.0.1'
+    );
+}
+
+function isLocalRequest(req) {
+    const hostHeader = String(req.headers?.host || '').split(':')[0];
+    return (
+        isLocalAddress(req.ip)
+        || isLocalAddress(req.socket?.remoteAddress)
+        || isLocalHostName(req.hostname)
+        || isLocalHostName(hostHeader)
+    );
+}
+
 export const createSessionCreationMiddleware = ({
                                             cookieName,
                                             cookieMaxAgeMs,
@@ -24,6 +48,12 @@ export function createSessionValidationMiddleware({
                                                       cookieName
                                                   }) {
     return (req, res, next) => {
+        if (isLocalRequest(req)) {
+            req.sessionToken = req.signedCookies && req.signedCookies[cookieName];
+            next();
+            return;
+        }
+
         const token = req.signedCookies && req.signedCookies[cookieName];
         if (!tokenManager.isValid(token)) {
             res.status(401).type('text/plain').send('Unauthorized');

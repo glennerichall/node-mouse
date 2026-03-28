@@ -8,6 +8,7 @@ import { bindConnectionOverlay } from '../ui/connection-overlay.js';
 import { bindPreviewStream } from '../preview/preview-stream.js';
 import { bindClientNotifications } from '../ui/notifications/bind-client-notifications.js';
 import { bindAdminDrawer } from '../ui/admin-drawer.js';
+import { bindAdminVersion } from '../ui/admin-version.js';
 
 export function initUi(socket) {
   const dom = getDom();
@@ -26,7 +27,9 @@ export function initUi(socket) {
     app: dom.app,
     touchpad: dom.touchpad,
     scrim: dom.adminDrawerScrim,
+    adminPanel: dom.leftMenu,
   });
+  bindAdminVersion(dom.adminAppVersion);
 
   window.addEventListener('resize', canvasUI.resize);
   canvasUI.resize();

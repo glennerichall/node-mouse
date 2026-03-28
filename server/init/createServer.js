@@ -24,6 +24,7 @@ function createHttpsServer(app) {
 }
 
 export async function createServer(instances) {
+    const serverStartedAt = Date.now();
     const app = express();
     
     const server = config.https.enabled
@@ -52,6 +53,7 @@ export async function createServer(instances) {
         app,
         server,
         io,
+        serverStartedAt,
         tokenManager,
         basePublicUrl,
         robot,

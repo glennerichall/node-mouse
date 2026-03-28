@@ -5,7 +5,22 @@ export function createSocketSessionAuthMiddleware({
                                                   {
                                         cookieName
                                     }) {
+    function isLocalAddress(value) {
+        const address = String(value || '').toLowerCase();
+        return (
+            address === '127.0.0.1'
+            || address === '::1'
+            || address === '::ffff:127.0.0.1'
+        );
+    }
+
     function authorizeSocket(socket, next) {
+        const remoteAddress = socket.request?.socket?.remoteAddress;
+        if (isLocalAddress(remoteAddress)) {
+            next();
+            return;
+        }
+
         const token = socket.request?.signedCookies?.[cookieName];
         if (!tokenManager.isValid(token)) {
             next(new Error('unauthorized'));

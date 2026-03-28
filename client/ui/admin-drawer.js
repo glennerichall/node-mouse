@@ -3,7 +3,7 @@ const SWIPE_OPEN_PX = 64;
 const SWIPE_CLOSE_PX = 54;
 const MAX_VERTICAL_DRIFT_PX = 44;
 
-export function bindAdminDrawer({ app, touchpad, scrim }) {
+export function bindAdminDrawer({ app, touchpad, scrim, adminPanel }) {
   if (!app || !touchpad) {
     return;
   }
@@ -86,6 +86,14 @@ export function bindAdminDrawer({ app, touchpad, scrim }) {
   touchpad.addEventListener('touchmove', onTouchMove, { passive: true });
   touchpad.addEventListener('touchend', onTouchEnd, { passive: true });
   touchpad.addEventListener('touchcancel', onTouchEnd, { passive: true });
+
+  if (adminPanel) {
+    adminPanel.addEventListener('touchstart', onTouchStart, { passive: true });
+    adminPanel.addEventListener('touchmove', onTouchMove, { passive: true });
+    adminPanel.addEventListener('touchend', onTouchEnd, { passive: true });
+    adminPanel.addEventListener('touchcancel', onTouchEnd, { passive: true });
+  }
+
   if (scrim) {
     scrim.addEventListener('click', onScrimClick);
     scrim.addEventListener('touchstart', onScrimClick, { passive: true });

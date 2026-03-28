@@ -38,5 +38,17 @@ export function createAdminEventRegistrar({ adminActions }) {
       const result = await adminActions.restartService({ clientId: socket.id });
       respondAdminAction('service-restart', result);
     });
+
+    socket.on('admin:open-qr-browser', async () => {
+      log.info({ client }, 'Demande admin:open-qr-browser');
+      const result = await adminActions.openQrBrowser({ clientId: socket.id });
+      respondAdminAction('open-qr-browser', result);
+    });
+
+    socket.on('admin:open-server-info-browser', async () => {
+      log.info({ client }, 'Demande admin:open-server-info-browser');
+      const result = await adminActions.openServerInfoBrowser({ clientId: socket.id });
+      respondAdminAction('open-server-info-browser', result);
+    });
   };
 }

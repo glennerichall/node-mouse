@@ -47,8 +47,8 @@ body {
   padding: 8px 8px 10px;
   box-sizing: border-box;
   overflow: hidden;
-  display: grid;
-  align-content: start;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
   background: color-mix(in srgb, var(--bg-2) 85%, black);
   border-right: 1px solid rgba(255, 255, 255, 0.1);
@@ -80,6 +80,15 @@ body {
 #left-menu button:active {
   transform: translateY(1px);
   background: #384955;
+}
+
+#admin-app-version {
+  margin: auto 0 0;
+  padding: 8px 6px 2px;
+  opacity: 0.72;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  text-align: center;
 }
 
 #touch-area {

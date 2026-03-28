@@ -18,6 +18,8 @@ export function bindActionButtons(
     btnForceUpdateCheck,
     btnInstallUpdate,
     btnRestartService,
+    btnOpenQrBrowser,
+    btnOpenServerInfoBrowser,
   },
 ) {
   btnEnter.addEventListener('click', () => emitWithTimestamp(socket, 'keyboard:key', { key: 'enter' }));
@@ -52,4 +54,6 @@ export function bindActionButtons(
   btnForceUpdateCheck.addEventListener('click', () => emitWithTimestamp(socket, 'admin:update-check'));
   btnInstallUpdate.addEventListener('click', () => emitWithTimestamp(socket, 'admin:update-install'));
   btnRestartService.addEventListener('click', () => emitWithTimestamp(socket, 'admin:service-restart'));
+  btnOpenQrBrowser.addEventListener('click', () => emitWithTimestamp(socket, 'admin:open-qr-browser'));
+  btnOpenServerInfoBrowser.addEventListener('click', () => emitWithTimestamp(socket, 'admin:open-server-info-browser'));
 }
