@@ -6,12 +6,7 @@ const config = getStartupConfigSnapshot();
 const log = createLogger('admin:install-update');
 
 export function createInstallUpdateAction({ notifier, updateChecker }) {
-  return async function installUpdate() {
-    if (!config.adminActionsEnabled) {
-      log.warn('Install update refusé: admin actions désactivées');
-      return { ok: false, message: 'Actions admin desactivees.' };
-    }
-
+  return async function installUpdate({ clientId } = {}) {
     log.info('Début install update');
     const inferredCommand = updateChecker && typeof updateChecker.getInstallCommand === 'function'
       ? String(updateChecker.getInstallCommand() || '').trim()
@@ -25,6 +20,8 @@ export function createInstallUpdateAction({ notifier, updateChecker }) {
         title: 'Update install',
         message: 'Aucune commande update disponible (configurer UPDATE_INSTALL_COMMAND ou UPDATE_CHECK_PACKAGE).',
         ttlMs: 3600,
+        target: 'client',
+        clientId,
       });
       return {
         ok: false,
@@ -37,6 +34,8 @@ export function createInstallUpdateAction({ notifier, updateChecker }) {
       title: 'Update install',
       message: 'Installation de mise a jour demarree...',
       ttlMs: 2200,
+      target: 'client',
+      clientId,
     });
 
     const timeoutMs = Math.max(10_000, config.updateCheck.installTimeoutSec * 1000);
@@ -49,6 +48,8 @@ export function createInstallUpdateAction({ notifier, updateChecker }) {
         title: 'Update install',
         message: 'Installation terminee avec succes.',
         ttlMs: 3200,
+        target: 'client',
+        clientId,
       });
       return { ok: true, message: 'Installation terminee.' };
     }
@@ -60,6 +61,8 @@ export function createInstallUpdateAction({ notifier, updateChecker }) {
       title: 'Update install',
       message: `Echec installation: ${details}`,
       ttlMs: 5000,
+      target: 'client',
+      clientId,
     });
 
     return { ok: false, message: `Echec installation: ${details}` };

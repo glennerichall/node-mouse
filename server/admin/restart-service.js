@@ -6,11 +6,7 @@ import { writeRestartMarker } from './restart-marker.js';
 const config = getStartupConfigSnapshot();
 
 export function createRestartServiceAction({ notifier }) {
-  return async function restartService() {
-    if (!config.adminActionsEnabled) {
-      return { ok: false, message: 'Actions admin desactivees.' };
-    }
-
+  return async function restartService({ clientId } = {}) {
     if (!(await commandExists('systemctl'))) {
       return { ok: false, message: 'systemctl indisponible.' };
     }
@@ -21,6 +17,8 @@ export function createRestartServiceAction({ notifier }) {
       title: 'Redemarrage service',
       message: `Redemarrage de ${config.serviceName} en cours...`,
       ttlMs: 2200,
+      target: 'client',
+      clientId,
     });
 
     const child = spawn(
