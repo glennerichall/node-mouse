@@ -53,7 +53,6 @@ export const ADMIN_ACTIONS_ENABLED = readBoolean('ADMIN_ACTIONS_ENABLED', true);
 export const SERVICE_NAME = readString('SERVICE_NAME', 'remote-mouse.service');
 export const UPDATE_CHECK_ENABLED = readBoolean('UPDATE_CHECK_ENABLED', false);
 export const UPDATE_CHECK_INTERVAL_MIN = readNumber('UPDATE_CHECK_INTERVAL_MIN', 360, { min: 1, max: 24 * 60 });
-export const UPDATE_CHECK_SOURCE = readString('UPDATE_CHECK_SOURCE', 'auto').toLowerCase();
 export const UPDATE_CHECK_COMMAND = readString('UPDATE_CHECK_COMMAND', '');
 export const UPDATE_CHECK_TIMEOUT_SEC = readNumber('UPDATE_CHECK_TIMEOUT_SEC', 20, { min: 1, max: 600 });
 export const UPDATE_CHECK_PACKAGE = readString('UPDATE_CHECK_PACKAGE', String(packageJson.name || '').trim());
@@ -61,8 +60,6 @@ export const UPDATE_CHECK_CURRENT_VERSION = readString(
   'UPDATE_CHECK_CURRENT_VERSION',
   String(packageJson.version || '').trim(),
 );
-export const UPDATE_CHECK_GIT_REMOTE = readString('UPDATE_CHECK_GIT_REMOTE', 'origin');
-export const UPDATE_CHECK_GIT_REF = readString('UPDATE_CHECK_GIT_REF', 'HEAD');
 export const UPDATE_INSTALL_COMMAND = readString('UPDATE_INSTALL_COMMAND', '');
 export const UPDATE_INSTALL_TIMEOUT_SEC = readNumber('UPDATE_INSTALL_TIMEOUT_SEC', 600, { min: 10, max: 7200 });
 export const UPDATE_INSTALL_AUTO_MERGE_ENV = readBoolean('UPDATE_INSTALL_AUTO_MERGE_ENV', true);
@@ -125,14 +122,11 @@ export function getStartupConfigSnapshot() {
     serviceName: SERVICE_NAME,
     updateCheck: {
       enabled: UPDATE_CHECK_ENABLED,
-      source: UPDATE_CHECK_SOURCE,
       checkCommand: UPDATE_CHECK_COMMAND,
       checkTimeoutSec: UPDATE_CHECK_TIMEOUT_SEC,
       intervalMin: UPDATE_CHECK_INTERVAL_MIN,
       packageName: UPDATE_CHECK_PACKAGE,
       currentVersion: UPDATE_CHECK_CURRENT_VERSION,
-      gitRemote: UPDATE_CHECK_GIT_REMOTE,
-      gitRef: UPDATE_CHECK_GIT_REF,
       installCommand: UPDATE_INSTALL_COMMAND,
       installTimeoutSec: UPDATE_INSTALL_TIMEOUT_SEC,
       autoMergeEnv: UPDATE_INSTALL_AUTO_MERGE_ENV,

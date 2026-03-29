@@ -1,143 +1,32 @@
 import os from 'node:os';
-import path from 'node:path';
-import { spawn } from 'node:child_process';
-import QRCode from 'qrcode';
-import {getStartupConfigSnapshot} from '../init/config.js';
-import { commandExists } from '../utils/process.js';
 import {createLogger} from '../log/logger.js';
+import {startQrOverlayYad} from './qr-overlay-yad.js';
+import {startQrOverlayWin32} from './qr-overlay-win32.js';
 
 const log = createLogger('qr-overlay');
-const config = getStartupConfigSnapshot();
 
-export async function startQrOverlay({ getUrl, robot }) {
-  const isSupported = config.qrOverlay.enabled
-    && os.platform() === 'linux'
-    && config.graphicalDisplay;
-
-  if (!isSupported) {
-    return {
-      close: () => {},
-      refresh: async () => {},
-      show: async () => false,
-      hide: () => false,
-      toggle: async () => false,
-      isVisible: () => false,
-    };
-  }
-
-  const hasYad = await commandExists('yad');
-  if (!hasYad) {
-    log.warn('Overlay QR non lancé: "yad" est introuvable.');
-    return {
-      close: () => {},
-      refresh: async () => {},
-      show: async () => false,
-      hide: () => false,
-      toggle: async () => false,
-      isVisible: () => false,
-    };
-  }
-
-  const size = config.qrOverlay.size;
-  const margin = config.qrOverlay.margin;
-  const topBarOffset = config.qrOverlay.topOffsetPx;
-  const qrPath = path.join(os.tmpdir(), 'remote-mouse-qr-overlay.png');
-  let child = null;
-  let refreshChain = Promise.resolve();
-  let visible = true;
-
-  const close = () => {
-    if (child && !child.killed) {
-      child.kill('SIGTERM');
-    }
-    child = null;
-  };
-
-  async function spawnOverlay() {
-    await QRCode.toFile(qrPath, getUrl(), { width: size, margin: 1 });
-
-    const screen = robot.getScreenSize();
-    const posX = Math.max(0, screen.width - size - margin);
-    const posY = Math.max(0, margin + topBarOffset);
-
-    const args = [
-      '--class=remote-mouse-qr-overlay',
-      '--undecorated',
-      '--skip-taskbar',
-      '--sticky',
-      '--on-top',
-      '--no-buttons',
-      '--fixed',
-      `--width=${size}`,
-      `--height=${size}`,
-      `--posx=${posX}`,
-      `--posy=${posY}`,
-      `--image=${qrPath}`,
-      '--text=',
-    ];
-
-    child = spawn('yad', args, { stdio: 'ignore' });
-    log.debug({ url: getUrl() }, 'QR overlay rafraîchi');
-  }
-
-  const refresh = async () => {
-    if (!visible) {
-      return;
-    }
-
-    refreshChain = refreshChain
-      .then(async () => {
-        close();
-        await spawnOverlay();
-      })
-      .catch((_error) => {});
-
-    await refreshChain;
-  };
-
-  const handleSigint = () => {
-    close();
-    process.exit(130);
-  };
-
-  const handleSigterm = () => {
-    close();
-    process.exit(143);
-  };
-
-  process.on('exit', close);
-  process.once('SIGINT', handleSigint);
-  process.once('SIGTERM', handleSigterm);
-
-  await refresh();
-
-  const hide = () => {
-    visible = false;
-    close();
-    return visible;
-  };
-
-  const show = async () => {
-    visible = true;
-    await refresh();
-    return visible;
-  };
-
-  const toggle = async () => {
-    if (visible) {
-      hide();
-      return visible;
-    }
-    await show();
-    return visible;
-  };
-
+function createNoopOverlay() {
   return {
-    close,
-    refresh,
-    show,
-    hide,
-    toggle,
-    isVisible: () => visible,
+    close: () => {},
+    refresh: async () => {},
+    show: async () => false,
+    hide: () => false,
+    toggle: async () => false,
+    isVisible: () => false,
   };
+}
+
+export async function startQrOverlay(params) {
+  const platform = os.platform();
+
+  if (platform === 'linux') {
+    return startQrOverlayYad(params);
+  }
+
+  if (platform === 'win32') {
+    return startQrOverlayWin32(params);
+  }
+
+  log.info({ platform }, 'QR overlay non supporté sur cette plateforme');
+  return createNoopOverlay();
 }
