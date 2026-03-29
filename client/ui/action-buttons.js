@@ -20,6 +20,7 @@ export function bindActionButtons(
     btnRestartService,
     btnOpenQrBrowser,
     btnOpenServerInfoBrowser,
+    btnRotateEntryToken,
   },
 ) {
   btnEnter.addEventListener('click', () => emitWithTimestamp(socket, 'keyboard:key', { key: 'enter' }));
@@ -56,4 +57,5 @@ export function bindActionButtons(
   btnRestartService.addEventListener('click', () => emitWithTimestamp(socket, 'admin:service-restart'));
   btnOpenQrBrowser.addEventListener('click', () => emitWithTimestamp(socket, 'admin:open-qr-browser'));
   btnOpenServerInfoBrowser.addEventListener('click', () => emitWithTimestamp(socket, 'admin:open-server-info-browser'));
+  btnRotateEntryToken.addEventListener('click', () => emitWithTimestamp(socket, 'admin:rotate-entry-token'));
 }

@@ -50,5 +50,11 @@ export function createAdminEventRegistrar({ adminActions }) {
       const result = await adminActions.openServerInfoBrowser({ clientId: socket.id });
       respondAdminAction('open-server-info-browser', result);
     });
+
+    socket.on('admin:rotate-entry-token', async () => {
+      log.info({ client }, 'Demande admin:rotate-entry-token');
+      const result = await adminActions.rotateEntryToken({ clientId: socket.id });
+      respondAdminAction('rotate-entry-token', result);
+    });
   };
 }

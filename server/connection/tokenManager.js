@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import {createRandomToken} from '../../utils/server/createRandomToken.js';
+import {createRandomToken} from '../utils/createRandomToken.js';
 import {createLogger} from '../log/logger.js';
 
 const log = createLogger('token-manager');

@@ -6,7 +6,7 @@ import {
     projectRoot,
     publicDir,
     sharedUtilsDir
-} from '../../utils/server/paths.js';
+} from '../utils/paths.js';
 import {
     getStartupConfigSnapshot,
     HTTPS_ENABLED,

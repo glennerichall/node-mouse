@@ -7,8 +7,8 @@ import {
 } from './config.js';
 import {Server} from "socket.io";
 import {createTokenManager} from "../connection/tokenManager.js";
-import {getPublicUrl} from "../../utils/server/network.js";
-import {loadRobot} from "../../utils/server/robot.js";
+import {getPublicUrl} from "../utils/network.js";
+import {loadRobot} from "../utils/robot.js";
 import {createNotifier} from "../notifier/notifier.js";
 
 const config = getStartupConfigSnapshot();

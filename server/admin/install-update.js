@@ -1,6 +1,7 @@
 import {getStartupConfigSnapshot} from '../init/config.js';
-import { execShell, truncateText } from './helpers.js';
+import { execShell } from '../utils/process.js';
 import {createLogger} from '../log/logger.js';
+import {truncateText} from "../utils/truncateText.js";
 
 const config = getStartupConfigSnapshot();
 const log = createLogger('admin:install-update');

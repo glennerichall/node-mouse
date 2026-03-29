@@ -1,4 +1,4 @@
-import { runGit } from '../../../utils/server/git.js';
+import { runGit } from '../../utils/git.js';
 import { buildNpmGlobalUpdateCommand } from '../install-command.js';
 
 export class GitUpdateSource {

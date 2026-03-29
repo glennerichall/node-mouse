@@ -1,4 +1,4 @@
-import { execFileAsync } from '../../../utils/server/process.js';
+import { execFileAsync } from '../../utils/process.js';
 
 export function createLinuxHostNotifier({ fallbackNotifier }) {
   return {

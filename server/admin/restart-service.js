@@ -1,6 +1,5 @@
-import { spawn } from 'child_process';
 import {getStartupConfigSnapshot} from '../init/config.js';
-import { commandExists } from './helpers.js';
+import { commandExists, spawnDetached } from '../utils/process.js';
 import { writeRestartMarker } from './restart-marker.js';
 
 const config = getStartupConfigSnapshot();
@@ -21,15 +20,13 @@ export function createRestartServiceAction({ notifier }) {
       clientId,
     });
 
-    const child = spawn(
+    const spawned = await spawnDetached(
       'bash',
       ['-lc', `sleep 0.8; systemctl --user restart ${config.serviceName}`],
-      {
-        detached: true,
-        stdio: 'ignore',
-      },
     );
-    child.unref();
+    if (!spawned) {
+      return { ok: false, message: 'Impossible de lancer la commande de redemarrage.' };
+    }
 
     return { ok: true, message: `Redemarrage demande pour ${config.serviceName}.` };
   };

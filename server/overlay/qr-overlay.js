@@ -3,7 +3,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import QRCode from 'qrcode';
 import {getStartupConfigSnapshot} from '../init/config.js';
-import { commandExists } from '../../utils/server/process.js';
+import { commandExists } from '../utils/process.js';
 import {createLogger} from '../log/logger.js';
 
 const log = createLogger('qr-overlay');

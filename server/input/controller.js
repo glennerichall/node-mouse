@@ -1,7 +1,7 @@
 import {createKeyboardController} from "./keyboard-controller.js";
 import {getStartupConfigSnapshot} from "../init/config.js";
 import {createMouseController} from "./mouse-controller.js";
-import {loadRobot} from "../../utils/server/robot.js";
+import {loadRobot} from "../utils/robot.js";
 
 const config = getStartupConfigSnapshot();
 

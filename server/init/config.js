@@ -9,7 +9,7 @@ import {
   readNumber,
   readString,
   resolveEnvFilePath,
-} from '../../utils/server/env.js';
+} from '../utils/env.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

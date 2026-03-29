@@ -1,5 +1,5 @@
 import os from 'os';
-import {commandExists, execFileAsync, spawnDetached} from '../../../utils/server/process.js';
+import {commandExists, execFileAsync, spawnDetached} from '../../utils/process.js';
 
 export async function openUrlOnHost(url) {
   const safeUrl = String(url || '').trim();

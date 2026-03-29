@@ -27,6 +27,7 @@ export function getDom() {
   const btnRestartService = document.getElementById('btn-restart-service');
   const btnOpenQrBrowser = document.getElementById('btn-open-qr-browser');
   const btnOpenServerInfoBrowser = document.getElementById('btn-open-server-info-browser');
+  const btnRotateEntryToken = document.getElementById('btn-rotate-entry-token');
   const adminAppVersion = document.getElementById('admin-app-version');
   const connectionOverlay = document.getElementById('connection-overlay');
   const notificationsRoot = document.getElementById('client-notifications');
@@ -61,6 +62,7 @@ export function getDom() {
     btnRestartService,
     btnOpenQrBrowser,
     btnOpenServerInfoBrowser,
+    btnRotateEntryToken,
     adminAppVersion,
     connectionOverlay,
     notificationsRoot,
