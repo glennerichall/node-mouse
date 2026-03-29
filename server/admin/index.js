@@ -4,11 +4,12 @@ import { createRestartServiceAction } from './restart-service.js';
 import { createOpenQrBrowserAction } from './open-qr-browser.js';
 import { createOpenServerInfoBrowserAction } from './open-server-info-browser.js';
 import { createRotateEntryTokenAction } from './rotate-entry-token.js';
+import { createToggleQrOverlayAction } from './toggle-qr-overlay.js';
 import { notifyIfRestarted } from './restart-marker.js';
 
 export { notifyIfRestarted };
 
-export function createAdminActions({ notifier, updateChecker, browser, tokenManager }) {
+export function createAdminActions({ notifier, updateChecker, browser, tokenManager, qrOverlay }) {
   return {
     forceUpdateCheck: createForceUpdateCheckAction({ notifier, updateChecker }),
     installUpdate: createInstallUpdateAction({ notifier, updateChecker }),
@@ -16,5 +17,6 @@ export function createAdminActions({ notifier, updateChecker, browser, tokenMana
     openQrBrowser: createOpenQrBrowserAction({ notifier, browser }),
     openServerInfoBrowser: createOpenServerInfoBrowserAction({ notifier, browser }),
     rotateEntryToken: createRotateEntryTokenAction({ notifier, tokenManager }),
+    toggleQrOverlay: createToggleQrOverlayAction({ notifier, qrOverlay }),
   };
 }

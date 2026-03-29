@@ -13,7 +13,7 @@ import {createConnectionRegistrar} from "../connection/socket/createConnectionRe
 const config = getStartupConfigSnapshot();
 
 export async function createSocketActionRegistrars(instances) {
-    const {notifier, robot, tokenManager} = instances;
+    const {notifier, robot, tokenManager, qrOverlay} = instances;
 
     const {
         mouse,
@@ -30,7 +30,7 @@ export async function createSocketActionRegistrars(instances) {
 
     const updateChecker = await startUpdateChecker(notifier);
 
-    const adminActions = createAdminActions({notifier, updateChecker, browser, tokenManager});
+    const adminActions = createAdminActions({notifier, updateChecker, browser, tokenManager, qrOverlay});
 
     return [
         createControlEventRegistrar({mouse, keyboard}),

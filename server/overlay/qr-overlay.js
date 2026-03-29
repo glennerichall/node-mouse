@@ -18,6 +18,10 @@ export async function startQrOverlay({ getUrl, robot }) {
     return {
       close: () => {},
       refresh: async () => {},
+      show: async () => false,
+      hide: () => false,
+      toggle: async () => false,
+      isVisible: () => false,
     };
   }
 
@@ -27,6 +31,10 @@ export async function startQrOverlay({ getUrl, robot }) {
     return {
       close: () => {},
       refresh: async () => {},
+      show: async () => false,
+      hide: () => false,
+      toggle: async () => false,
+      isVisible: () => false,
     };
   }
 
@@ -36,6 +44,7 @@ export async function startQrOverlay({ getUrl, robot }) {
   const qrPath = path.join(os.tmpdir(), 'remote-mouse-qr-overlay.png');
   let child = null;
   let refreshChain = Promise.resolve();
+  let visible = true;
 
   const close = () => {
     if (child && !child.killed) {
@@ -72,6 +81,10 @@ export async function startQrOverlay({ getUrl, robot }) {
   }
 
   const refresh = async () => {
+    if (!visible) {
+      return;
+    }
+
     refreshChain = refreshChain
       .then(async () => {
         close();
@@ -98,8 +111,33 @@ export async function startQrOverlay({ getUrl, robot }) {
 
   await refresh();
 
+  const hide = () => {
+    visible = false;
+    close();
+    return visible;
+  };
+
+  const show = async () => {
+    visible = true;
+    await refresh();
+    return visible;
+  };
+
+  const toggle = async () => {
+    if (visible) {
+      hide();
+      return visible;
+    }
+    await show();
+    return visible;
+  };
+
   return {
     close,
     refresh,
+    show,
+    hide,
+    toggle,
+    isVisible: () => visible,
   };
 }

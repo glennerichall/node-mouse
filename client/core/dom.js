@@ -26,6 +26,7 @@ export function getDom() {
   const btnInstallUpdate = document.getElementById('btn-install-update');
   const btnRestartService = document.getElementById('btn-restart-service');
   const btnOpenQrBrowser = document.getElementById('btn-open-qr-browser');
+  const btnToggleQrOverlay = document.getElementById('btn-toggle-qr-overlay');
   const btnOpenServerInfoBrowser = document.getElementById('btn-open-server-info-browser');
   const btnRotateEntryToken = document.getElementById('btn-rotate-entry-token');
   const adminAppVersion = document.getElementById('admin-app-version');
@@ -61,6 +62,7 @@ export function getDom() {
     btnInstallUpdate,
     btnRestartService,
     btnOpenQrBrowser,
+    btnToggleQrOverlay,
     btnOpenServerInfoBrowser,
     btnRotateEntryToken,
     adminAppVersion,

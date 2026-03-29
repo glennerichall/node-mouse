@@ -56,5 +56,11 @@ export function createAdminEventRegistrar({ adminActions }) {
       const result = await adminActions.rotateEntryToken({ clientId: socket.id });
       respondAdminAction('rotate-entry-token', result);
     });
+
+    socket.on('admin:toggle-qr-overlay', async () => {
+      log.info({ client }, 'Demande admin:toggle-qr-overlay');
+      const result = await adminActions.toggleQrOverlay({ clientId: socket.id });
+      respondAdminAction('toggle-qr-overlay', result);
+    });
   };
 }
