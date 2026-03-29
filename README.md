@@ -67,7 +67,7 @@ Le serveur affiche:
 
 - l'URL mobile avec point d'entrée random (ex: `http://192.168.x.x:3000/AbCdEf...`)
 - le QR code à scanner
-- une page QR: `http://<ip>:3000/<token>/qr`
+- une page QR: `http://<ip>:3000/qr`
 
 ## Variables utiles
 
@@ -98,18 +98,26 @@ Le serveur affiche:
 - `ADMIN_ACTIONS_ENABLED` (autorise les actions admin depuis client, défaut `true`)
 - `SERVICE_NAME` (service systemd --user à redémarrer, défaut `remote-mouse.service`)
 - `UPDATE_CHECK_ENABLED` (vérif de nouvelle version, défaut `false`)
-- `UPDATE_CHECK_SOURCE` (`auto`, `npm`, `git`; défaut `auto`)
+- `UPDATE_CHECK_COMMAND` (commande shell de vérification update, prioritaire si définie)
+- `UPDATE_CHECK_TIMEOUT_SEC` (timeout de `UPDATE_CHECK_COMMAND`, défaut `20`)
 - `UPDATE_CHECK_INTERVAL_MIN` (intervalle de vérif en minutes, défaut `360`)
 - `UPDATE_CHECK_PACKAGE` (package npm cible pour update check, défaut nom local)
 - `UPDATE_CHECK_CURRENT_VERSION` (version courante forcée, défaut version locale)
-- `UPDATE_CHECK_GIT_REMOTE` (remote git pour update check, défaut `origin`)
-- `UPDATE_CHECK_GIT_REF` (ref git à vérifier, défaut `HEAD`)
-- `UPDATE_INSTALL_COMMAND` (commande shell d'installation update, vide par défaut; fallback auto via source update)
+- `UPDATE_INSTALL_COMMAND` (commande shell d'installation update, prioritaire si définie)
 - `UPDATE_INSTALL_TIMEOUT_SEC` (timeout installation update, défaut `600`)
+- `UPDATE_INSTALL_AUTO_MERGE_ENV` (merge auto `.env.example` -> `.env` après install réussie, défaut `true`)
 
 Fallback install update:
-- Si `UPDATE_INSTALL_COMMAND` est vide, le serveur utilise une commande déduite de la source d'update.
-- Pour `npm` et `git`, la commande construite est `npm update -g <UPDATE_CHECK_PACKAGE> --force`.
+- Si `UPDATE_CHECK_COMMAND` est défini, il est exécuté pour déterminer s'il y a une mise à jour.
+- Si `UPDATE_CHECK_COMMAND` est vide, fallback automatique vers le check npm.
+- Si `UPDATE_INSTALL_COMMAND` est vide, fallback automatique vers:
+  `npm update -g <UPDATE_CHECK_PACKAGE> --force`.
+
+Protocoles supportés pour `UPDATE_CHECK_COMMAND`:
+- JSON: `{"hasUpdate":true,"key":"...","title":"...","message":"...","ttlMs":8000}`
+- Texte `1|true|yes|update|has_update` => update détectée
+- Texte `0|false|no|none` => pas d'update
+- tout autre texte non vide => update détectée (message = texte retourné)
 
 Exemple:
 
@@ -134,8 +142,7 @@ ENTRY_PATH_FIXED=remote-control-secret
 ```
 
 Note securite:
-- Si `ENTRY_PATH_ENABLED=true`, l'application n'est accessible que via `/<token>/...`.
-- Les routes `qr`, `state`, `health` et l'UI ne sont plus accessibles directement à la racine.
+- Si `ENTRY_PATH_ENABLED=true`, l'application est accessible via l'URL d'entrée `/<token>`.
 
 Persistance du token:
 - Par défaut, le token d'entrée aléatoire et son timestamp de rotation sont sauvegardés sur disque.

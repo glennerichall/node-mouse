@@ -5,6 +5,7 @@ import {truncateText} from "../utils/truncateText.js";
 import path from 'node:path';
 import {projectRoot} from '../utils/paths.js';
 import {mergeEnvWithExample, resolveWritableEnvFilePath} from '../utils/env.js';
+import {buildNpmGlobalUpdateCommand} from '../update-check/install-command.js';
 
 const config = getStartupConfigSnapshot();
 const log = createLogger('admin:install-update');
@@ -15,7 +16,8 @@ export function createInstallUpdateAction({ notifier, updateChecker }) {
     const inferredCommand = updateChecker && typeof updateChecker.getInstallCommand === 'function'
       ? String(updateChecker.getInstallCommand() || '').trim()
       : '';
-    const installCommand = String(config.updateCheck.installCommand || '').trim() || inferredCommand;
+    const npmFallbackCommand = buildNpmGlobalUpdateCommand(config.updateCheck.packageName);
+    const installCommand = String(config.updateCheck.installCommand || '').trim() || inferredCommand || npmFallbackCommand;
 
     if (!installCommand) {
       log.warn('Install update impossible: aucune commande disponible');
