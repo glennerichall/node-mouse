@@ -91,6 +91,12 @@
     const clientsTable = document.getElementById('clients-table');
     const configEl = document.getElementById('config');
     const logsEl = document.getElementById('logs');
+    const LOG_BOTTOM_THRESHOLD_PX = 8;
+    let logsAutoScroll = true;
+
+    function isLogScrollAtBottom() {
+      return logsEl.scrollTop + logsEl.clientHeight >= logsEl.scrollHeight - LOG_BOTTOM_THRESHOLD_PX;
+    }
 
     function formatDuration(totalSec) {
       const s = Math.max(0, Number(totalSec) || 0);
@@ -122,8 +128,16 @@
     }
 
     function renderLogs(logs) {
+      const previousScrollTop = logsEl.scrollTop;
+      const shouldAutoScroll = logsAutoScroll;
+
       if (!Array.isArray(logs) || logs.length === 0) {
         logsEl.textContent = 'Aucun log.';
+        if (shouldAutoScroll) {
+          logsEl.scrollTop = logsEl.scrollHeight;
+        } else {
+          logsEl.scrollTop = previousScrollTop;
+        }
         return;
       }
       logsEl.textContent = logs.map((entry) => {
@@ -132,7 +146,11 @@
         const data = entry.data ? ` ${JSON.stringify(entry.data)}` : '';
         return `${prefix} ${msg}${data}`;
       }).join('\n');
-      logsEl.scrollTop = logsEl.scrollHeight;
+      if (shouldAutoScroll) {
+        logsEl.scrollTop = logsEl.scrollHeight;
+      } else {
+        logsEl.scrollTop = previousScrollTop;
+      }
     }
 
     async function refresh() {
@@ -154,6 +172,10 @@
         logsEl.textContent = `Erreur de chargement: ${error?.message || error}`;
       }
     }
+
+    logsEl.addEventListener('scroll', () => {
+      logsAutoScroll = isLogScrollAtBottom();
+    }, { passive: true });
 
     refresh();
     setInterval(refresh, 2000);

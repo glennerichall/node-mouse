@@ -5,6 +5,8 @@ import {
   scaleSigned,
 } from '../../utils/shared/math.js';
 
+const SCROLL_GAIN = 1.1;
+
 export function handleTouchStart(event, { touchpad, state }) {
   event.preventDefault();
   const touches = event.touches;
@@ -56,7 +58,7 @@ export function handleTouchMove(event, { state, handler }) {
     if (state.oneFingerMode === 'scroll') {
       if (Math.abs(dy) > 0.12) {
         state.moved = true;
-        handler.scroll(scaleSigned(dy, 1.45));
+        handler.scroll(scaleSigned(dy, SCROLL_GAIN));
       }
     } else if (Math.abs(dx) + Math.abs(dy) > 0.5) {
       state.moved = true;
@@ -77,7 +79,7 @@ export function handleTouchMove(event, { state, handler }) {
 
     if (Math.abs(deltaY) > 0.12) {
       state.moved = true;
-      handler.scroll(scaleSigned(deltaY, 1.45));
+      handler.scroll(scaleSigned(deltaY, SCROLL_GAIN));
     }
 
     state.twoFinger = { p1: t1, p2: t2 };

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Brave">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#ff7a1a"/>
+      <stop offset="1" stop-color="#ff4f1a"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#g)" d="M32 4l10 4 8-1 5 8-2 9 3 8-6 8-8 16H22L14 40 8 32l3-8-2-9 5-8 8 1z"/>
+  <path fill="#fff" d="M19 29l5-9h16l5 9-2 11-6 7H27l-6-7z"/>
+  <path fill="#ff5a1f" d="M26 27l3 4h6l3-4-1 7-4 4h-2l-4-4z"/>
+  <circle cx="26" cy="26" r="1.5" fill="#ff5a1f"/>
+  <circle cx="38" cy="26" r="1.5" fill="#ff5a1f"/>
+</svg>

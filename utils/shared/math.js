@@ -16,12 +16,11 @@ export function applyNonLinearAcceleration(dx, dy, elapsedMs) {
   const speed = dist / dt; // px/ms
 
   // Courbe non lineaire: fine precision a basse vitesse, acceleration plus forte quand ca bouge vite.
-  const normalized = clamp(speed / 0.9, 0, 4);
-  const gain = clamp(0.55 + normalized ** 1.5, 0.55, 4);
+  const normalized = clamp(speed / 0.75, 0, 5);
+  const gain = clamp(0.55 + normalized ** 1.65, 0.55, 5.5);
 
   return {
     dx: dx * gain,
     dy: dy * gain,
   };
 }
-

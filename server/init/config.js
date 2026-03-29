@@ -63,6 +63,7 @@ export const UPDATE_CHECK_GIT_REMOTE = readString('UPDATE_CHECK_GIT_REMOTE', 'or
 export const UPDATE_CHECK_GIT_REF = readString('UPDATE_CHECK_GIT_REF', 'HEAD');
 export const UPDATE_INSTALL_COMMAND = readString('UPDATE_INSTALL_COMMAND', '');
 export const UPDATE_INSTALL_TIMEOUT_SEC = readNumber('UPDATE_INSTALL_TIMEOUT_SEC', 600, { min: 10, max: 7200 });
+export const UPDATE_INSTALL_AUTO_MERGE_ENV = readBoolean('UPDATE_INSTALL_AUTO_MERGE_ENV', true);
 export const ENTRY_PATH_ENABLED = readBoolean('ENTRY_PATH_ENABLED', true);
 export const ENTRY_PATH_FIXED = readString('ENTRY_PATH_FIXED', '');
 export const ENTRY_PATH_TOKEN_LENGTH = readNumber('ENTRY_PATH_TOKEN_LENGTH', 24, { min: 8, max: 128 });
@@ -130,6 +131,7 @@ export function getStartupConfigSnapshot() {
       gitRef: UPDATE_CHECK_GIT_REF,
       installCommand: UPDATE_INSTALL_COMMAND,
       installTimeoutSec: UPDATE_INSTALL_TIMEOUT_SEC,
+      autoMergeEnv: UPDATE_INSTALL_AUTO_MERGE_ENV,
     },
     qrOverlay: {
       enabled: QR_OVERLAY_ENABLED,
