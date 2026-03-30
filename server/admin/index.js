@@ -14,8 +14,10 @@ export function createAdminActions({ notifier, updateChecker, browser, tokenMana
     forceUpdateCheck: createForceUpdateCheckAction({ notifier, updateChecker }),
     installUpdate: createInstallUpdateAction({ notifier, updateChecker }),
     restartService: createRestartServiceAction({ notifier }),
-    openQrBrowser: createOpenQrBrowserAction({ notifier, browser }),
-    openServerInfoBrowser: createOpenServerInfoBrowserAction({ notifier, browser }),
+    openQrBrowserServer: createOpenQrBrowserAction({ notifier, browser, target: 'server' }),
+    openQrBrowserClient: createOpenQrBrowserAction({ notifier, browser, target: 'client' }),
+    openServerInfoBrowserServer: createOpenServerInfoBrowserAction({ notifier, browser, target: 'server' }),
+    openServerInfoBrowserClient: createOpenServerInfoBrowserAction({ notifier, browser, target: 'client' }),
     rotateEntryToken: createRotateEntryTokenAction({ notifier, tokenManager }),
     toggleQrOverlay: createToggleQrOverlayAction({ notifier, qrOverlay }),
   };

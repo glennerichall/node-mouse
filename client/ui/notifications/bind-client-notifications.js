@@ -6,6 +6,8 @@ export function bindClientNotifications(socket, root) {
   });
 
   socket.on('admin:result', (payload = {}) => {
-    console.log('Admin: result', payload);
+    if (payload?.openUrl) {
+      window.open(String(payload.openUrl), '_blank', 'noopener,noreferrer');
+    }
   });
 }

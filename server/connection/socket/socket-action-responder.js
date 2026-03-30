@@ -4,6 +4,7 @@ export function createSocketActionResponder({ socket, eventName = 'admin:result'
       action,
       ok: Boolean(result.ok),
       message: result.message,
+      openUrl: result.openUrl,
     });
   };
 }

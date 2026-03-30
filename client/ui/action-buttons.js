@@ -26,9 +26,11 @@ export function bindActionButtons(
     btnForceUpdateCheck,
     btnInstallUpdate,
     btnRestartService,
-    btnOpenQrBrowser,
+    btnOpenQrBrowserServer,
+    btnOpenQrBrowserClient,
     btnToggleQrOverlay,
-    btnOpenServerInfoBrowser,
+    btnOpenServerInfoBrowserServer,
+    btnOpenServerInfoBrowserClient,
     btnRotateEntryToken,
   },
 ) {
@@ -74,8 +76,10 @@ export function bindActionButtons(
   btnForceUpdateCheck.addEventListener('click', () => emitWithTimestamp(socket, 'admin:update-check'));
   btnInstallUpdate.addEventListener('click', () => emitWithTimestamp(socket, 'admin:update-install'));
   btnRestartService.addEventListener('click', () => emitWithTimestamp(socket, 'admin:service-restart'));
-  btnOpenQrBrowser.addEventListener('click', () => emitWithTimestamp(socket, 'admin:open-qr-browser'));
+  btnOpenQrBrowserServer.addEventListener('click', () => emitWithTimestamp(socket, 'admin:open-qr-browser-server'));
+  btnOpenQrBrowserClient.addEventListener('click', () => emitWithTimestamp(socket, 'admin:open-qr-browser-client'));
   btnToggleQrOverlay.addEventListener('click', () => emitWithTimestamp(socket, 'admin:toggle-qr-overlay'));
-  btnOpenServerInfoBrowser.addEventListener('click', () => emitWithTimestamp(socket, 'admin:open-server-info-browser'));
+  btnOpenServerInfoBrowserServer.addEventListener('click', () => emitWithTimestamp(socket, 'admin:open-server-info-browser-server'));
+  btnOpenServerInfoBrowserClient.addEventListener('click', () => emitWithTimestamp(socket, 'admin:open-server-info-browser-client'));
   btnRotateEntryToken.addEventListener('click', () => emitWithTimestamp(socket, 'admin:rotate-entry-token'));
 }

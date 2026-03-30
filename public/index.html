@@ -5,25 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Remote Mouse</title>
   <meta name="theme-color" content="#101417" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Remote Mouse" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="apple-touch-icon" href="/favicon.svg" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.webmanifest" />
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./styles.css?v=20260330b" />
 </head>
 <body>
   <main id="app">
     <section id="workspace" aria-label="Remote workspace">
       <aside id="left-menu" aria-label="Actions serveur">
-        <button id="btn-force-update-check" type="button" title="Forcer la vérification de mise à jour" aria-label="Forcer la vérification de mise à jour">Vérifier MAJ</button>
-        <button id="btn-install-update" type="button" title="Installer la mise à jour" aria-label="Installer la mise à jour">Installer MAJ</button>
-        <button id="btn-restart-service" type="button" title="Redémarrer le service" aria-label="Redémarrer le service">Redémarrer service</button>
-        <button id="btn-open-qr-browser" type="button" title="Ouvrir la page QR sur le serveur" aria-label="Ouvrir la page QR sur le serveur">Afficher QR serveur</button>
-        <button id="btn-toggle-qr-overlay" type="button" title="Masquer/Afficher l'overlay QR" aria-label="Masquer/Afficher l'overlay QR">Toggle QR overlay</button>
-        <button id="btn-open-server-info-browser" type="button" title="Ouvrir la page server info sur le serveur" aria-label="Ouvrir la page server info sur le serveur">Afficher Server Info</button>
-        <button id="btn-rotate-entry-token" type="button" title="Forcer la rotation du token d'entrée" aria-label="Forcer la rotation du token d'entrée">Changer le jeton d'entrée</button>
+        <div class="admin-group admin-group-updates" aria-label="Mises a jour">
+          <button id="btn-force-update-check" type="button" title="Forcer la vérification de mise à jour" aria-label="Forcer la vérification de mise à jour">Vérifier MAJ</button>
+          <button id="btn-install-update" type="button" title="Installer la mise à jour" aria-label="Installer la mise à jour">Installer MAJ</button>
+          <button id="btn-restart-service" type="button" title="Redémarrer le service" aria-label="Redémarrer le service">Redémarrer service</button>
+        </div>
+        <hr class="admin-separator" aria-hidden="true" />
+        <div class="admin-group admin-group-display" aria-label="Affichage et informations">
+          <div class="admin-split-row">
+            <button id="btn-open-qr-browser-server" type="button" title="Ouvrir la page QR sur le serveur" aria-label="Ouvrir la page QR sur le serveur">QR serveur</button>
+            <button id="btn-open-qr-browser-client" type="button" title="Ouvrir la page QR sur le client" aria-label="Ouvrir la page QR sur le client">QR client</button>
+          </div>
+          <div class="admin-split-row">
+            <button id="btn-open-server-info-browser-server" type="button" title="Ouvrir la page server info sur le serveur" aria-label="Ouvrir la page server info sur le serveur">Info serveur</button>
+            <button id="btn-open-server-info-browser-client" type="button" title="Ouvrir la page server info sur le client" aria-label="Ouvrir la page server info sur le client">Info client</button>
+          </div>
+        </div>
+        <hr class="admin-separator" aria-hidden="true" />
+        <div class="admin-group admin-group-access" aria-label="Acces">
+          <button id="btn-toggle-qr-overlay" type="button" title="Masquer/Afficher l'overlay QR" aria-label="Masquer/Afficher l'overlay QR">Toggle QR overlay</button>
+          <button id="btn-rotate-entry-token" type="button" title="Forcer la rotation du token d'entrée" aria-label="Forcer la rotation du token d'entrée">Changer le jeton d'entrée</button>
+        </div>
         <p id="admin-app-version" aria-label="Version du programme">Version: --</p>
       </aside>
 
@@ -86,6 +103,6 @@
   </main>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script type="module" src="./client/main.js?v=20260326a"></script>
+  <script type="module" src="./client/main.js?v=20260330b"></script>
 </body>
 </html>

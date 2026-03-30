@@ -1,10 +1,13 @@
-const CACHE_NAME = 'remote-mouse-shell-v1';
+const CACHE_NAME = 'remote-mouse-shell-v3';
 const SHELL_ASSETS = [
   '/',
-  '/styles.css',
+  '/styles.css?v=20260330b',
   '/favicon.svg',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/apple-touch-icon.png',
   '/manifest.webmanifest',
-  '/client/main.js',
+  '/client/main.js?v=20260330b',
 ];
 
 self.addEventListener('install', (event) => {

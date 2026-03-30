@@ -39,16 +39,28 @@ export function createAdminEventRegistrar({ adminActions }) {
       respondAdminAction('service-restart', result);
     });
 
-    socket.on('admin:open-qr-browser', async () => {
-      log.info({ client }, 'Demande admin:open-qr-browser');
-      const result = await adminActions.openQrBrowser({ clientId: socket.id });
-      respondAdminAction('open-qr-browser', result);
+    socket.on('admin:open-qr-browser-server', async () => {
+      log.info({ client }, 'Demande admin:open-qr-browser-server');
+      const result = await adminActions.openQrBrowserServer({ clientId: socket.id });
+      respondAdminAction('open-qr-browser-server', result);
     });
 
-    socket.on('admin:open-server-info-browser', async () => {
-      log.info({ client }, 'Demande admin:open-server-info-browser');
-      const result = await adminActions.openServerInfoBrowser({ clientId: socket.id });
-      respondAdminAction('open-server-info-browser', result);
+    socket.on('admin:open-qr-browser-client', async () => {
+      log.info({ client }, 'Demande admin:open-qr-browser-client');
+      const result = await adminActions.openQrBrowserClient({ clientId: socket.id });
+      respondAdminAction('open-qr-browser-client', result);
+    });
+
+    socket.on('admin:open-server-info-browser-server', async () => {
+      log.info({ client }, 'Demande admin:open-server-info-browser-server');
+      const result = await adminActions.openServerInfoBrowserServer({ clientId: socket.id });
+      respondAdminAction('open-server-info-browser-server', result);
+    });
+
+    socket.on('admin:open-server-info-browser-client', async () => {
+      log.info({ client }, 'Demande admin:open-server-info-browser-client');
+      const result = await adminActions.openServerInfoBrowserClient({ clientId: socket.id });
+      respondAdminAction('open-server-info-browser-client', result);
     });
 
     socket.on('admin:rotate-entry-token', async () => {

@@ -23,7 +23,7 @@
     }
     main { max-width: 1200px; margin: 0 auto; padding: 18px; display: grid; gap: 12px; }
     h1 { margin: 0; font-size: 1.05rem; }
-    .meta { color: var(--muted); font-size: .9rem; display: flex; flex-wrap: wrap; gap: 12px; }
+    .meta { color: var(--muted); font-size: .9rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
     section {
       border: 1px solid var(--line);
       background: var(--panel);
@@ -31,7 +31,8 @@
       padding: 12px;
     }
     h2 { margin: 0 0 10px; font-size: .95rem; color: var(--accent); }
-    table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .88rem; min-width: 540px; }
     th, td { text-align: left; border-bottom: 1px solid var(--line); padding: 6px; }
     pre {
       margin: 0;
@@ -43,6 +44,13 @@
       overflow: auto;
     }
     #logs { max-height: 440px; }
+    @media (max-width: 720px) {
+      main { padding: 12px; }
+      section { padding: 10px; }
+      h1 { font-size: 1rem; }
+      table { font-size: .82rem; }
+      pre { font-size: .76rem; max-height: 320px; }
+    }
   </style>
 </head>
 <body>
@@ -58,17 +66,19 @@
 
     <section>
       <h2>Clients connectes</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Connecte depuis</th>
-            <th>Adresse</th>
-            <th>Transport</th>
-          </tr>
-        </thead>
-        <tbody id="clients-table"></tbody>
-      </table>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Connecte depuis</th>
+              <th>Adresse</th>
+              <th>Transport</th>
+            </tr>
+          </thead>
+          <tbody id="clients-table"></tbody>
+        </table>
+      </div>
     </section>
 
     <section>

@@ -60,6 +60,25 @@ body {
   transform: translateX(0);
 }
 
+.admin-group {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-split-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.admin-separator {
+  width: 100%;
+  height: 1px;
+  margin: 2px 0;
+  border: none;
+  background: rgba(240, 244, 247, 0.18);
+}
+
 #left-menu button {
   appearance: none;
   border: none;
@@ -80,6 +99,30 @@ body {
 #left-menu button:active {
   transform: translateY(1px);
   background: #384955;
+}
+
+.admin-group-updates button {
+  background: #21465b;
+}
+
+.admin-group-updates button:active {
+  background: #2c5871;
+}
+
+.admin-group-display button {
+  background: #41365e;
+}
+
+.admin-group-display button:active {
+  background: #514478;
+}
+
+.admin-group-access button {
+  background: #672732;
+}
+
+.admin-group-access button:active {
+  background: #7e3240;
 }
 
 #admin-app-version {

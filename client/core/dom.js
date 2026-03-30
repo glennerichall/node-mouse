@@ -32,9 +32,11 @@ export function getDom() {
   const btnForceUpdateCheck = document.getElementById('btn-force-update-check');
   const btnInstallUpdate = document.getElementById('btn-install-update');
   const btnRestartService = document.getElementById('btn-restart-service');
-  const btnOpenQrBrowser = document.getElementById('btn-open-qr-browser');
+  const btnOpenQrBrowserServer = document.getElementById('btn-open-qr-browser-server');
+  const btnOpenQrBrowserClient = document.getElementById('btn-open-qr-browser-client');
   const btnToggleQrOverlay = document.getElementById('btn-toggle-qr-overlay');
-  const btnOpenServerInfoBrowser = document.getElementById('btn-open-server-info-browser');
+  const btnOpenServerInfoBrowserServer = document.getElementById('btn-open-server-info-browser-server');
+  const btnOpenServerInfoBrowserClient = document.getElementById('btn-open-server-info-browser-client');
   const btnRotateEntryToken = document.getElementById('btn-rotate-entry-token');
   const adminAppVersion = document.getElementById('admin-app-version');
   const connectionOverlay = document.getElementById('connection-overlay');
@@ -75,9 +77,11 @@ export function getDom() {
     btnForceUpdateCheck,
     btnInstallUpdate,
     btnRestartService,
-    btnOpenQrBrowser,
+    btnOpenQrBrowserServer,
+    btnOpenQrBrowserClient,
     btnToggleQrOverlay,
-    btnOpenServerInfoBrowser,
+    btnOpenServerInfoBrowserServer,
+    btnOpenServerInfoBrowserClient,
     btnRotateEntryToken,
     adminAppVersion,
     connectionOverlay,
