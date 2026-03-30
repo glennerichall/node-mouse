@@ -87,7 +87,7 @@ Le serveur affiche:
 - `SERVER_HOST` (forcer l'IP/host exposé dans le QR)
 - `CONFIG_DIR` (répertoire de config principal, défaut `~/.config/remote-mouse`)
 - `ENV_FILE_PATH` (chemin explicite du fichier `.env`)
-- `PERSISTENCE_DB_PATH` (chemin du fichier SQLite de persistence)
+- `PERSISTENCE_DB_PATH` (chemin du fichier SQLite de persistence, y compris les tokens d'entrée)
 - `HTTPS` (`true` pour activer HTTPS)
 - `SSL_KEY_PATH` (chemin de la clé privée PEM)
 - `SSL_CERT_PATH` (chemin du certificat PEM)
@@ -159,7 +159,7 @@ Note securite:
 - Si `ENTRY_PATH_ENABLED=true`, l'application est accessible via l'URL d'entrée `/<token>`.
 
 Persistance du token:
-- Par défaut, le token d'entrée aléatoire et son timestamp de rotation sont sauvegardés sur disque.
+- Par défaut, le token d'entrée aléatoire et son timestamp de rotation sont sauvegardés en SQLite.
 - Après redémarrage du serveur, le même token est réutilisé et la rotation conserve son échéance.
 
 Exemple HTTPS (certificat local):

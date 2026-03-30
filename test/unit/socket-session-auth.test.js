@@ -57,6 +57,10 @@ describe('createSocketSessionAuthMiddleware', () => {
     expect(next.calledOnce).toBe(true);
     expect(next.firstCall.args[0]).toBeInstanceOf(Error);
     expect(next.firstCall.args[0].message).toBe('unauthorized');
+    expect(next.firstCall.args[0].data).toEqual({
+      code: 'ENTRY_TOKEN_INVALID',
+      message: 'Rescannez le code QR du serveur.',
+    });
   });
 
   it('accepts remote authorized socket and sets sessionToken', () => {

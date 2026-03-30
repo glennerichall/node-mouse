@@ -39,7 +39,6 @@ export async function createServer(instances) {
         tokenLength: config.entryPath.tokenLength,
         rotateIntervalMin: config.entryPath.rotateMin,
         graceMin: config.entryPath.graceMin,
-        stateFilePath: config.entryPath.stateFile,
     });
 
     const basePublicUrl = getPublicUrl(config.port, config.protocol, config.serverHost);

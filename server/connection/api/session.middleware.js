@@ -1,4 +1,5 @@
 import express from "express";
+import {sendUnauthorizedResponse} from "./unauthorized-response.js";
 
 function isLocalHostName(value) {
     const host = String(value || '').toLowerCase();
@@ -56,7 +57,7 @@ export function createSessionValidationMiddleware({
 
         const token = req.signedCookies && req.signedCookies[cookieName];
         if (!tokenManager.isValid(token)) {
-            res.status(401).type('text/plain').send('Unauthorized');
+            sendUnauthorizedResponse(req, res);
             return;
         }
         req.sessionToken = token;
@@ -72,7 +73,7 @@ export function createEntryRouter(tokenManager) {
             res.createSession(req.params.token);
             res.redirect('/');
         } else {
-            res.status(401).type('text/plain').send('Unauthorized');
+            sendUnauthorizedResponse(req, res);
         }
     });
 

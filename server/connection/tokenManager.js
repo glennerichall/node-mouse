@@ -1,9 +1,8 @@
-import fs from 'node:fs';
-import path from 'node:path';
 import {createRandomToken} from '../utils/createRandomToken.js';
-import {createLogger} from '../log/logger.js';
-
-const log = createLogger('token-manager');
+import {
+    loadEntryTokens,
+    saveEntryTokens
+} from '../persistence/entry-token.dao.js';
 
 function trimSlashes(value) {
     return String(value || '').replace(/^\/+|\/+$/g, '');
@@ -13,74 +12,15 @@ function isTokenFormatValid(token) {
     return /^[A-Za-z0-9_-]{8,128}$/.test(String(token || ''));
 }
 
-function ensureDirForFile(filePath) {
-    const dir = path.dirname(filePath);
-    fs.mkdirSync(dir, {recursive: true});
-}
-
-function parseState(raw) {
-    try {
-        const payload = JSON.parse(raw);
-        if (!payload || typeof payload !== 'object') {
-            return null;
-        }
-
-        const tokens = new Map();
-        const entries = Array.isArray(payload.tokens) ? payload.tokens : [];
-        for (const entry of entries) {
-            if (!Array.isArray(entry) || entry.length !== 2) {
-                continue;
-            }
-            const token = trimSlashes(entry[0] || '');
-            const createdAt = Number(entry[1]);
-            if (!isTokenFormatValid(token) || !Number.isFinite(createdAt) || createdAt <= 0) {
-                continue;
-            }
-            tokens.set(token, Math.floor(createdAt));
-        }
-
-        return {tokens};
-    } catch (_error) {
-        return null;
-    }
-}
-
-function loadPersistedState(stateFilePath) {
-    if (!stateFilePath || !fs.existsSync(stateFilePath)) {
-        return null;
-    }
-    try {
-        const raw = fs.readFileSync(stateFilePath, 'utf8');
-        return parseState(raw);
-    } catch (_error) {
-        return null;
-    }
-}
-
-function savePersistedState(stateFilePath, {tokens}) {
-    if (!stateFilePath) {
-        return;
-    }
-
-    try {
-        ensureDirForFile(stateFilePath);
-        const payload = {
-            version: 1,
-            updatedAt: Date.now(),
-            tokens: Array.from(tokens.entries()),
-        };
-        fs.writeFileSync(stateFilePath, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
-    } catch (error) {
-        log.warn({ err: error }, 'Token state save failed');
-    }
-}
-
 export function createTokenManager({
                                        enabled,
                                        fixedPath,
                                        tokenLength,
                                        graceMin,
-                                       stateFilePath,
+                                       persistence = {
+                                           loadTokens: loadEntryTokens,
+                                           saveTokens: saveEntryTokens,
+                                       },
                                    }) {
     const normalizedFixedPath = trimSlashes(fixedPath);
     const effectiveEnabled = Boolean(enabled);
@@ -93,7 +33,7 @@ export function createTokenManager({
         if (!persistenceEnabled) {
             return;
         }
-        savePersistedState(stateFilePath, {tokens});
+        persistence.saveTokens(tokens);
     }
 
     function resolveLatestToken() {
@@ -123,10 +63,14 @@ export function createTokenManager({
         if (!persistenceEnabled) {
             return 0;
         }
-        const restored = loadPersistedState(stateFilePath);
-        if (restored) {
-            for (const [token, createdAt] of restored.tokens.entries()) {
-                tokens.set(token, createdAt);
+        const restored = persistence.loadTokens();
+        if (restored instanceof Map) {
+            for (const [token, createdAt] of restored.entries()) {
+                const normalizedToken = trimSlashes(token);
+                if (!isTokenFormatValid(normalizedToken) || !Number.isFinite(createdAt) || createdAt <= 0) {
+                    continue;
+                }
+                tokens.set(normalizedToken, Math.floor(createdAt));
             }
         }
         return tokens.size;

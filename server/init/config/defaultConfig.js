@@ -1,5 +1,4 @@
 import {
-    entryPathStateFile,
     packageJson
 } from "./bootstrapConfig.js";
 
@@ -13,7 +12,6 @@ export const DEFAULT_CONFIG = {
         tokenLength: 24,
         rotateMin: 60,
         graceMin: 120,
-        stateFile: entryPathStateFile,
     },
     session: {
         cookieName: 'remote_mouse_session',

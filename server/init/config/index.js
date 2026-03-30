@@ -13,7 +13,6 @@ import {
 } from "./getStartupConfigSnapshot.js";
 import {
     CONFIG_DIR,
-    entryPathStateFile,
 } from "./bootstrapConfig.js";
 
 function normalizeConfig(config) {
@@ -26,7 +25,6 @@ function normalizeConfig(config) {
         entryPath: {
             ...config.entryPath,
             enabled: Boolean(config.entryPath.enabled || config.entryPath.fixed),
-            stateFile: config.entryPath.stateFile || entryPathStateFile,
         },
         session: {
             ...config.session,

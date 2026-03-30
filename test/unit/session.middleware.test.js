@@ -107,4 +107,30 @@ describe('createSessionValidationMiddleware', () => {
     expect(next.calledOnce).toBe(true);
     expect(req.sessionToken).toBe('token-123');
   });
+
+  it('returns friendly html page for browser unauthorized request', () => {
+    const isValid = sandbox.stub().returns(false);
+    const middleware = createSessionValidationMiddleware({
+      tokenManager: {isValid},
+      cookieName: 'session',
+    });
+
+    const req = {
+      ip: '10.0.0.12',
+      hostname: '10.0.0.12',
+      headers: {host: '10.0.0.12:3000'},
+      socket: {remoteAddress: '10.0.0.12'},
+      signedCookies: {},
+      accepts: sandbox.stub().withArgs('html').returns(true),
+    };
+    const res = createResponseSpy();
+    const next = sandbox.stub();
+
+    middleware(req, res, next);
+
+    expect(next.called).toBe(false);
+    expect(res.state.statusCode).toBe(401);
+    expect(res.state.contentType).toBe('text/html');
+    expect(res.state.body).toMatch(/Rescannez le code QR/i);
+  });
 });

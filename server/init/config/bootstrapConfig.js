@@ -35,5 +35,4 @@ export function readPackageJson() {
     }
 }
 
-export const entryPathStateFile = path.join(CONFIG_DIR, 'entry-token-state.json');
 export const packageJson = readPackageJson();
