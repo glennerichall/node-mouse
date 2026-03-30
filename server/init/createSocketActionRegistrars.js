@@ -1,5 +1,5 @@
 import {createController} from "../remotes/input/controller.js";
-import {createBrowserReceiver} from "../remotes/browser/index.js";
+import {createBrowser} from "../remotes/browser/index.js";
 import {createPreviewStreamer} from "../remotes/preview/createPreviewStreamer.js";
 import {getConfig} from "./config/index.js";
 import {startUpdateChecker} from "../update-check/index.js";
@@ -21,7 +21,7 @@ export async function createSocketActionRegistrars(instances) {
         keyboard
     } = createController(robot);
 
-    const browser = createBrowserReceiver();
+    const browser = createBrowser();
     const samsung = createSamsungRemote();
 
     const preview = createPreviewStreamer(robot, {
