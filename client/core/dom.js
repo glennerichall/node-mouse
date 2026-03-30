@@ -1,92 +1,87 @@
-export function getDom() {
-  const app = document.getElementById('app');
-  const touchpad = document.getElementById('touchpad');
-  const adminDrawerScrim = document.getElementById('admin-drawer-scrim');
-  const leftMenu = document.getElementById('left-menu');
-  const keyboardPanel = document.getElementById('keyboard-panel');
-  const textInput = document.getElementById('text-input');
+function getElement(id) {
+  return document.getElementById(id);
+}
 
-  const btnKeyboard = document.getElementById('btn-keyboard');
-  const btnLeft = document.getElementById('btn-left');
-  const btnRight = document.getElementById('btn-right');
-  const btnEnter = document.getElementById('btn-enter');
-  const btnBackspace = document.getElementById('btn-backspace');
-  const btnSendText = document.getElementById('send-text');
-  const btnOpenBrave = document.getElementById('btn-open-brave');
-  const btnBrowserBack = document.getElementById('btn-browser-back');
-  const btnBrowserForward = document.getElementById('btn-browser-forward');
-  const btnPrevTab = document.getElementById('btn-prev-tab');
-  const btnNextTab = document.getElementById('btn-next-tab');
-  const btnNewTab = document.getElementById('btn-new-tab');
-  const btnCloseTab = document.getElementById('btn-close-tab');
-  const btnAddressBar = document.getElementById('btn-address-bar');
-  const btnHardReload = document.getElementById('btn-hard-reload');
-  const btnFullscreen = document.getElementById('btn-fullscreen');
-  const btnSamsungOn = document.getElementById('btn-samsung-on');
-  const btnSamsungOff = document.getElementById('btn-samsung-off');
-  const btnSamsungVolUp = document.getElementById('btn-samsung-volup');
-  const btnSamsungVolDown = document.getElementById('btn-samsung-voldown');
-  const btnSamsungInput = document.getElementById('btn-samsung-input');
-  const btnSamsungEnter = document.getElementById('btn-samsung-enter');
-  const btnSamsungPcInput = document.getElementById('btn-samsung-pc-input');
-  const btnForceUpdateCheck = document.getElementById('btn-force-update-check');
-  const btnInstallUpdate = document.getElementById('btn-install-update');
-  const btnRestartService = document.getElementById('btn-restart-service');
-  const btnOpenQrBrowserServer = document.getElementById('btn-open-qr-browser-server');
-  const btnOpenQrBrowserClient = document.getElementById('btn-open-qr-browser-client');
-  const btnToggleQrOverlay = document.getElementById('btn-toggle-qr-overlay');
-  const btnOpenServerInfoBrowserServer = document.getElementById('btn-open-server-info-browser-server');
-  const btnOpenServerInfoBrowserClient = document.getElementById('btn-open-server-info-browser-client');
-  const btnRotateEntryToken = document.getElementById('btn-rotate-entry-token');
-  const adminAppVersion = document.getElementById('admin-app-version');
-  const connectionOverlay = document.getElementById('connection-overlay');
-  const notificationsRoot = document.getElementById('client-notifications');
-  const previewCanvas = document.getElementById('preview-canvas');
-  const cursorPreview = document.getElementById('cursor-preview');
-
+function getLayoutDom() {
   return {
-    app,
-    touchpad,
-    adminDrawerScrim,
-    leftMenu,
-    keyboardPanel,
-    textInput,
-    btnKeyboard,
-    btnLeft,
-    btnRight,
-    btnEnter,
-    btnBackspace,
-    btnSendText,
-    btnOpenBrave,
-    btnBrowserBack,
-    btnBrowserForward,
-    btnPrevTab,
-    btnNextTab,
-    btnNewTab,
-    btnCloseTab,
-    btnAddressBar,
-    btnHardReload,
-    btnFullscreen,
-    btnSamsungOn,
-    btnSamsungOff,
-    btnSamsungVolUp,
-    btnSamsungVolDown,
-    btnSamsungInput,
-    btnSamsungEnter,
-    btnSamsungPcInput,
-    btnForceUpdateCheck,
-    btnInstallUpdate,
-    btnRestartService,
-    btnOpenQrBrowserServer,
-    btnOpenQrBrowserClient,
-    btnToggleQrOverlay,
-    btnOpenServerInfoBrowserServer,
-    btnOpenServerInfoBrowserClient,
-    btnRotateEntryToken,
-    adminAppVersion,
-    connectionOverlay,
-    notificationsRoot,
-    previewCanvas,
-    cursorPreview,
+    app: getElement('app'),
+    touchpad: getElement('touchpad'),
+    adminDrawerScrim: getElement('admin-drawer-scrim'),
+    leftMenu: getElement('left-menu'),
+    keyboardPanel: getElement('keyboard-panel'),
+    textInput: getElement('text-input'),
+    connectionOverlay: getElement('connection-overlay'),
+    notificationsRoot: getElement('client-notifications'),
+    previewCanvas: getElement('preview-canvas'),
+    cursorPreview: getElement('cursor-preview'),
+    adminAppVersion: getElement('admin-app-version'),
+  };
+}
+
+function getMouseControlsDom() {
+  return {
+    btnKeyboard: getElement('btn-keyboard'),
+    btnLeft: getElement('btn-left'),
+    btnRight: getElement('btn-right'),
+    btnSendText: getElement('send-text'),
+  };
+}
+
+function getKeyboardRemoteDom() {
+  return {
+    btnEnter: getElement('btn-enter'),
+    btnBackspace: getElement('btn-backspace'),
+  };
+}
+
+function getBrowserRemoteDom() {
+  return {
+    btnOpenBrave: getElement('btn-open-brave'),
+    btnBrowserBack: getElement('btn-browser-back'),
+    btnBrowserForward: getElement('btn-browser-forward'),
+    btnPrevTab: getElement('btn-prev-tab'),
+    btnNextTab: getElement('btn-next-tab'),
+    btnNewTab: getElement('btn-new-tab'),
+    btnCloseTab: getElement('btn-close-tab'),
+    btnAddressBar: getElement('btn-address-bar'),
+    btnHardReload: getElement('btn-hard-reload'),
+    btnFullscreen: getElement('btn-fullscreen'),
+  };
+}
+
+function getSamsungRemoteDom() {
+  return {
+    btnSamsungOn: getElement('btn-samsung-on'),
+    btnSamsungOff: getElement('btn-samsung-off'),
+    btnSamsungVolUp: getElement('btn-samsung-volup'),
+    btnSamsungVolDown: getElement('btn-samsung-voldown'),
+    btnSamsungInput: getElement('btn-samsung-input'),
+    btnSamsungEnter: getElement('btn-samsung-enter'),
+    btnSamsungPcInput: getElement('btn-samsung-pc-input'),
+  };
+}
+
+function getAdminRemoteDom() {
+  return {
+    btnForceUpdateCheck: getElement('btn-force-update-check'),
+    btnInstallUpdate: getElement('btn-install-update'),
+    btnRestartService: getElement('btn-restart-service'),
+    btnOpenQrBrowserServer: getElement('btn-open-qr-browser-server'),
+    btnOpenQrBrowserClient: getElement('btn-open-qr-browser-client'),
+    btnToggleQrOverlay: getElement('btn-toggle-qr-overlay'),
+    btnOpenServerInfoBrowserServer: getElement('btn-open-server-info-browser-server'),
+    btnOpenServerInfoBrowserClient: getElement('btn-open-server-info-browser-client'),
+    btnRotateEntryToken: getElement('btn-rotate-entry-token'),
+  };
+}
+
+export function getDom() {
+  return {
+    ...getLayoutDom(),
+    ...getMouseControlsDom(),
+    ...getKeyboardRemoteDom(),
+    ...getBrowserRemoteDom(),
+    ...getSamsungRemoteDom(),
+    ...getAdminRemoteDom(),
   };
 }

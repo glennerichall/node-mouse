@@ -1,11 +1,17 @@
 import { emitWithTimestamp } from '../core/socket-emit.js';
 
-export function bindActionButtons(
+function bindKeyboardRemoteButtons(socket, { keyboardPanel, btnEnter, btnBackspace }) {
+  btnEnter.addEventListener('click', () => {
+    emitWithTimestamp(socket, 'keyboard:key', { key: 'enter' });
+    keyboardPanel.classList.add('hidden');
+  });
+
+  btnBackspace.addEventListener('click', () => emitWithTimestamp(socket, 'keyboard:key', { key: 'backspace' }));
+}
+
+function bindBrowserRemoteButtons(
   socket,
   {
-    keyboardPanel,
-    btnEnter,
-    btnBackspace,
     btnOpenBrave,
     btnBrowserBack,
     btnBrowserForward,
@@ -16,29 +22,8 @@ export function bindActionButtons(
     btnAddressBar,
     btnHardReload,
     btnFullscreen,
-    btnSamsungOn,
-    btnSamsungOff,
-    btnSamsungVolUp,
-    btnSamsungVolDown,
-    btnSamsungInput,
-    btnSamsungEnter,
-    btnSamsungPcInput,
-    btnForceUpdateCheck,
-    btnInstallUpdate,
-    btnRestartService,
-    btnOpenQrBrowserServer,
-    btnOpenQrBrowserClient,
-    btnToggleQrOverlay,
-    btnOpenServerInfoBrowserServer,
-    btnOpenServerInfoBrowserClient,
-    btnRotateEntryToken,
   },
 ) {
-  btnEnter.addEventListener('click', () => {
-    emitWithTimestamp(socket, 'keyboard:key', { key: 'enter' });
-    keyboardPanel.classList.add('hidden');
-  });
-  btnBackspace.addEventListener('click', () => emitWithTimestamp(socket, 'keyboard:key', { key: 'backspace' }));
   btnOpenBrave.addEventListener('click', () => emitWithTimestamp(socket, 'browser:brave'));
   btnBrowserBack.addEventListener('click', () =>
     emitWithTimestamp(socket, 'keyboard:key', { key: 'left', modifiers: ['alt'] }),
@@ -65,6 +50,20 @@ export function bindActionButtons(
     emitWithTimestamp(socket, 'keyboard:key', { key: 'f5', modifiers: ['control'] }),
   );
   btnFullscreen.addEventListener('click', () => emitWithTimestamp(socket, 'keyboard:key', { key: 'f11' }));
+}
+
+function bindSamsungRemoteButtons(
+  socket,
+  {
+    btnSamsungOn,
+    btnSamsungOff,
+    btnSamsungVolUp,
+    btnSamsungVolDown,
+    btnSamsungInput,
+    btnSamsungEnter,
+    btnSamsungPcInput,
+  },
+) {
   btnSamsungOn.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:on'));
   btnSamsungOff.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:off'));
   btnSamsungVolUp.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:volup'));
@@ -72,7 +71,22 @@ export function bindActionButtons(
   btnSamsungInput.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:input'));
   btnSamsungEnter.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:enter'));
   btnSamsungPcInput.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:pc-input'));
+}
 
+function bindAdminRemoteButtons(
+  socket,
+  {
+    btnForceUpdateCheck,
+    btnInstallUpdate,
+    btnRestartService,
+    btnOpenQrBrowserServer,
+    btnOpenQrBrowserClient,
+    btnToggleQrOverlay,
+    btnOpenServerInfoBrowserServer,
+    btnOpenServerInfoBrowserClient,
+    btnRotateEntryToken,
+  },
+) {
   btnForceUpdateCheck.addEventListener('click', () => emitWithTimestamp(socket, 'admin:update-check'));
   btnInstallUpdate.addEventListener('click', () => emitWithTimestamp(socket, 'admin:update-install'));
   btnRestartService.addEventListener('click', () => emitWithTimestamp(socket, 'admin:service-restart'));
@@ -82,4 +96,11 @@ export function bindActionButtons(
   btnOpenServerInfoBrowserServer.addEventListener('click', () => emitWithTimestamp(socket, 'admin:open-server-info-browser-server'));
   btnOpenServerInfoBrowserClient.addEventListener('click', () => emitWithTimestamp(socket, 'admin:open-server-info-browser-client'));
   btnRotateEntryToken.addEventListener('click', () => emitWithTimestamp(socket, 'admin:rotate-entry-token'));
+}
+
+export function bindActionButtons(socket, elements) {
+  bindKeyboardRemoteButtons(socket, elements);
+  bindBrowserRemoteButtons(socket, elements);
+  bindSamsungRemoteButtons(socket, elements);
+  bindAdminRemoteButtons(socket, elements);
 }
