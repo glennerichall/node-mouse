@@ -1,9 +1,12 @@
-import { createRequire } from 'node:module';
 import { getStartupConfigSnapshot } from '../init/config.js';
 import { createLogger } from '../log/logger.js';
 
-const require = createRequire(import.meta.url);
-const { SamsungTvRemote, Keys, getAwakeSamsungDevices, getLastConnectedDevice } = require('samsung-tv-remote');
+import {
+  getAwakeSamsungDevices,
+  getLastConnectedDevice,
+  Keys,
+  SamsungTvRemote
+} from "samsung-tv-remote";
 
 const log = createLogger('samsung:remote');
 

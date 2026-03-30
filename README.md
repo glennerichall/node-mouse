@@ -63,6 +63,18 @@ Le chargement des variables est fait via `dotenv`.
 npm start
 ```
 
+Commit assiste par Codex:
+
+```bash
+npm run commit:codex
+```
+
+Le script:
+- demande a Codex un `bump` semver (`patch` | `minor` | `major`) et un message de commit
+- met a jour la version via `npm version --no-git-tag-version`
+- stage toutes les modifications
+- cree le commit git
+
 Le serveur affiche:
 
 - l'URL mobile avec point d'entrée random (ex: `http://192.168.x.x:3000/AbCdEf...`)
