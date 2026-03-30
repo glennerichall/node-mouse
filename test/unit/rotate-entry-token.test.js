@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import {createRotateEntryTokenAction} from '../../server/admin/rotate-entry-token.js';
+import {createRotateEntryTokenAction} from '../../server/remotes/admin/rotate-entry-token.js';
 
 describe('createRotateEntryTokenAction', () => {
   let sandbox;

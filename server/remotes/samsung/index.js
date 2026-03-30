@@ -1,5 +1,5 @@
-import { getConfig } from '../init/config/index.js';
-import { createLogger } from '../log/logger.js';
+import { getConfig } from '../../init/config/index.js';
+import { createLogger } from '../../log/logger.js';
 
 import {
   getAwakeSamsungDevices,

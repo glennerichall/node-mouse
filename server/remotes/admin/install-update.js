@@ -1,8 +1,8 @@
-import {getConfig} from '../init/config/index.js';
-import { execShell } from '../utils/process.js';
-import {createLogger} from '../log/logger.js';
-import {truncateText} from "../utils/truncateText.js";
-import {buildNpmGlobalUpdateCommand} from '../update-check/install-command.js';
+import {getConfig} from '../../init/config/index.js';
+import { execShell } from '../../utils/process.js';
+import {createLogger} from '../../log/logger.js';
+import {truncateText} from "../../utils/truncateText.js";
+import {buildNpmGlobalUpdateCommand} from '../../update-check/install-command.js';
 
 const log = createLogger('admin:install-update');
 

@@ -1,4 +1,4 @@
-import { commandExists, execFileAsync, spawnDetached } from '../../utils/process.js';
+import { commandExists, execFileAsync, spawnDetached } from '../../../utils/process.js';
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));

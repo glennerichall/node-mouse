@@ -1,5 +1,5 @@
-import {getConfig} from '../init/config/index.js';
-import { commandExists, spawnDetached } from '../utils/process.js';
+import {getConfig} from '../../init/config/index.js';
+import { commandExists, spawnDetached } from '../../utils/process.js';
 import { writeRestartMarker } from './restart-marker.js';
 
 export function createRestartServiceAction({ notifier }) {

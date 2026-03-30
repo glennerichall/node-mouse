@@ -1,4 +1,4 @@
-import {createLogger} from '../log/logger.js';
+import {createLogger} from '../../log/logger.js';
 
 const log = createLogger('admin:force-update-check');
 
