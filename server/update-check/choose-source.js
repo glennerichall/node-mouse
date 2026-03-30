@@ -1,10 +1,9 @@
-import {getStartupConfigSnapshot} from '../init/config.js';
+import {getConfig} from '../init/config/index.js';
 import { NpmUpdateSource } from './sources/npm-update-source.js';
 import { CommandUpdateSource } from './sources/command-update-source.js';
 
-const config = getStartupConfigSnapshot();
-
 export async function chooseUpdateSource() {
+  const config = getConfig();
   const checkCommand = String(config.updateCheck.checkCommand || '').trim();
   const commandSource = new CommandUpdateSource({
     checkCommand,

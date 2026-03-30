@@ -1,17 +1,16 @@
 import qrcodeTerminal from 'qrcode-terminal';
 import {
-    getStartupConfigSnapshot,
-    logStartupConfig,
-} from './init/config.js';
+    getConfig,
+    
+} from './init/config/index.js';
 import {createServer} from './init/createServer.js';
 import {createApp} from "./init/createApp.js";
 import {createServices} from "./init/createServices.js";
 import {createSocket} from "./init/createSocket.js";
 import {createLogger} from './log/logger.js';
+import {logStartupConfig} from "./init/config/logConfig.js";
 
 const log = createLogger('server');
-const config = getStartupConfigSnapshot();
-
 export async function startServer() {
     let instances = {};
 
@@ -22,7 +21,7 @@ export async function startServer() {
     
     const {server, getEntryUrl} = instances;
     
-    server.listen(config.port, () => {
+    server.listen(getConfig().port, () => {
         logStartupConfig(log);
 
         log.info({ url: getEntryUrl(), qrUrl: '/qr' }, 'Remote Mouse server démarré');

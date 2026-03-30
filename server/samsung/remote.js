@@ -1,4 +1,4 @@
-import { getStartupConfigSnapshot } from '../init/config.js';
+import { getConfig } from '../init/config/index.js';
 import { createLogger } from '../log/logger.js';
 
 import {
@@ -89,7 +89,7 @@ function pickDevice(candidates, config) {
 }
 
 export function createSamsungRemote() {
-  const config = getStartupConfigSnapshot().samsungTv;
+  const config = getConfig().samsungTv;
   if (!config.enabled) {
     return createDisabledRemote('Controle Samsung desactive. Activez SAMSUNG_TV_ENABLED.');
   }

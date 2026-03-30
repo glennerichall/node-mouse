@@ -2,14 +2,14 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import QRCode from 'qrcode';
-import {getStartupConfigSnapshot} from '../init/config.js';
+import {getConfig} from '../init/config/index.js';
 import { commandExists } from '../utils/process.js';
 import {createLogger} from '../log/logger.js';
 
 const log = createLogger('qr-overlay:yad');
-const config = getStartupConfigSnapshot();
 
 export async function startQrOverlayYad({ getUrl, robot }) {
+  const config = getConfig();
   const isSupported = config.qrOverlay.enabled
     && os.platform() === 'linux'
     && config.graphicalDisplay;

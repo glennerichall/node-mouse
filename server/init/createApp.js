@@ -8,12 +8,11 @@ import {
     sharedUtilsDir
 } from '../utils/paths.js';
 import {
-    getStartupConfigSnapshot,
-    HTTPS_ENABLED,
-    SESSION_COOKIE_MAX_AGE_DAYS,
-    SESSION_COOKIE_NAME,
-    SESSION_COOKIE_SECRET,
-} from './config.js';
+    getConfig,
+    
+    
+    
+} from './config/index.js';
 import cookieParser from 'cookie-parser';
 import {
     createEntryRouter,
@@ -39,23 +38,24 @@ function readPackageVersion() {
 }
 
 export async function createApp(instances) {
+    const config = getConfig();
 
     const {app, tokenManager, basePublicUrl, io, serverStartedAt} = instances;
 
     const getEntryUrl = () => `${basePublicUrl}/entry/${tokenManager.getToken()}`;
 
-    if (!HTTPS_ENABLED) {
+    if (!config.https.enabled) {
         log.warn('HTTPS=false: cookie session envoyé sans attribut Secure (moins sécuritaire).');
     }
     
-    const cookies = cookieParser(SESSION_COOKIE_SECRET);
+    const cookies = cookieParser(config.session.cookieSecret);
 
     app.use(cookies);
 
     app.use(createSessionCreationMiddleware({
-        cookieName: SESSION_COOKIE_NAME,
-        cookieMaxAgeMs: Math.max(1, SESSION_COOKIE_MAX_AGE_DAYS) * 24 * 60 * 60 * 1000,
-        secureCookies: HTTPS_ENABLED,
+        cookieName: config.session.cookieName,
+        cookieMaxAgeMs: Math.max(1, config.session.cookieMaxAgeDays) * 24 * 60 * 60 * 1000,
+        secureCookies: config.https.enabled,
     }));
 
     app.use('/entry', createEntryRouter(tokenManager));
@@ -63,7 +63,7 @@ export async function createApp(instances) {
 
     app.use(createSessionValidationMiddleware({
         tokenManager,
-        cookieName: SESSION_COOKIE_NAME,
+        cookieName: config.session.cookieName,
     }));
 
     app.get('/qr', createQrPageHandler(getEntryUrl));
@@ -85,7 +85,7 @@ export async function createApp(instances) {
         publicDir,
         io,
         serverStartedAt,
-        getConfigSnapshot: getStartupConfigSnapshot,
+        getConfigSnapshot: getConfig,
         getRecentLogs,
         getVersion: readPackageVersion,
     }));

@@ -1,12 +1,12 @@
-import {getStartupConfigSnapshot} from '../init/config.js';
+import {getConfig} from '../init/config/index.js';
 import { chooseUpdateSource } from './choose-source.js';
 import { UpdateChecker } from './checker.js';
 import {createLogger} from '../log/logger.js';
 
-const config = getStartupConfigSnapshot();
 const log = createLogger('update-check:start');
 
 export async function startUpdateChecker(notifier) {
+  const config = getConfig();
   const source = await chooseUpdateSource();
   const checker = new UpdateChecker({
     notifier,

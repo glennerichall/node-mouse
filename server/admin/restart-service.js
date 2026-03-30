@@ -1,11 +1,10 @@
-import {getStartupConfigSnapshot} from '../init/config.js';
+import {getConfig} from '../init/config/index.js';
 import { commandExists, spawnDetached } from '../utils/process.js';
 import { writeRestartMarker } from './restart-marker.js';
 
-const config = getStartupConfigSnapshot();
-
 export function createRestartServiceAction({ notifier }) {
   return async function restartService({ clientId } = {}) {
+    const config = getConfig();
     if (!(await commandExists('systemctl'))) {
       return { ok: false, message: 'systemctl indisponible.' };
     }

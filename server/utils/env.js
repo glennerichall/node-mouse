@@ -1,17 +1,62 @@
 import fs from 'node:fs';
-import path from 'node:path';
 import os from 'node:os';
+import path from 'node:path';
 import dotenv from 'dotenv';
 
-export function resolveEnvFilePath({ appRoot, explicitEnvFilePath = '' }) {
+export function expandHomePath(value) {
+  const raw = String(value || '').trim();
+  if (!raw) {
+    return '';
+  }
+  if (raw === '~') {
+    return os.homedir();
+  }
+  if (raw.startsWith('~/')) {
+    return path.join(os.homedir(), raw.slice(2));
+  }
+  return raw;
+}
+
+export function resolveConfigDir(explicitConfigDir = '') {
+  const configuredDir = expandHomePath(explicitConfigDir);
+  if (configuredDir) {
+    return path.resolve(process.cwd(), configuredDir);
+  }
+  if (process.env.NODE_ENV === 'test') {
+    return path.join(os.tmpdir(), 'remote-mouse');
+  }
+  return path.join(os.homedir(), '.config', 'remote-mouse');
+}
+
+export function resolvePathFromConfigDir(value, configDir, fallbackName = '') {
+  const rawValue = String(value || '').trim();
+  const rawFallback = String(fallbackName || '').trim();
+  const candidate = expandHomePath(rawValue || rawFallback);
+
+  if (!candidate) {
+    return '';
+  }
+
+  if (path.isAbsolute(candidate)) {
+    return candidate;
+  }
+
+  return path.resolve(configDir, candidate);
+}
+
+export function resolveEnvFilePath({ appRoot, configDir = '', explicitEnvFilePath = '' }) {
   const cwdEnvFilePath = path.join(process.cwd(), '.env');
   const appEnvFilePath = appRoot ? path.join(appRoot, '.env') : '';
+  const configDirEnvFilePath = configDir ? path.join(configDir, '.env') : '';
   const explicitResolved = explicitEnvFilePath
-    ? path.resolve(process.cwd(), explicitEnvFilePath)
+    ? path.resolve(process.cwd(), expandHomePath(explicitEnvFilePath))
     : '';
 
   if (explicitResolved && fs.existsSync(explicitResolved)) {
     return explicitResolved;
+  }
+  if (configDirEnvFilePath && fs.existsSync(configDirEnvFilePath)) {
+    return configDirEnvFilePath;
   }
   if (fs.existsSync(cwdEnvFilePath)) {
     return cwdEnvFilePath;
@@ -29,121 +74,6 @@ export function loadEnvFile(envFilePath) {
   dotenv.config({ path: envFilePath, override: false });
 }
 
-export function resolveWritableEnvFilePath({ appRoot, explicitEnvFilePath = '' }) {
-  const explicitResolved = explicitEnvFilePath
-    ? path.resolve(process.cwd(), explicitEnvFilePath)
-    : '';
-  if (explicitResolved) {
-    return explicitResolved;
-  }
-
-  const existing = resolveEnvFilePath({ appRoot, explicitEnvFilePath: '' });
-  if (existing) {
-    return existing;
-  }
-
-  return path.join(process.cwd(), '.env');
-}
-
-function parseEnvKey(line) {
-  const match = String(line || '').match(/^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
-  if (!match) {
-    return null;
-  }
-  return {
-    key: match[1],
-    rhs: match[2] ?? '',
-  };
-}
-
-function readFileIfExists(filePath) {
-  if (!filePath || !fs.existsSync(filePath)) {
-    return '';
-  }
-  return fs.readFileSync(filePath, 'utf8');
-}
-
-export function mergeEnvWithExample({ exampleEnvPath, targetEnvPath }) {
-  const exampleRaw = readFileIfExists(exampleEnvPath);
-  if (!exampleRaw) {
-    return {
-      ok: false,
-      reason: 'missing_example',
-      targetEnvPath,
-      added: 0,
-      updated: 0,
-      removed: 0,
-      unchanged: 0,
-    };
-  }
-
-  const targetRaw = readFileIfExists(targetEnvPath);
-  const targetLines = targetRaw ? targetRaw.split(/\r?\n/) : [];
-  const targetRhsByKey = new Map();
-  for (const line of targetLines) {
-    const parsed = parseEnvKey(line);
-    if (!parsed) {
-      continue;
-    }
-    targetRhsByKey.set(parsed.key, parsed.rhs);
-  }
-
-  const exampleLines = exampleRaw.split(/\r?\n/);
-  const mergedLines = [];
-  const seen = new Set();
-  let added = 0;
-  let updated = 0;
-  let unchanged = 0;
-
-  for (const line of exampleLines) {
-    const parsed = parseEnvKey(line);
-    if (!parsed) {
-      mergedLines.push(line);
-      continue;
-    }
-
-    const { key, rhs: exampleRhs } = parsed;
-    seen.add(key);
-
-    if (!targetRhsByKey.has(key)) {
-      mergedLines.push(line);
-      added += 1;
-      continue;
-    }
-
-    const targetRhs = targetRhsByKey.get(key);
-    if (String(targetRhs) === String(exampleRhs)) {
-      mergedLines.push(line);
-      unchanged += 1;
-      continue;
-    }
-
-    mergedLines.push(`${key}=${targetRhs}`);
-    updated += 1;
-  }
-
-  const targetKeys = new Set(Array.from(targetRhsByKey.keys()));
-  let removed = 0;
-  for (const key of targetKeys) {
-    if (!seen.has(key)) {
-      removed += 1;
-    }
-  }
-
-  const mergedText = `${mergedLines.join('\n').replace(/\n*$/, '\n')}`;
-  fs.mkdirSync(path.dirname(targetEnvPath), { recursive: true });
-  fs.writeFileSync(targetEnvPath, mergedText, 'utf8');
-
-  return {
-    ok: true,
-    targetEnvPath,
-    added,
-    updated,
-    removed,
-    unchanged,
-  };
-}
-
 export function readRaw(key, fallback = '') {
   if (Object.prototype.hasOwnProperty.call(process.env, key)
     && process.env[key] !== undefined
@@ -156,6 +86,16 @@ export function readRaw(key, fallback = '') {
 
 export function readString(key, fallback = '') {
   return readRaw(key, fallback).trim();
+}
+
+export function readOptionalString(key) {
+  if (!Object.prototype.hasOwnProperty.call(process.env, key)
+    || process.env[key] === undefined
+    || process.env[key] === null
+    || process.env[key] === '') {
+    return undefined;
+  }
+  return String(process.env[key]).trim();
 }
 
 export function readNumber(
@@ -177,21 +117,29 @@ export function readNumber(
   return value;
 }
 
+export function readOptionalNumber(key) {
+  if (!Object.prototype.hasOwnProperty.call(process.env, key)
+    || process.env[key] === undefined
+    || process.env[key] === null
+    || process.env[key] === '') {
+    return undefined;
+  }
+  const value = Number(process.env[key]);
+  return Number.isFinite(value) ? value : undefined;
+}
+
 export function readBoolean(key, fallback = false) {
   const raw = readRaw(key, fallback ? 'true' : 'false').toLowerCase();
   return raw === '1' || raw === 'true' || raw === 'yes' || raw === 'on';
 }
 
-export function expandHomePath(value) {
-  const raw = String(value || '').trim();
-  if (!raw) {
-    return '';
+export function readOptionalBoolean(key) {
+  if (!Object.prototype.hasOwnProperty.call(process.env, key)
+    || process.env[key] === undefined
+    || process.env[key] === null
+    || process.env[key] === '') {
+    return undefined;
   }
-  if (raw === '~') {
-    return os.homedir();
-  }
-  if (raw.startsWith('~/')) {
-    return path.join(os.homedir(), raw.slice(2));
-  }
-  return raw;
+  const normalized = String(process.env[key]).trim().toLowerCase();
+  return normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on';
 }

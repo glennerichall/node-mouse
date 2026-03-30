@@ -1,7 +1,6 @@
-import {getStartupConfigSnapshot} from '../init/config.js';
+import {getConfig} from '../init/config/index.js';
 import {createLogger} from '../log/logger.js';
 
-const config = getStartupConfigSnapshot();
 const log = createLogger('notifier:composite');
 
 export function createNotifierComposite({ clientNotifier, serverNotifier }) {
@@ -32,7 +31,7 @@ export function createNotifierComposite({ clientNotifier, serverNotifier }) {
       toClients = true,
       target,
       clientId,
-      ttlMs = config.notifications.ttlMs,
+      ttlMs = getConfig().notifications.ttlMs,
     }) {
       if (!message) {
         return;

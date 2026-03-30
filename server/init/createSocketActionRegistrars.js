@@ -1,7 +1,7 @@
 import {createController} from "../input/controller.js";
 import {createBrowserReceiver} from "../browser/index.js";
 import {createPreviewStreamer} from "../preview/preview.js";
-import {getStartupConfigSnapshot} from "./config.js";
+import {getConfig} from "./config/index.js";
 import {startUpdateChecker} from "../update-check/index.js";
 import {createAdminActions} from "../admin/index.js";
 import {createControlEventRegistrar} from "../connection/events/input.js";
@@ -11,9 +11,8 @@ import {createPreviewEventRegistrar} from "../connection/events/preview.js";
 import {createConnectionRegistrar} from "../connection/socket/createConnectionRegistrar.js";
 import {createSamsungRemote} from '../samsung/remote.js';
 
-const config = getStartupConfigSnapshot();
-
 export async function createSocketActionRegistrars(instances) {
+    const config = getConfig();
     const {notifier, robot, tokenManager, qrOverlay} = instances;
 
     const {

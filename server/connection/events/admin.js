@@ -1,13 +1,13 @@
 import {createLogger} from '../../log/logger.js';
-import {getStartupConfigSnapshot} from '../../init/config.js';
+import {getConfig} from '../../init/config/index.js';
 import {createSocketActionResponder} from '../socket/socket-action-responder.js';
 import {createAdminEventGuardMiddleware} from './admin.guard.js';
 
 const log = createLogger('events:admin');
-const config = getStartupConfigSnapshot();
 
 export function createAdminEventRegistrar({ adminActions }) {
   return function registerAdminEvents(socket) {
+    const config = getConfig();
     const respondAdminAction = createSocketActionResponder({
       socket,
       eventName: 'admin:result',

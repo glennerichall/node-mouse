@@ -1,11 +1,11 @@
-import {getStartupConfigSnapshot} from '../init/config.js';
+import {getConfig} from '../init/config/index.js';
 import {createLogger} from '../log/logger.js';
 
-const config = getStartupConfigSnapshot();
 const log = createLogger('admin:open-server-info-browser');
 
 export function createOpenServerInfoBrowserAction({ notifier, browser }) {
   return async function openServerInfoBrowser({ clientId } = {}) {
+    const config = getConfig();
     const localInfoUrl = `${config.protocol}://127.0.0.1:${config.port}/admin/server-info`;
     log.info({ localInfoUrl }, 'Ouverture de la page server info sur le serveur');
 

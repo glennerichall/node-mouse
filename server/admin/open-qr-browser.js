@@ -1,11 +1,11 @@
-import {getStartupConfigSnapshot} from '../init/config.js';
+import {getConfig} from '../init/config/index.js';
 import {createLogger} from '../log/logger.js';
 
-const config = getStartupConfigSnapshot();
 const log = createLogger('admin:open-qr-browser');
 
 export function createOpenQrBrowserAction({ notifier, browser }) {
   return async function openQrBrowser({ clientId } = {}) {
+    const config = getConfig();
     const localQrUrl = `${config.protocol}://127.0.0.1:${config.port}/qr`;
     log.info({ localQrUrl }, 'Ouverture de la page QR sur le serveur');
 

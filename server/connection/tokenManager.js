@@ -198,9 +198,6 @@ export function createTokenManager({
         cleanupExpired({persist: false});
         return tokens.has(normalized);
     }
-    
-    loadTokens();
-
     return {
         isValid,
         createToken,

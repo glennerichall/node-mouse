@@ -1,11 +1,9 @@
 import {createKeyboardController} from "./keyboard-controller.js";
-import {getStartupConfigSnapshot} from "../init/config.js";
+import {getConfig} from "../init/config/index.js";
 import {createMouseController} from "./mouse-controller.js";
-import {loadRobot} from "../utils/robot.js";
-
-const config = getStartupConfigSnapshot();
 
 export function createController(robot) {
+    const config = getConfig();
     
     const mouse = createMouseController(robot, {
         mouseSpeed: config.input.mouseSpeed,

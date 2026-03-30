@@ -1,12 +1,12 @@
-import {getStartupConfigSnapshot} from '../init/config.js';
+import {getConfig} from '../init/config/index.js';
 import {createLogger} from '../log/logger.js';
 
-const config = getStartupConfigSnapshot();
 const log = createLogger('notifier:client');
 
 export function createClientNotifier(io) {
   return {
     notify(payload, options = {}) {
+      const config = getConfig();
       if (!config.notifications.client) {
         return;
       }

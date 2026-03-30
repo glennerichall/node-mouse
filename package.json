@@ -1,6 +1,6 @@
 {
   "name": "remote-mouse",
-  "version": "1.2.9",
+  "version": "2.0.0",
   "type": "module",
   "description": "Remote mouse and keyboard with mobile client",
   "main": "index.js",
@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@hurdlegroup/robotjs": "^0.12.3",
+    "better-sqlite3": "^12.8.0",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.3.1",
     "express": "^4.21.2",

@@ -3,17 +3,16 @@ import http from 'node:http';
 import https from 'node:https';
 import express from 'express';
 import {
-    getStartupConfigSnapshot,
-} from './config.js';
+    getConfig,
+} from './config/index.js';
 import {Server} from "socket.io";
 import {createTokenManager} from "../connection/tokenManager.js";
 import {getPublicUrl} from "../utils/network.js";
 import {loadRobot} from "../utils/robot.js";
 import {createNotifier} from "../notifier/notifier.js";
 
-const config = getStartupConfigSnapshot();
-
 function createHttpsServer(app) {
+    const config = getConfig();
     if (!config.https.sslKeyPath || !config.https.sslCertPath) {
         throw new Error('HTTPS=true exige SSL_KEY_PATH et SSL_CERT_PATH.');
     }
@@ -24,6 +23,7 @@ function createHttpsServer(app) {
 }
 
 export async function createServer(instances) {
+    const config = getConfig();
     const serverStartedAt = Date.now();
     const app = express();
     

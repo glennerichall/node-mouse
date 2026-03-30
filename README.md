@@ -84,10 +84,10 @@ Le serveur affiche:
 ## Variables utiles
 
 - `PORT` (défaut `3000`)
-- `ENV_FILE_PATH` (chemin explicite du fichier `.env`)
 - `SERVER_HOST` (forcer l'IP/host exposé dans le QR)
-- `MOUSE_SPEED` (défaut `1.3`)
-- `SCROLL_SPEED` (défaut `0.25`)
+- `CONFIG_DIR` (répertoire de config principal, défaut `~/.config/remote-mouse`)
+- `ENV_FILE_PATH` (chemin explicite du fichier `.env`)
+- `PERSISTENCE_DB_PATH` (chemin du fichier SQLite de persistence)
 - `HTTPS` (`true` pour activer HTTPS)
 - `SSL_KEY_PATH` (chemin de la clé privée PEM)
 - `SSL_CERT_PATH` (chemin du certificat PEM)
@@ -96,30 +96,8 @@ Le serveur affiche:
 - `ENTRY_PATH_TOKEN_LENGTH` (longueur token, défaut `24`)
 - `ENTRY_PATH_ROTATE_INTERVAL_MIN` (rotation token en minutes, défaut `60`)
 - `ENTRY_PATH_GRACE_MIN` (grâce anciens tokens en minutes, défaut `120`)
-- `ENTRY_PATH_STATE_FILE` (fichier JSON de persistance du token + horodatage de rotation)
-- `TOP_BAR_OFFSET_PX` (offset vertical pour l'overlay QR `yad`, défaut `32`)
-- `QR_OVERLAY_ENABLED` (`true`/`false`, défaut `true`)
-- `QR_OVERLAY_SIZE` (taille du QR `yad`, défaut `75`)
-- `QR_OVERLAY_MARGIN` (marge droite du QR `yad`, défaut `14`)
-- `PREVIEW_WIDTH` (largeur de la preview souris, défaut `128`)
-- `PREVIEW_HEIGHT` (hauteur de la preview souris, défaut `84`)
-- `PREVIEW_FPS` (fréquence preview, défaut `6`)
-- `DESKTOP_NOTIFICATIONS_ENABLED` (notifications système serveur, défaut `true`)
-- `CLIENT_NOTIFICATIONS_ENABLED` (notifications push vers clients, défaut `true`)
-- `NOTIFICATION_TTL_MS` (durée d'affichage des notifications, défaut `2200`)
 - `ADMIN_ACTIONS_ENABLED` (autorise les actions admin depuis client, défaut `true`)
 - `SERVICE_NAME` (service systemd --user à redémarrer, défaut `remote-mouse.service`)
-- `SAMSUNG_TV_ENABLED` (active le module Samsung, défaut `false`)
-- `SAMSUNG_TV_HOST` (IP/host de la TV Samsung)
-- `SAMSUNG_TV_MAC` (adresse MAC de la TV, requise pour `on`)
-- `SAMSUNG_TV_PORT` (défaut `8002`, parfois `8001`)
-- `SAMSUNG_TV_APP_NAME` (nom annoncé à la TV, défaut `Remote Mouse`)
-- `SAMSUNG_TV_DISCOVERY_TIMEOUT_MS` (timeout de détection auto LAN, défaut `2500`)
-- `SAMSUNG_TV_TIMEOUT_MS` (timeout de connexion/commande, défaut `5000`)
-- `SAMSUNG_TV_PC_INPUT_KEY` (touche Samsung directe vers l'entrée PC, défaut `KEY_HDMI1`)
-- `SAMSUNG_TV_PC_INPUT_SEQUENCE` (séquence optionnelle de touches pour l'entrée PC, ex: `KEY_SOURCE,KEY_RIGHT,KEY_ENTER`)
-- `SAMSUNG_TV_POWER_OFF_KEY` (touche d'extinction, défaut `KEY_POWER`)
-- `UPDATE_CHECK_ENABLED` (vérif de nouvelle version, défaut `false`)
 - `UPDATE_CHECK_COMMAND` (commande shell de vérification update, prioritaire si définie)
 - `UPDATE_CHECK_TIMEOUT_SEC` (timeout de `UPDATE_CHECK_COMMAND`, défaut `20`)
 - `UPDATE_CHECK_INTERVAL_MIN` (intervalle de vérif en minutes, défaut `360`)
@@ -127,7 +105,13 @@ Le serveur affiche:
 - `UPDATE_CHECK_CURRENT_VERSION` (version courante forcée, défaut version locale)
 - `UPDATE_INSTALL_COMMAND` (commande shell d'installation update, prioritaire si définie)
 - `UPDATE_INSTALL_TIMEOUT_SEC` (timeout installation update, défaut `600`)
-- `UPDATE_INSTALL_AUTO_MERGE_ENV` (merge auto `.env.example` -> `.env` après install réussie, défaut `true`)
+
+Configs persistées en SQLite:
+- Le répertoire de config par défaut est `~/.config/remote-mouse`.
+- Par défaut, le serveur charge le fichier d'environnement `CONFIG_DIR/.env`.
+- La base SQLite est aussi stockée dans `CONFIG_DIR`, sauf override explicite avec `PERSISTENCE_DB_PATH`.
+- `getStartupConfigSnapshot()` ne contient plus que les paramètres statiques issus de l'environnement.
+- `getConfig()` fusionne les paramètres statiques avec les réglages persistés en base.
 
 Fallback install update:
 - Si `UPDATE_CHECK_COMMAND` est défini, il est exécuté pour déterminer s'il y a une mise à jour.
@@ -152,11 +136,7 @@ Ou en `.env`:
 ```env
 PORT=3000
 SERVER_HOST=192.168.1.10
-MOUSE_SPEED=1.3
-SCROLL_SPEED=0.25
-SAMSUNG_TV_ENABLED=true
-SAMSUNG_TV_HOST=192.168.1.50
-SAMSUNG_TV_MAC=AA:BB:CC:DD:EE:FF
+CONFIG_DIR=~/.config/remote-mouse
 ```
 
 Contrôle TV Samsung:
@@ -165,10 +145,7 @@ Contrôle TV Samsung:
 - Les commandes Socket.IO côté client utilisent le préfixe `samsung:` (`samsung:on`, `samsung:off`, etc.).
 - `on` utilise Wake-on-LAN, donc la TV doit l'accepter sur le réseau local.
 - L'intégration utilise maintenant explicitement le package npm `samsung-tv-remote`.
-- Si `SAMSUNG_TV_HOST` et/ou `SAMSUNG_TV_MAC` ne sont pas fournis, le serveur tente de détecter automatiquement une TV Samsung réveillée sur le LAN via `getAwakeSamsungDevices()`.
-- Si plusieurs TV Samsung sont détectées, il faut renseigner `SAMSUNG_TV_HOST` ou `SAMSUNG_TV_MAC` pour lever l'ambiguïté.
-- Le bouton `PC` envoie directement la touche configurée par `SAMSUNG_TV_PC_INPUT_KEY`, par exemple `KEY_HDMI1`.
-- Si votre TV ignore `KEY_HDMIx`, utilisez `SAMSUNG_TV_PC_INPUT_SEQUENCE` avec une navigation de menu compatible avec votre modèle.
+- La configuration détaillée Samsung est désormais persistée en SQLite.
 - Beaucoup de modèles Samsung acceptent mieux `KEY_POWER` que `KEY_POWEROFF` pour l'extinction.
 
 Avec token d'entrée fixe (si tu veux éviter la rotation):

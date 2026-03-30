@@ -1,17 +1,14 @@
-import {getStartupConfigSnapshot} from '../init/config.js';
+import {getConfig} from '../init/config/index.js';
 import { execShell } from '../utils/process.js';
 import {createLogger} from '../log/logger.js';
 import {truncateText} from "../utils/truncateText.js";
-import path from 'node:path';
-import {projectRoot} from '../utils/paths.js';
-import {mergeEnvWithExample, resolveWritableEnvFilePath} from '../utils/env.js';
 import {buildNpmGlobalUpdateCommand} from '../update-check/install-command.js';
 
-const config = getStartupConfigSnapshot();
 const log = createLogger('admin:install-update');
 
 export function createInstallUpdateAction({ notifier, updateChecker }) {
   return async function installUpdate({ clientId } = {}) {
+    const config = getConfig();
     log.info('Début install update');
     const inferredCommand = updateChecker && typeof updateChecker.getInstallCommand === 'function'
       ? String(updateChecker.getInstallCommand() || '').trim()
@@ -48,22 +45,6 @@ export function createInstallUpdateAction({ notifier, updateChecker }) {
     log.info({ timeoutMs, installCommand }, 'Exécution commande install update');
     const result = await execShell(installCommand, timeoutMs);
     if (result.ok) {
-      if (config.updateCheck.autoMergeEnv) {
-        const targetEnvPath = resolveWritableEnvFilePath({
-          appRoot: projectRoot,
-          explicitEnvFilePath: process.env.ENV_FILE_PATH || '',
-        });
-        const mergeResult = mergeEnvWithExample({
-          exampleEnvPath: path.join(projectRoot, '.env.example'),
-          targetEnvPath,
-        });
-        if (!mergeResult.ok) {
-          log.warn({ mergeResult }, 'Auto-merge .env skipped');
-        } else {
-          log.info({ mergeResult }, 'Auto-merge .env terminé');
-        }
-      }
-
       log.info('Install update terminée avec succès');
       notifier.notify({
         level: 'info',

@@ -1,7 +1,7 @@
 import pino from 'pino';
-import {getStartupConfigSnapshot} from '../init/config.js';
+import {getConfig} from '../init/config/index.js';
 
-const config = getStartupConfigSnapshot();
+const config = getConfig();
 const logLevel = config?.logging?.level || 'info';
 const logFormat = config?.logging?.format || 'json';
 const maxStoredLogs = 400;
