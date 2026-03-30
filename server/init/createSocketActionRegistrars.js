@@ -1,15 +1,16 @@
-import {createController} from "../input/controller.js";
+import {createController} from "../remotes/input/controller.js";
 import {createBrowserReceiver} from "../remotes/browser/index.js";
-import {createPreviewStreamer} from "../preview/preview.js";
+import {createPreviewStreamer} from "../remotes/preview/createPreviewStreamer.js";
 import {getConfig} from "./config/index.js";
 import {startUpdateChecker} from "../update-check/index.js";
 import {createAdminActions} from "../remotes/admin/index.js";
-import {createControlEventRegistrar} from "../connection/events/input.js";
-import {createCommandEventRegistrar} from "../connection/events/commands.js";
-import {createAdminEventRegistrar} from "../connection/events/admin.js";
-import {createPreviewEventRegistrar} from "../connection/events/preview.js";
+import {createControlEventRegistrar} from "../remotes/input/registrar.js";
+import {createAdminEventRegistrar} from "../remotes/admin/registrar.js";
+import {createPreviewEventRegistrar} from "../remotes/preview/registrar.js";
 import {createConnectionRegistrar} from "../connection/socket/createConnectionRegistrar.js";
 import {createSamsungRemote} from '../remotes/samsung/index.js';
+import {createBrowserRegistrar} from "../remotes/browser/registrar.js";
+import {createSamsungRegistrar} from "../remotes/samsung/registrar.js";
 
 export async function createSocketActionRegistrars(instances) {
     const config = getConfig();
@@ -35,9 +36,10 @@ export async function createSocketActionRegistrars(instances) {
 
     return [
         createControlEventRegistrar({mouse, keyboard}),
-        createCommandEventRegistrar({browser, samsung}),
+        createBrowserRegistrar({browser}),
         createAdminEventRegistrar({adminActions}),
         createPreviewEventRegistrar({preview}),
+        createSamsungRegistrar({samsung}),
         createConnectionRegistrar({notifier})
     ];
 

@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import {createAdminEventGuardMiddleware} from '../../server/connection/events/admin.guard.js';
+import {createAdminEventGuardMiddleware} from '../../server/remotes/admin/admin.guard.js';
 
 describe('createAdminEventGuardMiddleware', () => {
   let sandbox;

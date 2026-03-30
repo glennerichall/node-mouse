@@ -1,6 +1,6 @@
 import {createLogger} from '../../log/logger.js';
 import {getConfig} from '../../init/config/index.js';
-import {createSocketActionResponder} from '../socket/socket-action-responder.js';
+import {createSocketActionResponder} from '../../connection/socket/socket-action-responder.js';
 import {createAdminEventGuardMiddleware} from './admin.guard.js';
 
 const log = createLogger('events:admin');

@@ -1,7 +1,8 @@
 import sinon from 'sinon';
-import { createCommandEventRegistrar } from '../../server/connection/events/commands.js';
+import { createSamsungRegistrar } from '../../server/remotes/samsung/registrar.js';
+import { createBrowserRegistrar } from '../../server/remotes/browser/registrar.js';
 
-describe('createCommandEventRegistrar', () => {
+describe('remote command registrars', () => {
   let sandbox;
 
   beforeEach(() => {
@@ -12,26 +13,21 @@ describe('createCommandEventRegistrar', () => {
     sandbox.restore();
   });
 
-  it('registers samsung events without emitting client notifications', async () => {
+  it('registers samsung events', async () => {
     const handlers = new Map();
-    const emit = sandbox.stub();
-    const browser = {
-      focusOrLaunchBrave: sandbox.stub().resolves(),
-    };
     const samsung = {
-      turnOn: sandbox.stub().resolves({ ok: true, message: 'on' }),
-      turnOff: sandbox.stub().resolves({ ok: true, message: 'off' }),
-      volumeUp: sandbox.stub().resolves({ ok: true, message: 'up' }),
-      volumeDown: sandbox.stub().resolves({ ok: false, message: 'down failed' }),
-      switchInput: sandbox.stub().resolves({ ok: true, message: 'input' }),
-      confirm: sandbox.stub().resolves({ ok: true, message: 'enter' }),
-      switchToPcInput: sandbox.stub().resolves({ ok: true, message: 'pc' }),
+      turnOn: sandbox.stub().resolves(),
+      turnOff: sandbox.stub().resolves(),
+      volumeUp: sandbox.stub().resolves(),
+      volumeDown: sandbox.stub().resolves(),
+      switchInput: sandbox.stub().resolves(),
+      confirm: sandbox.stub().resolves(),
+      switchToPcInput: sandbox.stub().resolves(),
     };
 
-    const register = createCommandEventRegistrar({ browser, samsung });
+    const register = createSamsungRegistrar({ samsung });
     register({
       id: 'abcdef123456',
-      emit,
       on(eventName, handler) {
         handlers.set(eventName, handler);
       },
@@ -42,31 +38,18 @@ describe('createCommandEventRegistrar', () => {
 
     expect(samsung.turnOn.calledOnce).toBe(true);
     expect(samsung.volumeDown.calledOnce).toBe(true);
-    expect(emit.called).toBe(false);
   });
 
-  it('keeps browser shortcut handling intact', async () => {
+  it('registers browser shortcut handling', async () => {
     const handlers = new Map();
     const browser = {
       focusOrLaunchBrave: sandbox.stub().resolves(),
     };
 
-    const register = createCommandEventRegistrar({
-      browser,
-      samsung: {
-        turnOn: sandbox.stub(),
-        turnOff: sandbox.stub(),
-        volumeUp: sandbox.stub(),
-        volumeDown: sandbox.stub(),
-        switchInput: sandbox.stub(),
-        confirm: sandbox.stub(),
-        switchToPcInput: sandbox.stub(),
-      },
-    });
+    const register = createBrowserRegistrar({ browser });
 
     register({
       id: 'abcdef123456',
-      emit: sandbox.stub(),
       on(eventName, handler) {
         handlers.set(eventName, handler);
       },
