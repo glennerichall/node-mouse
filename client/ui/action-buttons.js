@@ -3,6 +3,7 @@ import { emitWithTimestamp } from '../core/socket-emit.js';
 export function bindActionButtons(
   socket,
   {
+    keyboardPanel,
     btnEnter,
     btnBackspace,
     btnOpenBrave,
@@ -31,7 +32,10 @@ export function bindActionButtons(
     btnRotateEntryToken,
   },
 ) {
-  btnEnter.addEventListener('click', () => emitWithTimestamp(socket, 'keyboard:key', { key: 'enter' }));
+  btnEnter.addEventListener('click', () => {
+    emitWithTimestamp(socket, 'keyboard:key', { key: 'enter' });
+    keyboardPanel.classList.add('hidden');
+  });
   btnBackspace.addEventListener('click', () => emitWithTimestamp(socket, 'keyboard:key', { key: 'backspace' }));
   btnOpenBrave.addEventListener('click', () => emitWithTimestamp(socket, 'browser:brave'));
   btnBrowserBack.addEventListener('click', () =>

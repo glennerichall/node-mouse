@@ -16,12 +16,67 @@ const ALLOWED_KEYS = new Set([
 ]);
 const ALLOWED_MODIFIERS = new Set(['control', 'shift', 'alt', 'command']);
 
+function isDirectTypeSafe(character) {
+  return /^[a-zA-Z0-9 ]$/.test(character);
+}
+
+function typeUnicodeCharacter(robot, character) {
+  const codePoint = character.codePointAt(0);
+  if (!codePoint) {
+    return;
+  }
+
+  if (process.platform !== 'linux') {
+    robot.typeString(character);
+    return;
+  }
+
+  robot.keyTap('u', ['control', 'shift']);
+  robot.typeString(codePoint.toString(16));
+  robot.keyTap('enter');
+}
+
 export function createKeyboardController(robot) {
   function typeText(text) {
     if (!text || typeof text !== 'string') {
       return;
     }
-    robot.typeString(text);
+
+    let directBuffer = '';
+    for (const character of Array.from(text)) {
+      if (character === '\n') {
+        if (directBuffer) {
+          robot.typeString(directBuffer);
+          directBuffer = '';
+        }
+        robot.keyTap('enter');
+        continue;
+      }
+
+      if (character === '\t') {
+        if (directBuffer) {
+          robot.typeString(directBuffer);
+          directBuffer = '';
+        }
+        robot.keyTap('tab');
+        continue;
+      }
+
+      if (isDirectTypeSafe(character)) {
+        directBuffer += character;
+        continue;
+      }
+
+      if (directBuffer) {
+        robot.typeString(directBuffer);
+        directBuffer = '';
+      }
+      typeUnicodeCharacter(robot, character);
+    }
+
+    if (directBuffer) {
+      robot.typeString(directBuffer);
+    }
   }
 
   function pressSpecialKey(key, modifiers = []) {
