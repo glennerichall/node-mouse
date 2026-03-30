@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Remote Mouse Config</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/admin-config.css?v=20260330a" />
+</head>
+<body>
+  <main class="config-page">
+    <header class="config-hero">
+      <div>
+        <p class="eyebrow">Administration</p>
+        <h1>Configuration persistante</h1>
+        <p class="hero-copy">Les champs ci-dessous sont stockes en base de donnees et regroupes selon la structure de l'objet de configuration.</p>
+      </div>
+      <div class="hero-actions">
+        <a class="secondary-link" href="/">Retour remote</a>
+        <button id="reload-config" type="button">Recharger</button>
+        <button id="save-config" type="button">Enregistrer</button>
+      </div>
+    </header>
+
+    <section class="status-bar" aria-live="polite">
+      <p id="config-status">Chargement de la configuration...</p>
+    </section>
+
+    <form id="config-form" class="config-grid"></form>
+  </main>
+
+  <template id="section-template">
+    <section class="config-section">
+      <div class="section-header">
+        <p class="section-key"></p>
+        <h2></h2>
+        <p class="section-description"></p>
+      </div>
+      <div class="section-fields"></div>
+    </section>
+  </template>
+
+  <template id="field-template">
+    <label class="field-card">
+      <span class="field-header">
+        <span class="field-label"></span>
+        <span class="field-path"></span>
+      </span>
+      <span class="field-control"></span>
+    </label>
+  </template>
+
+  <script type="module" src="/admin-config.js?v=20260330a"></script>
+</body>
+</html>

@@ -46,6 +46,33 @@ export function bootstrapConfigDatabase(defaultConfig, managedPaths = []) {
     // bootstrap();
 }
 
+export function saveStoredConfig(value, managedPaths = []) {
+    const db = getDatabase();
+    if (!bootstrapped) {
+        bootstrapConfigDatabase(getEnvConfig(), managedPaths);
+        bootstrapped = true;
+    }
+
+    const flattened = toFlatMap(value);
+    const allowedKeys = new Set(managedPaths);
+    const insertStatement = db.prepare(`
+        INSERT INTO ${CONFIG_TABLE} (key, value_json)
+        VALUES (?, ?)
+        ON CONFLICT(key) DO UPDATE SET value_json = excluded.value_json
+    `);
+
+    const persist = db.transaction(() => {
+        for (const [key, entryValue] of flattened.entries()) {
+            if (allowedKeys.size > 0 && !allowedKeys.has(key)) {
+                continue;
+            }
+            insertStatement.run(key, JSON.stringify(entryValue));
+        }
+    });
+
+    persist();
+}
+
 export function getStoredConfig(managedPaths = []) {
     const db = getDatabase();
     if (!bootstrapped) {

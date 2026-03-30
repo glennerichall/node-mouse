@@ -23,6 +23,7 @@ import {createQrPageHandler} from '../connection/api/qr-page.handler.js';
 import {createLogger} from '../log/logger.js';
 import {createServerInfoRouter} from '../connection/api/server-info.router.js';
 import {getRecentLogs} from '../log/logger.js';
+import {createAdminConfigRouter} from '../connection/api/admin-config.router.js';
 
 const log = createLogger('createApp');
 const packageJsonPath = path.join(projectRoot, 'package.json');
@@ -88,6 +89,11 @@ export async function createApp(instances) {
         getConfigSnapshot: getConfig,
         getRecentLogs,
         getVersion: readPackageVersion,
+    }));
+
+    app.use('/admin/config', createAdminConfigRouter({
+        publicDir,
+        getConfigSnapshot: getConfig,
     }));
 
     app.get('/health', (_req, res) => {

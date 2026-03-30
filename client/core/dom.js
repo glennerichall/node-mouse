@@ -71,6 +71,7 @@ function getAdminRemoteDom() {
     btnToggleQrOverlay: getElement('btn-toggle-qr-overlay'),
     btnOpenServerInfoBrowserServer: getElement('btn-open-server-info-browser-server'),
     btnOpenServerInfoBrowserClient: getElement('btn-open-server-info-browser-client'),
+    btnOpenConfigPage: getElement('btn-open-config-page'),
     btnRotateEntryToken: getElement('btn-rotate-entry-token'),
   };
 }
