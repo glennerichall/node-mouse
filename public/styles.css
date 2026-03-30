@@ -127,6 +127,53 @@ body {
   backdrop-filter: blur(6px);
 }
 
+#tv-controls {
+  position: absolute;
+  top: calc(62px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: grid;
+  gap: 6px;
+  width: min(92vw, 340px);
+  padding: 8px;
+  border-radius: 16px;
+  background: rgba(10, 16, 20, 0.5);
+  backdrop-filter: blur(6px);
+}
+
+.section-label {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  opacity: 0.74;
+}
+
+.tv-actions {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.tv-actions button {
+  appearance: none;
+  border: none;
+  border-radius: 9px;
+  color: var(--fg);
+  background: rgba(44, 57, 67, 0.92);
+  font-size: 0.82rem;
+  font-weight: 700;
+  min-height: 38px;
+  padding: 0 8px;
+}
+
+.tv-actions button:active {
+  transform: translateY(1px);
+  background: rgba(56, 73, 85, 0.96);
+}
+
 #browser-shortcuts button {
   pointer-events: auto;
   appearance: none;
@@ -256,6 +303,16 @@ body {
   height: 44px;
   background: var(--accent);
   color: #062231;
+}
+
+@media (max-width: 640px) {
+  #tv-controls {
+    width: min(94vw, 420px);
+  }
+
+  .tv-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 #connection-overlay {

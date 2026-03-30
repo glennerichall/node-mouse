@@ -9,6 +9,7 @@ import {createCommandEventRegistrar} from "../connection/events/commands.js";
 import {createAdminEventRegistrar} from "../connection/events/admin.js";
 import {createPreviewEventRegistrar} from "../connection/events/preview.js";
 import {createConnectionRegistrar} from "../connection/socket/createConnectionRegistrar.js";
+import {createSamsungRemote} from '../samsung/remote.js';
 
 const config = getStartupConfigSnapshot();
 
@@ -21,6 +22,7 @@ export async function createSocketActionRegistrars(instances) {
     } = createController(robot);
 
     const browser = createBrowserReceiver();
+    const samsung = createSamsungRemote();
 
     const preview = createPreviewStreamer(robot, {
         width: config.preview.width,
@@ -34,7 +36,7 @@ export async function createSocketActionRegistrars(instances) {
 
     return [
         createControlEventRegistrar({mouse, keyboard}),
-        createCommandEventRegistrar({browser}),
+        createCommandEventRegistrar({browser, samsung}),
         createAdminEventRegistrar({adminActions}),
         createPreviewEventRegistrar({preview}),
         createConnectionRegistrar({notifier})

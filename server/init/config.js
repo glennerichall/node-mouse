@@ -51,6 +51,19 @@ export const CLIENT_NOTIFICATIONS_ENABLED = readBoolean('CLIENT_NOTIFICATIONS_EN
 export const NOTIFICATION_TTL_MS = readNumber('NOTIFICATION_TTL_MS', 2200, { min: 500, max: 60_000 });
 export const ADMIN_ACTIONS_ENABLED = readBoolean('ADMIN_ACTIONS_ENABLED', true);
 export const SERVICE_NAME = readString('SERVICE_NAME', 'remote-mouse.service');
+const samsungTvHost = readString('SAMSUNG_TV_HOST', '');
+const samsungTvMac = readString('SAMSUNG_TV_MAC', '');
+const samsungTvEnabledByDefault = Boolean(samsungTvHost && samsungTvMac);
+export const SAMSUNG_TV_ENABLED = readBoolean('SAMSUNG_TV_ENABLED', samsungTvEnabledByDefault);
+export const SAMSUNG_TV_HOST = samsungTvHost;
+export const SAMSUNG_TV_MAC = samsungTvMac;
+export const SAMSUNG_TV_PORT = readNumber('SAMSUNG_TV_PORT', 8002, { min: 1, max: 65535 });
+export const SAMSUNG_TV_APP_NAME = readString('SAMSUNG_TV_APP_NAME', 'Remote Mouse');
+export const SAMSUNG_TV_DISCOVERY_TIMEOUT_MS = readNumber('SAMSUNG_TV_DISCOVERY_TIMEOUT_MS', 2500, { min: 500, max: 30_000 });
+export const SAMSUNG_TV_TIMEOUT_MS = readNumber('SAMSUNG_TV_TIMEOUT_MS', 5000, { min: 500, max: 60_000 });
+export const SAMSUNG_TV_PC_INPUT_KEY = readString('SAMSUNG_TV_PC_INPUT_KEY', 'KEY_HDMI1').toUpperCase();
+export const SAMSUNG_TV_PC_INPUT_SEQUENCE = readString('SAMSUNG_TV_PC_INPUT_SEQUENCE', '');
+export const SAMSUNG_TV_POWER_OFF_KEY = readString('SAMSUNG_TV_POWER_OFF_KEY', 'KEY_POWER').toUpperCase();
 export const UPDATE_CHECK_ENABLED = readBoolean('UPDATE_CHECK_ENABLED', false);
 export const UPDATE_CHECK_INTERVAL_MIN = readNumber('UPDATE_CHECK_INTERVAL_MIN', 360, { min: 1, max: 24 * 60 });
 export const UPDATE_CHECK_COMMAND = readString('UPDATE_CHECK_COMMAND', '');
@@ -120,6 +133,18 @@ export function getStartupConfigSnapshot() {
     },
     adminActionsEnabled: ADMIN_ACTIONS_ENABLED,
     serviceName: SERVICE_NAME,
+    samsungTv: {
+      enabled: SAMSUNG_TV_ENABLED,
+      host: SAMSUNG_TV_HOST,
+      mac: SAMSUNG_TV_MAC,
+      port: SAMSUNG_TV_PORT,
+      appName: SAMSUNG_TV_APP_NAME,
+      discoveryTimeoutMs: SAMSUNG_TV_DISCOVERY_TIMEOUT_MS,
+      timeoutMs: SAMSUNG_TV_TIMEOUT_MS,
+      pcInputKey: SAMSUNG_TV_PC_INPUT_KEY,
+      pcInputSequence: SAMSUNG_TV_PC_INPUT_SEQUENCE,
+      powerOffKey: SAMSUNG_TV_POWER_OFF_KEY,
+    },
     updateCheck: {
       enabled: UPDATE_CHECK_ENABLED,
       checkCommand: UPDATE_CHECK_COMMAND,
@@ -180,6 +205,10 @@ export function logStartupConfig(logger) {
   emitConfigLine(logger, 'config.admin', {
     adminActionsEnabled: payload.adminActionsEnabled,
     serviceName: payload.serviceName,
+  });
+  emitConfigLine(logger, 'config.samsungTv', {
+    ...payload.samsungTv,
+    mac: payload.samsungTv.mac ? '(set)' : '(unset)',
   });
   emitConfigLine(logger, 'config.update', {
     ...payload.updateCheck,

@@ -2,11 +2,48 @@ import {createLogger} from '../../log/logger.js';
 
 const log = createLogger('events:commands');
 
-export function createCommandEventRegistrar({ browser }) {
+export function createCommandEventRegistrar({ browser, samsung }) {
   return function registerCommandEvents(socket) {
+    const client = socket.id.slice(0, 8);
+
     socket.on('browser:brave', async () => {
-      log.info({ client: socket.id.slice(0, 8) }, 'Demande browser:brave');
+      log.info({ client }, 'Demande browser:brave');
       await browser.focusOrLaunchBrave();
+    });
+
+    socket.on('samsung:on', async () => {
+      log.info({ client }, 'Demande samsung:on');
+      await samsung.turnOn();
+    });
+
+    socket.on('samsung:off', async () => {
+      log.info({ client }, 'Demande samsung:off');
+      await samsung.turnOff();
+    });
+
+    socket.on('samsung:volup', async () => {
+      log.info({ client }, 'Demande samsung:volup');
+      await samsung.volumeUp();
+    });
+
+    socket.on('samsung:voldown', async () => {
+      log.info({ client }, 'Demande samsung:voldown');
+      await samsung.volumeDown();
+    });
+
+    socket.on('samsung:input', async () => {
+      log.info({ client }, 'Demande samsung:input');
+      await samsung.switchInput();
+    });
+
+    socket.on('samsung:enter', async () => {
+      log.info({ client }, 'Demande samsung:enter');
+      await samsung.confirm();
+    });
+
+    socket.on('samsung:pc-input', async () => {
+      log.info({ client }, 'Demande samsung:pc-input');
+      await samsung.switchToPcInput();
     });
   };
 }

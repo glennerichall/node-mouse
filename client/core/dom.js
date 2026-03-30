@@ -22,6 +22,13 @@ export function getDom() {
   const btnAddressBar = document.getElementById('btn-address-bar');
   const btnHardReload = document.getElementById('btn-hard-reload');
   const btnFullscreen = document.getElementById('btn-fullscreen');
+  const btnSamsungOn = document.getElementById('btn-samsung-on');
+  const btnSamsungOff = document.getElementById('btn-samsung-off');
+  const btnSamsungVolUp = document.getElementById('btn-samsung-volup');
+  const btnSamsungVolDown = document.getElementById('btn-samsung-voldown');
+  const btnSamsungInput = document.getElementById('btn-samsung-input');
+  const btnSamsungEnter = document.getElementById('btn-samsung-enter');
+  const btnSamsungPcInput = document.getElementById('btn-samsung-pc-input');
   const btnForceUpdateCheck = document.getElementById('btn-force-update-check');
   const btnInstallUpdate = document.getElementById('btn-install-update');
   const btnRestartService = document.getElementById('btn-restart-service');
@@ -58,6 +65,13 @@ export function getDom() {
     btnAddressBar,
     btnHardReload,
     btnFullscreen,
+    btnSamsungOn,
+    btnSamsungOff,
+    btnSamsungVolUp,
+    btnSamsungVolDown,
+    btnSamsungInput,
+    btnSamsungEnter,
+    btnSamsungPcInput,
     btnForceUpdateCheck,
     btnInstallUpdate,
     btnRestartService,

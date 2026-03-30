@@ -4,6 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
   <title>Remote Mouse</title>
+  <meta name="theme-color" content="#101417" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Remote Mouse" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
+  <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
@@ -36,6 +43,18 @@
           <button id="btn-hard-reload" type="button" aria-label="Recharger" title="Ctrl+F5">↻</button>
           <button id="btn-fullscreen" type="button" aria-label="Plein écran" title="F11">⛶</button>
         </nav>
+        <section id="tv-controls" aria-label="Controle TV Samsung">
+          <p class="section-label">Samsung TV</p>
+          <div class="tv-actions">
+            <button id="btn-samsung-on" type="button" aria-label="Allumer la television Samsung">On</button>
+            <button id="btn-samsung-off" type="button" aria-label="Eteindre la television Samsung">Off</button>
+            <button id="btn-samsung-volup" type="button" aria-label="Augmenter le volume Samsung">Vol+</button>
+            <button id="btn-samsung-voldown" type="button" aria-label="Diminuer le volume Samsung">Vol-</button>
+            <button id="btn-samsung-input" type="button" aria-label="Changer la source Samsung">Source</button>
+            <button id="btn-samsung-enter" type="button" aria-label="Valider le menu Samsung">Enter</button>
+            <button id="btn-samsung-pc-input" type="button" aria-label="Basculer vers l entree PC Samsung">PC</button>
+          </div>
+        </section>
         <canvas id="touchpad"></canvas>
         <section id="cursor-preview" aria-label="Aperçu sous curseur">
           <canvas id="preview-canvas" width="128" height="84"></canvas>

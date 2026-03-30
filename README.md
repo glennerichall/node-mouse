@@ -97,6 +97,16 @@ Le serveur affiche:
 - `NOTIFICATION_TTL_MS` (durée d'affichage des notifications, défaut `2200`)
 - `ADMIN_ACTIONS_ENABLED` (autorise les actions admin depuis client, défaut `true`)
 - `SERVICE_NAME` (service systemd --user à redémarrer, défaut `remote-mouse.service`)
+- `SAMSUNG_TV_ENABLED` (active le module Samsung, défaut `false`)
+- `SAMSUNG_TV_HOST` (IP/host de la TV Samsung)
+- `SAMSUNG_TV_MAC` (adresse MAC de la TV, requise pour `on`)
+- `SAMSUNG_TV_PORT` (défaut `8002`, parfois `8001`)
+- `SAMSUNG_TV_APP_NAME` (nom annoncé à la TV, défaut `Remote Mouse`)
+- `SAMSUNG_TV_DISCOVERY_TIMEOUT_MS` (timeout de détection auto LAN, défaut `2500`)
+- `SAMSUNG_TV_TIMEOUT_MS` (timeout de connexion/commande, défaut `5000`)
+- `SAMSUNG_TV_PC_INPUT_KEY` (touche Samsung directe vers l'entrée PC, défaut `KEY_HDMI1`)
+- `SAMSUNG_TV_PC_INPUT_SEQUENCE` (séquence optionnelle de touches pour l'entrée PC, ex: `KEY_SOURCE,KEY_RIGHT,KEY_ENTER`)
+- `SAMSUNG_TV_POWER_OFF_KEY` (touche d'extinction, défaut `KEY_POWER`)
 - `UPDATE_CHECK_ENABLED` (vérif de nouvelle version, défaut `false`)
 - `UPDATE_CHECK_COMMAND` (commande shell de vérification update, prioritaire si définie)
 - `UPDATE_CHECK_TIMEOUT_SEC` (timeout de `UPDATE_CHECK_COMMAND`, défaut `20`)
@@ -132,7 +142,22 @@ PORT=3000
 SERVER_HOST=192.168.1.10
 MOUSE_SPEED=1.3
 SCROLL_SPEED=0.25
+SAMSUNG_TV_ENABLED=true
+SAMSUNG_TV_HOST=192.168.1.50
+SAMSUNG_TV_MAC=AA:BB:CC:DD:EE:FF
 ```
+
+Contrôle TV Samsung:
+- Une nouvelle section "Samsung TV" apparaît dans le client mobile.
+- Actions disponibles: `on`, `off`, `vol+`, `vol-`, `source`, `enter`, `pc`.
+- Les commandes Socket.IO côté client utilisent le préfixe `samsung:` (`samsung:on`, `samsung:off`, etc.).
+- `on` utilise Wake-on-LAN, donc la TV doit l'accepter sur le réseau local.
+- L'intégration utilise maintenant explicitement le package npm `samsung-tv-remote`.
+- Si `SAMSUNG_TV_HOST` et/ou `SAMSUNG_TV_MAC` ne sont pas fournis, le serveur tente de détecter automatiquement une TV Samsung réveillée sur le LAN via `getAwakeSamsungDevices()`.
+- Si plusieurs TV Samsung sont détectées, il faut renseigner `SAMSUNG_TV_HOST` ou `SAMSUNG_TV_MAC` pour lever l'ambiguïté.
+- Le bouton `PC` envoie directement la touche configurée par `SAMSUNG_TV_PC_INPUT_KEY`, par exemple `KEY_HDMI1`.
+- Si votre TV ignore `KEY_HDMIx`, utilisez `SAMSUNG_TV_PC_INPUT_SEQUENCE` avec une navigation de menu compatible avec votre modèle.
+- Beaucoup de modèles Samsung acceptent mieux `KEY_POWER` que `KEY_POWEROFF` pour l'extinction.
 
 Avec token d'entrée fixe (si tu veux éviter la rotation):
 

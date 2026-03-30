@@ -15,6 +15,13 @@ export function bindActionButtons(
     btnAddressBar,
     btnHardReload,
     btnFullscreen,
+    btnSamsungOn,
+    btnSamsungOff,
+    btnSamsungVolUp,
+    btnSamsungVolDown,
+    btnSamsungInput,
+    btnSamsungEnter,
+    btnSamsungPcInput,
     btnForceUpdateCheck,
     btnInstallUpdate,
     btnRestartService,
@@ -52,6 +59,13 @@ export function bindActionButtons(
     emitWithTimestamp(socket, 'keyboard:key', { key: 'f5', modifiers: ['control'] }),
   );
   btnFullscreen.addEventListener('click', () => emitWithTimestamp(socket, 'keyboard:key', { key: 'f11' }));
+  btnSamsungOn.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:on'));
+  btnSamsungOff.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:off'));
+  btnSamsungVolUp.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:volup'));
+  btnSamsungVolDown.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:voldown'));
+  btnSamsungInput.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:input'));
+  btnSamsungEnter.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:enter'));
+  btnSamsungPcInput.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:pc-input'));
 
   btnForceUpdateCheck.addEventListener('click', () => emitWithTimestamp(socket, 'admin:update-check'));
   btnInstallUpdate.addEventListener('click', () => emitWithTimestamp(socket, 'admin:update-install'));

@@ -1,0 +1,24 @@
+{
+  "name": "Remote Mouse",
+  "short_name": "RemoteMouse",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#101417",
+  "theme_color": "#101417",
+  "description": "Controle souris/clavier a distance depuis mobile.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
