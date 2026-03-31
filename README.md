@@ -1,188 +1,85 @@
-# Remote Mouse + Keyboard (Express + RobotJS)
+# Remote Mouse
 
-Application de télécommande souris/clavier depuis un appareil mobile.
+Remote Mouse is a web-based remote control for operating a computer from a phone, tablet, or another browser on the same network. The server exposes a mobile-friendly interface for mouse and keyboard control, browser shortcuts, admin actions, and optional Samsung TV remote commands.
 
-## Fonctionnalités
+## Overview
 
-- QR code affiché au démarrage du serveur (terminal + page `/qr`)
-- Contrôle souris via zone tactile (canvas)
-- Clic gauche (tap ou bouton)
-- Clic droit (tap 2 doigts ou bouton)
-- Scroll à 2 doigts
-- Envoi de texte via panneau clavier
-- Touches spéciales: Entrée et Backspace
+The application includes:
 
-## Prérequis système (Linux)
+- a token-based entry path with QR code access
+- a mobile touchpad for mouse movement, clicking, and scrolling
+- a keyboard panel for text input and special keys
+- browser shortcut actions
+- admin actions from the client UI
+- a server info page
+- optional Samsung TV remote integration
 
-Node.js est requis (version 20+ recommandée):
+## Platform Dependencies
 
-```bash
-node -v
-npm -v
-```
+This project relies on `@hurdlegroup/robotjs`, which requires native dependencies.
 
-Si Node.js n'est pas installé (Debian/Ubuntu):
+### Linux
 
-```bash
-sudo apt-get update
-sudo apt-get install -y nodejs npm
-```
-
-`@hurdlegroup/robotjs` nécessite des bibliothèques natives X11.
-
-Exemple Debian/Ubuntu:
+Typical Debian or Ubuntu packages:
 
 ```bash
 sudo apt-get update
 sudo apt-get install -y build-essential libx11-dev libxtst-dev libpng++-dev wmctrl yad
 ```
 
-## Installation
+Notes:
+
+- `libx11-dev`, `libxtst-dev`, and `libpng++-dev` are required for the native mouse and keyboard integration
+- `wmctrl` is used for browser focus and window activation on Linux
+- `yad` is used for the Linux QR overlay
+- an X11 session is required for the Linux desktop control features
+
+### Windows
+
+Typical requirements:
+
+- Microsoft Visual Studio C++ Build Tools for native Node modules
+- Python available in `PATH` if native module compilation is needed
+- PowerShell and Windows Forms support for the QR overlay behavior
+
+Notes:
+
+- the Windows QR overlay uses PowerShell with Windows Forms
+- depending on your environment, `npm install` may use a prebuilt binary or may require local native compilation
+
+## Getting Started
+
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-Installation globale (CLI):
-
-```bash
-npm install -g .
-```
-
-Configuration via `.env`:
-
-```bash
-cp .env.example .env
-```
-
-Le chargement des variables est fait via `dotenv`.
-
-## Lancement
+Start the application:
 
 ```bash
 npm start
 ```
 
-Commit assiste par Codex:
+On startup, the server prints the client access URL and the corresponding QR code.
 
-```bash
-npm run commit:codex
-```
+## Configuration
 
-Le script:
-- demande a Codex un `bump` semver (`patch` | `minor` | `major`) et un message de commit
-- met a jour la version via `npm version --no-git-tag-version`
-- stage toutes les modifications
-- cree le commit git
+Startup configuration is handled through a `.env` file. Instead of duplicating every environment variable here, use [`.env.example`](./.env.example) as the reference.
 
-Le serveur affiche:
+## Access and Administration
 
-- l'URL mobile avec point d'entrée random (ex: `http://192.168.x.x:3000/AbCdEf...`)
-- le QR code à scanner
-- une page QR: `http://<ip>:3000/qr`
+Useful server pages:
 
-## Variables utiles
+- `/qr` displays the entry QR code
+- `/admin/server-info` shows server state, effective configuration, and recent logs
+- `/admin/config` lets you edit persisted settings grouped to match the configuration object structure
 
-- `PORT` (défaut `3000`)
-- `SERVER_HOST` (forcer l'IP/host exposé dans le QR)
-- `CONFIG_DIR` (répertoire de config principal, défaut `~/.config/remote-mouse`)
-- `ENV_FILE_PATH` (chemin explicite du fichier `.env`)
-- `PERSISTENCE_DB_PATH` (chemin du fichier SQLite de persistence, y compris les tokens d'entrée)
-- `HTTPS` (`true` pour activer HTTPS)
-- `SSL_KEY_PATH` (chemin de la clé privée PEM)
-- `SSL_CERT_PATH` (chemin du certificat PEM)
-- `ENTRY_PATH_ENABLED` (point d'entrée aléatoire, défaut `true`)
-- `ENTRY_PATH_FIXED` (chemin fixe optionnel, vide par défaut)
-- `ENTRY_PATH_TOKEN_LENGTH` (longueur token, défaut `24`)
-- `ENTRY_PATH_ROTATE_INTERVAL_MIN` (rotation token en minutes, défaut `60`)
-- `ENTRY_PATH_GRACE_MIN` (grâce anciens tokens en minutes, défaut `120`)
-- `ADMIN_ACTIONS_ENABLED` (autorise les actions admin depuis client, défaut `true`)
-- `SERVICE_NAME` (service systemd --user à redémarrer, défaut `remote-mouse.service`)
-- `UPDATE_CHECK_COMMAND` (commande shell de vérification update, prioritaire si définie)
-- `UPDATE_CHECK_TIMEOUT_SEC` (timeout de `UPDATE_CHECK_COMMAND`, défaut `20`)
-- `UPDATE_CHECK_INTERVAL_MIN` (intervalle de vérif en minutes, défaut `360`)
-- `UPDATE_CHECK_PACKAGE` (package npm cible pour update check, défaut nom local)
-- `UPDATE_CHECK_CURRENT_VERSION` (version courante forcée, défaut version locale)
-- `UPDATE_INSTALL_COMMAND` (commande shell d'installation update, prioritaire si définie)
-- `UPDATE_INSTALL_TIMEOUT_SEC` (timeout installation update, défaut `600`)
+## Linux Deployment
 
-Configs persistées en SQLite:
-- Le répertoire de config par défaut est `~/.config/remote-mouse`.
-- Par défaut, le serveur charge le fichier d'environnement `CONFIG_DIR/.env`.
-- La base SQLite est aussi stockée dans `CONFIG_DIR`, sauf override explicite avec `PERSISTENCE_DB_PATH`.
-- `getStartupConfigSnapshot()` ne contient plus que les paramètres statiques issus de l'environnement.
-- `getConfig()` fusionne les paramètres statiques avec les réglages persistés en base.
+The server can be run as a `systemd --user` service. Minimal example:
 
-Fallback install update:
-- Si `UPDATE_CHECK_COMMAND` est défini, il est exécuté pour déterminer s'il y a une mise à jour.
-- Si `UPDATE_CHECK_COMMAND` est vide, fallback automatique vers le check npm.
-- Si `UPDATE_INSTALL_COMMAND` est vide, fallback automatique vers:
-  `npm update -g <UPDATE_CHECK_PACKAGE> --force`.
-
-Protocoles supportés pour `UPDATE_CHECK_COMMAND`:
-- JSON: `{"hasUpdate":true,"key":"...","title":"...","message":"...","ttlMs":8000}`
-- Texte `1|true|yes|update|has_update` => update détectée
-- Texte `0|false|no|none` => pas d'update
-- tout autre texte non vide => update détectée (message = texte retourné)
-
-Exemple:
-
-```bash
-PORT=3000 SERVER_HOST=192.168.1.10 npm start
-```
-
-Ou en `.env`:
-
-```env
-PORT=3000
-SERVER_HOST=192.168.1.10
-CONFIG_DIR=~/.config/remote-mouse
-```
-
-Contrôle TV Samsung:
-- Une nouvelle section "Samsung TV" apparaît dans le client mobile.
-- Actions disponibles: `on`, `off`, `vol+`, `vol-`, `source`, `enter`, `pc`.
-- Les commandes Socket.IO côté client utilisent le préfixe `samsung:` (`samsung:on`, `samsung:off`, etc.).
-- `on` utilise Wake-on-LAN, donc la TV doit l'accepter sur le réseau local.
-- L'intégration utilise maintenant explicitement le package npm `samsung-tv-remote`.
-- La configuration détaillée Samsung est désormais persistée en SQLite.
-- Beaucoup de modèles Samsung acceptent mieux `KEY_POWER` que `KEY_POWEROFF` pour l'extinction.
-
-Avec token d'entrée fixe (si tu veux éviter la rotation):
-
-```env
-ENTRY_PATH_ENABLED=true
-ENTRY_PATH_FIXED=remote-control-secret
-```
-
-Note securite:
-- Si `ENTRY_PATH_ENABLED=true`, l'application est accessible via l'URL d'entrée `/<token>`.
-
-Persistance du token:
-- Par défaut, le token d'entrée aléatoire et son timestamp de rotation sont sauvegardés en SQLite.
-- Après redémarrage du serveur, le même token est réutilisé et la rotation conserve son échéance.
-
-Exemple HTTPS (certificat local):
-
-```bash
-openssl req -x509 -newkey rsa:2048 -nodes \
-  -keyout ./certs/key.pem \
-  -out ./certs/cert.pem \
-  -days 365 \
-  -subj "/CN=localhost"
-
-HTTPS=true SSL_KEY_PATH=./certs/key.pem SSL_CERT_PATH=./certs/cert.pem npm start
-```
-
-## Démarrage auto à l'ouverture de session (Linux, systemd user)
-
-Après installation globale (`npm install -g .` ou paquet publié):
-
-```bash
-NPM_PREFIX="$(npm prefix -g)"
-NODE_BIN_DIR="$(dirname "$(command -v node)")"
-mkdir -p ~/.config/systemd/user
-cat > ~/.config/systemd/user/remote-mouse.service <<EOF
+```ini
 [Unit]
 Description=Remote Mouse Server
 After=graphical-session.target network-online.target
@@ -190,29 +87,48 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-ExecStart=${NPM_PREFIX}/bin/remote-mouse
+ExecStart=/path/to/remote-mouse/bin/remote-mouse.js
 Restart=on-failure
 RestartSec=2
 Environment=NODE_ENV=production
-Environment=XDG_RUNTIME_DIR=/run/user/%U
-Environment=PATH=${NODE_BIN_DIR}:${NPM_PREFIX}/bin:/usr/local/bin:/usr/bin:/bin
 PassEnvironment=DISPLAY WAYLAND_DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS
 
 [Install]
 WantedBy=default.target
-EOF
-
-systemctl --user import-environment DISPLAY WAYLAND_DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS
-systemctl --user daemon-reload
-systemctl --user enable --now remote-mouse.service
-systemctl --user status remote-mouse.service
 ```
 
-Note: sans ces variables de session graphique, l'overlay QR `yad` peut ne pas apparaître quand le serveur est lancé via `systemd --user`.
+Depending on the graphical environment, passing the user session environment may be necessary for UI-related integrations.
 
-Voir les logs:
+An X11 session is required for the Linux desktop control features.
 
-```bash
-journalctl --user -u remote-mouse.service -f
-```
-# node-mouse
+## Windows Deployment
+
+On Windows, the simplest deployment approach is to run the application at user logon with Task Scheduler.
+
+Typical setup:
+
+1. Install dependencies in the project directory with `npm install`.
+2. Create a `.env` file based on [`.env.example`](./.env.example).
+3. Create a scheduled task that runs at logon for the target user.
+4. Start the application with `node index.js` from the project directory.
+
+Suggested Task Scheduler settings:
+
+- Trigger: `At log on`
+- Action: `Start a program`
+- Program/script: path to `node.exe`
+- Add arguments: `index.js`
+- Start in: path to the project directory
+- Run only when the user is logged on
+
+Notes:
+
+- running in a user session is usually preferable because mouse, keyboard, browser, and overlay integrations depend on an interactive desktop session
+- if you rely on the QR overlay or browser-opening actions, make sure the task runs in the same desktop session as the logged-in user
+- if you installed the app globally and prefer the CLI entrypoint, you can use the `remote-mouse` executable instead of `node index.js`
+
+## Notes
+
+- client access is controlled by either a generated token path or a fixed entry path, depending on configuration
+- HTTPS can be enabled when required by the deployment context
+- Samsung TV integration is optional and disabled by default
