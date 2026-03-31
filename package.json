@@ -1,6 +1,6 @@
 {
   "name": "remote-mouse",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "type": "module",
   "description": "Remote mouse and keyboard with mobile client",
   "main": "index.js",
