@@ -32,21 +32,52 @@ export function loadEntryTokens() {
     return new Map(rows.map((row) => [row.token, row.created_at]));
 }
 
-export function saveEntryTokens(tokens) {
+export function deleteExpiredEntryTokens({olderThan, keepToken = ''} = {}) {
     bootstrapEntryTokenTable();
 
     const db = getDatabase();
-    const replaceTokens = db.transaction((entries) => {
-        db.prepare(`DELETE FROM ${ENTRY_TOKEN_TABLE}`).run();
-        const insert = db.prepare(`
-            INSERT INTO ${ENTRY_TOKEN_TABLE} (token, created_at)
-            VALUES (?, ?)
-        `);
+    const safeOlderThan = Math.floor(Number(olderThan));
+    if (!Number.isFinite(safeOlderThan)) {
+        return 0;
+    }
 
-        for (const [token, createdAt] of entries) {
-            insert.run(token, createdAt);
-        }
-    });
+    if (keepToken) {
+        const result = db.prepare(`
+            DELETE FROM ${ENTRY_TOKEN_TABLE}
+            WHERE created_at < ?
+              AND token != ?
+        `).run(safeOlderThan, keepToken);
+        return result.changes;
+    }
 
-    replaceTokens(Array.from(tokens.entries()));
+    const result = db.prepare(`
+        DELETE FROM ${ENTRY_TOKEN_TABLE}
+        WHERE created_at < ?
+    `).run(safeOlderThan);
+    return result.changes;
+}
+
+export function hasEntryToken(token) {
+    bootstrapEntryTokenTable();
+
+    const db = getDatabase();
+    const row = db.prepare(`
+        SELECT 1
+        FROM ${ENTRY_TOKEN_TABLE}
+        WHERE token = ?
+        LIMIT 1
+    `).get(token);
+
+    return Boolean(row);
+}
+
+export function createEntryToken(token, createdAt = Date.now()) {
+    bootstrapEntryTokenTable();
+
+    const db = getDatabase();
+    db.prepare(`
+        INSERT INTO ${ENTRY_TOKEN_TABLE} (token, created_at)
+        VALUES (?, ?)
+        ON CONFLICT(token) DO UPDATE SET created_at = excluded.created_at
+    `).run(token, Math.floor(createdAt));
 }

@@ -1,7 +1,9 @@
 import {createRandomToken} from '../utils/createRandomToken.js';
 import {
+    createEntryToken,
+    deleteExpiredEntryTokens,
+    hasEntryToken,
     loadEntryTokens,
-    saveEntryTokens
 } from '../persistence/entry-token.dao.js';
 
 function trimSlashes(value) {
@@ -19,7 +21,9 @@ export function createTokenManager({
                                        graceMin,
                                        persistence = {
                                            loadTokens: loadEntryTokens,
-                                           saveTokens: saveEntryTokens,
+                                           deleteExpiredTokens: deleteExpiredEntryTokens,
+                                           hasToken: hasEntryToken,
+                                           createToken: createEntryToken,
                                        },
                                    }) {
     const normalizedFixedPath = trimSlashes(fixedPath);
@@ -28,13 +32,6 @@ export function createTokenManager({
     const persistenceEnabled = effectiveEnabled && !normalizedFixedPath;
     const tokens = new Map();
     const tokenChangeListeners = new Set();
-
-    function persistState() {
-        if (!persistenceEnabled) {
-            return;
-        }
-        persistence.saveTokens(tokens);
-    }
 
     function resolveLatestToken() {
         let latestToken = '';
@@ -82,9 +79,10 @@ export function createTokenManager({
         loadTokens();
         if (!resolveLatestToken()) {
             const token = createRandomToken(tokenLength);
-            tokens.set(token, Date.now());
+            const createdAt = Date.now();
+            tokens.set(token, createdAt);
+            persistence.createToken(token, createdAt);
         }
-        persistState();
     }
 
     function cleanupExpired({persist = false} = {}) {
@@ -105,7 +103,10 @@ export function createTokenManager({
             }
         }
         if (changed && persist) {
-            persistState();
+            persistence.deleteExpiredTokens({
+                olderThan: now - ttlMs,
+                keepToken: currentToken,
+            });
         }
     }
 
@@ -115,9 +116,11 @@ export function createTokenManager({
             return currentToken;
         }
         const token = createRandomToken(tokenLength);
-        tokens.set(token, Date.now());
+        const createdAt = Date.now();
+        tokens.set(token, createdAt);
+        persistence.createToken(token, createdAt);
         cleanupExpired({persist: false});
-        persistState();
+        cleanupExpired({persist: true});
         if (token !== currentToken) {
             notifyTokenChanged(token);
         }
@@ -139,8 +142,14 @@ export function createTokenManager({
         if (!normalized) {
             return false;
         }
-        cleanupExpired({persist: false});
-        return tokens.has(normalized);
+        cleanupExpired({persist: true});
+        if (tokens.has(normalized)) {
+            return true;
+        }
+        if (!persistenceEnabled) {
+            return false;
+        }
+        return Boolean(persistence.hasToken(normalized));
     }
     return {
         isValid,

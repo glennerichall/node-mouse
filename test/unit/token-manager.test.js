@@ -9,7 +9,9 @@ describe('createTokenManager', () => {
       graceMin: 120,
       persistence: {
         loadTokens: () => new Map(),
-        saveTokens: () => {},
+        deleteExpiredTokens: () => 0,
+        hasToken: () => false,
+        createToken: () => {},
       },
     });
 
@@ -19,20 +21,28 @@ describe('createTokenManager', () => {
   });
 
   it('loads and persists rotating tokens through the persistence adapter', () => {
-    const savedStates = [];
     let storedTokens = new Map([['persisted-token', 1000]]);
+    const persistence = {
+      loadTokens: () => new Map(storedTokens),
+      deleteExpiredTokens: ({olderThan, keepToken}) => {
+        for (const [token, createdAt] of storedTokens.entries()) {
+          if (token !== keepToken && createdAt < olderThan) {
+            storedTokens.delete(token);
+          }
+        }
+      },
+      hasToken: (token) => storedTokens.has(token),
+      createToken: (token, createdAt) => {
+        storedTokens.set(token, createdAt);
+      },
+    };
+
     const tokenManager = createTokenManager({
       enabled: true,
       fixedPath: '',
       tokenLength: 24,
       graceMin: 120,
-      persistence: {
-        loadTokens: () => new Map(storedTokens),
-        saveTokens: (tokens) => {
-          storedTokens = new Map(tokens);
-          savedStates.push(new Map(tokens));
-        },
-      },
+      persistence,
     });
 
     expect(tokenManager.getToken()).toBe('persisted-token');
@@ -40,7 +50,6 @@ describe('createTokenManager', () => {
     const nextToken = tokenManager.createToken();
 
     expect(nextToken).not.toBe('persisted-token');
-    expect(savedStates.length).toBeGreaterThan(0);
     expect(storedTokens.has(nextToken)).toBe(true);
   });
 });
