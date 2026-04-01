@@ -1,4 +1,4 @@
-const EDGE_START_PX = 28;
+const EDGE_START_PX = 46;
 const SWIPE_OPEN_PX = 64;
 const SWIPE_CLOSE_PX = 54;
 const MAX_VERTICAL_DRIFT_PX = 44;

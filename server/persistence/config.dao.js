@@ -9,7 +9,7 @@ const CONFIG_TABLE = 'config_entries';
 
 let bootstrapped = false;
 
-export function bootstrapConfigDatabase(defaultConfig, managedPaths = []) {
+export function bootstrapConfigDatabase() {
     const db = getDatabase();
     db.exec(`
         CREATE TABLE IF NOT EXISTS ${CONFIG_TABLE}
@@ -24,32 +24,12 @@ export function bootstrapConfigDatabase(defaultConfig, managedPaths = []) {
             NULL
         )
     `);
-
-    // const flattenedDefaults = toFlatMap(defaultConfig);
-    // const selectStatement = db.prepare(`SELECT 1
-    //                                     FROM ${CONFIG_TABLE}
-    //                                     WHERE key = ?`);
-    // const insertStatement = db.prepare(`INSERT INTO ${CONFIG_TABLE} (key, value_json)
-    //                                     VALUES (?, ?)`);
-    // const bootstrap = db.transaction(() => {
-    //     for (const key of managedPaths) {
-    //         if (selectStatement.get(key)) {
-    //             continue;
-    //         }
-    //         if (!flattenedDefaults.has(key)) {
-    //             continue;
-    //         }
-    //         insertStatement.run(key, JSON.stringify(flattenedDefaults.get(key)));
-    //     }
-    // });
-
-    // bootstrap();
 }
 
 export function saveStoredConfig(value, managedPaths = []) {
     const db = getDatabase();
     if (!bootstrapped) {
-        bootstrapConfigDatabase(getEnvConfig(), managedPaths);
+        bootstrapConfigDatabase();
         bootstrapped = true;
     }
 
@@ -76,7 +56,7 @@ export function saveStoredConfig(value, managedPaths = []) {
 export function getStoredConfig(managedPaths = []) {
     const db = getDatabase();
     if (!bootstrapped) {
-        bootstrapConfigDatabase(getEnvConfig(), managedPaths);
+        bootstrapConfigDatabase();
         bootstrapped = true;
     }
     const selectStatement = db.prepare(`SELECT key, value_json
@@ -100,4 +80,33 @@ export function getStoredConfig(managedPaths = []) {
     }
 
     return config;
+}
+
+export function deleteStoredConfig(paths = [], managedPaths = []) {
+    const db = getDatabase();
+    if (!bootstrapped) {
+        bootstrapConfigDatabase();
+        bootstrapped = true;
+    }
+
+    const allowedKeys = new Set(managedPaths);
+    const filteredPaths = Array.from(new Set(paths))
+        .filter((pathKey) => !allowedKeys.size || allowedKeys.has(pathKey));
+
+    if (!filteredPaths.length) {
+        return 0;
+    }
+
+    const remove = db.transaction(() => {
+        const statement = db.prepare(`DELETE FROM ${CONFIG_TABLE} WHERE key = ?`);
+        let changes = 0;
+
+        for (const pathKey of filteredPaths) {
+            changes += statement.run(pathKey).changes;
+        }
+
+        return changes;
+    });
+
+    return remove();
 }

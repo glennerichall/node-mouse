@@ -24,6 +24,7 @@ import {createLogger} from '../log/logger.js';
 import {createServerInfoRouter} from '../connection/api/server-info.router.js';
 import {getRecentLogs} from '../log/logger.js';
 import {createAdminConfigRouter} from '../connection/api/admin-config.router.js';
+import {createAdminConfigsRouter} from '../connection/api/admin-configs.router.js';
 
 const log = createLogger('createApp');
 const packageJsonPath = path.join(projectRoot, 'package.json');
@@ -93,6 +94,10 @@ export async function createApp(instances) {
 
     app.use('/admin/config', createAdminConfigRouter({
         publicDir,
+        getConfigSnapshot: getConfig,
+    }));
+
+    app.use('/admin/configs', createAdminConfigsRouter({
         getConfigSnapshot: getConfig,
     }));
 

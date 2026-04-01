@@ -18,7 +18,7 @@
       <div class="hero-actions">
         <a class="secondary-link" href="/">Retour remote</a>
         <button id="reload-config" type="button">Recharger</button>
-        <button id="save-config" type="button">Enregistrer</button>
+        <button id="restart-service" type="button">Redemarrer le service</button>
       </div>
     </header>
 
@@ -41,13 +41,16 @@
   </template>
 
   <template id="field-template">
-    <label class="field-card">
+    <div class="field-card">
       <span class="field-header">
         <span class="field-label"></span>
         <span class="field-path"></span>
       </span>
-      <span class="field-control"></span>
-    </label>
+      <span class="field-body">
+        <span class="field-control"></span>
+        <button class="field-reset" type="button">Default</button>
+      </span>
+    </div>
   </template>
 
   <script type="module" src="/admin-config.js?v=20260330a"></script>

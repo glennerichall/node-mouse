@@ -176,12 +176,12 @@ export const CONFIG_SCHEMA = {
       level: {
         label: 'Niveau',
         type: 'string',
-        placeholder: 'info',
+        options: ['trace', 'debug', 'info', 'warn', 'error', 'fatal'],
       },
       format: {
         label: 'Format',
         type: 'string',
-        placeholder: 'json',
+        options: ['json', 'pretty'],
       },
     },
   },

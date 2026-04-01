@@ -113,6 +113,10 @@ button:disabled {
   cursor: progress;
 }
 
+button[hidden] {
+  display: none !important;
+}
+
 .status-bar {
   padding: 14px 18px;
 }
@@ -167,8 +171,16 @@ button:disabled {
   display: grid;
 }
 
+.field-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
 .field-control input[type="text"],
-.field-control input[type="number"] {
+.field-control input[type="number"],
+.field-control select {
   width: 100%;
   min-height: 44px;
   border-radius: 12px;
@@ -177,6 +189,12 @@ button:disabled {
   color: var(--text);
   padding: 0 12px;
   font: inherit;
+}
+
+.field-reset {
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 12px;
 }
 
 .toggle-row {
@@ -224,5 +242,9 @@ button:disabled {
 
   .hero-actions > * {
     flex: 1 1 100%;
+  }
+
+  .field-body {
+    grid-template-columns: 1fr;
   }
 }
