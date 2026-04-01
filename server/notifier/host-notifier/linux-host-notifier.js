@@ -1,4 +1,5 @@
 import { execFileAsync } from '../../utils/process.js';
+import {NOTIFIER_LEVEL_ERROR} from '../notifier-composite.js';
 
 export function createLinuxHostNotifier({ fallbackNotifier }) {
   return {
@@ -6,7 +7,7 @@ export function createLinuxHostNotifier({ fallbackNotifier }) {
       const safeTtlMs = Math.max(500, Math.round(ttlMs));
       execFileAsync('notify-send', [
         '-u',
-        level === 'error' ? 'critical' : 'normal',
+        level === NOTIFIER_LEVEL_ERROR ? 'critical' : 'normal',
         '-t',
         String(safeTtlMs),
         title,

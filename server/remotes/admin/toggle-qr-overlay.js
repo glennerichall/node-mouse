@@ -1,4 +1,5 @@
 import {createLogger} from '../../log/logger.js';
+import {NOTIFIER_LEVEL_INFO, NOTIFIER_TARGET_CLIENT} from '../../notifier/notifier-composite.js';
 
 const log = createLogger('admin:toggle-qr-overlay');
 
@@ -14,12 +15,12 @@ export function createToggleQrOverlayAction({ notifier, qrOverlay }) {
       : 'QR overlay masque.';
 
     log.info({ visible }, 'Toggle QR overlay');
-    notifier.notify({
-      level: 'info',
+    notifier.target(NOTIFIER_TARGET_CLIENT).notify({
+      level: NOTIFIER_LEVEL_INFO,
       title: 'QR overlay',
       message,
       ttlMs: 2200,
-      target: 'client',
+    }, {
       clientId,
     });
 

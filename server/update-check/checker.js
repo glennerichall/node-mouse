@@ -1,4 +1,5 @@
 import {createLogger} from '../log/logger.js';
+import {NOTIFIER_LEVEL_WARNING} from '../notifier/notifier-composite.js';
 
 const log = createLogger('update-check');
 
@@ -24,8 +25,8 @@ export class UpdateChecker {
       }
 
       this.lastKey = result.key;
-      this.notifier.notify({
-        level: 'warning',
+      this.notifier.target().notify({
+        level: NOTIFIER_LEVEL_WARNING,
         title: result.title,
         message: result.message,
         ttlMs: result.ttlMs || 8000,

@@ -3,65 +3,77 @@ import {createLogger} from '../log/logger.js';
 
 const log = createLogger('notifier:composite');
 
-export function createNotifierComposite({ clientNotifier, serverNotifier, configService }) {
-  function resolveTarget({ target, toDesktop, toClients }) {
-    if (target) {
-      return String(target).toLowerCase();
+export const NOTIFIER_TARGET_ALL = 'all';
+export const NOTIFIER_TARGET_ALL_CLIENTS = 'all-clients';
+export const NOTIFIER_TARGET_CLIENT = 'client';
+export const NOTIFIER_TARGET_SERVER = 'server';
+export const NOTIFIER_TARGET_NONE = 'none';
+export const NOTIFIER_TARGETS = [
+    NOTIFIER_TARGET_ALL,
+    NOTIFIER_TARGET_ALL_CLIENTS,
+    NOTIFIER_TARGET_CLIENT,
+    NOTIFIER_TARGET_SERVER,
+    NOTIFIER_TARGET_NONE,
+];
+export const NOTIFIER_LEVEL_INFO = 'info';
+export const NOTIFIER_LEVEL_WARNING = 'warning';
+export const NOTIFIER_LEVEL_ERROR = 'error';
+export const NOTIFIER_LEVELS = [
+    NOTIFIER_LEVEL_INFO,
+    NOTIFIER_LEVEL_WARNING,
+    NOTIFIER_LEVEL_ERROR,
+];
+
+export function createNotifierComposite({clientNotifier, serverNotifier, configService}) {
+    function createTargetNotifier(selectedTarget) {
+        return {
+            notify({
+                       title = 'Remote Mouse',
+                       message,
+                       level = NOTIFIER_LEVEL_INFO,
+                       ttlMs = (configService?.get?.() ?? getConfig()).notifications.ttlMs,
+                   } = {}, options = {}) {
+                if (!message) {
+                    return;
+                }
+
+                const safeTtlMs = Math.max(500, Math.round(ttlMs));
+                const payload = {
+                    title,
+                    message,
+                    level,
+                    ttlMs: safeTtlMs,
+                    createdAt: Date.now(),
+                };
+
+                const resolvedTarget = String(selectedTarget ?? NOTIFIER_TARGET_ALL).toLowerCase();
+                const clientId = options.clientId;
+
+                if ((resolvedTarget === NOTIFIER_TARGET_ALL ||
+                    resolvedTarget === NOTIFIER_TARGET_ALL_CLIENTS ||
+                    resolvedTarget === NOTIFIER_TARGET_CLIENT) && clientNotifier) {
+                    clientNotifier.notify(payload, {
+                        scope: resolvedTarget === NOTIFIER_TARGET_CLIENT ?
+                            NOTIFIER_TARGET_CLIENT : NOTIFIER_TARGET_ALL_CLIENTS,
+                        clientId,
+                    });
+                }
+
+                if ((resolvedTarget === NOTIFIER_TARGET_ALL || 
+                    resolvedTarget === NOTIFIER_TARGET_SERVER) && serverNotifier) {
+                    serverNotifier.notify(payload);
+                }
+
+                if (!NOTIFIER_TARGETS.includes(resolvedTarget)) {
+                    log.warn({target: resolvedTarget}, 'Target de notification inconnu');
+                }
+            },
+        };
     }
-    const desktop = Boolean(toDesktop);
-    const clients = Boolean(toClients);
-    if (desktop && clients) {
-      return 'all';
-    }
-    if (desktop) {
-      return 'server';
-    }
-    if (clients) {
-      return 'all-clients';
-    }
-    return 'none';
-  }
 
-  return {
-    notify({
-      title = 'Remote Mouse',
-      message,
-      level = 'info',
-      toDesktop = true,
-      toClients = true,
-      target,
-      clientId,
-      ttlMs = (configService?.get?.() ?? getConfig()).notifications.ttlMs,
-    }) {
-      if (!message) {
-        return;
-      }
-
-      const safeTtlMs = Math.max(500, Math.round(ttlMs));
-      const payload = {
-        title,
-        message,
-        level,
-        ttlMs: safeTtlMs,
-        createdAt: Date.now(),
-      };
-
-      const resolvedTarget = resolveTarget({ target, toDesktop, toClients });
-
-      if ((resolvedTarget === 'all' || resolvedTarget === 'all-clients' || resolvedTarget === 'client') && clientNotifier) {
-        clientNotifier.notify(payload, {
-          scope: resolvedTarget === 'client' ? 'client' : 'all-clients',
-          clientId,
-        });
-      }
-
-      if ((resolvedTarget === 'all' || resolvedTarget === 'server') && serverNotifier) {
-        serverNotifier.notify(payload);
-      }
-
-      if (!['all', 'all-clients', 'client', 'server', 'none'].includes(resolvedTarget)) {
-        log.warn({ target: resolvedTarget }, 'Target de notification inconnu');
-      }
-    },
-  };
+    return {
+        target(target = NOTIFIER_TARGET_ALL) {
+            return createTargetNotifier(target);
+        },
+    };
 }

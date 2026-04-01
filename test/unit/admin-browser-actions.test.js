@@ -1,4 +1,5 @@
 import {jest} from '@jest/globals';
+import {NOTIFIER_TARGET_CLIENT} from '../../server/notifier/notifier-composite.js';
 
 describe('admin browser actions', () => {
   afterEach(() => {
@@ -7,13 +8,16 @@ describe('admin browser actions', () => {
 
   it('returns a client-side openUrl for QR client action', async () => {
     const {createOpenQrBrowserAction} = await import('../../server/remotes/admin/open-qr-browser.js');
-    const notifier = {notify: jest.fn()};
+    const notify = jest.fn();
+    const notifier = {
+      target: jest.fn(() => ({notify})),
+    };
     const browser = {openUrlOnHost: jest.fn()};
 
     const openQrBrowser = createOpenQrBrowserAction({
       notifier,
       browser,
-      target: 'client',
+      target: NOTIFIER_TARGET_CLIENT,
     });
 
     const result = await openQrBrowser({clientId: 'client-1'});
@@ -24,22 +28,26 @@ describe('admin browser actions', () => {
       openUrl: '/qr',
     });
     expect(browser.openUrlOnHost).not.toHaveBeenCalled();
-    expect(notifier.notify).toHaveBeenCalledWith(expect.objectContaining({
-      target: 'client',
-      clientId: 'client-1',
+    expect(notifier.target).toHaveBeenCalledWith(NOTIFIER_TARGET_CLIENT);
+    expect(notify).toHaveBeenCalledWith(expect.objectContaining({
       message: 'Page QR ouverte sur le client.',
-    }));
+    }), {
+      clientId: 'client-1',
+    });
   });
 
   it('returns a client-side openUrl for server info client action', async () => {
     const {createOpenServerInfoBrowserAction} = await import('../../server/remotes/admin/open-server-info-browser.js');
-    const notifier = {notify: jest.fn()};
+    const notify = jest.fn();
+    const notifier = {
+      target: jest.fn(() => ({notify})),
+    };
     const browser = {openUrlOnHost: jest.fn()};
 
     const openServerInfoBrowser = createOpenServerInfoBrowserAction({
       notifier,
       browser,
-      target: 'client',
+      target: NOTIFIER_TARGET_CLIENT,
     });
 
     const result = await openServerInfoBrowser({clientId: 'client-1'});
@@ -50,10 +58,11 @@ describe('admin browser actions', () => {
       openUrl: '/ui/admin/server-info',
     });
     expect(browser.openUrlOnHost).not.toHaveBeenCalled();
-    expect(notifier.notify).toHaveBeenCalledWith(expect.objectContaining({
-      target: 'client',
-      clientId: 'client-1',
+    expect(notifier.target).toHaveBeenCalledWith(NOTIFIER_TARGET_CLIENT);
+    expect(notify).toHaveBeenCalledWith(expect.objectContaining({
       message: 'Page server info ouverte sur le client.',
-    }));
+    }), {
+      clientId: 'client-1',
+    });
   });
 });

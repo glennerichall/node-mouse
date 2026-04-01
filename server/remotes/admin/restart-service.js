@@ -1,5 +1,6 @@
 import {getConfig} from '../../init/config/index.js';
 import { commandExists, spawnDetached } from '../../utils/process.js';
+import {NOTIFIER_LEVEL_WARNING, NOTIFIER_TARGET_CLIENT} from '../../notifier/notifier-composite.js';
 import { writeRestartMarker } from './restart-marker.js';
 
 export function createRestartServiceAction({ notifier }) {
@@ -10,12 +11,12 @@ export function createRestartServiceAction({ notifier }) {
     }
 
     writeRestartMarker();
-    notifier.notify({
-      level: 'warning',
+    notifier.target(NOTIFIER_TARGET_CLIENT).notify({
+      level: NOTIFIER_LEVEL_WARNING,
       title: 'Redemarrage service',
       message: `Redemarrage de ${config.serviceName} en cours...`,
       ttlMs: 2200,
-      target: 'client',
+    }, {
       clientId,
     });
 

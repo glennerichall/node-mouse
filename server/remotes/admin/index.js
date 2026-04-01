@@ -9,15 +9,17 @@ import { notifyIfRestarted } from './restart-marker.js';
 
 export { notifyIfRestarted };
 
+import {NOTIFIER_TARGET_CLIENT, NOTIFIER_TARGET_SERVER} from '../../notifier/notifier-composite.js';
+
 export function createAdminActions({ notifier, updateChecker, browser, tokenManager, qrOverlay }) {
   return {
     forceUpdateCheck: createForceUpdateCheckAction({ notifier, updateChecker }),
     installUpdate: createInstallUpdateAction({ notifier, updateChecker }),
     restartService: createRestartServiceAction({ notifier }),
-    openQrBrowserServer: createOpenQrBrowserAction({ notifier, browser, target: 'server' }),
-    openQrBrowserClient: createOpenQrBrowserAction({ notifier, browser, target: 'client' }),
-    openServerInfoBrowserServer: createOpenServerInfoBrowserAction({ notifier, browser, target: 'server' }),
-    openServerInfoBrowserClient: createOpenServerInfoBrowserAction({ notifier, browser, target: 'client' }),
+    openQrBrowserServer: createOpenQrBrowserAction({ notifier, browser, target: NOTIFIER_TARGET_SERVER }),
+    openQrBrowserClient: createOpenQrBrowserAction({ notifier, browser, target: NOTIFIER_TARGET_CLIENT }),
+    openServerInfoBrowserServer: createOpenServerInfoBrowserAction({ notifier, browser, target: NOTIFIER_TARGET_SERVER }),
+    openServerInfoBrowserClient: createOpenServerInfoBrowserAction({ notifier, browser, target: NOTIFIER_TARGET_CLIENT }),
     rotateEntryToken: createRotateEntryTokenAction({ notifier, tokenManager }),
     toggleQrOverlay: createToggleQrOverlayAction({ notifier, qrOverlay }),
   };

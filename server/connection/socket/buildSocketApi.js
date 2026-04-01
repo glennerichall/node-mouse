@@ -1,4 +1,5 @@
 import {createLogger} from '../../log/logger.js';
+import {NOTIFIER_LEVEL_INFO} from '../../notifier/notifier-composite.js';
 import {createSocketTimestampGuardMiddleware} from './socket.timestamp-middleware.js';
 
 const log = createLogger('socket');
@@ -25,8 +26,8 @@ export function buildSocketApi({
 
         log.info({ socketId: socket.id }, 'Client connecté');
         
-        notifier.notify({
-            level: 'info',
+        notifier.target().notify({
+            level: NOTIFIER_LEVEL_INFO,
             title: 'Client connecte',
             message: `Client ${socket.id.slice(0, 8)} connecte.`,
         });

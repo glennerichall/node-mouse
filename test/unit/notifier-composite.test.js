@@ -1,5 +1,10 @@
 import sinon from 'sinon';
-import {createNotifierComposite} from '../../server/notifier/notifier-composite.js';
+import {
+  createNotifierComposite,
+  NOTIFIER_TARGET_ALL_CLIENTS,
+  NOTIFIER_TARGET_CLIENT,
+  NOTIFIER_TARGET_SERVER,
+} from '../../server/notifier/notifier-composite.js';
 
 describe('createNotifierComposite', () => {
   let sandbox;
@@ -12,7 +17,7 @@ describe('createNotifierComposite', () => {
     sandbox.restore();
   });
 
-  it('sends to specific client when target=client', () => {
+  it('returns a targeted notifier that sends to a specific client', () => {
     const clientNotify = sandbox.stub();
     const serverNotify = sandbox.stub();
     const notifier = createNotifierComposite({
@@ -20,22 +25,22 @@ describe('createNotifierComposite', () => {
       serverNotifier: {notify: serverNotify},
     });
 
-    notifier.notify({
+    notifier.target(NOTIFIER_TARGET_CLIENT).notify({
       title: 'Admin',
       message: 'Done',
-      target: 'client',
+    }, {
       clientId: 'socket-1',
     });
 
     expect(clientNotify.calledOnce).toBe(true);
     expect(clientNotify.firstCall.args[1]).toEqual({
-      scope: 'client',
+      scope: NOTIFIER_TARGET_CLIENT,
       clientId: 'socket-1',
     });
     expect(serverNotify.called).toBe(false);
   });
 
-  it('sends to server only when target=server', () => {
+  it('defaults target() to all targets', () => {
     const clientNotify = sandbox.stub();
     const serverNotify = sandbox.stub();
     const notifier = createNotifierComposite({
@@ -43,17 +48,37 @@ describe('createNotifierComposite', () => {
       serverNotifier: {notify: serverNotify},
     });
 
-    notifier.notify({
+    notifier.target().notify({
+      title: 'Broadcast',
+      message: 'Hello',
+    });
+
+    expect(clientNotify.calledOnce).toBe(true);
+    expect(clientNotify.firstCall.args[1]).toEqual({
+      scope: NOTIFIER_TARGET_ALL_CLIENTS,
+      clientId: undefined,
+    });
+    expect(serverNotify.calledOnce).toBe(true);
+  });
+
+  it('returns a targeted notifier that sends to server only', () => {
+    const clientNotify = sandbox.stub();
+    const serverNotify = sandbox.stub();
+    const notifier = createNotifierComposite({
+      clientNotifier: {notify: clientNotify},
+      serverNotifier: {notify: serverNotify},
+    });
+
+    notifier.target(NOTIFIER_TARGET_SERVER).notify({
       title: 'Server',
       message: 'Hello',
-      target: 'server',
     });
 
     expect(clientNotify.called).toBe(false);
     expect(serverNotify.calledOnce).toBe(true);
   });
 
-  it('keeps legacy flags compatibility', () => {
+  it('returns a targeted notifier that sends to all clients only', () => {
     const clientNotify = sandbox.stub();
     const serverNotify = sandbox.stub();
     const notifier = createNotifierComposite({
@@ -61,16 +86,14 @@ describe('createNotifierComposite', () => {
       serverNotifier: {notify: serverNotify},
     });
 
-    notifier.notify({
-      title: 'Legacy',
+    notifier.target(NOTIFIER_TARGET_ALL_CLIENTS).notify({
+      title: 'Clients',
       message: 'Clients only',
-      toDesktop: false,
-      toClients: true,
     });
 
     expect(clientNotify.calledOnce).toBe(true);
     expect(clientNotify.firstCall.args[1]).toEqual({
-      scope: 'all-clients',
+      scope: NOTIFIER_TARGET_ALL_CLIENTS,
       clientId: undefined,
     });
     expect(serverNotify.called).toBe(false);
@@ -84,10 +107,9 @@ describe('createNotifierComposite', () => {
       serverNotifier: {notify: serverNotify},
     });
 
-    notifier.notify({
+    notifier.target().notify({
       title: 'Ignore',
       message: '',
-      target: 'all',
     });
 
     expect(clientNotify.called).toBe(false);
