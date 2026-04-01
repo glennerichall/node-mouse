@@ -30,6 +30,7 @@ fi
 SCHEMA_FILE="$(mktemp)"
 OUTPUT_FILE="$(mktemp)"
 trap 'rm -f "$SCHEMA_FILE" "$OUTPUT_FILE"' EXIT
+SKILL_FILE="$ROOT_DIR/.codex/skills/codex-commit/SKILL.md"
 
 cat > "$SCHEMA_FILE" <<'EOF'
 {
@@ -49,7 +50,21 @@ cat > "$SCHEMA_FILE" <<'EOF'
 }
 EOF
 
-PROMPT="$(cat <<'EOF'
+if [[ -f "$SKILL_FILE" ]]; then
+  PROMPT="$(cat <<'EOF'
+Utilise la skill `codex-commit` disponible dans le depot courant.
+
+Analyse le depot git courant et determine:
+- le niveau de version semver a appliquer dans package.json parmi patch, minor, major
+- un message de commit git court, clair, en francais
+
+Contraintes de sortie:
+- reponds uniquement avec l'objet JSON conforme au schema
+- le message doit etre en une seule ligne, sans backticks, sans prefixe de type obligatoire
+EOF
+)"
+else
+  PROMPT="$(cat <<'EOF'
 Analyse le depot git courant et determine:
 - le niveau de version semver a appliquer dans package.json parmi patch, minor, major
 - un message de commit git court, clair, en francais
@@ -62,6 +77,7 @@ Regles:
 - le message doit etre en une seule ligne, sans backticks, sans prefixe de type obligatoire
 EOF
 )"
+fi
 
 codex exec \
   --full-auto \
@@ -94,4 +110,3 @@ git add -A
 git commit -m "$COMMIT_MESSAGE"
 
 echo "Commit cree avec succes."
-
