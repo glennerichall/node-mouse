@@ -3,7 +3,7 @@ import {createLogger} from '../log/logger.js';
 
 const log = createLogger('notifier:composite');
 
-export function createNotifierComposite({ clientNotifier, serverNotifier }) {
+export function createNotifierComposite({ clientNotifier, serverNotifier, configService }) {
   function resolveTarget({ target, toDesktop, toClients }) {
     if (target) {
       return String(target).toLowerCase();
@@ -31,7 +31,7 @@ export function createNotifierComposite({ clientNotifier, serverNotifier }) {
       toClients = true,
       target,
       clientId,
-      ttlMs = getConfig().notifications.ttlMs,
+      ttlMs = (configService?.get?.() ?? getConfig()).notifications.ttlMs,
     }) {
       if (!message) {
         return;

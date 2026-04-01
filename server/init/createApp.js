@@ -1,32 +1,20 @@
 import {createClientEndpointsRouter} from '../connection/api/client.router.js';
 import fs from 'node:fs';
 import path from 'node:path';
-import {
-    clientDir,
-    projectRoot,
-    publicDir,
-    sharedUtilsDir
-} from '../utils/paths.js';
-import {
-    getConfig,
-    
-    
-    
-} from './config/index.js';
+import {clientDir, projectRoot, publicDir, sharedUtilsDir} from '../utils/paths.js';
 import cookieParser from 'cookie-parser';
 import {
     createEntryRouter,
     createSessionCreationMiddleware,
-    createSessionValidationMiddleware
+    createSessionValidationMiddleware, createSessionRouter,
 } from '../connection/api/session.middleware.js';
 import {createQrPageHandler} from '../connection/api/qr-page.handler.js';
 import {createLogger} from '../log/logger.js';
 import {createServerInfoRouter} from '../connection/api/server-info.router.js';
 import {getRecentLogs} from '../log/logger.js';
-import {createAdminConfigRouter} from '../connection/api/admin-config.router.js';
+import {createAdminConfigActionsRouter, createAdminConfigRouter} from '../connection/api/admin-config.router.js';
 import {createAdminConfigsRouter} from '../connection/api/admin-configs.router.js';
 
-const log = createLogger('createApp');
 const packageJsonPath = path.join(projectRoot, 'package.json');
 
 function readPackageVersion() {
@@ -40,9 +28,9 @@ function readPackageVersion() {
 }
 
 export async function createApp(instances) {
-    const config = getConfig();
-
-    const {app, tokenManager, basePublicUrl, io, serverStartedAt} = instances;
+    const {app, tokenManager, basePublicUrl, io, serverStartedAt, configService} = instances;
+    const config = configService.get();
+    const log = createLogger('createApp', configService);
 
     const getEntryUrl = () => `${basePublicUrl}/entry/${tokenManager.getToken()}`;
 
@@ -52,6 +40,7 @@ export async function createApp(instances) {
     
     const cookies = cookieParser(config.session.cookieSecret);
 
+    app.set('trust proxy', 'loopback');
     app.use(cookies);
 
     app.use(createSessionCreationMiddleware({
@@ -61,6 +50,7 @@ export async function createApp(instances) {
     }));
 
     app.use('/entry', createEntryRouter(tokenManager));
+    app.use('/api/sessions', createSessionRouter(tokenManager));
 
 
     app.use(createSessionValidationMiddleware({
@@ -83,22 +73,35 @@ export async function createApp(instances) {
         sharedUtilsDir
     }));
 
-    app.use('/admin/server-info', createServerInfoRouter({
+    app.use('/api/admin/server-info', createServerInfoRouter({
         publicDir,
         io,
         serverStartedAt,
-        getConfigSnapshot: getConfig,
+        getConfigSnapshot: () => configService.get(),
         getRecentLogs,
         getVersion: readPackageVersion,
     }));
 
-    app.use('/admin/config', createAdminConfigRouter({
-        publicDir,
-        getConfigSnapshot: getConfig,
+    app.use('/api/admin/configs', createAdminConfigsRouter({
+        getConfigSnapshot: () => configService.get(),
+        configService,
     }));
 
-    app.use('/admin/configs', createAdminConfigsRouter({
-        getConfigSnapshot: getConfig,
+    app.use('/api/admin/restart-service', createAdminConfigActionsRouter({
+        getConfigSnapshot: () => configService.get(),
+    }));
+
+    app.use('/ui/admin/config', createAdminConfigRouter({
+        publicDir,
+    }));
+
+    app.use('/ui/admin/server-info', createServerInfoRouter({
+        publicDir,
+        io,
+        serverStartedAt,
+        getConfigSnapshot: () => configService.get(),
+        getRecentLogs,
+        getVersion: readPackageVersion,
     }));
 
     app.get('/health', (_req, res) => {

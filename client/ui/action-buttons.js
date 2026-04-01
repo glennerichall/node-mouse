@@ -97,7 +97,7 @@ function bindAdminRemoteButtons(
   btnOpenServerInfoBrowserServer.addEventListener('click', () => emitWithTimestamp(socket, 'admin:open-server-info-browser-server'));
   btnOpenServerInfoBrowserClient.addEventListener('click', () => emitWithTimestamp(socket, 'admin:open-server-info-browser-client'));
   btnOpenConfigPage.addEventListener('click', () => {
-    window.location.href = '/admin/config';
+    window.location.href = '/ui/admin/config';
   });
   btnRotateEntryToken.addEventListener('click', () => emitWithTimestamp(socket, 'admin:rotate-entry-token'));
 }

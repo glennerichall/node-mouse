@@ -3,10 +3,10 @@ import {createLogger} from '../log/logger.js';
 
 const log = createLogger('notifier:client');
 
-export function createClientNotifier(io) {
+export function createClientNotifier(io, { configService } = {}) {
   return {
     notify(payload, options = {}) {
-      const config = getConfig();
+      const config = configService?.get?.() ?? getConfig();
       if (!config.notifications.client) {
         return;
       }

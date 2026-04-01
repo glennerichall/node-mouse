@@ -165,7 +165,7 @@
 
     async function refresh() {
       try {
-        const response = await fetch('/admin/server-info/data', { cache: 'no-store' });
+        const response = await fetch('/api/admin/server-info/data', { cache: 'no-store' });
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}`);
         }

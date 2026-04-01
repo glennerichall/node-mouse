@@ -1,11 +1,9 @@
 import pino from 'pino';
 import {getConfig} from '../init/config/index.js';
 
-const config = getConfig();
-const logLevel = config?.logging?.level || 'info';
-const logFormat = config?.logging?.format || 'json';
 const maxStoredLogs = 400;
 const recentLogs = [];
+let rootLogger = null;
 
 const levelNamesByValue = {
   10: 'trace',
@@ -40,7 +38,7 @@ function pushRecentLog(scope, level, message, data) {
   }
 }
 
-function createDestination() {
+function createDestination(logFormat) {
   if (logFormat === 'flat' || logFormat === 'pretty') {
     return pino.transport({
       target: 'pino-pretty',
@@ -56,33 +54,60 @@ function createDestination() {
   return undefined;
 }
 
-const rootLogger = pino(
-  {
-    level: logLevel,
-    timestamp: pino.stdTimeFunctions.isoTime,
-    hooks: {
-      logMethod(args, method, level) {
-        const bindings = typeof this.bindings === 'function' ? this.bindings() : {};
-        const scope = bindings?.scope || 'app';
-        const first = args[0];
-        const second = args[1];
-        const data = first && typeof first === 'object' && !Array.isArray(first) ? first : undefined;
-        const message = typeof first === 'string'
-          ? first
-          : (typeof second === 'string' ? second : '');
-        pushRecentLog(scope, levelNamesByValue[level] || String(level), message, data);
-        method.apply(this, args);
+function buildRootLogger(configProvider) {
+  const initialConfig = configProvider?.get?.() || getConfig();
+  const logLevel = initialConfig?.logging?.level || 'info';
+  const logFormat = initialConfig?.logging?.format || 'json';
+
+  const logger = pino(
+    {
+      level: logLevel,
+      timestamp: pino.stdTimeFunctions.isoTime,
+      hooks: {
+        logMethod(args, method, level) {
+          const bindings = typeof this.bindings === 'function' ? this.bindings() : {};
+          const scope = bindings?.scope || 'app';
+          const first = args[0];
+          const second = args[1];
+          const data = first && typeof first === 'object' && !Array.isArray(first) ? first : undefined;
+          const message = typeof first === 'string'
+            ? first
+            : (typeof second === 'string' ? second : '');
+          pushRecentLog(scope, levelNamesByValue[level] || String(level), message, data);
+          method.apply(this, args);
+        },
       },
     },
-  },
-  createDestination(),
-);
+    createDestination(logFormat),
+  );
 
-export function createLogger(scope) {
-  return rootLogger.child({ scope });
+  if (typeof configProvider?.onChange === 'function') {
+    configProvider.onChange((next) => {
+      const nextLevel = next?.logging?.level;
+      if (nextLevel && logger.level !== nextLevel) {
+        logger.level = nextLevel;
+      }
+    });
+  }
+
+  return logger;
 }
 
-export const logger = rootLogger;
+export function bootstrapLogger(configProvider) {
+  if (!rootLogger) {
+    rootLogger = buildRootLogger(configProvider);
+  }
+  return rootLogger;
+}
+
+export function createLogger(scope, configProvider) {
+  const logger = bootstrapLogger(configProvider);
+  return logger.child({ scope });
+}
+
+export function getRootLogger() {
+  return bootstrapLogger();
+}
 
 export function getRecentLogs(limit = 200) {
   const safeLimit = Math.max(1, Math.min(1000, Math.round(Number(limit) || 200)));

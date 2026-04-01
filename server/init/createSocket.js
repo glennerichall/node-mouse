@@ -1,12 +1,10 @@
-import {createSocketSessionAuthMiddleware} from "../connection/socket/socket-session-auth.js";
-import {
-    getConfig,
-} from "./config/index.js";
-import {buildSocketApi} from "../connection/socket/buildSocketApi.js";
-import {createSocketActionRegistrars} from "./createSocketActionRegistrars.js";
+import {createSocketSessionAuthMiddleware} from '../connection/socket/socket-session-auth.js';
+import {buildSocketApi} from '../connection/socket/buildSocketApi.js';
+import {createSocketActionRegistrars} from './createSocketActionRegistrars.js';
 
 export async function createSocket(instances) {
-    const config = getConfig();
+    const {configService} = instances;
+    const config = configService.get();
     const {prepareSocketAuth, authorizeSocket} = createSocketSessionAuthMiddleware(
         instances,
         {

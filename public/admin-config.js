@@ -109,7 +109,7 @@ function setConfigValue(pathKey, value) {
 }
 
 async function patchField(pathKey, value) {
-  const response = await fetch(`/admin/configs/${encodeURIComponent(pathKey)}`, {
+  const response = await fetch(`/api/admin/configs/${encodeURIComponent(pathKey)}`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
@@ -338,7 +338,7 @@ function getConfigObjectFromEntries(entries) {
 async function loadConfig() {
   setStatus('Chargement de la configuration...', 'pending');
 
-  const response = await fetch('/admin/configs', {cache: 'no-store'});
+  const response = await fetch('/api/admin/configs', {cache: 'no-store'});
   if (!response.ok) {
     throw new Error('Impossible de charger la configuration.');
   }
@@ -361,7 +361,7 @@ async function resetField({pathKey, field, input, defaultValue, resetButton}) {
   setStatus(`Reset de ${pathKey} en cours...`, 'pending');
 
   try {
-    const response = await fetch(`/admin/configs/${encodeURIComponent(pathKey)}`, {
+    const response = await fetch(`/api/admin/configs/${encodeURIComponent(pathKey)}`, {
       method: 'DELETE',
     });
     const payload = await response.json();
@@ -385,7 +385,7 @@ async function restartService() {
   setStatus('Redemarrage du service en cours...', 'pending');
 
   try {
-    const response = await fetch('/admin/config/restart-service', {
+    const response = await fetch('/api/admin/restart-service', {
       method: 'POST',
     });
     const payload = await response.json();

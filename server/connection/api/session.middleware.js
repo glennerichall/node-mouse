@@ -1,28 +1,18 @@
-import express from "express";
-import {sendUnauthorizedResponse} from "./unauthorized-response.js";
-
-function isLocalHostName(value) {
-    const host = String(value || '').toLowerCase();
-    return host === 'localhost' || host === '127.0.0.1' || host === '::1';
-}
+import express from 'express';
+import {sendUnauthorizedResponse} from './unauthorized-response.js';
 
 function isLocalAddress(value) {
-    const address = String(value || '').toLowerCase();
-    return (
-        address === '127.0.0.1'
-        || address === '::1'
-        || address === '::ffff:127.0.0.1'
-    );
+  const address = String(value || '').toLowerCase();
+  return (
+    address === '127.0.0.1'
+    || address === '::1'
+    || address === '::ffff:127.0.0.1'
+  );
 }
 
-function isLocalRequest(req) {
-    const hostHeader = String(req.headers?.host || '').split(':')[0];
-    return (
-        isLocalAddress(req.ip)
-        || isLocalAddress(req.socket?.remoteAddress)
-        || isLocalHostName(req.hostname)
-        || isLocalHostName(hostHeader)
-    );
+function getForwardedFor(req) {
+  const raw = String(req.headers?.['x-forwarded-for'] || '').split(',')[0].trim();
+  return raw || null;
 }
 
 export const createSessionCreationMiddleware = ({
@@ -49,14 +39,12 @@ export function createSessionValidationMiddleware({
                                                       cookieName
                                                   }) {
     return (req, res, next) => {
-        if (isLocalRequest(req)) {
-            req.sessionToken = req.signedCookies && req.signedCookies[cookieName];
-            next();
-            return;
-        }
+        const forwarded = getForwardedFor(req);
+        const clientIp = forwarded || req.ip || req.socket?.remoteAddress;
+        const allowBypass = isLocalAddress(clientIp);
 
         const token = req.signedCookies && req.signedCookies[cookieName];
-        if (!tokenManager.isValid(token)) {
+        if (!allowBypass && !tokenManager.isValid(token)) {
             sendUnauthorizedResponse(req, res);
             return;
         }
@@ -78,4 +66,20 @@ export function createEntryRouter(tokenManager) {
     });
 
     return router;
+}
+
+export function createSessionRouter(tokenManager) {
+  const router = express.Router();
+
+  router.post('/:token', (req, res) => {
+    const token = req.params.token;
+    if (!tokenManager.isValid(token)) {
+      res.status(401).json({ ok: false, message: 'Invalid token' });
+      return;
+    }
+    res.createSession(token);
+    res.status(204).end();
+  });
+
+  return router;
 }

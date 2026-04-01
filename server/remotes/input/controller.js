@@ -1,10 +1,7 @@
-import {createKeyboardController} from "./keyboard-controller.js";
-import {getConfig} from "../../init/config/index.js";
-import {createMouseController} from "./mouse-controller.js";
+import {createKeyboardController} from './keyboard-controller.js';
+import {createMouseController} from './mouse-controller.js';
 
-export function createController(robot) {
-    const config = getConfig();
-    
+export function createController(robot, {config}) {
     const mouse = createMouseController(robot, {
         mouseSpeed: config.input.mouseSpeed,
         scrollSpeed: config.input.scrollSpeed,
@@ -16,5 +13,11 @@ export function createController(robot) {
         robot,
         mouse,
         keyboard,
+        updateConfig(nextConfig) {
+            mouse.updateSpeeds({
+                mouseSpeed: nextConfig.input?.mouseSpeed,
+                scrollSpeed: nextConfig.input?.scrollSpeed,
+            });
+        }
     };
 }

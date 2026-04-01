@@ -72,8 +72,8 @@ Startup configuration is handled through a `.env` file. Instead of duplicating e
 Useful server pages:
 
 - `/qr` displays the entry QR code
-- `/admin/server-info` shows server state, effective configuration, and recent logs
-- `/admin/config` lets you edit persisted settings grouped to match the configuration object structure
+- `/ui/admin/server-info` shows server state, effective configuration, and recent logs
+- `/ui/admin/config` lets you edit persisted settings grouped to match the configuration object structure
 
 ## Linux Deployment
 

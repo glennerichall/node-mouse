@@ -1,3 +1,17 @@
+function isLocalAddress(value) {
+    const address = String(value || '').toLowerCase();
+    return (
+        address === '127.0.0.1'
+        || address === '::1'
+        || address === '::ffff:127.0.0.1'
+    );
+}
+
+function getForwardedFor(request) {
+    const raw = String(request?.headers?.['x-forwarded-for'] || '').split(',')[0].trim();
+    return raw || null;
+}
+
 export function createSocketSessionAuthMiddleware({
                                         tokenManager,
                                         cookies
@@ -14,17 +28,9 @@ export function createSocketSessionAuthMiddleware({
         return error;
     }
 
-    function isLocalAddress(value) {
-        const address = String(value || '').toLowerCase();
-        return (
-            address === '127.0.0.1'
-            || address === '::1'
-            || address === '::ffff:127.0.0.1'
-        );
-    }
-
     function authorizeSocket(socket, next) {
-        const remoteAddress = socket.request?.socket?.remoteAddress;
+        const forwarded = getForwardedFor(socket.request);
+        const remoteAddress = forwarded || socket.request?.socket?.remoteAddress;
         if (isLocalAddress(remoteAddress)) {
             next();
             return;

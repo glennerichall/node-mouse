@@ -7,8 +7,8 @@ export function createOpenServerInfoBrowserAction({ notifier, browser, target = 
   return async function openServerInfoBrowser({ clientId } = {}) {
     const config = getConfig();
     const isClientTarget = target === 'client';
-    const localInfoUrl = `${config.protocol}://127.0.0.1:${config.port}/admin/server-info`;
-    const clientInfoUrl = '/admin/server-info';
+    const localInfoUrl = `${config.protocol}://127.0.0.1:${config.port}/ui/admin/server-info`;
+    const clientInfoUrl = '/ui/admin/server-info';
 
     if (isClientTarget) {
       log.info({ clientId, clientInfoUrl }, 'Ouverture de la page server info sur le client');
@@ -34,7 +34,7 @@ export function createOpenServerInfoBrowserAction({ notifier, browser, target = 
       notifier.notify({
         level: 'error',
         title: 'Server info',
-        message: "Impossible d'ouvrir /admin/server-info sur le serveur.",
+        message: "Impossible d'ouvrir /ui/admin/server-info sur le serveur.",
         ttlMs: 3200,
         target: 'client',
         clientId,

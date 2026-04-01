@@ -13,7 +13,7 @@ import {
   getManagedConfigSnapshot,
 } from './admin-config.shared.js';
 
-export function createAdminConfigsRouter({getConfigSnapshot = getConfig} = {}) {
+export function createAdminConfigsRouter({getConfigSnapshot = getConfig, configService} = {}) {
   const router = express.Router();
 
   router.get('/', (_req, res) => {
@@ -78,6 +78,9 @@ export function createAdminConfigsRouter({getConfigSnapshot = getConfig} = {}) {
         setNestedValue(nextConfig, pathKey, nextValue);
         saveStoredConfig(nextConfig, CONFIG_PATHS);
       }
+      if (configService) {
+        configService.refresh();
+      }
 
       const config = getManagedConfigSnapshot(getConfigSnapshot(), CONFIG_PATHS);
       res.json({
@@ -104,6 +107,9 @@ export function createAdminConfigsRouter({getConfigSnapshot = getConfig} = {}) {
     }
 
     deleteStoredConfig([pathKey], CONFIG_PATHS);
+    if (configService) {
+      configService.refresh();
+    }
     const config = getManagedConfigSnapshot(getConfigSnapshot(), CONFIG_PATHS);
     res.json({
       ok: true,

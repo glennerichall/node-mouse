@@ -94,8 +94,9 @@ Avant de conclure :
 - lister les fichiers créés/modifiés ;
 - proposer les tests pertinents ;
 - vérifier lint/tests/typecheck si disponibles.
+- toujours exécuter les tests unitaires ;
 
-## Definition of done
+## 9. Definition of done
 Le travail est terminé seulement si :
 - le code respecte la structure du projet ;
 - aucune duplication évidente n’a été introduite ;
@@ -104,3 +105,14 @@ Le travail est terminé seulement si :
 - l’intégration socket ne duplique pas la logique métier ;
 - les vérifications disponibles ont été lancées ou leur absence a été signalée ;
 - les tests unitaires passent avec succès.
+
+## 10. Checklist obligatoire avant de coder
+- Ai-je trouvé une implémentation similaire existante ?
+- Ai-je vérifié les middlewares déjà en place ?
+- Ai-je vérifié le système de validation déjà utilisé ?
+- Ai-je vérifié les conventions de réponse et d’erreur ?
+- Ai-je évité de mettre de la logique métier dans les routes ?
+- Ai-je modélisé la fonctionnalité comme une ressource REST plutôt qu’un RPC caché ?
+- Ai-je évalué si Socket.IO est vraiment nécessaire pour ce flux ?
+- Ai-je mutualisé la logique entre HTTP et socket ?
+- Ai-je évité toute nouvelle dépendance non justifiée ?

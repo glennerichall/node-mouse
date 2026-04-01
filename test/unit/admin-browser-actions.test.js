@@ -47,7 +47,7 @@ describe('admin browser actions', () => {
     expect(result).toEqual({
       ok: true,
       message: 'Page server info ouverte sur le client.',
-      openUrl: '/admin/server-info',
+      openUrl: '/ui/admin/server-info',
     });
     expect(browser.openUrlOnHost).not.toHaveBeenCalled();
     expect(notifier.notify).toHaveBeenCalledWith(expect.objectContaining({

@@ -9,15 +9,21 @@ export {
   coerceConfigValue,
 } from './admin-config.shared.js';
 
-export function createAdminConfigRouter({publicDir, getConfigSnapshot = getConfig} = {}) {
+export function createAdminConfigRouter({publicDir} = {}) {
   const router = express.Router();
 
   router.get('/', (_req, res) => {
     res.sendFile(path.join(publicDir, 'admin-config.html'));
   });
 
+  return router;
+}
+
+export function createAdminConfigActionsRouter({ getConfigSnapshot = getConfig } = {}) {
+  const router = express.Router();
+
   router.post('/restart-service', async (_req, res) => {
-    const config = getConfig();
+    const config = getConfigSnapshot();
 
     if (!(await commandExists('systemctl'))) {
       res.status(400).json({
