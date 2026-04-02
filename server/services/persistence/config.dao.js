@@ -5,7 +5,7 @@ import {
 
 const CONFIG_TABLE = 'config_entries';
 
-export function createConfigDao({getDatabase}) {
+export function createConfigDao({getDatabase, getStatePubSub} = {}) {
     let bootstrapped = false;
 
     function bootstrapConfigDatabase() {
@@ -17,6 +17,20 @@ export function createConfigDao({getDatabase}) {
                 value_json TEXT NOT NULL
             )
         `);
+    }
+
+    function emitStateChange(changeType, changedKeys = []) {
+        if (typeof getStatePubSub !== 'function') {
+            return;
+        }
+
+        getStatePubSub().publish('config', {
+            changeType,
+            changedKeys: Array.from(new Set(changedKeys)),
+            storedConfig: getStoredConfig(),
+        }, {
+            type: `config.${changeType}`,
+        });
     }
 
     function saveStoredConfig(value, managedPaths = []) {
@@ -44,6 +58,10 @@ export function createConfigDao({getDatabase}) {
         });
 
         persist();
+        emitStateChange(
+            'updated',
+            Array.from(flattened.keys()).filter((key) => !allowedKeys.size || allowedKeys.has(key)),
+        );
     }
 
     function getStoredConfig(managedPaths = []) {
@@ -100,7 +118,11 @@ export function createConfigDao({getDatabase}) {
             return changes;
         });
 
-        return remove();
+        const changes = remove();
+        if (changes > 0) {
+            emitStateChange('deleted', filteredPaths);
+        }
+        return changes;
     }
 
     return {

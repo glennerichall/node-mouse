@@ -43,7 +43,8 @@ export function bootstrapApi(services) {
         getSystemConfig,
         getLogger,
         getPersistence,
-        getServer
+        getServer,
+        getTaskManager,
     } = services;
 
     const {
@@ -102,6 +103,7 @@ export function bootstrapApi(services) {
         getConfigSnapshot: getConfig,
         getRecentLogs,
         getVersion: readPackageVersion,
+        getTasksSnapshot: () => getTaskManager().getTasksSnapshot(),
     }));
 
     app.use('/api/admin/configs', createAdminConfigsRouter({
@@ -124,6 +126,7 @@ export function bootstrapApi(services) {
         getConfigSnapshot: getConfig,
         getRecentLogs,
         getVersion: readPackageVersion,
+        getTasksSnapshot: () => getTaskManager().getTasksSnapshot(),
     }));
 
     app.get('/health', (_req, res) => {

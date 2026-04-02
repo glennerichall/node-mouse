@@ -82,6 +82,23 @@
     </section>
 
     <section>
+      <h2>Taches planifiees</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Etat</th>
+              <th>Echeance</th>
+              <th>Dans</th>
+            </tr>
+          </thead>
+          <tbody id="tasks-table"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
       <h2>Configuration</h2>
       <pre id="config"></pre>
     </section>
@@ -99,6 +116,7 @@
     const uptimeEl = document.getElementById('uptime');
     const clientsCountEl = document.getElementById('clients-count');
     const clientsTable = document.getElementById('clients-table');
+    const tasksTable = document.getElementById('tasks-table');
     const configEl = document.getElementById('config');
     const logsEl = document.getElementById('logs');
     const LOG_BOTTOM_THRESHOLD_PX = 8;
@@ -134,6 +152,44 @@
           <td>${client.transport || '-'}</td>
         `;
         clientsTable.appendChild(row);
+      }
+    }
+
+    function formatRemaining(dueAt) {
+      if (!dueAt) {
+        return '-';
+      }
+
+      const diffMs = new Date(dueAt).getTime() - Date.now();
+      if (!Number.isFinite(diffMs)) {
+        return '-';
+      }
+
+      if (diffMs <= 0) {
+        return 'maintenant';
+      }
+
+      return formatDuration(Math.ceil(diffMs / 1000));
+    }
+
+    function renderTasks(tasks) {
+      tasksTable.innerHTML = '';
+      if (!Array.isArray(tasks) || tasks.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="4">Aucune tache planifiee.</td>';
+        tasksTable.appendChild(row);
+        return;
+      }
+
+      for (const task of tasks) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${task.name || task.id || ''}</td>
+          <td>${task.running ? 'En cours' : task.dueAt ? 'Planifiee' : 'En attente'}</td>
+          <td>${task.dueAt || '-'}</td>
+          <td>${formatRemaining(task.dueAt)}</td>
+        `;
+        tasksTable.appendChild(row);
       }
     }
 
@@ -176,6 +232,7 @@
         uptimeEl.textContent = `Uptime: ${formatDuration(data.uptimeSec)}`;
         clientsCountEl.textContent = `Clients: ${Number(data.clientsConnected) || 0}`;
         renderClients(data.clients || []);
+        renderTasks(data.tasks || []);
         configEl.textContent = JSON.stringify(data.config || {}, null, 2);
         renderLogs(data.logs || []);
       } catch (error) {

@@ -27,7 +27,7 @@ function readAndClearRestartMarker() {
 
 export function notifyIfRestarted(notifier) {
   if (readAndClearRestartMarker()) {
-    notifier.target().notify({
+    notifier.notify({
       level: NOTIFIER_LEVEL_INFO,
       title: 'Service redemarre',
       message: 'Le service Remote Mouse a redemarre avec succes.',

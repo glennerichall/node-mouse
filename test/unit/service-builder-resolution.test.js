@@ -29,14 +29,19 @@ describe('service builders resolve providers only in methods', () => {
         createEntryToken: jest.fn(),
       },
     }));
+    const getStatePubSub = jest.fn(() => ({
+      publish: jest.fn(),
+    }));
 
     const tokenManager = createTokenManager({
       getSystemConfig,
       getPersistence,
+      getPubSub: getStatePubSub,
     });
 
     expect(getSystemConfig).not.toHaveBeenCalled();
     expect(getPersistence).not.toHaveBeenCalled();
+    expect(getStatePubSub).not.toHaveBeenCalled();
 
     expect(tokenManager.getToken()).toBe('fixed-token');
     expect(getSystemConfig).toHaveBeenCalled();
@@ -65,18 +70,23 @@ describe('service builders resolve providers only in methods', () => {
       debug: jest.fn(),
       error: jest.fn(),
     }));
+    const getStatePubSub = jest.fn(() => ({
+      publish: jest.fn(),
+    }));
 
     const updateManager = createUpdateManager({
       getConfig,
       getSystemConfig,
       getNotifier,
       getLogger,
+      getPubSub: getStatePubSub,
     });
 
     expect(getConfig).not.toHaveBeenCalled();
     expect(getSystemConfig).not.toHaveBeenCalled();
     expect(getNotifier).not.toHaveBeenCalled();
     expect(getLogger).not.toHaveBeenCalled();
+    expect(getStatePubSub).not.toHaveBeenCalled();
 
     await updateManager.runNow();
     expect(getConfig).toHaveBeenCalled();
@@ -145,6 +155,9 @@ describe('service builders resolve providers only in methods', () => {
 
   it('createRotateEntryTokenAction does not read services during builder creation', async () => {
     const notify = jest.fn();
+    const getLogger = jest.fn(() => ({
+      info: jest.fn(),
+    }));
     const getNotifier = jest.fn(() => ({
       target: jest.fn(() => ({notify})),
     }));
@@ -154,14 +167,17 @@ describe('service builders resolve providers only in methods', () => {
     }));
 
     const action = createRotateEntryTokenAction({
+      getLogger,
       getNotifier,
       getTokenManager,
     });
 
+    expect(getLogger).not.toHaveBeenCalled();
     expect(getNotifier).not.toHaveBeenCalled();
     expect(getTokenManager).not.toHaveBeenCalled();
 
     await action({clientId: 'client-a'});
+    expect(getLogger).toHaveBeenCalled();
     expect(getNotifier).toHaveBeenCalled();
     expect(getTokenManager).toHaveBeenCalled();
   });

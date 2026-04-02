@@ -30,8 +30,8 @@ export async function startQrOverlayYad({ getUrl, robot, getConfig, getSystemCon
 
     return {
       qrOverlayConfig,
-      isSupported: qrOverlayConfig.enabled
-        && os.platform() === 'linux'
+      startsVisible: Boolean(qrOverlayConfig.enabled),
+      isSupported: os.platform() === 'linux'
         && Boolean(systemConfig.graphicalDisplay),
     };
   }
@@ -49,7 +49,7 @@ export async function startQrOverlayYad({ getUrl, robot, getConfig, getSystemCon
   const qrPath = path.join(os.tmpdir(), 'remote-mouse-qr-overlay.png');
   let child = null;
   let refreshChain = Promise.resolve();
-  let visible = true;
+  let visible = getOverlayContext().startsVisible;
 
   const close = () => {
     if (child && !child.killed) {
@@ -132,8 +132,6 @@ export async function startQrOverlayYad({ getUrl, robot, getConfig, getSystemCon
     await show();
     return visible;
   };
-
-  await refresh();
 
   return {
     close,

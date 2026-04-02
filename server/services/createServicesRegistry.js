@@ -7,9 +7,11 @@ import {getSystemConfig} from "./config/index.js";
 import {createConfig} from "./config/configService.js";
 import {createTokenManager} from "./token-manager/createTokenManager.js";
 import {createNotifier} from "./notifier/createNotifier.js";
+import {createTaskManager} from './task-manager/createTaskManager.js';
 import {createUpdateManager} from "./update-manager/createUpdateManager.js";
 import {startQrOverlay} from "./overlay/qr-overlay.js";
 import {createRemotes} from "./remotes/createRemotes.js";
+import {createPubSub} from './pubsub/createPubSub.js';
 
 export function qrOverlayFactory(services) {
     return startQrOverlay({
@@ -29,6 +31,8 @@ export function createServicesRegistry() {
         createTokenManager,
         createRobot: loadRobot,
         createNotifier,
+        createPubSub,
+        createTaskManager,
         createQrOverlay: qrOverlayFactory,
         createUpdateManager,
         createServer,

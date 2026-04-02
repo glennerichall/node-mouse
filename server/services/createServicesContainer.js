@@ -25,8 +25,11 @@ function urlFactory(services) {
         getTokenManager
     } = services;
 
+    const tokenManager = getTokenManager();
+    const token = tokenManager.getToken() || tokenManager.createToken();
+
     return {
-        entryUrl: `${getServer().basePublicUrl}/entry/${getTokenManager().getToken()}`
+        entryUrl: `${getServer().basePublicUrl}/entry/${token}`
     }
 }
 
@@ -43,6 +46,8 @@ export async function createServicesContainer({
                                                   createTokenManager,
                                                   createRobot,
                                                   createNotifier,
+                                                  createPubSub,
+                                                  createTaskManager,
                                                   createQrOverlay,
                                                   createUpdateManager,
                                                   createServer,
@@ -57,6 +62,8 @@ export async function createServicesContainer({
         getConfig: () => createConfig(container),
         getTokenManager: createLazy(() => createTokenManager(container)),
         getNotifier: createLazy(() => createNotifier(container)),
+        getPubSub: createLazy(() => createPubSub(container)),
+        getTaskManager: createLazy(() => createTaskManager(container)),
         getQrOverlay: createLazy(() => createQrOverlay(container)),
         getUpdateManager: createLazy(() => createUpdateManager(container)),
         getUrls: () => urlFactory(container),
@@ -68,6 +75,7 @@ export async function createServicesContainer({
 
     container.getRobot = await resolveNow(() => createRobot(container));
     container.getServer = await resolveNow(() => createServer(container));
+    container.getQrOverlay = await resolveNow(() => createQrOverlay(container));
 
     return container;
 }

@@ -34,10 +34,6 @@ export async function startCliServer(services) {
     removeSocketIfNeeded(socketPath);
   }
 
-  function registerShutdownHandler(eventName) {
-    process.once(eventName, closeServer);
-  }
-
   removeSocketIfNeeded(socketPath);
 
   const server = net.createServer({allowHalfOpen: true}, (socket) => {
@@ -92,10 +88,6 @@ export async function startCliServer(services) {
       // Best effort.
     }
   }
-
-  registerShutdownHandler('SIGINT');
-  registerShutdownHandler('SIGTERM');
-  registerShutdownHandler('exit');
 
   log.info({socketPath}, 'Interface CLI locale prête');
 

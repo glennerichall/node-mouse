@@ -22,11 +22,12 @@ describe('createRotateEntryTokenAction', () => {
     const notify = sandbox.stub();
     const target = sandbox.stub().withArgs(NOTIFIER_TARGET_CLIENT).returns({notify});
     const action = createRotateEntryTokenAction({
-      notifier: {target},
-      tokenManager: {
+      getLogger: sandbox.stub().returns({info: sandbox.stub()}),
+      getNotifier: sandbox.stub().returns({target}),
+      getTokenManager: sandbox.stub().returns({
         getToken: sandbox.stub().returns('old-token'),
         createToken: sandbox.stub().returns(''),
-      },
+      }),
     });
 
     const result = await action({clientId: 'client-a'});
@@ -43,11 +44,12 @@ describe('createRotateEntryTokenAction', () => {
     const notify = sandbox.stub();
     const target = sandbox.stub().withArgs(NOTIFIER_TARGET_CLIENT).returns({notify});
     const action = createRotateEntryTokenAction({
-      notifier: {target},
-      tokenManager: {
+      getLogger: sandbox.stub().returns({info: sandbox.stub()}),
+      getNotifier: sandbox.stub().returns({target}),
+      getTokenManager: sandbox.stub().returns({
         getToken: sandbox.stub().returns('same-token'),
         createToken: sandbox.stub().returns('same-token'),
-      },
+      }),
     });
 
     const result = await action({clientId: 'client-b'});
@@ -62,12 +64,14 @@ describe('createRotateEntryTokenAction', () => {
   it('succeeds when token changes', async () => {
     const notify = sandbox.stub();
     const target = sandbox.stub().withArgs(NOTIFIER_TARGET_CLIENT).returns({notify});
+    const info = sandbox.stub();
     const action = createRotateEntryTokenAction({
-      notifier: {target},
-      tokenManager: {
+      getLogger: sandbox.stub().returns({info}),
+      getNotifier: sandbox.stub().returns({target}),
+      getTokenManager: sandbox.stub().returns({
         getToken: sandbox.stub().returns('old-token'),
         createToken: sandbox.stub().returns('new-token'),
-      },
+      }),
     });
 
     const result = await action({clientId: 'client-c'});
@@ -77,5 +81,6 @@ describe('createRotateEntryTokenAction', () => {
     expect(notify.calledOnce).toBe(true);
     expect(notify.firstCall.args[0].level).toBe(NOTIFIER_LEVEL_INFO);
     expect(notify.firstCall.args[1]).toEqual({clientId: 'client-c'});
+    expect(info.calledOnce).toBe(true);
   });
 });

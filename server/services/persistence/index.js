@@ -9,7 +9,10 @@ export function createPersistence(services) {
 
     return {
         getDatabase,
-        configDao: createConfigDao({getDatabase}),
+        configDao: createConfigDao({
+            getDatabase,
+            getStatePubSub: () => services.getStatePubSub(),
+        }),
         entryTokenDao: createEntryTokenDao({getDatabase}),
     };
 }

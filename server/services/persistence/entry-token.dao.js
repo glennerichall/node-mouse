@@ -57,6 +57,27 @@ export function createEntryTokenDao({getDatabase}) {
         return String(row?.token || '');
     }
 
+    function getLatestEntryTokenRecord() {
+        bootstrapEntryTokenTable();
+
+        const db = getDatabase();
+        const row = db.prepare(`
+            SELECT token, created_at
+            FROM ${ENTRY_TOKEN_TABLE}
+            ORDER BY created_at DESC
+            LIMIT 1
+        `).get();
+
+        if (!row) {
+            return null;
+        }
+
+        return {
+            token: String(row.token || ''),
+            createdAt: Number(row.created_at),
+        };
+    }
+
     function deleteExpiredEntryTokens({olderThan, keepToken = ''} = {}) {
         bootstrapEntryTokenTable();
 
@@ -111,6 +132,7 @@ export function createEntryTokenDao({getDatabase}) {
         loadEntryTokens,
         countEntryTokens,
         getLatestEntryToken,
+        getLatestEntryTokenRecord,
         deleteExpiredEntryTokens,
         hasEntryToken,
         createEntryToken,

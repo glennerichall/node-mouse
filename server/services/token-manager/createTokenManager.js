@@ -8,6 +8,7 @@ function createTokenPersistence(services) {
         countTokens: () => services.getPersistence().entryTokenDao.countEntryTokens(),
         deleteExpiredTokens: (options) => services.getPersistence().entryTokenDao.deleteExpiredEntryTokens(options),
         getLatestToken: () => services.getPersistence().entryTokenDao.getLatestEntryToken(),
+        getLatestTokenRecord: () => services.getPersistence().entryTokenDao.getLatestEntryTokenRecord(),
         hasToken: (token) => services.getPersistence().entryTokenDao.hasEntryToken(token),
         createToken: (token, createdAt) => services.getPersistence().entryTokenDao.createEntryToken(token, createdAt),
     };
@@ -16,7 +17,21 @@ function createTokenPersistence(services) {
 export function createTokenManager(services) {
     const persistence = createTokenPersistence(services);
     const tokenChangeListeners = createTokenChangeListeners();
-    let initialized = false;
+
+    function publishState(type = 'state.changed') {
+        if (typeof services.getPubSub !== 'function') {
+            return;
+        }
+
+        services.getPubSub().publish('token-manager', {
+            enabled: isEffectivelyEnabled(),
+            gateEnabled: isGateEnabled(),
+            persistenceEnabled: isPersistenceEnabled(),
+            token: getCurrentToken() || '',
+            tokenCount: loadTokens(),
+            nextRotationDelayMs: getNextRotationDelayMs(),
+        }, {type});
+    }
 
     function getEntryPathConfig() {
         return services.getSystemConfig().entryPath;
@@ -50,26 +65,30 @@ export function createTokenManager(services) {
         return isTokenFormatValid(token) ? token : '';
     }
 
-    function initializeIfNeeded() {
-        if (initialized) {
-            return;
-        }
-        initialized = true;
-
-        if (!getNormalizedFixedPath() && isEffectivelyEnabled() && !readCurrentToken()) {
-            const token = createRandomToken(getEntryPathConfig().tokenLength);
-            const createdAt = Date.now();
-            persistence.createToken(token, createdAt);
-        }
-    }
-
     function getCurrentToken() {
-        initializeIfNeeded();
         return readCurrentToken();
     }
 
+    function getRotateTtlMs() {
+        return Math.max(60_000, Number(getEntryPathConfig().rotateMin || 0) * 60_000);
+    }
+
+    function getLatestTokenRecord() {
+        const record = persistence.getLatestTokenRecord?.();
+        const token = normalizeToken(record?.token);
+        const createdAt = Math.floor(Number(record?.createdAt));
+
+        if (!isTokenFormatValid(token) || !Number.isFinite(createdAt)) {
+            return null;
+        }
+
+        return {
+            token,
+            createdAt,
+        };
+    }
+
     function loadTokens() {
-        initializeIfNeeded();
         if (!isPersistenceEnabled()) {
             return 0;
         }
@@ -77,7 +96,6 @@ export function createTokenManager(services) {
     }
 
     function cleanupExpired({persist = false} = {}) {
-        initializeIfNeeded();
         const normalizedFixedPath = getNormalizedFixedPath();
         if (!isGateEnabled() || normalizedFixedPath) {
             return;
@@ -91,24 +109,30 @@ export function createTokenManager(services) {
     }
 
     function createToken() {
-        initializeIfNeeded();
         const normalizedFixedPath = getNormalizedFixedPath();
         const currentToken = getCurrentToken();
         if (!isEffectivelyEnabled() || normalizedFixedPath) {
             return currentToken;
         }
-        const token = createRandomToken(getEntryPathConfig().tokenLength);
         const createdAt = Date.now();
+        const token = createRandomToken(getEntryPathConfig().tokenLength);
+
+        if (currentToken && currentToken !== token) {
+            // Keep the previous token valid for a fresh grace window after rotation,
+            // while ensuring the newly generated token remains the current one.
+            persistence.createToken(currentToken, createdAt - 1);
+        }
+
         persistence.createToken(token, createdAt);
         cleanupExpired({persist: true});
         if (token !== currentToken) {
+            publishState('token.changed');
             tokenChangeListeners.notify(token);
         }
         return token;
     }
 
     function isValid(token) {
-        initializeIfNeeded();
         const normalizedFixedPath = getNormalizedFixedPath();
         const currentToken = getCurrentToken();
         const normalized = normalizeToken(token);
@@ -136,12 +160,46 @@ export function createTokenManager(services) {
         }
         return Boolean(persistence.hasToken(normalized));
     }
+
+    function getNextRotationDelayMs() {
+        if (!isPersistenceEnabled()) {
+            return null;
+        }
+
+        const latestToken = getLatestTokenRecord();
+        if (!latestToken) {
+            return 0;
+        }
+
+        return Math.max(0, latestToken.createdAt + getRotateTtlMs() - Date.now());
+    }
+
+    function rotateIfNeeded() {
+        if (!isPersistenceEnabled()) {
+            return getCurrentToken();
+        }
+
+        const latestToken = getLatestTokenRecord();
+        if (!latestToken) {
+            return createToken();
+        }
+
+        if (Date.now() < latestToken.createdAt + getRotateTtlMs()) {
+            return latestToken.token;
+        }
+
+        return createToken();
+    }
+    
     return {
         isValid,
         createToken,
         cleanupExpired,
         loadTokens,
         getToken: getCurrentToken,
+        getNextRotationDelayMs,
+        rotateIfNeeded,
+        publishState,
         onTokenChanged(listener) {
             return tokenChangeListeners.subscribe(listener);
         },

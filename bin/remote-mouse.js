@@ -19,6 +19,9 @@ async function main() {
     console.log('Usage:');
     console.log('  remote-mouse              Demarre le serveur');
     console.log('  remote-mouse config       Affiche la configuration persistée effective');
+    console.log('  remote-mouse tasks        Affiche les informations du task manager');
+    console.log('  remote-mouse task-manager Alias de tasks');
+    console.log('  remote-mouse tokens       Liste les tokens en base');
     console.log('  remote-mouse open-qr      Envoie une commande au service deja demarre');
     console.log('  remote-mouse qr           Alias de open-qr');
     process.exit(0);

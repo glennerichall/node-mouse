@@ -59,7 +59,8 @@ export async function startQrOverlayWin32({ getUrl, robot, getConfig }) {
     };
     return {
       qrOverlayConfig,
-      isSupported: qrOverlayConfig.enabled && os.platform() === 'win32',
+      startsVisible: Boolean(qrOverlayConfig.enabled),
+      isSupported: os.platform() === 'win32',
     };
   }
 
@@ -71,7 +72,7 @@ export async function startQrOverlayWin32({ getUrl, robot, getConfig }) {
   const scriptPath = path.join(os.tmpdir(), 'remote-mouse-qr-overlay.ps1');
   let child = null;
   let refreshChain = Promise.resolve();
-  let visible = true;
+  let visible = getOverlayContext().startsVisible;
 
   const close = () => {
     if (child && !child.killed) {
@@ -146,8 +147,6 @@ export async function startQrOverlayWin32({ getUrl, robot, getConfig }) {
     await show();
     return visible;
   };
-
-  await refresh();
 
   return {
     close,

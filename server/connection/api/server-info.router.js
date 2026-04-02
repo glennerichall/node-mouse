@@ -40,6 +40,7 @@ export function createServerInfoRouter({
   getConfigSnapshot,
   getRecentLogs,
   getVersion,
+  getTasksSnapshot,
 }) {
   const router = express.Router();
 
@@ -53,6 +54,7 @@ export function createServerInfoRouter({
     const config = redactSecrets(rawConfig);
     const logs = typeof getRecentLogs === 'function' ? getRecentLogs(250) : [];
     const version = typeof getVersion === 'function' ? getVersion() : 'unknown';
+    const tasks = typeof getTasksSnapshot === 'function' ? getTasksSnapshot() : [];
 
     res.json({
       version,
@@ -61,6 +63,7 @@ export function createServerInfoRouter({
       uptimeSec: Math.floor(process.uptime()),
       clientsConnected: clients.length,
       clients,
+      tasks,
       config,
       logs,
     });

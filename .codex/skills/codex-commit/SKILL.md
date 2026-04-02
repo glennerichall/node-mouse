@@ -1,6 +1,11 @@
 ---
 name: codex-commit
-description: Creer un commit git selon la logique de `bin/codex-commit.sh` : analyser les modifications courantes, choisir un bump semver `patch|minor|major`, formuler un message de commit court en francais, mettre a jour la version avec `npm version --no-git-tag-version`, puis faire `git add -A` et `git commit`.
+description: >-
+  Creer un commit git selon la logique de `bin/codex-commit.sh` : analyser les
+  modifications courantes, choisir un bump semver `patch|minor|major`,
+  formuler un message de commit court en francais, mettre a jour la version
+  avec `npm version --no-git-tag-version`, puis faire `git add -A` et
+  `git commit`.
 ---
 
 # Objectif
