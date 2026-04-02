@@ -8,6 +8,15 @@ import {
 
 const log = createLogger('admin:open-qr-browser');
 
+function notifyClient(notifier, payload, clientId) {
+  if (!clientId) {
+    return;
+  }
+  notifier.target(NOTIFIER_TARGET_CLIENT).notify(payload, {
+    clientId,
+  });
+}
+
 export function createOpenQrBrowserAction(servicesOrOptions, options = {}) {
   const getNotifier = servicesOrOptions?.getNotifier
     ? () => servicesOrOptions.getNotifier()
@@ -46,25 +55,21 @@ export function createOpenQrBrowserAction(servicesOrOptions, options = {}) {
 
     const ok = await browser.openUrlOnHost(localQrUrl);
     if (!ok) {
-      notifier.target(NOTIFIER_TARGET_CLIENT).notify({
+      notifyClient(notifier, {
         level: NOTIFIER_LEVEL_ERROR,
         title: 'QR',
         message: "Impossible d'ouvrir le navigateur du serveur sur /qr.",
         ttlMs: 3200,
-      }, {
-        clientId,
-      });
+      }, clientId);
       return {ok: false, message: 'Impossible d’ouvrir /qr sur le serveur.'};
     }
 
-    notifier.target(NOTIFIER_TARGET_CLIENT).notify({
+    notifyClient(notifier, {
       level: NOTIFIER_LEVEL_INFO,
       title: 'QR',
       message: 'Page QR ouverte sur le serveur.',
       ttlMs: 2200,
-    }, {
-      clientId,
-    });
+    }, clientId);
     return {ok: true, message: 'Page QR ouverte sur le serveur.'};
   };
 }

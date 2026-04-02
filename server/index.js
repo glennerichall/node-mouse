@@ -6,6 +6,7 @@ import {
 } from './services/log/logger.js';
 import {logStartupConfig} from './services/config/logConfig.js';
 import {bootstrapSocket} from "./init/bootstrapSocket.js";
+import {startCliServer} from './cli/startCliServer.js';
 
 export async function startServer() {
     const services = await createServicesRegistry();
@@ -39,6 +40,9 @@ export async function startServer() {
         log.info('Scanner ce QR avec le mobile');
 
         getUpdateManager().start();
+        startCliServer(services).catch((error) => {
+            log.error({err: error}, 'Erreur au démarrage de l interface CLI locale');
+        });
 
         qrcodeTerminal.generate(getUrls().entryUrl, {small: true});
     });
