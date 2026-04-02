@@ -36,12 +36,13 @@ export function pickSamsungDevice(candidates, config) {
 }
 
 export function createSamsungDeviceConfigResolver({
-    config,
-    log,
-    getLastConnectedDeviceFn = getLastConnectedDevice,
-    getAwakeSamsungDevicesFn = getAwakeSamsungDevices,
-}) {
+                                                      getConfig,
+                                                      getLogger,
+                                                      getLastConnectedDeviceFn = getLastConnectedDevice,
+                                                      getAwakeSamsungDevicesFn = getAwakeSamsungDevices,
+                                                  }) {
     return async function resolveDeviceConfig() {
+        const config = getConfig();
         if (config.host && config.mac) {
             return {
                 ip: config.host,
@@ -66,7 +67,7 @@ export function createSamsungDeviceConfigResolver({
             throw new Error('TV Samsung detectee mais impossible de resoudre host/mac');
         }
 
-        log.info({
+        getLogger().info({
             ip: selected.ip,
             name: selected.name,
             model: selected.model,

@@ -4,7 +4,7 @@ import {
   NOTIFIER_TARGET_ALL_CLIENTS,
   NOTIFIER_TARGET_CLIENT,
   NOTIFIER_TARGET_SERVER,
-} from '../../server/notifier/notifier-composite.js';
+} from '../../server/services/notifier/createNotifierComposite.js';
 
 describe('createNotifierComposite', () => {
   let sandbox;
@@ -48,7 +48,7 @@ describe('createNotifierComposite', () => {
       serverNotifier: {notify: serverNotify},
     });
 
-    notifier.target().notify({
+    notifier.notify({
       title: 'Broadcast',
       message: 'Hello',
     });
@@ -107,7 +107,7 @@ describe('createNotifierComposite', () => {
       serverNotifier: {notify: serverNotify},
     });
 
-    notifier.target().notify({
+    notifier.notify({
       title: 'Ignore',
       message: '',
     });

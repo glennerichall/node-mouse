@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import { createKeyboardController } from '../../server/remotes/input/keyboard-controller.js';
+import { createKeyboardController } from '../../server/services/input/createKeyboardController.js';
 
 describe('createKeyboardController', () => {
   let sandbox;

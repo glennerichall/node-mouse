@@ -1,8 +1,6 @@
 import express from 'express';
 
-import {CONFIG_PATHS} from '../../init/config/configPaths.js';
-import {getConfig} from '../../init/config/index.js';
-import {deleteStoredConfig, saveStoredConfig} from '../../persistence/config.dao.js';
+import {CONFIG_PATHS} from '../../services/config/configPaths.js';
 import {setNestedValue} from '../../../utils/shared/objet.utils.js';
 import {
   adminConfigDefaults,
@@ -13,7 +11,7 @@ import {
   getManagedConfigSnapshot,
 } from './admin-config.shared.js';
 
-export function createAdminConfigsRouter({getConfigSnapshot = getConfig, configService} = {}) {
+export function createAdminConfigsRouter({configDao, getConfigSnapshot} = {}) {
   const router = express.Router();
 
   router.get('/', (_req, res) => {
@@ -71,15 +69,12 @@ export function createAdminConfigsRouter({getConfigSnapshot = getConfig, configS
 
     try {
       if (req.body.value === null) {
-        deleteStoredConfig([pathKey], CONFIG_PATHS);
+        configDao.deleteStoredConfig([pathKey], CONFIG_PATHS);
       } else {
         const nextValue = coerceConfigValue(req.body.value, field);
         const nextConfig = {};
         setNestedValue(nextConfig, pathKey, nextValue);
-        saveStoredConfig(nextConfig, CONFIG_PATHS);
-      }
-      if (configService) {
-        configService.refresh();
+        configDao.saveStoredConfig(nextConfig, CONFIG_PATHS);
       }
 
       const config = getManagedConfigSnapshot(getConfigSnapshot(), CONFIG_PATHS);
@@ -106,10 +101,7 @@ export function createAdminConfigsRouter({getConfigSnapshot = getConfig, configS
       return;
     }
 
-    deleteStoredConfig([pathKey], CONFIG_PATHS);
-    if (configService) {
-      configService.refresh();
-    }
+    configDao.deleteStoredConfig([pathKey], CONFIG_PATHS);
     const config = getManagedConfigSnapshot(getConfigSnapshot(), CONFIG_PATHS);
     res.json({
       ok: true,

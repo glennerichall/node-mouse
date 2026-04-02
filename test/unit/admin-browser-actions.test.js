@@ -1,5 +1,5 @@
 import {jest} from '@jest/globals';
-import {NOTIFIER_TARGET_CLIENT} from '../../server/notifier/notifier-composite.js';
+import {NOTIFIER_TARGET_CLIENT} from '../../server/services/notifier/createNotifierComposite.js';
 
 describe('admin browser actions', () => {
   afterEach(() => {

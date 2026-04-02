@@ -5,7 +5,7 @@ import {
   NOTIFIER_LEVEL_INFO,
   NOTIFIER_LEVEL_WARNING,
   NOTIFIER_TARGET_CLIENT,
-} from '../../server/notifier/notifier-composite.js';
+} from '../../server/services/notifier/createNotifierComposite.js';
 
 describe('createRotateEntryTokenAction', () => {
   let sandbox;

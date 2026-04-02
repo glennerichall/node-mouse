@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import {createSocketTimestampGuardMiddleware} from '../../server/connection/socket/socket.timestamp-middleware.js';
+import {socketTimestampGuardMiddleware} from '../../server/connection/socket/socket.timestamp-middleware.js';
 
 describe('createSocketTimestampGuardMiddleware', () => {
   let sandbox;
@@ -13,7 +13,7 @@ describe('createSocketTimestampGuardMiddleware', () => {
   });
 
   it('rejects packet without timestamp', () => {
-    const middleware = createSocketTimestampGuardMiddleware({maxEventAgeMs: 1000, socketId: 's1'});
+    const middleware = socketTimestampGuardMiddleware({maxEventAgeMs: 1000, socketId: 's1'});
     const next = sandbox.stub();
 
     middleware(['mouse:move', {}], next);
@@ -24,7 +24,7 @@ describe('createSocketTimestampGuardMiddleware', () => {
   });
 
   it('rejects stale packet', () => {
-    const middleware = createSocketTimestampGuardMiddleware({maxEventAgeMs: 100, socketId: 's1'});
+    const middleware = socketTimestampGuardMiddleware({maxEventAgeMs: 100, socketId: 's1'});
     const next = sandbox.stub();
     const ts = Date.now() - 1000;
 
@@ -36,7 +36,7 @@ describe('createSocketTimestampGuardMiddleware', () => {
   });
 
   it('accepts fresh packet', () => {
-    const middleware = createSocketTimestampGuardMiddleware({maxEventAgeMs: 1000, socketId: 's1'});
+    const middleware = socketTimestampGuardMiddleware({maxEventAgeMs: 1000, socketId: 's1'});
     const next = sandbox.stub();
     const ts = Date.now();
 

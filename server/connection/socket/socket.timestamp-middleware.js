@@ -1,8 +1,8 @@
-import {createLogger} from '../../log/logger.js';
+import {createLogger} from '../../services/log/logger.js';
 
 const log = createLogger('socket:timestamp');
 
-export function createSocketTimestampGuardMiddleware({ maxEventAgeMs = 1200, socketId } = {}) {
+export function socketTimestampGuardMiddleware({ maxEventAgeMs = 1200, socketId } = {}) {
   return function enforceSocketEventTimestamp(packet, next) {
     const [, payload] = packet;
     const ts = payload && typeof payload === 'object'

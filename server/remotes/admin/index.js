@@ -1,26 +1,32 @@
-import { createForceUpdateCheckAction } from './force-update-check.js';
-import { createInstallUpdateAction } from './install-update.js';
-import { createRestartServiceAction } from './restart-service.js';
-import { createOpenQrBrowserAction } from './open-qr-browser.js';
-import { createOpenServerInfoBrowserAction } from './open-server-info-browser.js';
-import { createRotateEntryTokenAction } from './rotate-entry-token.js';
-import { createToggleQrOverlayAction } from './toggle-qr-overlay.js';
-import { notifyIfRestarted } from './restart-marker.js';
+import {createForceUpdateCheckAction} from './force-update-check.js';
+import {createInstallUpdateAction} from './install-update.js';
+import {createRestartServiceAction} from './restart-service.js';
+import {createOpenQrBrowserAction} from './open-qr-browser.js';
+import {createOpenServerInfoBrowserAction} from './open-server-info-browser.js';
+import {createRotateEntryTokenAction} from './rotate-entry-token.js';
+import {createToggleQrOverlayAction} from './toggle-qr-overlay.js';
+import {notifyIfRestarted} from './restart-marker.js';
 
-export { notifyIfRestarted };
+export {notifyIfRestarted};
 
-import {NOTIFIER_TARGET_CLIENT, NOTIFIER_TARGET_SERVER} from '../../notifier/notifier-composite.js';
+import {
+    NOTIFIER_TARGET_CLIENT,
+    NOTIFIER_TARGET_SERVER
+} from '../../services/notifier/createNotifierComposite.js';
+import {createBrowser} from '../browser/index.js';
 
-export function createAdminActions({ notifier, updateChecker, browser, tokenManager, qrOverlay }) {
-  return {
-    forceUpdateCheck: createForceUpdateCheckAction({ notifier, updateChecker }),
-    installUpdate: createInstallUpdateAction({ notifier, updateChecker }),
-    restartService: createRestartServiceAction({ notifier }),
-    openQrBrowserServer: createOpenQrBrowserAction({ notifier, browser, target: NOTIFIER_TARGET_SERVER }),
-    openQrBrowserClient: createOpenQrBrowserAction({ notifier, browser, target: NOTIFIER_TARGET_CLIENT }),
-    openServerInfoBrowserServer: createOpenServerInfoBrowserAction({ notifier, browser, target: NOTIFIER_TARGET_SERVER }),
-    openServerInfoBrowserClient: createOpenServerInfoBrowserAction({ notifier, browser, target: NOTIFIER_TARGET_CLIENT }),
-    rotateEntryToken: createRotateEntryTokenAction({ notifier, tokenManager }),
-    toggleQrOverlay: createToggleQrOverlayAction({ notifier, qrOverlay }),
-  };
+export function createAdminActions(services) {
+    const browser = createBrowser();
+
+    return {
+        forceUpdateCheck: createForceUpdateCheckAction(services),
+        installUpdate: createInstallUpdateAction(services),
+        restartService: createRestartServiceAction(services),
+        openQrBrowserServer: createOpenQrBrowserAction(services, {browser, target: NOTIFIER_TARGET_SERVER}),
+        openQrBrowserClient: createOpenQrBrowserAction(services, {browser, target: NOTIFIER_TARGET_CLIENT}),
+        openServerInfoBrowserServer: createOpenServerInfoBrowserAction(services, {browser, target: NOTIFIER_TARGET_SERVER}),
+        openServerInfoBrowserClient: createOpenServerInfoBrowserAction(services, {browser, target: NOTIFIER_TARGET_CLIENT}),
+        rotateEntryToken: createRotateEntryTokenAction(services),
+        toggleQrOverlay: createToggleQrOverlayAction(services),
+    };
 }

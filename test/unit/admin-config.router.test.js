@@ -2,7 +2,7 @@ import {
   buildManagedConfigPayload,
   coerceConfigValue,
 } from '../../server/connection/api/admin-config.shared.js';
-import {DEFAULT_CONFIG} from '../../server/init/config/defaultConfig.js';
+import {DEFAULT_PERSISTED_CONFIG} from '../../server/services/config/defaultConfig.js';
 
 describe('admin config router helpers', () => {
   it('coerces booleans, integers and numbers', () => {
@@ -56,7 +56,7 @@ describe('admin config router helpers', () => {
   });
 
   it('exposes the default logging values in the shared defaults source', () => {
-    expect(DEFAULT_CONFIG.logging).toEqual({
+    expect(DEFAULT_PERSISTED_CONFIG.logging).toEqual({
       level: 'info',
       format: 'json',
     });

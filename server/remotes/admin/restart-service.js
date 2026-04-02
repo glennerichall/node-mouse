@@ -1,11 +1,18 @@
-import {getConfig} from '../../init/config/index.js';
 import { commandExists, spawnDetached } from '../../utils/process.js';
-import {NOTIFIER_LEVEL_WARNING, NOTIFIER_TARGET_CLIENT} from '../../notifier/notifier-composite.js';
+import {NOTIFIER_LEVEL_WARNING, NOTIFIER_TARGET_CLIENT} from '../../services/notifier/createNotifierComposite.js';
 import { writeRestartMarker } from './restart-marker.js';
 
-export function createRestartServiceAction({ notifier }) {
+export function createRestartServiceAction(servicesOrOptions) {
+  const getNotifier = servicesOrOptions?.getNotifier
+    ? () => servicesOrOptions.getNotifier()
+    : () => servicesOrOptions.notifier;
+  const getSystemConfig = servicesOrOptions?.getSystemConfig
+    ? () => servicesOrOptions.getSystemConfig()
+    : () => servicesOrOptions?.systemConfig;
+
   return async function restartService({ clientId } = {}) {
-    const config = getConfig();
+    const config = getSystemConfig();
+    const notifier = getNotifier();
     if (!(await commandExists('systemctl'))) {
       return { ok: false, message: 'systemctl indisponible.' };
     }

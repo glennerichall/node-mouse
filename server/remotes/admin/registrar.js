@@ -1,13 +1,12 @@
-import {createLogger} from '../../log/logger.js';
-import {getConfig} from '../../init/config/index.js';
+import {createLogger} from '../../services/log/logger.js';
 import {createSocketActionResponder} from '../../connection/socket/socket-action-responder.js';
 import {createAdminEventGuardMiddleware} from './admin.guard.js';
 
 const log = createLogger('events:admin');
 
-export function createAdminEventRegistrar({ adminActions }) {
+export function createAdminEventRegistrar({ adminActions, getSystemConfig }) {
   return function registerAdminEvents(socket) {
-    const config = getConfig();
+    const config = getSystemConfig();
     const respondAdminAction = createSocketActionResponder({
       socket,
       eventName: 'admin:result',

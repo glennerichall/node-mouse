@@ -1,6 +1,6 @@
 import {jest} from '@jest/globals';
 
-describe('getStartupConfigSnapshot', () => {
+describe('getStartupSystemConfigSnapshot', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
@@ -15,8 +15,8 @@ describe('getStartupConfigSnapshot', () => {
   });
 
   it('keeps entry path enabled by default when env var is absent', async () => {
-    const {getStartupConfigSnapshot} = await import('../../server/init/config/getStartupConfigSnapshot.js');
+    const {getStartupSystemConfigSnapshot} = await import('../../server/services/config/index.js');
 
-    expect(getStartupConfigSnapshot().entryPath.enabled).toBe(true);
+    expect(getStartupSystemConfigSnapshot().entryPath.enabled).toBe(true);
   });
 });

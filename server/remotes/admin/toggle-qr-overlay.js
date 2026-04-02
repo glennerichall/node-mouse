@@ -1,10 +1,19 @@
-import {createLogger} from '../../log/logger.js';
-import {NOTIFIER_LEVEL_INFO, NOTIFIER_TARGET_CLIENT} from '../../notifier/notifier-composite.js';
+import {createLogger} from '../../services/log/logger.js';
+import {NOTIFIER_LEVEL_INFO, NOTIFIER_TARGET_CLIENT} from '../../services/notifier/createNotifierComposite.js';
 
 const log = createLogger('admin:toggle-qr-overlay');
 
-export function createToggleQrOverlayAction({ notifier, qrOverlay }) {
+export function createToggleQrOverlayAction(servicesOrOptions) {
+  const getNotifier = servicesOrOptions?.getNotifier
+    ? () => servicesOrOptions.getNotifier()
+    : () => servicesOrOptions.notifier;
+  const getQrOverlay = servicesOrOptions?.getQrOverlay
+    ? () => servicesOrOptions.getQrOverlay()
+    : () => servicesOrOptions.qrOverlay;
+
   return async function toggleQrOverlay({ clientId } = {}) {
+    const notifier = getNotifier();
+    const qrOverlay = getQrOverlay();
     if (!qrOverlay || typeof qrOverlay.toggle !== 'function') {
       return { ok: false, message: 'QR overlay indisponible.' };
     }

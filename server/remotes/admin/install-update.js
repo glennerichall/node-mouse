@@ -1,23 +1,34 @@
-import {getConfig} from '../../init/config/index.js';
 import { execShell } from '../../utils/process.js';
-import {createLogger} from '../../log/logger.js';
+import {createLogger} from '../../services/log/logger.js';
 import {truncateText} from "../../utils/truncateText.js";
-import {buildNpmGlobalUpdateCommand} from '../../update-check/install-command.js';
+import {buildNpmGlobalUpdateCommand} from '../../services/update-manager/buildNpmGlobalUpdateCommand.js';
 import {
   NOTIFIER_LEVEL_ERROR,
   NOTIFIER_LEVEL_INFO,
   NOTIFIER_LEVEL_WARNING,
   NOTIFIER_TARGET_CLIENT,
-} from '../../notifier/notifier-composite.js';
+} from '../../services/notifier/createNotifierComposite.js';
 
 const log = createLogger('admin:install-update');
 
-export function createInstallUpdateAction({ notifier, updateChecker }) {
+export function createInstallUpdateAction(servicesOrOptions) {
+  const getNotifier = servicesOrOptions?.getNotifier
+    ? () => servicesOrOptions.getNotifier()
+    : () => servicesOrOptions.notifier;
+  const getUpdateManager = servicesOrOptions?.getUpdateManager
+    ? () => servicesOrOptions.getUpdateManager()
+    : () => servicesOrOptions.updateManager;
+  const getConfig = servicesOrOptions?.getConfig
+    ? () => servicesOrOptions.getConfig()
+    : servicesOrOptions.getConfig;
+
   return async function installUpdate({ clientId } = {}) {
     const config = getConfig();
+    const notifier = getNotifier();
+    const updateManager = getUpdateManager();
     log.info('Début install update');
-    const inferredCommand = updateChecker && typeof updateChecker.getInstallCommand === 'function'
-      ? String(updateChecker.getInstallCommand() || '').trim()
+    const inferredCommand = updateManager && typeof updateManager.getInstallCommand === 'function'
+      ? String(updateManager.getInstallCommand() || '').trim()
       : '';
     const npmFallbackCommand = buildNpmGlobalUpdateCommand(config.updateCheck.packageName);
     const installCommand = String(config.updateCheck.installCommand || '').trim() || inferredCommand || npmFallbackCommand;

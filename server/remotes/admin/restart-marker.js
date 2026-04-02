@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import {NOTIFIER_LEVEL_INFO} from '../../notifier/notifier-composite.js';
+import {NOTIFIER_LEVEL_INFO} from '../../services/notifier/createNotifierComposite.js';
 
 const RESTART_MARKER_FILE = path.join(os.tmpdir(), 'remote-mouse-restarted.marker');
 

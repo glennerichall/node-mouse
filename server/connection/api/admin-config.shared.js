@@ -1,6 +1,6 @@
-import {CONFIG_PATHS} from '../../init/config/configPaths.js';
-import {getManagedConfigSchema} from '../../init/config/configSchema.js';
-import {DEFAULT_CONFIG} from '../../init/config/defaultConfig.js';
+import {CONFIG_PATHS} from '../../services/config/configPaths.js';
+import {getManagedConfigSchema} from '../../services/config/configSchema.js';
+import {DEFAULT_PERSISTED_CONFIG} from '../../services/config/defaultConfig.js';
 import {setNestedValue} from '../../../utils/shared/objet.utils.js';
 
 export const adminConfigSchema = getManagedConfigSchema(CONFIG_PATHS);
@@ -86,4 +86,4 @@ export function buildConfigEntry(pathKey, schema, config, defaults) {
   };
 }
 
-export const adminConfigDefaults = getManagedConfigSnapshot(DEFAULT_CONFIG, CONFIG_PATHS);
+export const adminConfigDefaults = getManagedConfigSnapshot(DEFAULT_PERSISTED_CONFIG, CONFIG_PATHS);

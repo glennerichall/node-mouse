@@ -36,14 +36,15 @@ describe('samsung device config', () => {
   it('returns explicit host and mac without network discovery', async () => {
     const getLastConnectedDeviceFn = sandbox.stub();
     const getAwakeSamsungDevicesFn = sandbox.stub();
+    const getLogger = () => ({info: sandbox.stub()});
 
     const resolveDeviceConfig = createSamsungDeviceConfigResolver({
-      config: {
+      getConfig: () => ({
         host: '192.168.1.55',
         mac: 'AA:BB:CC:DD:EE:FF',
         discoveryTimeoutMs: 3000,
-      },
-      log: {info: sandbox.stub()},
+      }),
+      getLogger,
       getLastConnectedDeviceFn,
       getAwakeSamsungDevicesFn,
     });
@@ -57,13 +58,14 @@ describe('samsung device config', () => {
   });
 
   it('throws when several devices are discovered without a selector', async () => {
+    const getLogger = () => ({info: sandbox.stub()});
     const resolveDeviceConfig = createSamsungDeviceConfigResolver({
-      config: {
+      getConfig: () => ({
         host: '',
         mac: '',
         discoveryTimeoutMs: 3000,
-      },
-      log: {info: sandbox.stub()},
+      }),
+      getLogger,
       getLastConnectedDeviceFn: sandbox.stub().returns(null),
       getAwakeSamsungDevicesFn: sandbox.stub().resolves([
         {ip: '192.168.1.10', wifiMac: 'AA:BB:CC:DD:EE:01'},

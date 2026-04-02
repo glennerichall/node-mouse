@@ -1,15 +1,24 @@
-import {createLogger} from '../../log/logger.js';
+import {createLogger} from '../../services/log/logger.js';
 import {
   NOTIFIER_LEVEL_ERROR,
   NOTIFIER_LEVEL_INFO,
   NOTIFIER_LEVEL_WARNING,
   NOTIFIER_TARGET_CLIENT,
-} from '../../notifier/notifier-composite.js';
+} from '../../services/notifier/createNotifierComposite.js';
 
 const log = createLogger('admin:rotate-entry-token');
 
-export function createRotateEntryTokenAction({ notifier, tokenManager }) {
+export function createRotateEntryTokenAction(servicesOrOptions) {
+  const getNotifier = servicesOrOptions?.getNotifier
+    ? () => servicesOrOptions.getNotifier()
+    : () => servicesOrOptions.notifier;
+  const getTokenManager = servicesOrOptions?.getTokenManager
+    ? () => servicesOrOptions.getTokenManager()
+    : () => servicesOrOptions.tokenManager;
+
   return async function rotateEntryToken({ clientId } = {}) {
+    const notifier = getNotifier();
+    const tokenManager = getTokenManager();
     const before = String(tokenManager?.getToken?.() || '');
     const after = String(tokenManager?.createToken?.() || '');
 

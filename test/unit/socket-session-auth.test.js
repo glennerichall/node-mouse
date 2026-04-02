@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import {createSocketSessionAuthMiddleware} from '../../server/connection/socket/socket-session-auth.js';
+import {createSocketSessionAuthMiddleware} from '../../server/connection/socket/createSocketSessionAuthMiddleware.js';
 
 describe('createSocketSessionAuthMiddleware', () => {
   let sandbox;
@@ -12,15 +12,22 @@ describe('createSocketSessionAuthMiddleware', () => {
     sandbox.restore();
   });
 
+  function createServices({isValid = () => false, cookieName = 'session'} = {}) {
+    return {
+      getSystemConfig: () => ({
+        session: {
+          cookieName,
+        },
+      }),
+      getTokenManager: () => ({
+        isValid,
+      }),
+    };
+  }
+
   it('allows localhost socket without cookie', () => {
     const isValid = sandbox.stub().returns(false);
-    const middleware = createSocketSessionAuthMiddleware(
-      {
-        tokenManager: {isValid},
-        cookies: sandbox.stub(),
-      },
-      {cookieName: 'session'},
-    );
+    const authorizeSocket = createSocketSessionAuthMiddleware(createServices({isValid}));
     const next = sandbox.stub();
     const socket = {
       request: {
@@ -29,7 +36,7 @@ describe('createSocketSessionAuthMiddleware', () => {
       },
     };
 
-    middleware.authorizeSocket(socket, next);
+    authorizeSocket(socket, next);
 
     expect(next.calledOnceWithExactly()).toBe(true);
     expect(isValid.called).toBe(false);
@@ -37,13 +44,7 @@ describe('createSocketSessionAuthMiddleware', () => {
 
   it('rejects remote unauthorized socket', () => {
     const isValid = sandbox.stub().returns(false);
-    const middleware = createSocketSessionAuthMiddleware(
-      {
-        tokenManager: {isValid},
-        cookies: sandbox.stub(),
-      },
-      {cookieName: 'session'},
-    );
+    const authorizeSocket = createSocketSessionAuthMiddleware(createServices({isValid}));
     const next = sandbox.stub();
     const socket = {
       request: {
@@ -52,7 +53,7 @@ describe('createSocketSessionAuthMiddleware', () => {
       },
     };
 
-    middleware.authorizeSocket(socket, next);
+    authorizeSocket(socket, next);
 
     expect(next.calledOnce).toBe(true);
     expect(next.firstCall.args[0]).toBeInstanceOf(Error);
@@ -65,13 +66,7 @@ describe('createSocketSessionAuthMiddleware', () => {
 
   it('accepts remote authorized socket and sets sessionToken', () => {
     const isValid = sandbox.stub().returns(true);
-    const middleware = createSocketSessionAuthMiddleware(
-      {
-        tokenManager: {isValid},
-        cookies: sandbox.stub(),
-      },
-      {cookieName: 'session'},
-    );
+    const authorizeSocket = createSocketSessionAuthMiddleware(createServices({isValid}));
     const next = sandbox.stub();
     const socket = {
       request: {
@@ -80,31 +75,29 @@ describe('createSocketSessionAuthMiddleware', () => {
       },
     };
 
-    middleware.authorizeSocket(socket, next);
+    authorizeSocket(socket, next);
 
     expect(next.calledOnceWithExactly()).toBe(true);
     expect(socket.sessionToken).toBe('token-abc');
   });
 
-  it('prepareSocketAuth delegates to cookies middleware', () => {
-    const cookies = sandbox.stub().callsFake((_req, _res, next) => next());
-    const middleware = createSocketSessionAuthMiddleware(
-      {
-        tokenManager: {isValid: sandbox.stub()},
-        cookies,
-      },
-      {cookieName: 'session'},
-    );
-    const engineUse = sandbox.stub();
-    const io = {engine: {use: engineUse}};
-
-    middleware.prepareSocketAuth(io);
-
-    expect(engineUse.calledOnce).toBe(true);
-    const callback = engineUse.firstCall.args[0];
+  it('prefers x-forwarded-for over socket remoteAddress', () => {
+    const isValid = sandbox.stub().returns(true);
+    const authorizeSocket = createSocketSessionAuthMiddleware(createServices({isValid}));
     const next = sandbox.stub();
-    callback({}, {}, next);
-    expect(cookies.calledOnce).toBe(true);
-    expect(next.calledOnce).toBe(true);
+    const socket = {
+      request: {
+        headers: {
+          'x-forwarded-for': '10.1.2.3, 127.0.0.1',
+        },
+        socket: {remoteAddress: '127.0.0.1'},
+        signedCookies: {session: 'token-abc'},
+      },
+    };
+
+    authorizeSocket(socket, next);
+
+    expect(isValid.calledOnceWithExactly('token-abc')).toBe(true);
+    expect(next.calledOnceWithExactly()).toBe(true);
   });
 });
