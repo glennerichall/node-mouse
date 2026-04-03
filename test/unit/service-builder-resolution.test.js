@@ -181,30 +181,23 @@ describe('service builders resolve providers only in methods', () => {
       publishEvent: jest.fn(),
     }));
     const getUpdateManager = jest.fn(() => ({
-      getInstallCommand: jest.fn(() => ''),
-    }));
-    const getConfig = jest.fn(() => ({
-      updateCheck: {
-        packageName: '',
-        installCommand: '',
-        installTimeoutSec: 30,
-      },
+      update: jest.fn(async () => ({
+        ok: false,
+        status: 'no-command',
+      })),
     }));
 
     const action = createInstallUpdateAction({
       getEvents,
       getUpdateManager,
-      getConfig,
     });
 
     expect(getEvents).not.toHaveBeenCalled();
     expect(getUpdateManager).not.toHaveBeenCalled();
-    expect(getConfig).not.toHaveBeenCalled();
 
     await action({clientId: 'client-a'});
     expect(getEvents).toHaveBeenCalled();
     expect(getUpdateManager).toHaveBeenCalled();
-    expect(getConfig).toHaveBeenCalled();
   });
 
   it('input builders do not read robot during builder creation', () => {

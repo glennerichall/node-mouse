@@ -66,4 +66,20 @@ describe('server info router token entries', () => {
       },
     })).toThrow('entryPath.graceMin must be a finite number');
   });
+
+  it('redacts secrets in system config snapshots', () => {
+    expect(__testables.redactSecrets({
+      serviceName: 'remote-mouse',
+      apiSecret: 'secret-value',
+      nested: {
+        dbPassword: 'top-secret',
+      },
+    })).toEqual({
+      serviceName: 'remote-mouse',
+      apiSecret: '[redacted]',
+      nested: {
+        dbPassword: '[redacted]',
+      },
+    });
+  });
 });

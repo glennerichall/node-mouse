@@ -121,6 +121,11 @@
     </section>
 
     <section>
+      <h2>Configuration systeme</h2>
+      <pre id="sys-config"></pre>
+    </section>
+
+    <section>
       <h2>Logs recents</h2>
       <pre id="logs"></pre>
     </section>
@@ -136,6 +141,7 @@
     const tasksTable = document.getElementById('tasks-table');
     const tokensTable = document.getElementById('tokens-table');
     const configEl = document.getElementById('config');
+    const sysConfigEl = document.getElementById('sys-config');
     const logsEl = document.getElementById('logs');
     const LOG_BOTTOM_THRESHOLD_PX = 8;
     const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
@@ -291,6 +297,7 @@
         renderTasks(data.tasks || []);
         renderTokens(data.tokens || []);
         configEl.textContent = JSON.stringify(data.config || {}, null, 2);
+        sysConfigEl.textContent = JSON.stringify(data.sysConfig || {}, null, 2);
         renderLogs(data.logs || []);
       } catch (error) {
         logsEl.textContent = `Erreur de chargement: ${error?.message || error}`;

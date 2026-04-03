@@ -66,6 +66,26 @@ describe('server cli', () => {
     });
   });
 
+  it('returns the system config for sys-config command', async () => {
+    const systemConfig = {
+      port: 3000,
+      protocol: 'http',
+    };
+
+    const result = await executeCliCommand({
+      getSystemConfig: () => systemConfig,
+      getRemotes: () => ({
+        adminActions: {},
+      }),
+    }, 'sys-config');
+
+    expect(result).toEqual({
+      ok: true,
+      message: 'Configuration système.',
+      data: systemConfig,
+    });
+  });
+
   it('returns the token list for tokens command', async () => {
     const result = await executeCliCommand({
       getPersistence: () => ({

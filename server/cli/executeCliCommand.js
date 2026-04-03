@@ -3,6 +3,7 @@ function buildHelpMessage() {
     'Commandes disponibles:',
     '  help     Affiche cette aide',
     '  config   Affiche la configuration persistée effective',
+    '  sys-config Affiche la configuration système',
     '  tasks    Affiche les informations du task manager',
     '  task-manager Alias de tasks',
     '  tokens   Liste les tokens en base',
@@ -52,6 +53,14 @@ export async function executeCliCommand(services, input) {
       ok: true,
       message: 'Configuration persistée effective.',
       data: services.getConfig(),
+    };
+  }
+
+  if (command === 'sys-config') {
+    return {
+      ok: true,
+      message: 'Configuration système.',
+      data: services.getSystemConfig(),
     };
   }
 

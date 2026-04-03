@@ -20,6 +20,7 @@ export function createAdminUiRouter(services) {
         io: services.getServer().io,
         serverStartedAt: services.getServer().serverStartedAt,
         getConfigSnapshot: services.getConfig,
+        getSystemConfigSnapshot: services.getSystemConfig,
         getEntryPathConfig: () => services.getSystemConfig().entryPath,
         getRecentLogs,
         getVersion: () => readPackageVersion(packageJsonPath),

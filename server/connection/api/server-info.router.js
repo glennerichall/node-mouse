@@ -95,6 +95,7 @@ export function createServerInfoRouter({
   io,
   serverStartedAt,
   getConfigSnapshot,
+  getSystemConfigSnapshot,
   getEntryPathConfig,
   getRecentLogs,
   getVersion,
@@ -111,7 +112,9 @@ export function createServerInfoRouter({
   router.get('/data', (_req, res) => {
     const clients = getConnectedClients(io);
     const rawConfig = getConfigSnapshot();
+    const rawSystemConfig = getSystemConfigSnapshot ? getSystemConfigSnapshot() : {};
     const config = redactSecrets(rawConfig);
+    const sysConfig = redactSecrets(rawSystemConfig);
     const logs = getRecentLogs(250);
     const version = getVersion();
     const tasks = getTasksSnapshot();
@@ -134,6 +137,7 @@ export function createServerInfoRouter({
       tasks,
       tokens,
       config,
+      sysConfig,
       logs,
     });
   });
@@ -143,4 +147,5 @@ export function createServerInfoRouter({
 
 export const __testables = {
   buildTokenEntries,
+  redactSecrets,
 };
