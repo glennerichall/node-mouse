@@ -1,7 +1,10 @@
 import {createRandomToken} from '../../utils/createRandomToken.js';
-import {createTokenChangeListeners} from './createTokenChangeListeners.js';
 import {isTokenFormatValid, normalizeToken} from './token-format.js';
 import {computeTokenTtlMs} from './token-store-utils.js';
+import {
+    PUBSUB_EVENT_TOKEN_CHANGED,
+    PUBSUB_SERVICE_TOKEN_MANAGER
+} from "../pubsub/serviceEventConstants.js";
 
 function createTokenPersistence(services) {
     return {
@@ -16,10 +19,9 @@ function createTokenPersistence(services) {
 
 export function createTokenManager(services) {
     const persistence = createTokenPersistence(services);
-    const tokenChangeListeners = createTokenChangeListeners();
 
     function publishState(type = 'state.changed') {
-        if (typeof services.getPubSub !== 'function') {
+        if (typeof services.getEvents !== 'function') {
             return;
         }
 
@@ -30,7 +32,7 @@ export function createTokenManager(services) {
                 ? 0
                 : Math.max(0, latestToken.createdAt + getRotateTtlMs() - Date.now());
 
-        services.getPubSub().publish('token-manager', {
+        services.getEvents().publishState(PUBSUB_SERVICE_TOKEN_MANAGER, {
             enabled: isEffectivelyEnabled(),
             gateEnabled: isGateEnabled(),
             persistenceEnabled: isPersistenceEnabled(),
@@ -128,8 +130,7 @@ export function createTokenManager(services) {
         persistence.createToken(token, createdAt);
         cleanupExpired({persist: true});
         if (token !== currentToken) {
-            publishState('token.changed');
-            tokenChangeListeners.notify(token);
+            publishState(PUBSUB_EVENT_TOKEN_CHANGED);
         }
         return token;
     }
@@ -188,8 +189,5 @@ export function createTokenManager(services) {
         getToken: getCurrentToken,
         rotateIfNeeded,
         publishState,
-        onTokenChanged(listener) {
-            return tokenChangeListeners.subscribe(listener);
-        },
     };
 }

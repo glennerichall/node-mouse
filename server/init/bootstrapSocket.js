@@ -1,22 +1,23 @@
 import {createSocketSessionAuthMiddleware} from '../connection/socket/createSocketSessionAuthMiddleware.js';
 import {createSocketActionRegistrars} from './createSocketActionRegistrars.js';
 import {socketTimestampGuardMiddleware} from "../connection/socket/socket.timestamp-middleware.js";
-import {NOTIFIER_LEVEL_INFO} from "../services/notifier/createNotifierComposite.js";
+import {
+    PUBSUB_EVENT_SOCKET_CLIENT_CONNECTED,
+    PUBSUB_SERVICE_SOCKET
+} from "../services/pubsub/serviceEventConstants.js";
 
 function broadcast(...functions) {
     return (...args) => functions.flatMap(f => f).map(f => f(...args));
 }
 
 function createNotificationHandler(services) {
-    const notifier = services.getNotifier();
+    const events = services.getEvents();
     const log = services.getLogger('socket:timestamp');
 
     return socket => {
         log.info({socketId: socket.id}, 'Client connecté');
-        notifier.target().notify({
-            level: NOTIFIER_LEVEL_INFO,
-            title: 'Client connecte',
-            message: `Client ${socket.id.slice(0, 8)} connecte.`,
+        events.publishEvent(PUBSUB_SERVICE_SOCKET, PUBSUB_EVENT_SOCKET_CLIENT_CONNECTED, {
+            clientId: socket.id,
         });
     }
 }

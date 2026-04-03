@@ -1,7 +1,10 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import {NOTIFIER_LEVEL_INFO} from '../../services/notifier/createNotifierComposite.js';
+import {
+  PUBSUB_EVENT_ADMIN_RESTART_DETECTED,
+  PUBSUB_SERVICE_ADMIN_RESTART_SERVICE,
+} from '../../services/pubsub/serviceEventConstants.js';
 
 const RESTART_MARKER_FILE = path.join(os.tmpdir(), 'remote-mouse-restarted.marker');
 
@@ -25,13 +28,8 @@ function readAndClearRestartMarker() {
   }
 }
 
-export function notifyIfRestarted(notifier) {
+export function notifyIfRestarted(events) {
   if (readAndClearRestartMarker()) {
-    notifier.notify({
-      level: NOTIFIER_LEVEL_INFO,
-      title: 'Service redemarre',
-      message: 'Le service Remote Mouse a redemarre avec succes.',
-      ttlMs: 3000,
-    });
+    events.publishEvent(PUBSUB_SERVICE_ADMIN_RESTART_SERVICE, PUBSUB_EVENT_ADMIN_RESTART_DETECTED, {});
   }
 }

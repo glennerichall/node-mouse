@@ -1,26 +1,30 @@
 import {createLogger} from '../../services/log/logger.js';
 import {
-  NOTIFIER_LEVEL_ERROR,
-  NOTIFIER_LEVEL_INFO,
   NOTIFIER_TARGET_CLIENT,
   NOTIFIER_TARGET_SERVER,
 } from '../../services/notifier/createNotifierComposite.js';
+import {
+  PUBSUB_EVENT_ADMIN_CLIENT_OPENED,
+  PUBSUB_EVENT_ADMIN_SERVER_OPEN_FAILED,
+  PUBSUB_EVENT_ADMIN_SERVER_OPENED,
+  PUBSUB_SERVICE_ADMIN_OPEN_QR_BROWSER,
+} from '../../services/pubsub/serviceEventConstants.js';
 
 const log = createLogger('admin:open-qr-browser');
 
-function notifyClient(notifier, payload, clientId) {
+function publishClientEvent(events, type, clientId) {
   if (!clientId) {
     return;
   }
-  notifier.target(NOTIFIER_TARGET_CLIENT).notify(payload, {
+  events.publishEvent(PUBSUB_SERVICE_ADMIN_OPEN_QR_BROWSER, type, {
     clientId,
   });
 }
 
 export function createOpenQrBrowserAction(servicesOrOptions, options = {}) {
-  const getNotifier = servicesOrOptions?.getNotifier
-    ? () => servicesOrOptions.getNotifier()
-    : () => servicesOrOptions.notifier;
+  const getEvents = servicesOrOptions?.getEvents
+    ? () => servicesOrOptions.getEvents()
+    : () => servicesOrOptions.events;
   const browser = options.browser || servicesOrOptions?.browser;
   const target = options.target || servicesOrOptions?.target || NOTIFIER_TARGET_SERVER;
   const getSystemConfig = servicesOrOptions?.getSystemConfig
@@ -28,18 +32,13 @@ export function createOpenQrBrowserAction(servicesOrOptions, options = {}) {
     : () => servicesOrOptions?.systemConfig;
 
   return async function openQrBrowser({ clientId } = {}) {
-    const notifier = getNotifier();
+    const events = getEvents();
     const isClientTarget = target === NOTIFIER_TARGET_CLIENT;
     const clientQrUrl = '/qr';
 
     if (isClientTarget) {
       log.info({ clientId, clientQrUrl }, 'Ouverture de la page QR sur le client');
-      notifier.target(NOTIFIER_TARGET_CLIENT).notify({
-        level: NOTIFIER_LEVEL_INFO,
-        title: 'QR',
-        message: 'Page QR ouverte sur le client.',
-        ttlMs: 2200,
-      }, {
+      events.publishEvent(PUBSUB_SERVICE_ADMIN_OPEN_QR_BROWSER, PUBSUB_EVENT_ADMIN_CLIENT_OPENED, {
         clientId,
       });
       return {
@@ -55,21 +54,11 @@ export function createOpenQrBrowserAction(servicesOrOptions, options = {}) {
 
     const ok = await browser.openUrlOnHost(localQrUrl);
     if (!ok) {
-      notifyClient(notifier, {
-        level: NOTIFIER_LEVEL_ERROR,
-        title: 'QR',
-        message: "Impossible d'ouvrir le navigateur du serveur sur /qr.",
-        ttlMs: 3200,
-      }, clientId);
+      publishClientEvent(events, PUBSUB_EVENT_ADMIN_SERVER_OPEN_FAILED, clientId);
       return {ok: false, message: 'Impossible d’ouvrir /qr sur le serveur.'};
     }
 
-    notifyClient(notifier, {
-      level: NOTIFIER_LEVEL_INFO,
-      title: 'QR',
-      message: 'Page QR ouverte sur le serveur.',
-      ttlMs: 2200,
-    }, clientId);
+    publishClientEvent(events, PUBSUB_EVENT_ADMIN_SERVER_OPENED, clientId);
     return {ok: true, message: 'Page QR ouverte sur le serveur.'};
   };
 }

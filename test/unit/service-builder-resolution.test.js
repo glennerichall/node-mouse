@@ -29,19 +29,19 @@ describe('service builders resolve providers only in methods', () => {
         createEntryToken: jest.fn(),
       },
     }));
-    const getStatePubSub = jest.fn(() => ({
-      publish: jest.fn(),
+    const getEvents = jest.fn(() => ({
+      publishState: jest.fn(),
     }));
 
     const tokenManager = createTokenManager({
       getSystemConfig,
       getPersistence,
-      getPubSub: getStatePubSub,
+      getEvents,
     });
 
     expect(getSystemConfig).not.toHaveBeenCalled();
     expect(getPersistence).not.toHaveBeenCalled();
-    expect(getStatePubSub).not.toHaveBeenCalled();
+    expect(getEvents).not.toHaveBeenCalled();
 
     expect(tokenManager.getToken()).toBe('fixed-token');
     expect(getSystemConfig).toHaveBeenCalled();
@@ -62,31 +62,26 @@ describe('service builders resolve providers only in methods', () => {
         intervalMin: 60,
       },
     }));
-    const getNotifier = jest.fn(() => ({
-      notify: jest.fn(),
+    const getEvents = jest.fn(() => ({
+      publishState: jest.fn(),
+      publishEvent: jest.fn(),
     }));
     const getLogger = jest.fn(() => ({
       info: jest.fn(),
       debug: jest.fn(),
       error: jest.fn(),
     }));
-    const getStatePubSub = jest.fn(() => ({
-      publish: jest.fn(),
-    }));
-
     const updateManager = createUpdateManager({
       getConfig,
       getSystemConfig,
-      getNotifier,
       getLogger,
-      getPubSub: getStatePubSub,
+      getEvents,
     });
 
     expect(getConfig).not.toHaveBeenCalled();
     expect(getSystemConfig).not.toHaveBeenCalled();
-    expect(getNotifier).not.toHaveBeenCalled();
     expect(getLogger).not.toHaveBeenCalled();
-    expect(getStatePubSub).not.toHaveBeenCalled();
+    expect(getEvents).not.toHaveBeenCalled();
 
     await updateManager.runNow();
     expect(getConfig).toHaveBeenCalled();
@@ -154,12 +149,11 @@ describe('service builders resolve providers only in methods', () => {
   });
 
   it('createRotateEntryTokenAction does not read services during builder creation', async () => {
-    const notify = jest.fn();
     const getLogger = jest.fn(() => ({
       info: jest.fn(),
     }));
-    const getNotifier = jest.fn(() => ({
-      target: jest.fn(() => ({notify})),
+    const getEvents = jest.fn(() => ({
+      publishEvent: jest.fn(),
     }));
     const getTokenManager = jest.fn(() => ({
       getToken: jest.fn(() => 'old-token'),
@@ -168,24 +162,23 @@ describe('service builders resolve providers only in methods', () => {
 
     const action = createRotateEntryTokenAction({
       getLogger,
-      getNotifier,
+      getEvents,
       getTokenManager,
     });
 
     expect(getLogger).not.toHaveBeenCalled();
-    expect(getNotifier).not.toHaveBeenCalled();
+    expect(getEvents).not.toHaveBeenCalled();
     expect(getTokenManager).not.toHaveBeenCalled();
 
     await action({clientId: 'client-a'});
     expect(getLogger).toHaveBeenCalled();
-    expect(getNotifier).toHaveBeenCalled();
+    expect(getEvents).toHaveBeenCalled();
     expect(getTokenManager).toHaveBeenCalled();
   });
 
   it('createInstallUpdateAction does not read services during builder creation', async () => {
-    const notify = jest.fn();
-    const getNotifier = jest.fn(() => ({
-      target: jest.fn(() => ({notify})),
+    const getEvents = jest.fn(() => ({
+      publishEvent: jest.fn(),
     }));
     const getUpdateManager = jest.fn(() => ({
       getInstallCommand: jest.fn(() => ''),
@@ -199,17 +192,17 @@ describe('service builders resolve providers only in methods', () => {
     }));
 
     const action = createInstallUpdateAction({
-      getNotifier,
+      getEvents,
       getUpdateManager,
       getConfig,
     });
 
-    expect(getNotifier).not.toHaveBeenCalled();
+    expect(getEvents).not.toHaveBeenCalled();
     expect(getUpdateManager).not.toHaveBeenCalled();
     expect(getConfig).not.toHaveBeenCalled();
 
     await action({clientId: 'client-a'});
-    expect(getNotifier).toHaveBeenCalled();
+    expect(getEvents).toHaveBeenCalled();
     expect(getUpdateManager).toHaveBeenCalled();
     expect(getConfig).toHaveBeenCalled();
   });

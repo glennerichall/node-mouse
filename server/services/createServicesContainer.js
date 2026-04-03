@@ -41,6 +41,8 @@ export async function createServicesContainer({
                                                   createSystemConfig,
                                                   createPersistence,
                                                   createConfig,
+                                                  createEventStore,
+                                                  createServiceEvents,
                                                   createTokenManager,
                                                   createRobot,
                                                   createNotifier,
@@ -59,6 +61,8 @@ export async function createServicesContainer({
         getSystemConfig: createLazy(() => createSystemConfig(container)),
         getPersistence: createLazy(() => createPersistence(container)),
         getConfig: () => createConfig(container),
+        getEventStore: createLazy(() => createEventStore(container)),
+        getEvents: createLazy(() => createServiceEvents(container)),
         getTokenManager: createLazy(() => createTokenManager(container)),
         getNotifier: createLazy(() => createNotifier(container)),
         getPubSub: createLazy(() => createPubSub(container)),
@@ -74,6 +78,7 @@ export async function createServicesContainer({
     };
 
     container.getRobot = await resolveNow(() => createRobot(container));
+    container.getEventStore = await resolveNow(() => createEventStore(container));
     container.getServer = await resolveNow(() => createServer(container));
     container.getQrOverlay = await resolveNow(() => createQrOverlay(container));
 

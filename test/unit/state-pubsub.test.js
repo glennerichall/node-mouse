@@ -1,9 +1,21 @@
 import {jest} from '@jest/globals';
 import {createPubSub} from '../../server/services/pubsub/createPubSub.js';
+import {createEventStore} from '../../server/services/pubsub/createEventStore.js';
+import {createServiceEvents} from '../../server/services/pubsub/createServiceEvents.js';
+import {startNotificationObserver} from '../../server/services/notifier/startNotificationObserver.js';
 import {createTaskManager} from '../../server/services/task-manager/createTaskManager.js';
 import {createTaskRunner} from '../../server/services/task-runner/createTaskRunner.js';
 import {createTokenManager} from '../../server/services/token-manager/createTokenManager.js';
 import {createUpdateManager} from '../../server/services/update-manager/createUpdateManager.js';
+import {NOTIFIER_TARGET_CLIENT} from '../../server/services/notifier/createNotifierComposite.js';
+import {
+  PUBSUB_EVENT_ADMIN_ROTATED,
+  PUBSUB_EVENT_TOKEN_CHANGED,
+  PUBSUB_SERVICE_ADMIN_ROTATE_ENTRY_TOKEN,
+  PUBSUB_SERVICE_TASK_MANAGER,
+  PUBSUB_SERVICE_TOKEN_MANAGER,
+  PUBSUB_SERVICE_UPDATE_MANAGER,
+} from '../../server/services/pubsub/serviceEventConstants.js';
 
 describe('state pubsub', () => {
   beforeEach(() => {
@@ -17,29 +29,74 @@ describe('state pubsub', () => {
 
   it('stores the latest state and notifies subscribers', () => {
     const bus = createPubSub();
+    const eventStore = createEventStore({
+      getPubSub: () => bus,
+    });
     const listener = jest.fn();
     bus.subscribe(listener);
 
-    const event = bus.publish('task-manager', {tasks: []}, {type: 'task.changed'});
+    const event = bus.publish(PUBSUB_SERVICE_TASK_MANAGER, {tasks: []}, {type: 'task.changed'});
 
     expect(event).toEqual({
       sequence: 1,
-      service: 'task-manager',
+      service: PUBSUB_SERVICE_TASK_MANAGER,
       type: 'task.changed',
       at: '2026-04-02T12:00:00.000Z',
-      state: {tasks: []},
+      payload: {tasks: []},
+      snapshot: true,
     });
     expect(listener).toHaveBeenCalledWith(event);
-    expect(bus.getServiceState('task-manager')).toEqual(event);
-    expect(bus.getLatestSnapshot()).toEqual([event]);
+    expect(eventStore.getServiceState(PUBSUB_SERVICE_TASK_MANAGER)).toEqual(event);
+    expect(eventStore.getLatestSnapshot()).toEqual([event]);
+  });
+
+  it('filters subscriptions with a predicate', () => {
+    const bus = createPubSub();
+    const listener = jest.fn();
+    bus.subscribe(listener, (event) => event.type === PUBSUB_EVENT_TOKEN_CHANGED);
+
+    bus.publish(PUBSUB_SERVICE_TASK_MANAGER, {tasks: []}, {type: 'task.changed'});
+    bus.publish(PUBSUB_SERVICE_TOKEN_MANAGER, {token: 'abc'}, {type: PUBSUB_EVENT_TOKEN_CHANGED});
+
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(listener).toHaveBeenCalledWith(expect.objectContaining({
+      service: PUBSUB_SERVICE_TOKEN_MANAGER,
+      type: PUBSUB_EVENT_TOKEN_CHANGED,
+    }));
+  });
+
+  it('filters subscriptions by exact event fields', () => {
+    const bus = createPubSub();
+    const listener = jest.fn();
+    bus.subscribe(listener, {
+      service: PUBSUB_SERVICE_TOKEN_MANAGER,
+      type: PUBSUB_EVENT_TOKEN_CHANGED,
+    });
+
+    bus.publish(PUBSUB_SERVICE_TASK_MANAGER, {tasks: []}, {type: 'task.changed'});
+    bus.publish(PUBSUB_SERVICE_TOKEN_MANAGER, {token: 'abc'}, {type: 'task.changed'});
+    bus.publish(PUBSUB_SERVICE_TOKEN_MANAGER, {token: 'abc'}, {type: PUBSUB_EVENT_TOKEN_CHANGED});
+
+    expect(listener).toHaveBeenCalledTimes(1);
+    expect(listener).toHaveBeenCalledWith(expect.objectContaining({
+      service: PUBSUB_SERVICE_TOKEN_MANAGER,
+      type: PUBSUB_EVENT_TOKEN_CHANGED,
+    }));
   });
 
   it('publishes task manager state changes to the central bus', async () => {
     const bus = createPubSub();
+    const eventStore = createEventStore({
+      getPubSub: () => bus,
+    });
+    const services = {
+      getPubSub: () => bus,
+    };
+    const events = createServiceEvents(services);
     const taskRunner = createTaskRunner();
     const taskManager = createTaskManager({
       getTaskRunner: () => taskRunner,
-      getPubSub: () => bus,
+      getEvents: () => events,
       getUpdateManager: () => ({
         check: jest.fn(() => Promise.resolve()),
       }),
@@ -54,9 +111,9 @@ describe('state pubsub', () => {
 
     await taskManager.start();
 
-    expect(bus.getServiceState('task-manager')).toEqual(expect.objectContaining({
-      service: 'task-manager',
-      state: {
+    expect(eventStore.getServiceState(PUBSUB_SERVICE_TASK_MANAGER)).toEqual(expect.objectContaining({
+      service: PUBSUB_SERVICE_TASK_MANAGER,
+      payload: {
         tasks: [
           expect.objectContaining({
             name: 'update-check',
@@ -72,9 +129,9 @@ describe('state pubsub', () => {
 
     await jest.advanceTimersByTimeAsync(60_000);
 
-    expect(bus.getServiceState('task-manager')).toEqual(expect.objectContaining({
-      service: 'task-manager',
-      state: {
+    expect(eventStore.getServiceState(PUBSUB_SERVICE_TASK_MANAGER)).toEqual(expect.objectContaining({
+      service: PUBSUB_SERVICE_TASK_MANAGER,
+      payload: {
         tasks: expect.arrayContaining([
           expect.objectContaining({
             name: 'update-check',
@@ -91,6 +148,13 @@ describe('state pubsub', () => {
 
   it('publishes token manager state changes to the central bus', () => {
     const bus = createPubSub();
+    const eventStore = createEventStore({
+      getPubSub: () => bus,
+    });
+    const services = {
+      getPubSub: () => bus,
+    };
+    const events = createServiceEvents(services);
     let latestToken = '';
     let latestCreatedAt = null;
     const createEntryToken = jest.fn((token, createdAt) => {
@@ -98,7 +162,7 @@ describe('state pubsub', () => {
       latestCreatedAt = createdAt;
     });
     const tokenManager = createTokenManager({
-      getPubSub: () => bus,
+      getEvents: () => events,
       getSystemConfig: () => ({
         entryPath: {
           enabled: true,
@@ -127,10 +191,10 @@ describe('state pubsub', () => {
 
     expect(typeof token).toBe('string');
     expect(createEntryToken).toHaveBeenCalled();
-    expect(bus.getServiceState('token-manager')).toEqual(expect.objectContaining({
-      service: 'token-manager',
-      type: 'token.changed',
-      state: expect.objectContaining({
+    expect(eventStore.getServiceState(PUBSUB_SERVICE_TOKEN_MANAGER)).toEqual(expect.objectContaining({
+      service: PUBSUB_SERVICE_TOKEN_MANAGER,
+      type: PUBSUB_EVENT_TOKEN_CHANGED,
+      payload: expect.objectContaining({
         enabled: true,
         persistenceEnabled: true,
         token,
@@ -140,9 +204,15 @@ describe('state pubsub', () => {
 
   it('publishes update manager checks to the central bus', async () => {
     const bus = createPubSub();
-    const notify = jest.fn();
-    const updateManager = createUpdateManager({
+    const eventStore = createEventStore({
       getPubSub: () => bus,
+    });
+    const services = {
+      getPubSub: () => bus,
+    };
+    const events = createServiceEvents(services);
+    const updateManager = createUpdateManager({
+      getEvents: () => events,
       getConfig: () => ({
         updateCheck: {
           enabled: true,
@@ -157,7 +227,6 @@ describe('state pubsub', () => {
           intervalMin: 60,
         },
       }),
-      getNotifier: () => ({notify}),
       getLogger: () => ({
         debug: jest.fn(),
         error: jest.fn(),
@@ -166,10 +235,10 @@ describe('state pubsub', () => {
 
     await updateManager.check();
 
-    expect(bus.getServiceState('update-manager')).toEqual(expect.objectContaining({
-      service: 'update-manager',
+    expect(eventStore.getServiceState(PUBSUB_SERVICE_UPDATE_MANAGER)).toEqual(expect.objectContaining({
+      service: PUBSUB_SERVICE_UPDATE_MANAGER,
       type: 'update.check',
-      state: expect.objectContaining({
+      payload: expect.objectContaining({
         enabled: true,
         lastResult: expect.objectContaining({
           checked: true,
@@ -177,5 +246,32 @@ describe('state pubsub', () => {
         }),
       }),
     }));
+  });
+
+  it('routes domain events from pubsub to the notifier', () => {
+    const bus = createPubSub();
+    const notify = jest.fn();
+    const target = jest.fn(() => ({notify}));
+    const stop = startNotificationObserver({
+      getPubSub: () => bus,
+      getNotifier: () => ({target}),
+    });
+
+    bus.publish(PUBSUB_SERVICE_ADMIN_ROTATE_ENTRY_TOKEN, {
+      clientId: 'client-1',
+    }, {
+      type: PUBSUB_EVENT_ADMIN_ROTATED,
+      snapshot: false,
+    });
+
+    expect(target).toHaveBeenCalledWith(NOTIFIER_TARGET_CLIENT);
+    expect(notify).toHaveBeenCalledWith(expect.objectContaining({
+      title: 'Entry token',
+      message: 'Token d entree rotation forcee.',
+    }), {
+      clientId: 'client-1',
+    });
+
+    stop();
   });
 });

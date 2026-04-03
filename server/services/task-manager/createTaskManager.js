@@ -1,3 +1,5 @@
+import {PUBSUB_SERVICE_TASK_MANAGER} from "../pubsub/serviceEventConstants.js";
+
 function getFixedDelayMs(valueInMinutes) {
   return Math.max(60_000, Number(valueInMinutes || 0) * 60_000);
 }
@@ -10,11 +12,11 @@ export function createTaskManager(services) {
   }
 
   function publishState() {
-    if (typeof services.getPubSub !== 'function') {
+    if (typeof services.getEvents !== 'function') {
       return;
     }
 
-    services.getPubSub().publish('task-manager', {
+    services.getEvents().publishState(PUBSUB_SERVICE_TASK_MANAGER, {
       tasks: getTaskRunner().getTasksSnapshot(),
     });
   }

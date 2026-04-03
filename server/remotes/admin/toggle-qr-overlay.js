@@ -1,18 +1,21 @@
 import {createLogger} from '../../services/log/logger.js';
-import {NOTIFIER_LEVEL_INFO, NOTIFIER_TARGET_CLIENT} from '../../services/notifier/createNotifierComposite.js';
+import {
+  PUBSUB_EVENT_ADMIN_TOGGLED,
+  PUBSUB_SERVICE_ADMIN_TOGGLE_QR_OVERLAY,
+} from '../../services/pubsub/serviceEventConstants.js';
 
 const log = createLogger('admin:toggle-qr-overlay');
 
 export function createToggleQrOverlayAction(servicesOrOptions) {
-  const getNotifier = servicesOrOptions?.getNotifier
-    ? () => servicesOrOptions.getNotifier()
-    : () => servicesOrOptions.notifier;
+  const getEvents = servicesOrOptions?.getEvents
+    ? () => servicesOrOptions.getEvents()
+    : () => servicesOrOptions.events;
   const getQrOverlay = servicesOrOptions?.getQrOverlay
     ? () => servicesOrOptions.getQrOverlay()
     : () => servicesOrOptions.qrOverlay;
 
   return async function toggleQrOverlay({ clientId } = {}) {
-    const notifier = getNotifier();
+    const events = getEvents();
     const qrOverlay = getQrOverlay();
     if (!qrOverlay || typeof qrOverlay.toggle !== 'function') {
       return { ok: false, message: 'QR overlay indisponible.' };
@@ -24,13 +27,9 @@ export function createToggleQrOverlayAction(servicesOrOptions) {
       : 'QR overlay masque.';
 
     log.info({ visible }, 'Toggle QR overlay');
-    notifier.target(NOTIFIER_TARGET_CLIENT).notify({
-      level: NOTIFIER_LEVEL_INFO,
-      title: 'QR overlay',
-      message,
-      ttlMs: 2200,
-    }, {
+    events.publishEvent(PUBSUB_SERVICE_ADMIN_TOGGLE_QR_OVERLAY, PUBSUB_EVENT_ADMIN_TOGGLED, {
       clientId,
+      visible,
     });
 
     return { ok: true, message };

@@ -1,7 +1,10 @@
 import {chooseUpdateSource} from "./chooseUpdateSource.js";
 import {
-    NOTIFIER_LEVEL_WARNING,
-} from "../notifier/createNotifierComposite.js";
+    PUBSUB_EVENT_UPDATE_AVAILABLE,
+    PUBSUB_EVENT_UPDATE_CHECK,
+    PUBSUB_EVENT_UPDATE_ERROR,
+    PUBSUB_SERVICE_UPDATE_MANAGER
+} from "../pubsub/serviceEventConstants.js";
 
 export function createUpdateManager(services) {
     let lastKey = '';
@@ -20,12 +23,12 @@ export function createUpdateManager(services) {
         return services.getConfig().updateCheck || {};
     }
 
-    function publishState(type = 'state.changed') {
-        if (typeof services.getPubSub !== 'function') {
+    function publishState(type = PUBSUB_EVENT_UPDATE_CHECK) {
+        if (typeof services.getEvents !== 'function') {
             return;
         }
 
-        services.getPubSub().publish('update-manager', {
+        services.getEvents().publishState(PUBSUB_SERVICE_UPDATE_MANAGER, {
             enabled: Boolean(getUpdateConfig().enabled),
             lastKey,
             lastInstallCommand,
@@ -41,7 +44,7 @@ export function createUpdateManager(services) {
                 skipped: true,
                 checkedAt: new Date().toISOString(),
             };
-            publishState('update.check');
+            publishState(PUBSUB_EVENT_UPDATE_CHECK);
             return {
                 checked: true,
                 hasUpdate: false,
@@ -58,7 +61,7 @@ export function createUpdateManager(services) {
                     hasUpdate: false,
                     checkedAt: new Date().toISOString(),
                 };
-                publishState('update.check');
+                publishState(PUBSUB_EVENT_UPDATE_CHECK);
                 return {
                     checked: true,
                     hasUpdate: false,
@@ -70,15 +73,12 @@ export function createUpdateManager(services) {
                 checked: true,
                 hasUpdate: true,
                 key: result.key,
-                checkedAt: new Date().toISOString(),
-            };
-            services.getNotifier().notify({
-                level: NOTIFIER_LEVEL_WARNING,
                 title: result.title,
                 message: result.message,
                 ttlMs: result.ttlMs || 8000,
-            });
-            publishState('update.available');
+                checkedAt: new Date().toISOString(),
+            };
+            publishState(PUBSUB_EVENT_UPDATE_AVAILABLE);
             return {
                 checked: true,
                 hasUpdate: true,
@@ -92,7 +92,7 @@ export function createUpdateManager(services) {
                 checkedAt: new Date().toISOString(),
                 error: _error.message,
             };
-            publishState('update.error');
+            publishState(PUBSUB_EVENT_UPDATE_ERROR);
             return {
                 checked: false,
                 hasUpdate: false,

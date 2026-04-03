@@ -1,5 +1,10 @@
 import {jest} from '@jest/globals';
 import {NOTIFIER_TARGET_CLIENT} from '../../server/services/notifier/createNotifierComposite.js';
+import {
+  PUBSUB_EVENT_ADMIN_CLIENT_OPENED,
+  PUBSUB_SERVICE_ADMIN_OPEN_QR_BROWSER,
+  PUBSUB_SERVICE_ADMIN_OPEN_SERVER_INFO_BROWSER,
+} from '../../server/services/pubsub/serviceEventConstants.js';
 
 describe('admin browser actions', () => {
   afterEach(() => {
@@ -8,14 +13,13 @@ describe('admin browser actions', () => {
 
   it('returns a client-side openUrl for QR client action', async () => {
     const {createOpenQrBrowserAction} = await import('../../server/remotes/admin/open-qr-browser.js');
-    const notify = jest.fn();
-    const notifier = {
-      target: jest.fn(() => ({notify})),
+    const events = {
+      publishEvent: jest.fn(),
     };
     const browser = {openUrlOnHost: jest.fn()};
 
     const openQrBrowser = createOpenQrBrowserAction({
-      notifier,
+      events,
       browser,
       target: NOTIFIER_TARGET_CLIENT,
     });
@@ -28,24 +32,20 @@ describe('admin browser actions', () => {
       openUrl: '/qr',
     });
     expect(browser.openUrlOnHost).not.toHaveBeenCalled();
-    expect(notifier.target).toHaveBeenCalledWith(NOTIFIER_TARGET_CLIENT);
-    expect(notify).toHaveBeenCalledWith(expect.objectContaining({
-      message: 'Page QR ouverte sur le client.',
-    }), {
+    expect(events.publishEvent).toHaveBeenCalledWith(PUBSUB_SERVICE_ADMIN_OPEN_QR_BROWSER, PUBSUB_EVENT_ADMIN_CLIENT_OPENED, {
       clientId: 'client-1',
     });
   });
 
   it('returns a client-side openUrl for server info client action', async () => {
     const {createOpenServerInfoBrowserAction} = await import('../../server/remotes/admin/open-server-info-browser.js');
-    const notify = jest.fn();
-    const notifier = {
-      target: jest.fn(() => ({notify})),
+    const events = {
+      publishEvent: jest.fn(),
     };
     const browser = {openUrlOnHost: jest.fn()};
 
     const openServerInfoBrowser = createOpenServerInfoBrowserAction({
-      notifier,
+      events,
       browser,
       target: NOTIFIER_TARGET_CLIENT,
     });
@@ -58,10 +58,7 @@ describe('admin browser actions', () => {
       openUrl: '/ui/admin/server-info',
     });
     expect(browser.openUrlOnHost).not.toHaveBeenCalled();
-    expect(notifier.target).toHaveBeenCalledWith(NOTIFIER_TARGET_CLIENT);
-    expect(notify).toHaveBeenCalledWith(expect.objectContaining({
-      message: 'Page server info ouverte sur le client.',
-    }), {
+    expect(events.publishEvent).toHaveBeenCalledWith(PUBSUB_SERVICE_ADMIN_OPEN_SERVER_INFO_BROWSER, PUBSUB_EVENT_ADMIN_CLIENT_OPENED, {
       clientId: 'client-1',
     });
   });

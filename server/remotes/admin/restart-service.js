@@ -1,30 +1,29 @@
 import { commandExists, spawnDetached } from '../../utils/process.js';
-import {NOTIFIER_LEVEL_WARNING, NOTIFIER_TARGET_CLIENT} from '../../services/notifier/createNotifierComposite.js';
 import { writeRestartMarker } from './restart-marker.js';
+import {
+  PUBSUB_EVENT_ADMIN_STARTED,
+  PUBSUB_SERVICE_ADMIN_RESTART_SERVICE,
+} from '../../services/pubsub/serviceEventConstants.js';
 
 export function createRestartServiceAction(servicesOrOptions) {
-  const getNotifier = servicesOrOptions?.getNotifier
-    ? () => servicesOrOptions.getNotifier()
-    : () => servicesOrOptions.notifier;
+  const getEvents = servicesOrOptions?.getEvents
+    ? () => servicesOrOptions.getEvents()
+    : () => servicesOrOptions.events;
   const getSystemConfig = servicesOrOptions?.getSystemConfig
     ? () => servicesOrOptions.getSystemConfig()
     : () => servicesOrOptions?.systemConfig;
 
   return async function restartService({ clientId } = {}) {
     const config = getSystemConfig();
-    const notifier = getNotifier();
+    const events = getEvents();
     if (!(await commandExists('systemctl'))) {
       return { ok: false, message: 'systemctl indisponible.' };
     }
 
     writeRestartMarker();
-    notifier.target(NOTIFIER_TARGET_CLIENT).notify({
-      level: NOTIFIER_LEVEL_WARNING,
-      title: 'Redemarrage service',
-      message: `Redemarrage de ${config.serviceName} en cours...`,
-      ttlMs: 2200,
-    }, {
+    events.publishEvent(PUBSUB_SERVICE_ADMIN_RESTART_SERVICE, PUBSUB_EVENT_ADMIN_STARTED, {
       clientId,
+      serviceName: config.serviceName,
     });
 
     const spawned = await spawnDetached(

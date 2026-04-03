@@ -13,6 +13,8 @@ import {createUpdateManager} from "./update-manager/createUpdateManager.js";
 import {startQrOverlay} from "./overlay/qr-overlay.js";
 import {createRemotes} from "./remotes/createRemotes.js";
 import {createPubSub} from './pubsub/createPubSub.js';
+import {createEventStore} from './pubsub/createEventStore.js';
+import {createServiceEvents} from './pubsub/createServiceEvents.js';
 
 export function qrOverlayFactory(services) {
     return startQrOverlay({
@@ -29,6 +31,8 @@ export function createServicesRegistry() {
         createSystemConfig: getSystemConfig,
         createPersistence,
         createConfig,
+        createEventStore,
+        createServiceEvents,
         createTokenManager,
         createRobot: loadRobot,
         createNotifier,

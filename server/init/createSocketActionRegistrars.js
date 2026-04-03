@@ -32,7 +32,7 @@ export function createSocketActionRegistrars(services) {
             const {samsung} = services.getRemotes();
             return createSamsungRegistrar({samsung})(socket);
         },
-        (socket) => createConnectionRegistrar({notifier: services.getNotifier()})(socket)
+        (socket) => createConnectionRegistrar({events: services.getEvents()})(socket)
     ];
 
 }

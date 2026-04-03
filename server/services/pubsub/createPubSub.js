@@ -9,34 +9,64 @@ function cloneEvent(event) {
     service: event.service,
     type: event.type,
     at: event.at,
-    state: event.state,
+    payload: event.payload,
+    snapshot: event.snapshot,
+  };
+}
+
+function createExactMatchPredicate(filters = {}) {
+  const entries = Object.entries(filters);
+  if (!entries.length) {
+    return null;
+  }
+
+  return (event) => entries.every(([key, value]) => event?.[key] === value);
+}
+
+function createListenerEntry(listener, predicateOrObject) {
+  if (typeof listener !== 'function') {
+    return null;
+  }
+
+  let predicate = null;
+  if (typeof predicateOrObject === 'function') {
+    predicate = predicateOrObject;
+  } else if (predicateOrObject && typeof predicateOrObject === 'object') {
+    const normalizedFilters = {...predicateOrObject};
+    if (normalizedFilters.service !== undefined) {
+      normalizedFilters.service = normalizeServiceName(normalizedFilters.service);
+    }
+    predicate = createExactMatchPredicate(normalizedFilters);
+  }
+
+  return {
+    notify(event) {
+      if (predicate && !predicate(event)) {
+        return;
+      }
+
+      listener(event);
+    },
   };
 }
 
 export function createPubSub() {
   const listeners = new Set();
-  const latestByService = new Map();
-  const history = [];
   let nextSequence = 1;
 
-  function publish(service, state, options = {}) {
+  function publish(service, payload, options = {}) {
     const event = {
       sequence: nextSequence++,
       service: normalizeServiceName(service),
-      type: String(options.type || 'state.changed').trim() || 'state.changed',
+      type: String(options.type || 'event').trim() || 'event',
       at: new Date().toISOString(),
-      state,
+      payload,
+      snapshot: options.snapshot !== false,
     };
-
-    latestByService.set(event.service, event);
-    history.push(event);
-    if (history.length > 500) {
-      history.splice(0, history.length - 500);
-    }
 
     for (const listener of listeners) {
       try {
-        listener(cloneEvent(event));
+        listener.notify(cloneEvent(event));
       } catch (_error) {
         // Best effort: keep the bus alive even if one subscriber fails.
       }
@@ -45,37 +75,20 @@ export function createPubSub() {
     return cloneEvent(event);
   }
 
-  function subscribe(listener) {
-    if (typeof listener !== 'function') {
+  function subscribe(listener, predicateOrObject) {
+    const entry = createListenerEntry(listener, predicateOrObject);
+    if (!entry) {
       return () => {};
     }
 
-    listeners.add(listener);
+    listeners.add(entry);
     return () => {
-      listeners.delete(listener);
+      listeners.delete(entry);
     };
-  }
-
-  function getLatestSnapshot() {
-    return Array.from(latestByService.values(), (event) => cloneEvent(event));
-  }
-
-  function getHistory(limit = 100) {
-    const safeLimit = Math.max(0, Math.floor(Number(limit) || 0));
-    const source = safeLimit > 0 ? history.slice(-safeLimit) : history;
-    return source.map((event) => cloneEvent(event));
-  }
-
-  function getServiceState(service) {
-    const event = latestByService.get(normalizeServiceName(service));
-    return event ? cloneEvent(event) : null;
   }
 
   return {
     publish,
     subscribe,
-    getLatestSnapshot,
-    getHistory,
-    getServiceState,
   };
 }
