@@ -23,13 +23,20 @@ export function createTokenManager(services) {
             return;
         }
 
+        const latestToken = getLatestTokenRecord();
+        const nextRotationDelayMs = !isPersistenceEnabled()
+            ? null
+            : !latestToken
+                ? 0
+                : Math.max(0, latestToken.createdAt + getRotateTtlMs() - Date.now());
+
         services.getPubSub().publish('token-manager', {
             enabled: isEffectivelyEnabled(),
             gateEnabled: isGateEnabled(),
             persistenceEnabled: isPersistenceEnabled(),
             token: getCurrentToken() || '',
             tokenCount: loadTokens(),
-            nextRotationDelayMs: getNextRotationDelayMs(),
+            nextRotationDelayMs,
         }, {type});
     }
 
@@ -101,8 +108,9 @@ export function createTokenManager(services) {
             return;
         }
         if (persist) {
+            const graceTtlMs = computeTokenTtlMs(getEntryPathConfig().graceMin);
             persistence.deleteExpiredTokens({
-                olderThan: Date.now() - computeTokenTtlMs(getEntryPathConfig().graceMin),
+                olderThan: Date.now() - graceTtlMs,
                 keepToken: getCurrentToken(),
             });
         }
@@ -116,12 +124,6 @@ export function createTokenManager(services) {
         }
         const createdAt = Date.now();
         const token = createRandomToken(getEntryPathConfig().tokenLength);
-
-        if (currentToken && currentToken !== token) {
-            // Keep the previous token valid for a fresh grace window after rotation,
-            // while ensuring the newly generated token remains the current one.
-            persistence.createToken(currentToken, createdAt - 1);
-        }
 
         persistence.createToken(token, createdAt);
         cleanupExpired({persist: true});
@@ -161,19 +163,6 @@ export function createTokenManager(services) {
         return Boolean(persistence.hasToken(normalized));
     }
 
-    function getNextRotationDelayMs() {
-        if (!isPersistenceEnabled()) {
-            return null;
-        }
-
-        const latestToken = getLatestTokenRecord();
-        if (!latestToken) {
-            return 0;
-        }
-
-        return Math.max(0, latestToken.createdAt + getRotateTtlMs() - Date.now());
-    }
-
     function rotateIfNeeded() {
         if (!isPersistenceEnabled()) {
             return getCurrentToken();
@@ -197,7 +186,6 @@ export function createTokenManager(services) {
         cleanupExpired,
         loadTokens,
         getToken: getCurrentToken,
-        getNextRotationDelayMs,
         rotateIfNeeded,
         publishState,
         onTokenChanged(listener) {

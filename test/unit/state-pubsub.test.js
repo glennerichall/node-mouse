@@ -1,6 +1,7 @@
 import {jest} from '@jest/globals';
 import {createPubSub} from '../../server/services/pubsub/createPubSub.js';
 import {createTaskManager} from '../../server/services/task-manager/createTaskManager.js';
+import {createTaskRunner} from '../../server/services/task-runner/createTaskRunner.js';
 import {createTokenManager} from '../../server/services/token-manager/createTokenManager.js';
 import {createUpdateManager} from '../../server/services/update-manager/createUpdateManager.js';
 
@@ -35,25 +36,23 @@ describe('state pubsub', () => {
 
   it('publishes task manager state changes to the central bus', async () => {
     const bus = createPubSub();
+    const taskRunner = createTaskRunner();
     const taskManager = createTaskManager({
+      getTaskRunner: () => taskRunner,
       getPubSub: () => bus,
+      getUpdateManager: () => ({
+        check: jest.fn(() => Promise.resolve()),
+      }),
+      getTokenManager: () => ({
+        rotateIfNeeded: jest.fn(() => 'token'),
+      }),
+      getSystemConfig: () => ({
+        updateCheck: {intervalMin: 0.5},
+        entryPath: {rotateMin: 1},
+      }),
     });
 
-    taskManager.run(() => Promise.resolve(), 30_000, {name: 'update-check'});
-
-    expect(bus.getServiceState('task-manager')).toEqual(expect.objectContaining({
-      service: 'task-manager',
-      state: {
-        tasks: [
-          expect.objectContaining({
-            name: 'update-check',
-            dueAt: '2026-04-02T12:00:30.000Z',
-          }),
-        ],
-      },
-    }));
-
-    await jest.advanceTimersByTimeAsync(30_000);
+    await taskManager.start();
 
     expect(bus.getServiceState('task-manager')).toEqual(expect.objectContaining({
       service: 'task-manager',
@@ -62,9 +61,30 @@ describe('state pubsub', () => {
           expect.objectContaining({
             name: 'update-check',
             dueAt: '2026-04-02T12:01:00.000Z',
-            running: false,
+          }),
+          expect.objectContaining({
+            name: 'token-rotation',
+            dueAt: '2026-04-02T12:01:00.000Z',
           }),
         ],
+      },
+    }));
+
+    await jest.advanceTimersByTimeAsync(60_000);
+
+    expect(bus.getServiceState('task-manager')).toEqual(expect.objectContaining({
+      service: 'task-manager',
+      state: {
+        tasks: expect.arrayContaining([
+          expect.objectContaining({
+            name: 'update-check',
+            dueAt: '2026-04-02T12:02:00.000Z',
+          }),
+          expect.objectContaining({
+            name: 'token-rotation',
+            delayMs: 60_000,
+          }),
+        ]),
       },
     }));
   });

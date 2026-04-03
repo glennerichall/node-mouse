@@ -7,6 +7,7 @@ import {getSystemConfig} from "./config/index.js";
 import {createConfig} from "./config/configService.js";
 import {createTokenManager} from "./token-manager/createTokenManager.js";
 import {createNotifier} from "./notifier/createNotifier.js";
+import {createTaskRunner} from './task-runner/createTaskRunner.js';
 import {createTaskManager} from './task-manager/createTaskManager.js';
 import {createUpdateManager} from "./update-manager/createUpdateManager.js";
 import {startQrOverlay} from "./overlay/qr-overlay.js";
@@ -32,6 +33,7 @@ export function createServicesRegistry() {
         createRobot: loadRobot,
         createNotifier,
         createPubSub,
+        createTaskRunner,
         createTaskManager,
         createQrOverlay: qrOverlayFactory,
         createUpdateManager,

@@ -1,6 +1,6 @@
 import express from 'express';
 
-export function createClientEndpointsRouter({
+export function createStaticShareRouter({
                                     publicDir,
                                     clientDir,
                                     sharedUtilsDir,

@@ -1,6 +1,6 @@
-import {createConfigDao} from './config.dao.js';
-import {createEntryTokenDao} from './entry-token.dao.js';
-import {createDatabaseProvider} from './sqlite.js';
+import {createConfigDao} from './createConfigDao.js';
+import {createEntryTokenDao} from './createEntryTokenDao.js';
+import {createDatabaseProvider} from './createDatabaseProvider.js';
 
 export function createPersistence(services) {
     const getDatabase = createDatabaseProvider({

@@ -2,8 +2,8 @@ import {jest} from '@jest/globals';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import {createConfigDao} from '../../server/services/persistence/config.dao.js';
-import {createDatabaseProvider} from '../../server/services/persistence/sqlite.js';
+import {createConfigDao} from '../../server/services/persistence/createConfigDao.js';
+import {createDatabaseProvider} from '../../server/services/persistence/createDatabaseProvider.js';
 
 describe('config dao pubsub', () => {
   let tempDir;

@@ -29,14 +29,12 @@ function urlFactory(services) {
     const token = tokenManager.getToken() || tokenManager.createToken();
 
     return {
-        entryUrl: `${getServer().basePublicUrl}/entry/${token}`
+        entryUrl: `${getServer().basePublicUrl}/api/sessions/${token}`
     }
 }
 
 function loggerFactory(services) {
-    return scope => createLogger(scope, {
-        get: () => services.getConfig(),
-    });
+    return scope => createLogger(scope, services.getConfig);
 }
 
 export async function createServicesContainer({
@@ -47,6 +45,7 @@ export async function createServicesContainer({
                                                   createRobot,
                                                   createNotifier,
                                                   createPubSub,
+                                                  createTaskRunner,
                                                   createTaskManager,
                                                   createQrOverlay,
                                                   createUpdateManager,
@@ -63,6 +62,7 @@ export async function createServicesContainer({
         getTokenManager: createLazy(() => createTokenManager(container)),
         getNotifier: createLazy(() => createNotifier(container)),
         getPubSub: createLazy(() => createPubSub(container)),
+        getTaskRunner: createLazy(() => createTaskRunner(container)),
         getTaskManager: createLazy(() => createTaskManager(container)),
         getQrOverlay: createLazy(() => createQrOverlay(container)),
         getUpdateManager: createLazy(() => createUpdateManager(container)),

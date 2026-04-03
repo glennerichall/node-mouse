@@ -99,6 +99,23 @@
     </section>
 
     <section>
+      <h2>Tokens</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Etat</th>
+              <th>Token</th>
+              <th>Cree le</th>
+              <th>Expire le</th>
+            </tr>
+          </thead>
+          <tbody id="tokens-table"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
       <h2>Configuration</h2>
       <pre id="config"></pre>
     </section>
@@ -117,9 +134,14 @@
     const clientsCountEl = document.getElementById('clients-count');
     const clientsTable = document.getElementById('clients-table');
     const tasksTable = document.getElementById('tasks-table');
+    const tokensTable = document.getElementById('tokens-table');
     const configEl = document.getElementById('config');
     const logsEl = document.getElementById('logs');
     const LOG_BOTTOM_THRESHOLD_PX = 8;
+    const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
+      dateStyle: 'medium',
+      timeStyle: 'medium',
+    });
     let logsAutoScroll = true;
 
     function isLogScrollAtBottom() {
@@ -132,6 +154,19 @@
       const m = Math.floor((s % 3600) / 60);
       const sec = s % 60;
       return `${h}h ${m}m ${sec}s`;
+    }
+
+    function formatDateTime(value) {
+      if (!value) {
+        return '-';
+      }
+
+      const date = new Date(value);
+      if (!Number.isFinite(date.getTime())) {
+        return '-';
+      }
+
+      return dateTimeFormatter.format(date);
     }
 
     function renderClients(clients) {
@@ -147,7 +182,7 @@
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${client.id || ''}</td>
-          <td>${client.connectedAt || '-'}</td>
+          <td>${formatDateTime(client.connectedAt)}</td>
           <td>${client.address || '-'}</td>
           <td>${client.transport || '-'}</td>
         `;
@@ -186,10 +221,31 @@
         row.innerHTML = `
           <td>${task.name || task.id || ''}</td>
           <td>${task.running ? 'En cours' : task.dueAt ? 'Planifiee' : 'En attente'}</td>
-          <td>${task.dueAt || '-'}</td>
+          <td>${formatDateTime(task.dueAt)}</td>
           <td>${formatRemaining(task.dueAt)}</td>
         `;
         tasksTable.appendChild(row);
+      }
+    }
+
+    function renderTokens(tokens) {
+      tokensTable.innerHTML = '';
+      if (!Array.isArray(tokens) || tokens.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="4">Aucun token persiste.</td>';
+        tokensTable.appendChild(row);
+        return;
+      }
+
+      for (const tokenEntry of tokens) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${tokenEntry.isCurrent ? 'Actif' : 'Archive'}</td>
+          <td>${tokenEntry.token || '[masque]'}</td>
+          <td>${formatDateTime(tokenEntry.createdAt)}</td>
+          <td>${formatDateTime(tokenEntry.expiresAt)}</td>
+        `;
+        tokensTable.appendChild(row);
       }
     }
 
@@ -227,12 +283,13 @@
         }
         const data = await response.json();
         versionEl.textContent = `Version: ${String(data.version || 'unknown')}`;
-        nowEl.textContent = `Now: ${data.now || '-'}`;
-        onlineSinceEl.textContent = `Online since: ${data.onlineSince || '-'}`;
+        nowEl.textContent = `Now: ${formatDateTime(data.now)}`;
+        onlineSinceEl.textContent = `Online since: ${formatDateTime(data.onlineSince)}`;
         uptimeEl.textContent = `Uptime: ${formatDuration(data.uptimeSec)}`;
         clientsCountEl.textContent = `Clients: ${Number(data.clientsConnected) || 0}`;
         renderClients(data.clients || []);
         renderTasks(data.tasks || []);
+        renderTokens(data.tokens || []);
         configEl.textContent = JSON.stringify(data.config || {}, null, 2);
         renderLogs(data.logs || []);
       } catch (error) {

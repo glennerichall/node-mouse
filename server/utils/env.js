@@ -74,6 +74,16 @@ export function loadEnvFile(envFilePath) {
   dotenv.config({ path: envFilePath, override: false });
 }
 
+export function readPackageVersion(packageJsonPath, fallback = 'unknown') {
+  try {
+    const raw = fs.readFileSync(packageJsonPath, 'utf8');
+    const parsed = JSON.parse(raw);
+    return String(parsed?.version || '').trim() || fallback;
+  } catch (_error) {
+    return fallback;
+  }
+}
+
 export function readRaw(key, fallback = '') {
   if (Object.prototype.hasOwnProperty.call(process.env, key)
     && process.env[key] !== undefined

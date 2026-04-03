@@ -1,8 +1,9 @@
 import pino from 'pino';
-import {DEFAULT_PERSISTED_CONFIG} from '../config/defaultConfig.js';
 import {getSystemConfig} from "../config/index.js";
 
 const maxStoredLogs = 400;
+const maxStoredMessageLength = 2_000;
+const maxStoredDataLength = 8_000;
 const recentLogs = [];
 let rootLogger = null;
 
@@ -20,9 +21,23 @@ function safeClone(value) {
     return undefined;
   }
   try {
-    return JSON.parse(JSON.stringify(value));
+    const serialized = JSON.stringify(value);
+    if (typeof serialized !== 'string') {
+      return undefined;
+    }
+    if (serialized.length <= maxStoredDataLength) {
+      return JSON.parse(serialized);
+    }
+
+    return {
+      truncated: true,
+      preview: `${serialized.slice(0, maxStoredDataLength)}...`,
+    };
   } catch (_error) {
-    return String(value);
+    const text = String(value);
+    return text.length <= maxStoredDataLength
+      ? text
+      : `${text.slice(0, maxStoredDataLength)}...`;
   }
 }
 
@@ -31,7 +46,7 @@ function pushRecentLog(scope, level, message, data) {
     at: new Date().toISOString(),
     scope: String(scope || 'app'),
     level: String(level || 'info'),
-    message: String(message || ''),
+    message: String(message || '').slice(0, maxStoredMessageLength),
     data: safeClone(data),
   });
   if (recentLogs.length > maxStoredLogs) {
@@ -56,7 +71,7 @@ function createDestination(logFormat) {
 }
 
 function buildRootLogger(configProvider) {
-  const initialConfig = configProvider?.get?.() || DEFAULT_PERSISTED_CONFIG;
+  const initialConfig = configProvider();
   const logLevel = initialConfig?.logging?.level || 'info';
   const logFormat = initialConfig?.logging?.format || 'json';
 
@@ -82,7 +97,7 @@ function buildRootLogger(configProvider) {
     createDestination(logFormat),
   );
 
-  if (typeof configProvider?.onChange === 'function') {
+  if (typeof configProvider.onChange === 'function') {
     configProvider.onChange((next) => {
       const nextLevel = next?.logging?.level;
       if (nextLevel && logger.level !== nextLevel) {
@@ -101,13 +116,9 @@ export function bootstrapLogger(configProvider) {
   return rootLogger;
 }
 
-export function createLogger(scope, configProvider = getSystemConfig()) {
+export function createLogger(scope, configProvider = getSystemConfig) {
   const logger = bootstrapLogger(configProvider);
   return logger.child({ scope });
-}
-
-export function getRootLogger() {
-  return bootstrapLogger();
 }
 
 export function getRecentLogs(limit = 200) {

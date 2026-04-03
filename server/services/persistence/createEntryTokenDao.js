@@ -90,9 +90,9 @@ export function createEntryTokenDao({getDatabase}) {
         if (keepToken) {
             const result = db.prepare(`
                 DELETE FROM ${ENTRY_TOKEN_TABLE}
-                WHERE created_at < ?
-                  AND token != ?
-            `).run(safeOlderThan, keepToken);
+                WHERE token != ?
+                  AND created_at < ?
+            `).run(keepToken, safeOlderThan);
             return result.changes;
         }
 

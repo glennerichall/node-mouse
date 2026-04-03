@@ -1,5 +1,6 @@
 import {jest} from '@jest/globals';
 import {createTaskManager} from '../../server/services/task-manager/createTaskManager.js';
+import {createTaskRunner} from '../../server/services/task-runner/createTaskRunner.js';
 
 describe('task manager', () => {
   beforeEach(() => {
@@ -11,54 +12,66 @@ describe('task manager', () => {
     jest.useRealTimers();
   });
 
-  it('exposes scheduled tasks with due dates', () => {
-    const taskManager = createTaskManager();
-    const stop = taskManager.run(() => {}, 60_000, {name: 'update-check'});
+  it('starts and stops the system tasks through the task runner', async () => {
+    const taskRunner = createTaskRunner();
+    const taskManager = createTaskManager({
+      getTaskRunner: () => taskRunner,
+      getUpdateManager: () => ({
+        check: jest.fn(async () => ({})),
+      }),
+      getTokenManager: () => ({
+        rotateIfNeeded: jest.fn(() => 'token'),
+      }),
+      getSystemConfig: () => ({
+        updateCheck: {intervalMin: 5},
+        entryPath: {rotateMin: 10},
+      }),
+    });
+
+    await taskManager.start();
 
     expect(taskManager.getTasksSnapshot()).toEqual([
       expect.objectContaining({
         name: 'update-check',
-        dueAt: '2026-04-02T12:01:00.000Z',
-        delayMs: 60_000,
-        running: false,
+        dueAt: '2026-04-02T12:05:00.000Z',
+        delayMs: 300_000,
+      }),
+      expect.objectContaining({
+        name: 'token-rotation',
+        dueAt: '2026-04-02T12:10:00.000Z',
+        delayMs: 600_000,
       }),
     ]);
 
-    stop();
+    taskManager.stop();
 
     expect(taskManager.getTasksSnapshot()).toEqual([]);
   });
 
-  it('marks a task as running while it executes and reschedules it afterwards', async () => {
-    const taskManager = createTaskManager();
-    let releaseTask;
-    const taskPromise = new Promise((resolve) => {
-      releaseTask = resolve;
+  it('uses rotateMin directly for token rotation scheduling', async () => {
+    const taskRunner = createTaskRunner();
+    const taskManager = createTaskManager({
+      getTaskRunner: () => taskRunner,
+      getUpdateManager: () => ({
+        check: jest.fn(async () => ({})),
+      }),
+      getTokenManager: () => ({
+        rotateIfNeeded: jest.fn(() => 'token'),
+      }),
+      getSystemConfig: () => ({
+        updateCheck: {intervalMin: 5},
+        entryPath: {rotateMin: 2, graceMin: 120},
+      }),
     });
 
-    taskManager.run(() => taskPromise, 5_000, {name: 'token-rotation'});
+    await taskManager.start();
 
-    await jest.advanceTimersByTimeAsync(5_000);
-
-    expect(taskManager.getTasksSnapshot()).toEqual([
+    expect(taskManager.getTasksSnapshot()).toEqual(expect.arrayContaining([
       expect.objectContaining({
         name: 'token-rotation',
-        dueAt: null,
-        delayMs: 5_000,
-        running: true,
+        dueAt: '2026-04-02T12:02:00.000Z',
+        delayMs: 120_000,
       }),
-    ]);
-
-    releaseTask();
-    await Promise.resolve();
-
-    expect(taskManager.getTasksSnapshot()).toEqual([
-      expect.objectContaining({
-        name: 'token-rotation',
-        dueAt: '2026-04-02T12:00:10.000Z',
-        delayMs: 5_000,
-        running: false,
-      }),
-    ]);
+    ]));
   });
 });

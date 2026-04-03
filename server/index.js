@@ -10,6 +10,9 @@ import {startCliServer} from './cli/startCliServer.js';
 
 export async function startServer() {
     const services = await createServicesRegistry();
+    const tokenManager = services.getTokenManager();
+
+    tokenManager.createToken();
     
     bootstrapApi(services);
     bootstrapSocket(services);
@@ -20,8 +23,6 @@ export async function startServer() {
         getQrOverlay,
         getSystemConfig,
         getTaskManager,
-        getTokenManager,
-        getUpdateManager,
         getUrls,
         getLogger
     } = services;
@@ -29,18 +30,14 @@ export async function startServer() {
     const config = getConfig();
     const systemConfig = getSystemConfig();
 
-    bootstrapLogger({get: () => config});
+    bootstrapLogger(getConfig);
     
     const log = getLogger('server');
     const httpServer = getServer().server;
     const qrOverlay = getQrOverlay();
     const taskManager = getTaskManager();
-    const tokenManager = getTokenManager();
-    const updateManager = getUpdateManager();
     let cliServer = null;
     let shuttingDown = false;
-    let stopUpdateCheckTask = null;
-    let stopTokenRotationTask = null;
 
     tokenManager.onTokenChanged(() => {
         void qrOverlay.refresh();
@@ -55,9 +52,7 @@ export async function startServer() {
         log.info({signal}, 'Arret du serveur');
 
         try {
-            stopUpdateCheckTask();
-            stopTokenRotationTask();
-            taskManager.stopAll();
+            taskManager.stop();
         } catch (error) {
             log.error({err: error}, 'Erreur a l arret du task manager');
         }
@@ -101,18 +96,7 @@ export async function startServer() {
             await qrOverlay.show();
         }
 
-        await updateManager.check();
-        stopUpdateCheckTask = taskManager.run(
-            () => updateManager.check(),
-            Math.max(60_000, Number(getSystemConfig().updateCheck?.intervalMin || 1) * 60_000),
-            {name: 'update-check'},
-        );
-
-        stopTokenRotationTask = taskManager.run(
-            () => tokenManager.rotateIfNeeded(),
-            () => tokenManager.getNextRotationDelayMs(),
-            {name: 'token-rotation'},
-        );
+        await taskManager.start();
 
         try {
             cliServer = await startCliServer(services);
