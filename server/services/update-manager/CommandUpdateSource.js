@@ -69,8 +69,4 @@ export class CommandUpdateSource {
 
     return normalizeCommandResult(result.stdout, 'Mise a jour detectee (commande)');
   }
-
-  getInstallCommand() {
-    return '';
-  }
 }

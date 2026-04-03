@@ -13,7 +13,7 @@ export function createForceUpdateCheckAction(services) {
     } = services;
     return async function forceUpdateCheck({clientId} = {}) {
         log.info('Début force update check');
-        const result = await getUpdateManager().runNow();
+        const result = await getUpdateManager().check();
 
         if (result && result.checked && result.hasUpdate) {
             log.info('Force update check: mise à jour détectée');

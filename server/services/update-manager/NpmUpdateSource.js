@@ -1,6 +1,5 @@
 import { fetchJson } from '../../utils/http.js';
 import { isVersionGreater } from '../../utils/semver.js';
-import { buildNpmGlobalUpdateCommand } from './buildNpmGlobalUpdateCommand.js';
 
 export class NpmUpdateSource {
   constructor({ packageName, currentVersion }) {
@@ -31,9 +30,5 @@ export class NpmUpdateSource {
       message: `Version ${latest} disponible (actuelle: ${this.currentVersion}).`,
       ttlMs: 8000,
     };
-  }
-
-  getInstallCommand() {
-    return buildNpmGlobalUpdateCommand(this.packageName);
   }
 }

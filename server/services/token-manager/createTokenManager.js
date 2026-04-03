@@ -188,6 +188,5 @@ export function createTokenManager(services) {
         loadTokens,
         getToken: getCurrentToken,
         rotateIfNeeded,
-        publishState,
     };
 }

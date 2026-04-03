@@ -55,7 +55,7 @@ describe('service builders resolve providers only in methods', () => {
     }));
     const getSystemConfig = jest.fn(() => ({
       updateCheck: {
-        checkCommand: '',
+        checkCommand: 'custom-check-command',
         checkTimeoutSec: 20,
         packageName: 'remote-mouse',
         currentVersion: '1.0.0',
@@ -83,12 +83,9 @@ describe('service builders resolve providers only in methods', () => {
     expect(getLogger).not.toHaveBeenCalled();
     expect(getEvents).not.toHaveBeenCalled();
 
-    await updateManager.runNow();
+    await updateManager.check();
     expect(getConfig).toHaveBeenCalled();
     expect(getLogger).not.toHaveBeenCalled();
-
-    updateManager.getInstallCommand();
-    expect(getSystemConfig).toHaveBeenCalled();
   });
 
   it('createPreviewStreamer does not read services during builder creation', () => {
