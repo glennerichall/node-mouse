@@ -15,9 +15,13 @@ export function handleForceUpdateCheckEvent(notifier, event) {
     notify(notifier, NOTIFIER_TARGET_CLIENT, {
         level: event.payload?.hasUpdate ? NOTIFIER_LEVEL_WARNING : NOTIFIER_LEVEL_INFO,
         title: NOTIFICATION_TITLE_UPDATE_CHECK,
+        titleKey: 'notification.updateCheck.title',
         message: event.payload?.hasUpdate
             ? 'Mise a jour detectee.'
             : 'Aucune nouvelle mise a jour detectee.',
+        messageKey: event.payload?.hasUpdate
+            ? 'notification.updateCheck.available'
+            : 'notification.updateCheck.none',
         ttlMs: event.payload?.hasUpdate ? 2500 : 2200,
     }, {clientId: event.payload?.clientId});
 }

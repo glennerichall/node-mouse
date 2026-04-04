@@ -5,9 +5,18 @@ export function showToast(root, payload = {}) {
     return;
   }
   const {t} = getClientI18n();
+  const params = payload.params && typeof payload.params === 'object' ? payload.params : {};
 
-  const title = String(payload.title || t('common.notification'));
-  const message = String(payload.message || '').trim();
+  const title = String(
+    payload.titleKey
+      ? t(payload.titleKey, params)
+      : (payload.title || t('common.notification')),
+  );
+  const message = String(
+    payload.messageKey
+      ? t(payload.messageKey, params)
+      : (payload.message || ''),
+  ).trim();
   if (!message) {
     return;
   }

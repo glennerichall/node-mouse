@@ -34,18 +34,24 @@ export function createNotifierComposite({clientNotifier, serverNotifier, getNoti
         return {
             notify({
                        title = 'Remote Mouse',
+                       titleKey,
                        message,
+                       messageKey,
+                       params,
                        level = NOTIFIER_LEVEL_INFO,
                        ttlMs = getDefaultTtlMs(),
                    } = {}, options = {}) {
-                if (!message) {
+                if (!message && !messageKey) {
                     return;
                 }
 
                 const safeTtlMs = Math.max(500, Math.round(ttlMs));
                 const payload = {
                     title,
+                    titleKey,
                     message,
+                    messageKey,
+                    params,
                     level,
                     ttlMs: safeTtlMs,
                     createdAt: Date.now(),

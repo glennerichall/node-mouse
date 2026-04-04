@@ -19,7 +19,12 @@ export function handleRestartServiceEvent(notifier, event) {
         notify(notifier, NOTIFIER_TARGET_CLIENT, {
             level: NOTIFIER_LEVEL_WARNING,
             title: NOTIFICATION_TITLE_SERVICE_RESTARTING,
+            titleKey: 'notification.serviceRestarting.title',
             message: `Redemarrage de ${event.payload?.serviceName} en cours...`,
+            messageKey: 'notification.serviceRestarting.message',
+            params: {
+                serviceName: event.payload?.serviceName || 'Remote Mouse',
+            },
             ttlMs: 2200,
         }, {clientId: event.payload?.clientId});
     } else if (event.type === PUBSUB_EVENT_ADMIN_RESTART_DETECTED) {
@@ -27,6 +32,8 @@ export function handleRestartServiceEvent(notifier, event) {
             level: NOTIFIER_LEVEL_INFO,
             title: NOTIFICATION_TITLE_SERVICE_RESTARTED,
             message: 'Le service Remote Mouse a redemarre avec succes.',
+            titleKey: 'notification.serviceRestarted.title',
+            messageKey: 'notification.serviceRestarted.message',
             ttlMs: 3000,
         });
     }

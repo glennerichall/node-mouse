@@ -15,6 +15,7 @@ export function handleUpdateManagerEvent(notifier, event) {
     notify(notifier, NOTIFIER_TARGET_ALL, {
         level: NOTIFIER_LEVEL_WARNING,
         title: result.title || NOTIFICATION_TITLE_UPDATE,
+        titleKey: result.title ? undefined : 'notification.update.title',
         message: result.message,
         ttlMs: result.ttlMs || 8000,
     });

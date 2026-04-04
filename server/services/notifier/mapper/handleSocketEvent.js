@@ -21,12 +21,22 @@ export function handleSocketEvent(notifier, event) {
             level: NOTIFIER_LEVEL_INFO,
             title: NOTIFICATION_TITLE_CLIENT_CONNECTED,
             message: `Client ${shortClientId} connecte.`,
+            titleKey: 'notification.clientConnected.title',
+            messageKey: 'notification.clientConnected.message',
+            params: {
+                clientId: shortClientId,
+            },
         }, {clientId});
     } else if (event.type === PUBSUB_EVENT_SOCKET_CLIENT_DISCONNECTED) {
         notify(notifier, NOTIFIER_TARGET_ALL, {
             level: NOTIFIER_LEVEL_INFO,
             title: NOTIFICATION_TITLE_CLIENT_DISCONNECTED,
             message: `Client ${shortClientId} deconnecte.`,
+            titleKey: 'notification.clientDisconnected.title',
+            messageKey: 'notification.clientDisconnected.message',
+            params: {
+                clientId: shortClientId,
+            },
         }, {clientId});
     }
 }

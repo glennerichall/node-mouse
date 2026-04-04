@@ -1,5 +1,5 @@
 export function notify(notifier, target, payload, options = {}) {
-    if (!payload?.message) {
+    if (!payload?.message && !payload?.messageKey) {
         return;
     }
 

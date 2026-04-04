@@ -14,7 +14,9 @@ export function handleToggleQrOverlayEvent(notifier, event) {
     notify(notifier, NOTIFIER_TARGET_CLIENT, {
         level: NOTIFIER_LEVEL_INFO,
         title: NOTIFICATION_TITLE_QR_OVERLAY,
+        titleKey: 'notification.qrOverlay.title',
         message: event.payload?.visible ? 'QR overlay affiche.' : 'QR overlay masque.',
+        messageKey: event.payload?.visible ? 'notification.qrOverlay.shown' : 'notification.qrOverlay.hidden',
         ttlMs: 2200,
     }, {clientId: event.payload?.clientId});
 }
