@@ -15,6 +15,7 @@ const ALLOWED_KEYS = new Set([
     'f11',
 ]);
 const ALLOWED_MODIFIERS = new Set(['control', 'shift', 'alt', 'command']);
+const DEFAULT_KEYBOARD_DELAY_MS = 20;
 
 function isDirectTypeSafe(character) {
     return /^[a-zA-Z0-9 ]$/.test(character);
@@ -40,54 +41,84 @@ export function createKeyboardController(servicesOrRobot) {
     const getRobot = servicesOrRobot?.getRobot
         ? () => servicesOrRobot.getRobot()
         : () => servicesOrRobot;
+    let inputQueue = Promise.resolve();
+    let keyboardConfigured = false;
 
-    function typeText(text) {
-        if (!text || typeof text !== 'string') {
+    function configureKeyboard(robot) {
+        if (keyboardConfigured) {
             return;
         }
 
-        const robot = getRobot();
+        if (typeof robot?.setKeyboardDelay === 'function') {
+            robot.setKeyboardDelay(DEFAULT_KEYBOARD_DELAY_MS);
+        }
+        keyboardConfigured = true;
+    }
 
-        let directBuffer = '';
-        for (const character of Array.from(text)) {
-            if (character === '\n') {
+    function enqueue(task) {
+        inputQueue = inputQueue
+            .catch(() => {
+                // Keep the queue alive after a failed keyboard task.
+            })
+            .then(() => {
+                const robot = getRobot();
+                configureKeyboard(robot);
+                return task(robot);
+            });
+
+        return inputQueue;
+    }
+
+    function typeText(text) {
+        if (!text || typeof text !== 'string') {
+            return Promise.resolve();
+        }
+
+        return enqueue((robot) => {
+            let directBuffer = '';
+            for (const character of Array.from(text)) {
+                if (character === '\n') {
+                    if (directBuffer) {
+                        robot.typeString(directBuffer);
+                        directBuffer = '';
+                    }
+                    robot.keyTap('enter');
+                    continue;
+                }
+
+                if (character === '\t') {
+                    if (directBuffer) {
+                        robot.typeString(directBuffer);
+                        directBuffer = '';
+                    }
+                    robot.keyTap('tab');
+                    continue;
+                }
+
+                if (isDirectTypeSafe(character)) {
+                    directBuffer += character;
+                    continue;
+                }
+
                 if (directBuffer) {
                     robot.typeString(directBuffer);
                     directBuffer = '';
                 }
-                robot.keyTap('enter');
-                continue;
-            }
-
-            if (character === '\t') {
-                if (directBuffer) {
-                    robot.typeString(directBuffer);
-                    directBuffer = '';
-                }
-                robot.keyTap('tab');
-                continue;
-            }
-
-            if (isDirectTypeSafe(character)) {
-                directBuffer += character;
-                continue;
+                typeUnicodeCharacter(robot, character);
             }
 
             if (directBuffer) {
                 robot.typeString(directBuffer);
-                directBuffer = '';
             }
-            typeUnicodeCharacter(robot, character);
-        }
-
-        if (directBuffer) {
-            robot.typeString(directBuffer);
-        }
+        });
     }
 
     function pressSpecialKey(key, modifiers = []) {
-        const robot = getRobot();
-        if (ALLOWED_KEYS.has(key)) {
+        if (!ALLOWED_KEYS.has(key)) {
+            return Promise.resolve();
+        }
+
+        return enqueue((robot) => {
             if (!Array.isArray(modifiers) || modifiers.length === 0) {
                 robot.keyTap(key);
                 return;
@@ -102,7 +133,7 @@ export function createKeyboardController(servicesOrRobot) {
             } else {
                 robot.keyTap(key);
             }
-        }
+        });
     }
 
     return {

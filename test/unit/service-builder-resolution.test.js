@@ -225,6 +225,39 @@ describe('service builders resolve providers only in methods', () => {
     expect(getRobot).toHaveBeenCalled();
   });
 
+  it('keyboard controller serializes text and special key input', async () => {
+    const calls = [];
+    const robot = {
+      setKeyboardDelay: jest.fn((value) => {
+        calls.push(`delay:${value}`);
+      }),
+      typeString: jest.fn((value) => {
+        calls.push(`type:${value}`);
+      }),
+      keyTap: jest.fn((key, modifiers) => {
+        const suffix = Array.isArray(modifiers) && modifiers.length ? `:${modifiers.join('+')}` : '';
+        calls.push(`key:${key}${suffix}`);
+      }),
+    };
+
+    const keyboard = createKeyboardController({
+      getRobot: () => robot,
+    });
+
+    const first = keyboard.typeText('ab\n');
+    const second = keyboard.pressSpecialKey('enter');
+
+    await Promise.all([first, second]);
+
+    expect(robot.setKeyboardDelay).toHaveBeenCalledWith(20);
+    expect(calls).toEqual([
+      'delay:20',
+      'type:ab',
+      'key:enter',
+      'key:enter',
+    ]);
+  });
+
   it('createClientNotifier does not read io or config during builder creation', () => {
     const io = {
       emit: jest.fn(),
