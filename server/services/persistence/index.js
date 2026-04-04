@@ -11,7 +11,7 @@ export function createPersistence(services) {
         getDatabase,
         configDao: createConfigDao({
             getDatabase,
-            getStatePubSub: () => services.getStatePubSub(),
+            getPubSub: () => services.getPubSub(),
         }),
         entryTokenDao: createEntryTokenDao({getDatabase}),
     };

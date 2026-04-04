@@ -4,6 +4,11 @@ import os from 'node:os';
 import path from 'node:path';
 import {createConfigDao} from '../../server/services/persistence/createConfigDao.js';
 import {createDatabaseProvider} from '../../server/services/persistence/createDatabaseProvider.js';
+import {
+  PUBSUB_EVENT_CONFIG_DELETED,
+  PUBSUB_EVENT_CONFIG_UPDATED,
+  PUBSUB_SERVICE_CONFIG,
+} from '../../server/services/pubsub/serviceEventConstants.js';
 
 describe('config dao pubsub', () => {
   let tempDir;
@@ -30,7 +35,7 @@ describe('config dao pubsub', () => {
     const publish = jest.fn();
     const dao = createConfigDao({
       getDatabase,
-      getStatePubSub: () => ({publish}),
+      getPubSub: () => ({publish}),
     });
 
     dao.saveStoredConfig({
@@ -42,7 +47,7 @@ describe('config dao pubsub', () => {
       },
     }, ['logging.level', 'notifications.client']);
 
-    expect(publish).toHaveBeenCalledWith('config', {
+    expect(publish).toHaveBeenCalledWith(PUBSUB_SERVICE_CONFIG, {
       changeType: 'updated',
       changedKeys: ['logging.level', 'notifications.client'],
       storedConfig: {
@@ -54,7 +59,8 @@ describe('config dao pubsub', () => {
         },
       },
     }, {
-      type: 'config.updated',
+      type: PUBSUB_EVENT_CONFIG_UPDATED,
+      snapshot: false,
     });
   });
 
@@ -62,7 +68,7 @@ describe('config dao pubsub', () => {
     const publish = jest.fn();
     const dao = createConfigDao({
       getDatabase,
-      getStatePubSub: () => ({publish}),
+      getPubSub: () => ({publish}),
     });
 
     dao.saveStoredConfig({
@@ -75,12 +81,13 @@ describe('config dao pubsub', () => {
     const changes = dao.deleteStoredConfig(['logging.level'], ['logging.level']);
 
     expect(changes).toBe(1);
-    expect(publish).toHaveBeenCalledWith('config', {
+    expect(publish).toHaveBeenCalledWith(PUBSUB_SERVICE_CONFIG, {
       changeType: 'deleted',
       changedKeys: ['logging.level'],
       storedConfig: {},
     }, {
-      type: 'config.deleted',
+      type: PUBSUB_EVENT_CONFIG_DELETED,
+      snapshot: false,
     });
   });
 });

@@ -3,25 +3,9 @@ import {bootstrapApi} from './init/bootstrapApi.js';
 import {logStartupConfig} from './services/config/logConfig.js';
 import {bootstrapSocket} from "./init/bootstrapSocket.js";
 import {startCliServer} from './cli/startCliServer.js';
-import {startNotificationObserver} from './services/notifier/startNotificationObserver.js';
-import {
-    PUBSUB_EVENT_TOKEN_CHANGED,
-    PUBSUB_SERVICE_TOKEN_MANAGER
-} from './services/pubsub/serviceEventConstants.js';
-
-function startQrOverlayRefreshObserver(services) {
-    if (typeof services.getPubSub !== 'function') {
-        return () => {};
-    }
-
-    const bus = services.getPubSub();
-    const qrOverlay = services.getQrOverlay();
-
-    return bus.subscribe(() => void qrOverlay.refresh(), {
-        service: PUBSUB_SERVICE_TOKEN_MANAGER,
-        type: PUBSUB_EVENT_TOKEN_CHANGED,
-    });
-}
+import {startConfigObserver} from './init/observers/startConfigObserver.js';
+import {startNotificationObserver} from './init/observers/startNotificationObserver.js';
+import {startQrOverlayRefreshObserver} from "./init/observers/startQrOverlayRefreshObserver.js";
 
 export function createApplicationLifecycle(services) {
     const {
@@ -45,6 +29,7 @@ export function createApplicationLifecycle(services) {
 
     let cliServer = null;
     let shuttingDown = false;
+    let stopConfigObserver = () => {};
     let stopNotificationObserver = () => {};
     let stopQrOverlayRefreshObserver = () => {};
 
@@ -60,6 +45,12 @@ export function createApplicationLifecycle(services) {
             taskManager.stop();
         } catch (error) {
             log.error({err: error}, 'Erreur a l arret du task manager');
+        }
+
+        try {
+            stopConfigObserver();
+        } catch (error) {
+            log.error({err: error}, 'Erreur a l arret de l observateur de configuration');
         }
 
         try {
@@ -94,6 +85,7 @@ export function createApplicationLifecycle(services) {
     }
 
     async function start() {
+        stopConfigObserver = startConfigObserver(services);
         stopNotificationObserver = startNotificationObserver(services);
         stopQrOverlayRefreshObserver = startQrOverlayRefreshObserver(services);
 

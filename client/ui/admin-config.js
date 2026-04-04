@@ -9,6 +9,11 @@ let currentSchema = {};
 let currentDefaults = {};
 let currentConfig = {};
 const syncTimers = new Map();
+let configStream = null;
+let configSubscriptionId = '';
+let configReloadInFlight = false;
+let configReloadPending = false;
+let configMutationDepth = 0;
 
 function getValueAtPath(source, dottedPath) {
   return String(dottedPath || '')
@@ -90,6 +95,19 @@ function setActionsDisabled(disabled) {
   restartButton.disabled = disabled;
 }
 
+function beginConfigMutation() {
+  configMutationDepth += 1;
+}
+
+function endConfigMutation() {
+  configMutationDepth = Math.max(0, configMutationDepth - 1);
+  if (configMutationDepth === 0 && configReloadPending) {
+    queueMicrotask(() => {
+      refreshConfigFromServer({silent: true});
+    });
+  }
+}
+
 function setConfigValue(pathKey, value) {
   const segments = String(pathKey || '').split('.').filter(Boolean);
   if (!segments.length) {
@@ -134,6 +152,7 @@ async function syncField({pathKey, field, input, defaultValue, resetButton}) {
     return;
   }
 
+  beginConfigMutation();
   setActionsDisabled(true);
   setStatus(`Synchronisation de ${pathKey}...`, 'pending');
 
@@ -145,6 +164,7 @@ async function syncField({pathKey, field, input, defaultValue, resetButton}) {
     setStatus(error.message || 'Erreur de synchronisation.', 'error');
   } finally {
     setActionsDisabled(false);
+    endConfigMutation();
   }
 }
 
@@ -335,8 +355,10 @@ function getConfigObjectFromEntries(entries) {
   return config;
 }
 
-async function loadConfig() {
-  setStatus('Chargement de la configuration...', 'pending');
+async function loadConfig({silent = false} = {}) {
+  if (!silent) {
+    setStatus('Chargement de la configuration...', 'pending');
+  }
 
   const response = await fetch('/api/admin/configs', {cache: 'no-store'});
   if (!response.ok) {
@@ -347,7 +369,73 @@ async function loadConfig() {
   currentSchema = payload.schema || {};
   currentDefaults = payload.defaults || {};
   renderConfigForm(getConfigObjectFromEntries(payload.configs || []), currentSchema);
-  setStatus('Configuration chargee.');
+  if (!silent) {
+    setStatus('Configuration chargee.');
+  }
+}
+
+async function refreshConfigFromServer({silent = false} = {}) {
+  if (configReloadInFlight || configMutationDepth > 0) {
+    configReloadPending = true;
+    return;
+  }
+
+  configReloadInFlight = true;
+  configReloadPending = false;
+
+  try {
+    await loadConfig({silent});
+  } catch (error) {
+    setStatus(error.message || 'Erreur de chargement.', 'error');
+  } finally {
+    configReloadInFlight = false;
+    if (configReloadPending && configMutationDepth === 0) {
+      queueMicrotask(() => {
+        refreshConfigFromServer({silent: true});
+      });
+    }
+  }
+}
+
+async function subscribeToConfigEvents() {
+  if (typeof window.EventSource !== 'function') {
+    return;
+  }
+
+  const response = await fetch('/api/admin/subs/configs', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({scope: 'config'}),
+  });
+  if (!response.ok) {
+    throw new Error('Impossible de creer la souscription config.');
+  }
+
+  const payload = await response.json();
+  configSubscriptionId = String(payload.id || '');
+  if (!configSubscriptionId || !payload.eventsUrl) {
+    throw new Error('Souscription SSE invalide.');
+  }
+
+  configStream?.close();
+  configStream = new EventSource(payload.eventsUrl);
+  configStream.addEventListener('config.changed', () => {
+    refreshConfigFromServer({silent: true});
+  });
+}
+
+function unsubscribeFromConfigEvents() {
+  if (!configSubscriptionId) {
+    return;
+  }
+
+  fetch(`/api/admin/subs/${encodeURIComponent(configSubscriptionId)}`, {
+    method: 'DELETE',
+    keepalive: true,
+  }).catch(() => {});
+  configSubscriptionId = '';
 }
 
 async function resetField({pathKey, field, input, defaultValue, resetButton}) {
@@ -357,6 +445,7 @@ async function resetField({pathKey, field, input, defaultValue, resetButton}) {
     syncTimers.delete(pathKey);
   }
 
+  beginConfigMutation();
   setActionsDisabled(true);
   setStatus(`Reset de ${pathKey} en cours...`, 'pending');
 
@@ -377,6 +466,7 @@ async function resetField({pathKey, field, input, defaultValue, resetButton}) {
     setStatus(error.message || 'Reset failed.', 'error');
   } finally {
     setActionsDisabled(false);
+    endConfigMutation();
   }
 }
 
@@ -402,7 +492,7 @@ async function restartService() {
 }
 
 reloadButton.addEventListener('click', () => {
-  loadConfig().catch((error) => {
+  refreshConfigFromServer().catch((error) => {
     setStatus(error.message || 'Erreur de chargement.', 'error');
   });
 });
@@ -411,6 +501,11 @@ restartButton.addEventListener('click', () => {
   restartService();
 });
 
-loadConfig().catch((error) => {
+refreshConfigFromServer().catch((error) => {
   setStatus(error.message || 'Erreur de chargement.', 'error');
+});
+subscribeToConfigEvents().catch(() => {});
+window.addEventListener('beforeunload', () => {
+  configStream?.close();
+  unsubscribeFromConfigEvents();
 });

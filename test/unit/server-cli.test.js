@@ -66,6 +66,67 @@ describe('server cli', () => {
     });
   });
 
+  it('returns one persisted config value for config get', async () => {
+    const result = await executeCliCommand({
+      getConfig: () => ({
+        logging: {
+          level: 'debug',
+        },
+      }),
+      getRemotes: () => ({
+        adminActions: {},
+      }),
+    }, 'config get logging.level');
+
+    expect(result).toEqual({
+      ok: true,
+      message: 'Configuration logging.level.',
+      data: {
+        path: 'logging.level',
+        value: 'debug',
+      },
+    });
+  });
+
+  it('updates one persisted config value for config set through configDao', async () => {
+    const saveStoredConfig = jest.fn();
+    let currentConfig = {
+      logging: {
+        level: 'info',
+      },
+    };
+
+    saveStoredConfig.mockImplementation((nextConfig) => {
+      currentConfig = nextConfig;
+    });
+
+    const result = await executeCliCommand({
+      getConfig: () => currentConfig,
+      getPersistence: () => ({
+        configDao: {
+          saveStoredConfig,
+        },
+      }),
+      getRemotes: () => ({
+        adminActions: {},
+      }),
+    }, 'config set logging.level debug');
+
+    expect(saveStoredConfig).toHaveBeenCalledWith({
+      logging: {
+        level: 'debug',
+      },
+    }, expect.arrayContaining(['logging.level']));
+    expect(result).toEqual({
+      ok: true,
+      message: 'Configuration logging.level mise a jour.',
+      data: {
+        path: 'logging.level',
+        value: 'debug',
+      },
+    });
+  });
+
   it('returns the system config for sys-config command', async () => {
     const systemConfig = {
       port: 3000,

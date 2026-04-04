@@ -2,7 +2,7 @@ import {jest} from '@jest/globals';
 import {createPubSub} from '../../server/services/pubsub/createPubSub.js';
 import {createEventStore} from '../../server/services/pubsub/createEventStore.js';
 import {createServiceEvents} from '../../server/services/pubsub/createServiceEvents.js';
-import {startNotificationObserver} from '../../server/services/notifier/startNotificationObserver.js';
+import {startNotificationObserver} from '../../server/init/observers/startNotificationObserver.js';
 import {createTaskManager} from '../../server/services/task-manager/createTaskManager.js';
 import {createTaskRunner} from '../../server/services/task-runner/createTaskRunner.js';
 import {createTokenManager} from '../../server/services/token-manager/createTokenManager.js';

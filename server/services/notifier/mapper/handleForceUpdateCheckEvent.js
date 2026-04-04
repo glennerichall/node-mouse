@@ -5,6 +5,7 @@ import {
     NOTIFIER_TARGET_CLIENT
 } from "../createNotifierComposite.js";
 import {PUBSUB_EVENT_ADMIN_COMPLETED} from "../../pubsub/serviceEventConstants.js";
+import {NOTIFICATION_TITLE_UPDATE_CHECK} from "../notificationTitles.js";
 
 export function handleForceUpdateCheckEvent(notifier, event) {
     if (event.type !== PUBSUB_EVENT_ADMIN_COMPLETED) {
@@ -13,7 +14,7 @@ export function handleForceUpdateCheckEvent(notifier, event) {
 
     notify(notifier, NOTIFIER_TARGET_CLIENT, {
         level: event.payload?.hasUpdate ? NOTIFIER_LEVEL_WARNING : NOTIFIER_LEVEL_INFO,
-        title: 'Check update',
+        title: NOTIFICATION_TITLE_UPDATE_CHECK,
         message: event.payload?.hasUpdate
             ? 'Mise a jour detectee.'
             : 'Aucune nouvelle mise a jour detectee.',

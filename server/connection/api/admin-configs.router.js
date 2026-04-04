@@ -11,11 +11,12 @@ import {
   getManagedConfigSnapshot,
 } from './admin-config.shared.js';
 
-export function createAdminConfigsRouter({configDao, getConfigSnapshot} = {}) {
+export function createAdminConfigsRouter(services) {
+  const getConfig = services.getConfig;
   const router = express.Router();
 
   router.get('/', (_req, res) => {
-    const config = getManagedConfigSnapshot(getConfigSnapshot(), CONFIG_PATHS);
+    const config = getManagedConfigSnapshot(getConfig(), CONFIG_PATHS);
     res.json({
       configs: CONFIG_PATHS.map((pathKey) => buildConfigEntry(pathKey, adminConfigSchema, config, adminConfigDefaults)),
       defaults: adminConfigDefaults,
@@ -34,7 +35,7 @@ export function createAdminConfigsRouter({configDao, getConfigSnapshot} = {}) {
       return;
     }
 
-    const config = getManagedConfigSnapshot(getConfigSnapshot(), CONFIG_PATHS);
+    const config = getManagedConfigSnapshot(getConfig(), CONFIG_PATHS);
     res.json({
       config: buildConfigEntry(pathKey, adminConfigSchema, config, adminConfigDefaults),
     });
@@ -69,15 +70,15 @@ export function createAdminConfigsRouter({configDao, getConfigSnapshot} = {}) {
 
     try {
       if (req.body.value === null) {
-        configDao.deleteStoredConfig([pathKey], CONFIG_PATHS);
+        services.getPersistence().configDao.deleteStoredConfig([pathKey], CONFIG_PATHS);
       } else {
         const nextValue = coerceConfigValue(req.body.value, field);
         const nextConfig = {};
         setNestedValue(nextConfig, pathKey, nextValue);
-        configDao.saveStoredConfig(nextConfig, CONFIG_PATHS);
+        services.getPersistence().configDao.saveStoredConfig(nextConfig, CONFIG_PATHS);
       }
 
-      const config = getManagedConfigSnapshot(getConfigSnapshot(), CONFIG_PATHS);
+      const config = getManagedConfigSnapshot(getConfig(), CONFIG_PATHS);
       res.json({
         ok: true,
         message: 'Configuration updated.',
@@ -101,8 +102,8 @@ export function createAdminConfigsRouter({configDao, getConfigSnapshot} = {}) {
       return;
     }
 
-    configDao.deleteStoredConfig([pathKey], CONFIG_PATHS);
-    const config = getManagedConfigSnapshot(getConfigSnapshot(), CONFIG_PATHS);
+    services.getPersistence().configDao.deleteStoredConfig([pathKey], CONFIG_PATHS);
+    const config = getManagedConfigSnapshot(getConfig(), CONFIG_PATHS);
     res.json({
       ok: true,
       message: `${pathKey} reset to default.`,

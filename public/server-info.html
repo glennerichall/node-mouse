@@ -149,6 +149,10 @@
       timeStyle: 'medium',
     });
     let logsAutoScroll = true;
+    let configStream = null;
+    let configSubscriptionId = '';
+    let pendingConfigPayload = null;
+    let applyingConfigPayload = false;
 
     function isLogScrollAtBottom() {
       return logsEl.scrollTop + logsEl.clientHeight >= logsEl.scrollHeight - LOG_BOTTOM_THRESHOLD_PX;
@@ -281,6 +285,41 @@
       }
     }
 
+    function renderConfigSnapshot(snapshot) {
+      configEl.textContent = JSON.stringify(snapshot || {}, null, 2);
+    }
+
+    function renderSystemConfigSnapshot(snapshot) {
+      sysConfigEl.textContent = JSON.stringify(snapshot || {}, null, 2);
+    }
+
+    function flushPendingConfigPayload() {
+      if (applyingConfigPayload || !pendingConfigPayload) {
+        return;
+      }
+
+      applyingConfigPayload = true;
+      const payload = pendingConfigPayload;
+      pendingConfigPayload = null;
+
+      try {
+        renderConfigSnapshot(payload.config);
+        renderSystemConfigSnapshot(payload.sysConfig);
+      } finally {
+        applyingConfigPayload = false;
+        if (pendingConfigPayload) {
+          flushPendingConfigPayload();
+        }
+      }
+    }
+
+    function scheduleConfigPayload(payload) {
+      pendingConfigPayload = payload;
+      queueMicrotask(() => {
+        flushPendingConfigPayload();
+      });
+    }
+
     async function refresh() {
       try {
         const response = await fetch('/api/admin/server-info/data', { cache: 'no-store' });
@@ -296,12 +335,59 @@
         renderClients(data.clients || []);
         renderTasks(data.tasks || []);
         renderTokens(data.tokens || []);
-        configEl.textContent = JSON.stringify(data.config || {}, null, 2);
-        sysConfigEl.textContent = JSON.stringify(data.sysConfig || {}, null, 2);
+        scheduleConfigPayload({
+          config: data.config,
+          sysConfig: data.sysConfig,
+        });
         renderLogs(data.logs || []);
       } catch (error) {
         logsEl.textContent = `Erreur de chargement: ${error?.message || error}`;
       }
+    }
+
+    async function subscribeToConfigEvents() {
+      if (typeof window.EventSource !== 'function') {
+        return;
+      }
+
+      const response = await fetch('/api/admin/subs/configs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({scope: 'config'}),
+      });
+      if (!response.ok) {
+        throw new Error('Impossible de creer la souscription config.');
+      }
+
+      const payload = await response.json();
+      configSubscriptionId = String(payload.id || '');
+      if (!configSubscriptionId || !payload.eventsUrl) {
+        throw new Error('Souscription SSE invalide.');
+      }
+
+      configStream?.close();
+      configStream = new EventSource(payload.eventsUrl);
+      configStream.addEventListener('config.changed', (event) => {
+        try {
+          scheduleConfigPayload(JSON.parse(event.data || '{}'));
+        } catch (_error) {
+          // Best effort.
+        }
+      });
+    }
+
+    function unsubscribeFromConfigEvents() {
+      if (!configSubscriptionId) {
+        return;
+      }
+
+      fetch(`/api/admin/subs/${encodeURIComponent(configSubscriptionId)}`, {
+        method: 'DELETE',
+        keepalive: true,
+      }).catch(() => {});
+      configSubscriptionId = '';
     }
 
     logsEl.addEventListener('scroll', () => {
@@ -310,6 +396,11 @@
 
     refresh();
     setInterval(refresh, 2000);
+    subscribeToConfigEvents().catch(() => {});
+    window.addEventListener('beforeunload', () => {
+      configStream?.close();
+      unsubscribeFromConfigEvents();
+    });
   </script>
 </body>
 </html>

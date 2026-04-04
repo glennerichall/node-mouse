@@ -22,11 +22,11 @@ export function createAdminConfigRouter({publicDir} = {}) {
     return router;
 }
 
-export function createAdminConfigActionsRouter({getConfigSnapshot} = {}) {
+export function createAdminConfigActionsRouter(services) {
     const router = express.Router();
 
     router.post('/restart-service', async (_req, res) => {
-        const config = getConfigSnapshot();
+        const config = services.getConfig();
 
         if (!(await commandExists('systemctl'))) {
             res.status(400).json({

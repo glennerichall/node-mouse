@@ -2,10 +2,15 @@ import {
     setNestedValue,
     toFlatMap
 } from "../../../utils/shared/objet.utils.js";
+import {
+    PUBSUB_EVENT_CONFIG_DELETED,
+    PUBSUB_EVENT_CONFIG_UPDATED,
+    PUBSUB_SERVICE_CONFIG
+} from "../pubsub/serviceEventConstants.js";
 
 const CONFIG_TABLE = 'config_entries';
 
-export function createConfigDao({getDatabase, getStatePubSub} = {}) {
+export function createConfigDao({getDatabase, getPubSub} = {}) {
     let bootstrapped = false;
 
     function bootstrapConfigDatabase() {
@@ -20,16 +25,17 @@ export function createConfigDao({getDatabase, getStatePubSub} = {}) {
     }
 
     function emitStateChange(changeType, changedKeys = []) {
-        if (typeof getStatePubSub !== 'function') {
+        if (typeof getPubSub !== 'function') {
             return;
         }
 
-        getStatePubSub().publish('config', {
+        getPubSub().publish(PUBSUB_SERVICE_CONFIG, {
             changeType,
             changedKeys: Array.from(new Set(changedKeys)),
             storedConfig: getStoredConfig(),
         }, {
-            type: `config.${changeType}`,
+            type: changeType === 'deleted' ? PUBSUB_EVENT_CONFIG_DELETED : PUBSUB_EVENT_CONFIG_UPDATED,
+            snapshot: false,
         });
     }
 

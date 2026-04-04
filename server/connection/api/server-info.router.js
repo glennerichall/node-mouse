@@ -2,6 +2,11 @@ import express from 'express';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {computeTokenTtlMs} from '../../services/token-manager/token-store-utils.js';
+import {publicDir, projectRoot} from '../../utils/paths.js';
+import {getRecentLogs} from '../../services/log/logger.js';
+import {readPackageVersion} from '../../utils/env.js';
+
+const packageJsonPath = path.join(projectRoot, 'package.json');
 
 function redactSecrets(value, key = '') {
   const keyLower = String(key || '').toLowerCase();
@@ -90,19 +95,7 @@ function buildTokenEntries({entries, currentToken, entryPathConfig}) {
   return tokenEntries;
 }
 
-export function createServerInfoRouter({
-  publicDir,
-  io,
-  serverStartedAt,
-  getConfigSnapshot,
-  getSystemConfigSnapshot,
-  getEntryPathConfig,
-  getRecentLogs,
-  getVersion,
-  getTasksSnapshot,
-  getTokenEntriesSnapshot,
-  getCurrentToken,
-}) {
+export function createServerInfoRouter(services) {
   const router = express.Router();
 
   router.get('/', (_req, res) => {
@@ -110,17 +103,17 @@ export function createServerInfoRouter({
   });
 
   router.get('/data', (_req, res) => {
-    const clients = getConnectedClients(io);
-    const rawConfig = getConfigSnapshot();
-    const rawSystemConfig = getSystemConfigSnapshot ? getSystemConfigSnapshot() : {};
+    const clients = getConnectedClients(services.getServer().io);
+    const rawConfig = services.getConfig();
+    const rawSystemConfig = services.getSystemConfig?.() || {};
     const config = redactSecrets(rawConfig);
     const sysConfig = redactSecrets(rawSystemConfig);
     const logs = getRecentLogs(250);
-    const version = getVersion();
-    const tasks = getTasksSnapshot();
-    const tokenEntries = getTokenEntriesSnapshot();
-    const currentToken = getCurrentToken();
-    const entryPathConfig = getEntryPathConfig();
+    const version = readPackageVersion(packageJsonPath);
+    const tasks = services.getTaskManager().getTasksSnapshot();
+    const tokenEntries = services.getPersistence().entryTokenDao.loadEntryTokens();
+    const currentToken = services.getTokenManager().getToken();
+    const entryPathConfig = services.getSystemConfig().entryPath;
     const tokens = buildTokenEntries({
       entries: tokenEntries,
       currentToken,
@@ -130,7 +123,7 @@ export function createServerInfoRouter({
     res.json({
       version,
       now: new Date().toISOString(),
-      onlineSince: new Date(serverStartedAt).toISOString(),
+      onlineSince: new Date(services.getServer().serverStartedAt).toISOString(),
       uptimeSec: Math.floor(process.uptime()),
       clientsConnected: clients.length,
       clients,
@@ -141,7 +134,6 @@ export function createServerInfoRouter({
       logs,
     });
   });
-
   return router;
 }
 

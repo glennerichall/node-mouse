@@ -75,6 +75,62 @@ Useful server pages:
 - `/ui/admin/server-info` shows server state, effective configuration, and recent logs
 - `/ui/admin/config` lets you edit persisted settings grouped to match the configuration object structure
 
+Useful CLI commands:
+
+- `help` displays the available CLI commands
+- `config` prints the effective persisted configuration
+- `config get <path>` prints one persisted configuration value
+- `config set <path> <value>` updates one persisted configuration value
+- `sys-config` prints the system configuration
+- `tasks` prints the task manager snapshot
+- `task-manager` is an alias of `tasks`
+- `tokens` lists persisted entry tokens
+- `open-qr` opens the QR page on the server
+- `qr` is an alias of `open-qr`
+
+## Routes
+
+The server exposes two main HTTP surfaces:
+
+- UI routes for HTML pages
+- API routes for JSON and SSE
+
+### UI Routes
+
+- `GET /` serves the client application
+- `GET /qr` displays the entry QR code page
+- `GET /ui/admin/server-info` serves the server info page
+- `GET /ui/admin/config` serves the admin configuration page
+
+### Session Route
+
+- `GET /api/sessions/:token` validates an entry token, creates the signed session cookie, and redirects to `/`
+
+### Admin API Routes
+
+- `GET /api/admin/server-info/data` returns the current server snapshot:
+  version, uptime, connected clients, tasks, tokens, effective config, system config, and recent logs
+- `GET /api/admin/configs` returns the managed configuration entries, schema, defaults, and managed paths
+- `GET /api/admin/configs/:configId` returns one managed configuration entry
+- `PATCH /api/admin/configs/:configId` updates one managed configuration entry
+- `DELETE /api/admin/configs/:configId` resets one managed configuration entry to its default value
+- `POST /api/admin/subs/configs` creates a config SSE subscription and returns its id plus the stream URL
+- `GET /api/admin/subs/:id` opens the SSE stream for a previously created subscription
+- `DELETE /api/admin/subs/:id` deletes a previously created subscription
+- `POST /api/admin/restart-service` requests a local service restart through `systemctl --user`
+
+### Health Route
+
+- `GET /health` returns a simple health payload with the current application version
+
+### Static Assets
+
+After session validation, static assets are also available through:
+
+- `/client/*`
+- `/utils/shared/*`
+- files served from `public/`
+
 ## Linux Deployment
 
 The server can be run as a `systemd --user` service. Minimal example:

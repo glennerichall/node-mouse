@@ -15,6 +15,7 @@ import {createRemotes} from "./remotes/createRemotes.js";
 import {createPubSub} from './pubsub/createPubSub.js';
 import {createEventStore} from './pubsub/createEventStore.js';
 import {createServiceEvents} from './pubsub/createServiceEvents.js';
+import {createSseService} from './sse/createSseService.js';
 
 export function qrOverlayFactory(services) {
     return startQrOverlay({
@@ -31,6 +32,7 @@ export function createServicesRegistry() {
         createSystemConfig: getSystemConfig,
         createPersistence,
         createConfig,
+        createSseService,
         createEventStore,
         createServiceEvents,
         createTokenManager,
