@@ -1,4 +1,5 @@
 import {createStaticShareRouter} from '../connection/api/client.router.js';
+import express from 'express';
 import path from 'node:path';
 import {
     clientDir,
@@ -17,6 +18,14 @@ import {createAdminApiRouter} from "./createAdminApiRouter.js";
 import {readPackageVersion} from '../utils/env.js';
 
 const packageJsonPath = path.join(projectRoot, 'package.json');
+const publicPwaAssets = [
+    '/manifest.webmanifest',
+    '/sw.js',
+    '/favicon.svg',
+    '/icon-192.png',
+    '/icon-512.png',
+    '/apple-touch-icon.png',
+];
 
 export function bootstrapApi(services) {
     const {
@@ -46,6 +55,8 @@ export function bootstrapApi(services) {
         cookieMaxAgeMs: Math.max(1, systemConfig.session.cookieMaxAgeDays) * 24 * 60 * 60 * 1000,
         secureCookies: systemConfig.https.enabled,
     }));
+
+    app.use(publicPwaAssets, express.static(publicDir, {index: false}));
 
     app.use('/api/sessions', createSessionRouter(services));
 
