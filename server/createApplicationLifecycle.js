@@ -33,6 +33,26 @@ export function createApplicationLifecycle(services) {
     let stopNotificationObserver = () => {};
     let stopQrOverlayRefreshObserver = () => {};
 
+    function logStartupUrls(urls) {
+        const entries = [
+            ['Entree mobile', urls.entryUrl],
+            ['QR', urls.qrUrl],
+            ['Admin config', urls.adminConfigUrl],
+            ['Server info', urls.serverInfoUrl],
+            ['Health', urls.healthUrl],
+            ['Entree locale', urls.localEntryUrl],
+            ['QR local', urls.localQrUrl],
+            ['Admin config local', urls.localAdminConfigUrl],
+            ['Server info local', urls.localServerInfoUrl],
+            ['Health local', urls.localHealthUrl],
+        ].filter(([, value]) => Boolean(value));
+
+        console.log('URLs disponibles au demarrage:');
+        for (const [label, value] of entries) {
+            console.log(`  ${label}: ${value}`);
+        }
+    }
+
     async function shutdown(signal) {
         if (shuttingDown) {
             return;
@@ -103,12 +123,15 @@ export function createApplicationLifecycle(services) {
 
         await new Promise((resolve) => {
             httpServer.listen(systemConfig.port, async () => {
+                const urls = getUrls();
+
                 logStartupConfig(log, {
                     systemConfig,
                     config,
                 });
 
-                log.info({url: getUrls().entryUrl, qrUrl: '/qr'}, 'Remote Mouse server démarré');
+                log.info({url: urls.entryUrl, qrUrl: urls.qrUrl}, 'Remote Mouse server démarré');
+                logStartupUrls(urls);
                 log.info('Scanner ce QR avec le mobile');
 
                 if (getConfig().qrOverlay?.enabled) {
@@ -123,7 +146,7 @@ export function createApplicationLifecycle(services) {
                     log.error({err: error}, 'Erreur au démarrage de l interface CLI locale');
                 }
 
-                qrcodeTerminal.generate(getUrls().entryUrl, {small: true});
+                qrcodeTerminal.generate(urls.entryUrl, {small: true});
                 resolve();
             });
         });

@@ -1,6 +1,8 @@
 import {jest} from '@jest/globals';
 import {
+  PUBSUB_EVENT_CONFIG_UPDATED,
   PUBSUB_EVENT_TOKEN_CHANGED,
+  PUBSUB_SERVICE_CONFIG,
   PUBSUB_SERVICE_TOKEN_MANAGER,
 } from '../../server/services/pubsub/serviceEventConstants.js';
 
@@ -57,16 +59,23 @@ describe('startServer', () => {
   it('rotates the entry token during startup', async () => {
     const createToken = jest.fn(() => 'startup-token');
     const show = jest.fn(async () => {});
-    const refresh = jest.fn(async () => {});
+    const hide = jest.fn(() => false);
+    const update = jest.fn(async () => {});
     const taskStart = jest.fn(async () => {});
     const info = jest.fn();
     const error = jest.fn();
     const subscribers = new Set();
+    const configState = {
+      qrOverlay: {
+        enabled: true,
+      },
+    };
     const pubsub = {
-      subscribe: jest.fn((listener) => {
-        subscribers.add(listener);
+      subscribe: jest.fn((listener, filter) => {
+        const entry = {listener, filter};
+        subscribers.add(entry);
         return () => {
-          subscribers.delete(listener);
+          subscribers.delete(entry);
         };
       }),
     };
@@ -76,11 +85,7 @@ describe('startServer', () => {
         createToken,
       }),
       getPubSub: () => pubsub,
-      getConfig: () => ({
-        qrOverlay: {
-          enabled: true,
-        },
-      }),
+      getConfig: () => configState,
       getServer: () => ({
         server: {
           listen: (_port, callback) => callback(),
@@ -89,8 +94,9 @@ describe('startServer', () => {
       }),
       getQrOverlay: () => ({
         show,
+        hide,
         close: jest.fn(),
-        refresh,
+        update,
       }),
       getSystemConfig: () => ({
         port: 3000,
@@ -112,10 +118,45 @@ describe('startServer', () => {
     await startServer();
     await new Promise((resolve) => setImmediate(resolve));
 
-    for (const listener of subscribers) {
-      listener({
+    for (const subscriber of subscribers) {
+      const notify = (event) => {
+        if (!subscriber.filter) {
+          subscriber.listener(event);
+          return;
+        }
+
+        if (typeof subscriber.filter === 'function') {
+          if (subscriber.filter(event)) {
+            subscriber.listener(event);
+          }
+          return;
+        }
+
+        const matches = Object.entries(subscriber.filter)
+          .every(([key, value]) => event?.[key] === value);
+        if (matches) {
+          subscriber.listener(event);
+        }
+      };
+
+      notify({
         service: PUBSUB_SERVICE_TOKEN_MANAGER,
         type: PUBSUB_EVENT_TOKEN_CHANGED,
+      });
+      notify({
+        service: PUBSUB_SERVICE_CONFIG,
+        type: PUBSUB_EVENT_CONFIG_UPDATED,
+        payload: {
+          changedKeys: ['qrOverlay.size'],
+        },
+      });
+      configState.qrOverlay.enabled = false;
+      notify({
+        service: PUBSUB_SERVICE_CONFIG,
+        type: PUBSUB_EVENT_CONFIG_UPDATED,
+        payload: {
+          changedKeys: ['qrOverlay.enabled'],
+        },
       });
     }
     await new Promise((resolve) => setImmediate(resolve));
@@ -127,7 +168,8 @@ describe('startServer', () => {
     expect(taskStart).toHaveBeenCalledTimes(1);
     expect(show).toHaveBeenCalledTimes(1);
     expect(pubsub.subscribe).toHaveBeenCalled();
-    expect(refresh).toHaveBeenCalledTimes(1);
+    expect(update).toHaveBeenCalledTimes(2);
+    expect(hide).toHaveBeenCalledTimes(1);
     expect(startCliServer).toHaveBeenCalledTimes(1);
     expect(qrcodeGenerate).toHaveBeenCalledWith(
       'http://127.0.0.1:3000/api/sessions/startup-token',

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html data-i18n-page-title="serverInfo.pageTitle">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -55,7 +55,7 @@
 </head>
 <body>
   <main>
-    <h1>Remote Mouse - Server Info</h1>
+    <h1 data-i18n="serverInfo.heading">Remote Mouse - Server Info</h1>
     <div class="meta">
       <span id="version">Version: -</span>
       <span id="now">Now: -</span>
@@ -65,15 +65,15 @@
     </div>
 
     <section>
-      <h2>Clients connectes</h2>
+      <h2 data-i18n="serverInfo.section.clients">Clients connectes</h2>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Connecte depuis</th>
-              <th>Adresse</th>
-              <th>Transport</th>
+              <th data-i18n="serverInfo.table.client.id">ID</th>
+              <th data-i18n="serverInfo.table.client.connectedAt">Connecte depuis</th>
+              <th data-i18n="serverInfo.table.client.address">Adresse</th>
+              <th data-i18n="serverInfo.table.client.transport">Transport</th>
             </tr>
           </thead>
           <tbody id="clients-table"></tbody>
@@ -82,15 +82,15 @@
     </section>
 
     <section>
-      <h2>Taches planifiees</h2>
+      <h2 data-i18n="serverInfo.section.tasks">Taches planifiees</h2>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Nom</th>
-              <th>Etat</th>
-              <th>Echeance</th>
-              <th>Dans</th>
+              <th data-i18n="serverInfo.table.task.name">Nom</th>
+              <th data-i18n="serverInfo.table.task.state">Etat</th>
+              <th data-i18n="serverInfo.table.task.dueAt">Echeance</th>
+              <th data-i18n="serverInfo.table.task.remaining">Dans</th>
             </tr>
           </thead>
           <tbody id="tasks-table"></tbody>
@@ -99,15 +99,15 @@
     </section>
 
     <section>
-      <h2>Tokens</h2>
+      <h2 data-i18n="serverInfo.section.tokens">Tokens</h2>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Etat</th>
-              <th>Token</th>
-              <th>Cree le</th>
-              <th>Expire le</th>
+              <th data-i18n="serverInfo.table.token.state">Etat</th>
+              <th data-i18n="serverInfo.table.token.token">Token</th>
+              <th data-i18n="serverInfo.table.token.createdAt">Cree le</th>
+              <th data-i18n="serverInfo.table.token.expiresAt">Expire le</th>
             </tr>
           </thead>
           <tbody id="tokens-table"></tbody>
@@ -116,22 +116,27 @@
     </section>
 
     <section>
-      <h2>Configuration</h2>
+      <h2 data-i18n="serverInfo.section.config">Configuration</h2>
       <pre id="config"></pre>
     </section>
 
     <section>
-      <h2>Configuration systeme</h2>
+      <h2 data-i18n="serverInfo.section.sysConfig">Configuration systeme</h2>
       <pre id="sys-config"></pre>
     </section>
 
     <section>
-      <h2>Logs recents</h2>
+      <h2 data-i18n="serverInfo.section.logs">Logs recents</h2>
       <pre id="logs"></pre>
     </section>
   </main>
 
-  <script>
+  <script type="module">
+    import {applyPageTranslations, getClientI18n, initClientI18n, mountLanguageSwitcher, onClientI18nChange} from '/client/i18n/index.js';
+    await initClientI18n();
+    mountLanguageSwitcher();
+    const {t} = getClientI18n();
+    applyPageTranslations(document);
     const versionEl = document.getElementById('version');
     const nowEl = document.getElementById('now');
     const onlineSinceEl = document.getElementById('online-since');
@@ -183,7 +188,7 @@
       clientsTable.innerHTML = '';
       if (!Array.isArray(clients) || clients.length === 0) {
         const row = document.createElement('tr');
-        row.innerHTML = '<td colspan="4">Aucun client connecte.</td>';
+        row.innerHTML = `<td colspan="4">${t('serverInfo.empty.clients')}</td>`;
         clientsTable.appendChild(row);
         return;
       }
@@ -211,7 +216,7 @@
       }
 
       if (diffMs <= 0) {
-        return 'maintenant';
+        return t('serverInfo.nowMoment');
       }
 
       return formatDuration(Math.ceil(diffMs / 1000));
@@ -221,7 +226,7 @@
       tasksTable.innerHTML = '';
       if (!Array.isArray(tasks) || tasks.length === 0) {
         const row = document.createElement('tr');
-        row.innerHTML = '<td colspan="4">Aucune tache planifiee.</td>';
+        row.innerHTML = `<td colspan="4">${t('serverInfo.empty.tasks')}</td>`;
         tasksTable.appendChild(row);
         return;
       }
@@ -230,7 +235,7 @@
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${task.name || task.id || ''}</td>
-          <td>${task.running ? 'En cours' : task.dueAt ? 'Planifiee' : 'En attente'}</td>
+          <td>${task.running ? t('serverInfo.task.running') : task.dueAt ? t('serverInfo.task.scheduled') : t('serverInfo.task.waiting')}</td>
           <td>${formatDateTime(task.dueAt)}</td>
           <td>${formatRemaining(task.dueAt)}</td>
         `;
@@ -242,7 +247,7 @@
       tokensTable.innerHTML = '';
       if (!Array.isArray(tokens) || tokens.length === 0) {
         const row = document.createElement('tr');
-        row.innerHTML = '<td colspan="4">Aucun token persiste.</td>';
+        row.innerHTML = `<td colspan="4">${t('serverInfo.empty.tokens')}</td>`;
         tokensTable.appendChild(row);
         return;
       }
@@ -250,7 +255,7 @@
       for (const tokenEntry of tokens) {
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td>${tokenEntry.isCurrent ? 'Actif' : 'Archive'}</td>
+          <td>${tokenEntry.isCurrent ? t('serverInfo.token.active') : t('serverInfo.token.archived')}</td>
           <td>${tokenEntry.token || '[masque]'}</td>
           <td>${formatDateTime(tokenEntry.createdAt)}</td>
           <td>${formatDateTime(tokenEntry.expiresAt)}</td>
@@ -264,7 +269,7 @@
       const shouldAutoScroll = logsAutoScroll;
 
       if (!Array.isArray(logs) || logs.length === 0) {
-        logsEl.textContent = 'Aucun log.';
+        logsEl.textContent = t('serverInfo.empty.logs');
         if (shouldAutoScroll) {
           logsEl.scrollTop = logsEl.scrollHeight;
         } else {
@@ -327,11 +332,11 @@
           throw new Error(`HTTP ${response.status}`);
         }
         const data = await response.json();
-        versionEl.textContent = `Version: ${String(data.version || 'unknown')}`;
-        nowEl.textContent = `Now: ${formatDateTime(data.now)}`;
-        onlineSinceEl.textContent = `Online since: ${formatDateTime(data.onlineSince)}`;
-        uptimeEl.textContent = `Uptime: ${formatDuration(data.uptimeSec)}`;
-        clientsCountEl.textContent = `Clients: ${Number(data.clientsConnected) || 0}`;
+        versionEl.textContent = t('serverInfo.version', {value: String(data.version || t('common.unknown'))});
+        nowEl.textContent = t('serverInfo.now', {value: formatDateTime(data.now)});
+        onlineSinceEl.textContent = t('serverInfo.onlineSince', {value: formatDateTime(data.onlineSince)});
+        uptimeEl.textContent = t('serverInfo.uptime', {value: formatDuration(data.uptimeSec)});
+        clientsCountEl.textContent = t('serverInfo.clientsCount', {value: Number(data.clientsConnected) || 0});
         renderClients(data.clients || []);
         renderTasks(data.tasks || []);
         renderTokens(data.tokens || []);
@@ -341,7 +346,7 @@
         });
         renderLogs(data.logs || []);
       } catch (error) {
-        logsEl.textContent = `Erreur de chargement: ${error?.message || error}`;
+        logsEl.textContent = t('serverInfo.loadError', {message: error?.message || error});
       }
     }
 
@@ -358,13 +363,13 @@
         body: JSON.stringify({scope: 'config'}),
       });
       if (!response.ok) {
-        throw new Error('Impossible de creer la souscription config.');
+        throw new Error(t('serverInfo.sseCreateError'));
       }
 
       const payload = await response.json();
       configSubscriptionId = String(payload.id || '');
       if (!configSubscriptionId || !payload.eventsUrl) {
-        throw new Error('Souscription SSE invalide.');
+        throw new Error(t('serverInfo.sseInvalid'));
       }
 
       configStream?.close();
@@ -397,6 +402,10 @@
     refresh();
     setInterval(refresh, 2000);
     subscribeToConfigEvents().catch(() => {});
+    onClientI18nChange(() => {
+      applyPageTranslations(document);
+      refresh();
+    });
     window.addEventListener('beforeunload', () => {
       configStream?.close();
       unsubscribeFromConfigEvents();

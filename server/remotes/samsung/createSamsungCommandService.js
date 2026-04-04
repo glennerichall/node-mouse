@@ -7,7 +7,7 @@ import {
     toSamsungErrorMessage,
 } from "./utils.js";
 
-export function createSamsungCommandService({getConfig, getRemote, getLogger, createDisabledRemote}) {
+export function createSamsungCommandService({getConfig, discoverDevices, getRemote, getLogger, createDisabledRemote}) {
     function getEnabledRemote() {
         if (getConfig().enabled) {
             return null;
@@ -58,6 +58,9 @@ export function createSamsungCommandService({getConfig, getRemote, getLogger, cr
     return {
         isEnabled() {
             return Boolean(getConfig().enabled);
+        },
+        async discoverDevices() {
+            return discoverDevices();
         },
         async turnOn() {
             const disabledRemote = getEnabledRemote();

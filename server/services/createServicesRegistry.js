@@ -10,21 +10,13 @@ import {createNotifier} from "./notifier/createNotifier.js";
 import {createTaskRunner} from './task-runner/createTaskRunner.js';
 import {createTaskManager} from './task-manager/createTaskManager.js';
 import {createUpdateManager} from "./update-manager/createUpdateManager.js";
-import {startQrOverlay} from "./overlay/qr-overlay.js";
+import {createQrOverlay} from "./overlay/qr-overlay.js";
 import {createRemotes} from "./remotes/createRemotes.js";
 import {createPubSub} from './pubsub/createPubSub.js';
 import {createEventStore} from './pubsub/createEventStore.js';
 import {createServiceEvents} from './pubsub/createServiceEvents.js';
 import {createSseService} from './sse/createSseService.js';
 
-export function qrOverlayFactory(services) {
-    return startQrOverlay({
-        getUrl: () => services.getUrls().entryUrl,
-        robot: services.getRobot(),
-        getConfig: () => services.getConfig(),
-        getSystemConfig: () => services.getSystemConfig(),
-    });
-}
 
 export function createServicesRegistry() {
 
@@ -41,7 +33,7 @@ export function createServicesRegistry() {
         createPubSub,
         createTaskRunner,
         createTaskManager,
-        createQrOverlay: qrOverlayFactory,
+        createQrOverlay,
         createUpdateManager,
         createServer,
         createInputController,

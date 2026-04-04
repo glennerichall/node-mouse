@@ -1,9 +1,24 @@
+import {applyPageTranslations, getClientI18n, initClientI18n, mountLanguageSwitcher, onClientI18nChange} from '../i18n/index.js';
+
+await initClientI18n();
+mountLanguageSwitcher();
+
 const form = document.getElementById('config-form');
 const statusNode = document.getElementById('config-status');
 const reloadButton = document.getElementById('reload-config');
 const restartButton = document.getElementById('restart-service');
 const sectionTemplate = document.getElementById('section-template');
 const fieldTemplate = document.getElementById('field-template');
+applyPageTranslations(document);
+
+function t(key, params) {
+  return getClientI18n().t(key, params);
+}
+
+function translateOr(key, fallback = '') {
+  const value = t(key);
+  return value === key ? fallback : value;
+}
 
 let currentSchema = {};
 let currentDefaults = {};
@@ -33,7 +48,7 @@ function setStatus(message, tone = '') {
 function updateBooleanLabel(input) {
   const copy = input?.closest('.toggle-row')?.querySelector('.toggle-copy');
   if (copy) {
-    copy.textContent = input.checked ? 'Active' : 'Inactif';
+    copy.textContent = input.checked ? t('adminConfig.toggleActive') : t('adminConfig.toggleInactive');
   }
 }
 
@@ -122,10 +137,10 @@ function syncSectionCollapseState(sectionNode, sectionKey, toggleButton) {
   const collapsed = collapsedSections.has(sectionKey);
   sectionNode.classList.toggle('is-collapsed', collapsed);
   toggleButton.setAttribute('aria-expanded', String(!collapsed));
-  const label = collapsed ? 'Afficher la section' : 'Masquer la section';
+  const label = collapsed ? t('adminConfig.showSectionLabel') : t('adminConfig.hideSectionLabel');
   toggleButton.setAttribute('aria-label', label);
   toggleButton.setAttribute('title', label);
-  toggleButton.textContent = collapsed ? 'Afficher' : 'Masquer';
+  toggleButton.textContent = collapsed ? t('adminConfig.showSection') : t('adminConfig.hideSection');
 }
 
 function beginConfigMutation() {
@@ -238,7 +253,7 @@ function applyConfigEventPayload(payload) {
 function formatSamsungDeviceLabel(device, index) {
   const parts = [
     `${index + 1}.`,
-    device.name || 'TV Samsung',
+    device.name || t('adminConfig.unnamedSamsung'),
     device.model ? `(${device.model})` : '',
     device.host ? `IP ${device.host}` : '',
     device.mac ? `MAC ${device.mac}` : '',
@@ -247,45 +262,49 @@ function formatSamsungDeviceLabel(device, index) {
 }
 
 async function discoverSamsungDevice() {
-  setStatus('Decouverte des TV Samsung...', 'pending');
+  setStatus(t('adminConfig.statusSamsungDiscovering'), 'pending');
 
   const response = await fetch('/api/admin/configs/samsung/discover', {
     method: 'POST',
   });
   const payload = await response.json();
   if (!response.ok || !payload.ok) {
-    throw new Error(payload.message || 'Decouverte Samsung impossible.');
+    throw new Error(payload.message || t('adminConfig.statusSamsungDiscoverError'));
   }
 
   const devices = Array.isArray(payload.devices) ? payload.devices : [];
   if (!devices.length) {
-    throw new Error('Aucune TV Samsung detectee.');
+    throw new Error(t('adminConfig.statusSamsungNone'));
   }
 
   let selectedIndex = devices.findIndex((device) => device.isSelected);
   if (devices.length === 1) {
     const accepted = window.confirm(
-      `TV detectee:\n${formatSamsungDeviceLabel(devices[0], 0)}\n\nAppliquer cette configuration ?`,
+      t('adminConfig.samsungSinglePrompt', {
+        label: formatSamsungDeviceLabel(devices[0], 0),
+      }),
     );
     if (!accepted) {
-      setStatus('Selection Samsung annulee.');
+      setStatus(t('adminConfig.statusSamsungCancelled'));
       return;
     }
     selectedIndex = 0;
   } else {
     const suggestedIndex = selectedIndex >= 0 ? selectedIndex + 1 : 1;
     const choice = window.prompt(
-      `TV Samsung detectees:\n${devices.map(formatSamsungDeviceLabel).join('\n')}\n\nEntrez le numero a appliquer :`,
+      t('adminConfig.samsungMultiPrompt', {
+        choices: devices.map(formatSamsungDeviceLabel).join('\n'),
+      }),
       String(suggestedIndex),
     );
     if (choice == null) {
-      setStatus('Selection Samsung annulee.');
+      setStatus(t('adminConfig.statusSamsungCancelled'));
       return;
     }
 
     selectedIndex = Number.parseInt(String(choice).trim(), 10) - 1;
     if (!Number.isInteger(selectedIndex) || selectedIndex < 0 || selectedIndex >= devices.length) {
-      throw new Error('Selection Samsung invalide.');
+      throw new Error(t('adminConfig.statusSamsungInvalidSelection'));
     }
   }
 
@@ -294,7 +313,9 @@ async function discoverSamsungDevice() {
     ['samsungTv.host', selectedDevice.host || ''],
     ['samsungTv.mac', selectedDevice.mac || ''],
   ]);
-  setStatus(`TV Samsung appliquee: ${selectedDevice.name || selectedDevice.host || 'inconnue'}.`, 'success');
+  setStatus(t('adminConfig.statusSamsungApplied', {
+    name: selectedDevice.name || selectedDevice.host || t('common.unknown'),
+  }), 'success');
 }
 
 async function syncField({pathKey, field, input, defaultValue, resetButton}) {
@@ -308,14 +329,14 @@ async function syncField({pathKey, field, input, defaultValue, resetButton}) {
 
   beginConfigMutation();
   setActionsDisabled(true);
-  setStatus(`Synchronisation de ${pathKey}...`, 'pending');
+  setStatus(t('adminConfig.statusSyncing', {path: pathKey}), 'pending');
 
   try {
     const payload = await patchField(pathKey, valuesMatch(nextValue, defaultValue) ? null : nextValue);
     syncResetButtonVisibility({input, field, defaultValue, resetButton});
     setStatus(payload.message || `${pathKey} synchronized.`, 'success');
   } catch (error) {
-    setStatus(error.message || 'Erreur de synchronisation.', 'error');
+    setStatus(error.message || t('adminConfig.statusSyncError'), 'error');
   } finally {
     setActionsDisabled(false);
     endConfigMutation();
@@ -349,14 +370,14 @@ function createInput(pathKey, field, value) {
 
     const copy = document.createElement('span');
     copy.className = 'toggle-copy';
-    copy.textContent = value ? 'Active' : 'Inactif';
+    copy.textContent = value ? t('adminConfig.toggleActive') : t('adminConfig.toggleInactive');
 
     const input = document.createElement('input');
     input.type = 'checkbox';
     input.name = pathKey;
     input.checked = Boolean(value);
     input.addEventListener('change', () => {
-      copy.textContent = input.checked ? 'Active' : 'Inactif';
+      copy.textContent = input.checked ? t('adminConfig.toggleActive') : t('adminConfig.toggleInactive');
     });
 
     wrapper.append(copy, input);
@@ -413,8 +434,8 @@ function renderConfigForm(config, schema) {
 
     const sectionNode = sectionTemplate.content.firstElementChild.cloneNode(true);
     sectionNode.querySelector('.section-key').textContent = sectionKey;
-    sectionNode.querySelector('h2').textContent = section.title;
-    sectionNode.querySelector('.section-description').textContent = section.description || '';
+    sectionNode.querySelector('h2').textContent = translateOr(`adminConfig.section.${sectionKey}.title`, section.title);
+    sectionNode.querySelector('.section-description').textContent = translateOr(`adminConfig.section.${sectionKey}.description`, section.description || '');
     const sectionToggleButton = sectionNode.querySelector('.section-toggle');
 
     const fieldsNode = sectionNode.querySelector('.section-fields');
@@ -425,10 +446,10 @@ function renderConfigForm(config, schema) {
       const discoverButton = document.createElement('button');
       discoverButton.type = 'button';
       discoverButton.className = 'section-action-button';
-      discoverButton.textContent = 'Detecter TV';
+      discoverButton.textContent = t('adminConfig.detectSamsung');
       discoverButton.addEventListener('click', () => {
         discoverSamsungDevice().catch((error) => {
-          setStatus(error.message || 'Decouverte Samsung impossible.', 'error');
+          setStatus(error.message || t('adminConfig.statusSamsungDiscoverError'), 'error');
         });
       });
       sectionActionsNode.append(discoverButton);
@@ -440,7 +461,7 @@ function renderConfigForm(config, schema) {
       const currentValue = getValueAtPath(currentConfig, pathKey);
       const defaultValue = getValueAtPath(currentDefaults, pathKey);
       const fieldNode = fieldTemplate.content.firstElementChild.cloneNode(true);
-      fieldNode.querySelector('.field-label').textContent = field.label;
+      fieldNode.querySelector('.field-label').textContent = translateOr(`adminConfig.field.${pathKey}`, field.label);
       fieldNode.querySelector('.field-path').textContent = pathKey;
       const fieldControlNode = fieldNode.querySelector('.field-control');
       fieldControlNode.append(createInput(pathKey, field, currentValue));
@@ -502,6 +523,11 @@ function renderConfigForm(config, schema) {
   }
 }
 
+function refreshLocalizedTexts() {
+  applyPageTranslations(document);
+  renderConfigForm(currentConfig, currentSchema);
+}
+
 function collectFormValues(schema) {
   const values = {};
 
@@ -545,12 +571,12 @@ function getConfigObjectFromEntries(entries) {
 
 async function loadConfig({silent = false} = {}) {
   if (!silent) {
-    setStatus('Chargement de la configuration...', 'pending');
+    setStatus(t('adminConfig.statusLoading'), 'pending');
   }
 
   const response = await fetch('/api/admin/configs', {cache: 'no-store'});
   if (!response.ok) {
-    throw new Error('Impossible de charger la configuration.');
+    throw new Error(t('adminConfig.statusLoadError'));
   }
 
   const payload = await response.json();
@@ -558,7 +584,7 @@ async function loadConfig({silent = false} = {}) {
   currentDefaults = payload.defaults || {};
   renderConfigForm(getConfigObjectFromEntries(payload.configs || []), currentSchema);
   if (!silent) {
-    setStatus('Configuration chargee.');
+    setStatus(t('adminConfig.statusLoaded'));
   }
 }
 
@@ -574,7 +600,7 @@ async function refreshConfigFromServer({silent = false} = {}) {
   try {
     await loadConfig({silent});
   } catch (error) {
-    setStatus(error.message || 'Erreur de chargement.', 'error');
+    setStatus(error.message || t('adminConfig.statusLoadError'), 'error');
   } finally {
     configReloadInFlight = false;
     if (configReloadPending && configMutationDepth === 0) {
@@ -598,13 +624,13 @@ async function subscribeToConfigEvents() {
     body: JSON.stringify({scope: 'config'}),
   });
   if (!response.ok) {
-    throw new Error('Impossible de creer la souscription config.');
+    throw new Error(t('adminConfig.statusSseCreateError'));
   }
 
   const payload = await response.json();
   configSubscriptionId = String(payload.id || '');
   if (!configSubscriptionId || !payload.eventsUrl) {
-    throw new Error('Souscription SSE invalide.');
+    throw new Error(t('adminConfig.statusSseInvalid'));
   }
 
   configStream?.close();
@@ -639,7 +665,7 @@ async function resetField({pathKey, field, input, defaultValue, resetButton}) {
 
   beginConfigMutation();
   setActionsDisabled(true);
-  setStatus(`Reset de ${pathKey} en cours...`, 'pending');
+  setStatus(t('adminConfig.statusResetting', {path: pathKey}), 'pending');
 
   try {
     const response = await fetch(`/api/admin/configs/${encodeURIComponent(pathKey)}`, {
@@ -647,7 +673,7 @@ async function resetField({pathKey, field, input, defaultValue, resetButton}) {
     });
     const payload = await response.json();
     if (!response.ok || !payload.ok) {
-      throw new Error(payload.message || 'Reset failed.');
+      throw new Error(payload.message || t('adminConfig.statusResetError'));
     }
 
     setConfigValue(pathKey, payload.config?.value);
@@ -655,7 +681,7 @@ async function resetField({pathKey, field, input, defaultValue, resetButton}) {
     syncResetButtonVisibility({input, field, defaultValue, resetButton});
     setStatus(payload.message || `${pathKey} reset.`, 'success');
   } catch (error) {
-    setStatus(error.message || 'Reset failed.', 'error');
+    setStatus(error.message || t('adminConfig.statusResetError'), 'error');
   } finally {
     setActionsDisabled(false);
     endConfigMutation();
@@ -664,7 +690,7 @@ async function resetField({pathKey, field, input, defaultValue, resetButton}) {
 
 async function restartService() {
   setActionsDisabled(true);
-  setStatus('Redemarrage du service en cours...', 'pending');
+  setStatus(t('adminConfig.statusRestarting'), 'pending');
 
   try {
     const response = await fetch('/api/admin/restart-service', {
@@ -672,12 +698,12 @@ async function restartService() {
     });
     const payload = await response.json();
     if (!response.ok || !payload.ok) {
-      throw new Error(payload.message || 'Restart failed.');
+      throw new Error(payload.message || t('adminConfig.statusRestartError'));
     }
 
-    setStatus(payload.message || 'Restart requested.', 'success');
+    setStatus(payload.message || t('adminConfig.statusRestartRequested'), 'success');
   } catch (error) {
-    setStatus(error.message || 'Restart failed.', 'error');
+    setStatus(error.message || t('adminConfig.statusRestartError'), 'error');
   } finally {
     setActionsDisabled(false);
   }
@@ -685,7 +711,7 @@ async function restartService() {
 
 reloadButton.addEventListener('click', () => {
   refreshConfigFromServer().catch((error) => {
-    setStatus(error.message || 'Erreur de chargement.', 'error');
+    setStatus(error.message || t('adminConfig.statusLoadError'), 'error');
   });
 });
 
@@ -694,10 +720,14 @@ restartButton.addEventListener('click', () => {
 });
 
 refreshConfigFromServer().catch((error) => {
-  setStatus(error.message || 'Erreur de chargement.', 'error');
+  setStatus(error.message || t('adminConfig.statusLoadError'), 'error');
 });
 subscribeToConfigEvents().catch(() => {});
 window.addEventListener('beforeunload', () => {
   configStream?.close();
   unsubscribeFromConfigEvents();
+});
+
+onClientI18nChange(() => {
+  refreshLocalizedTexts();
 });

@@ -11,15 +11,20 @@ const log = createLogger('qr-overlay:yad');
 function getNoopOverlay() {
   return {
     close: () => {},
-    refresh: async () => {},
     show: async () => false,
     hide: () => false,
+    update: async () => {},
     toggle: async () => false,
     isVisible: () => false,
   };
 }
 
-export async function startQrOverlayYad({ getUrl, robot, getConfig, getSystemConfig }) {
+export async function createQrOverlayYad(services) {
+  const getUrl = () => services.getUrls().entryUrl;
+  const getConfig = () => services.getConfig();
+  const getSystemConfig = () => services.getSystemConfig();
+  const robot = services.getRobot();
+
   function getOverlayContext() {
     const config = getConfig?.() || {};
     const systemConfig = getSystemConfig?.() || {};
@@ -93,7 +98,7 @@ export async function startQrOverlayYad({ getUrl, robot, getConfig, getSystemCon
     log.debug({ url: getUrl() }, 'QR overlay rafraîchi');
   }
 
-  const refresh = async () => {
+  const update = async () => {
     if (!visible || !getOverlayContext().isSupported) {
       return;
     }
@@ -120,7 +125,7 @@ export async function startQrOverlayYad({ getUrl, robot, getConfig, getSystemCon
       return visible;
     }
     visible = true;
-    await refresh();
+    await update();
     return visible;
   };
 
@@ -135,9 +140,9 @@ export async function startQrOverlayYad({ getUrl, robot, getConfig, getSystemCon
 
   return {
     close,
-    refresh,
     show,
     hide,
+    update,
     toggle,
     isVisible: () => visible,
   };

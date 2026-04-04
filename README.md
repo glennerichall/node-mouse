@@ -84,6 +84,7 @@ Useful CLI commands:
 - `sys-config` prints the system configuration
 - `tasks` prints the task manager snapshot
 - `task-manager` is an alias of `tasks`
+- `samsung-detect` detects Samsung TVs available on the network
 - `tokens` lists persisted entry tokens
 - `open-qr` opens the QR page on the server
 - `qr` is an alias of `open-qr`

@@ -21,15 +21,33 @@ async function resolveNow(asyncProvider) {
 
 function urlFactory(services) {
     const {
+        getSystemConfig,
         getServer,
         getTokenManager
     } = services;
 
+    const systemConfig = getSystemConfig();
+    const protocol = String(systemConfig?.protocol || 'http');
+    const port = Number(systemConfig?.port || 0);
+    const publicBaseUrl = getServer().basePublicUrl;
+    const localBaseUrl = `${protocol}://127.0.0.1:${port}`;
     const tokenManager = getTokenManager();
     const token = tokenManager.getToken() || tokenManager.createToken();
+    const entryPath = `/api/sessions/${token}`;
 
     return {
-        entryUrl: `${getServer().basePublicUrl}/api/sessions/${token}`
+        publicBaseUrl,
+        localBaseUrl,
+        entryUrl: `${publicBaseUrl}${entryPath}`,
+        localEntryUrl: `${localBaseUrl}${entryPath}`,
+        qrUrl: `${publicBaseUrl}/qr`,
+        localQrUrl: `${localBaseUrl}/qr`,
+        adminConfigUrl: `${publicBaseUrl}/ui/admin/config`,
+        localAdminConfigUrl: `${localBaseUrl}/ui/admin/config`,
+        serverInfoUrl: `${publicBaseUrl}/ui/admin/server-info`,
+        localServerInfoUrl: `${localBaseUrl}/ui/admin/server-info`,
+        healthUrl: `${publicBaseUrl}/health`,
+        localHealthUrl: `${localBaseUrl}/health`,
     }
 }
 

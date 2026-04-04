@@ -11,9 +11,9 @@ const log = createLogger('qr-overlay:win32');
 function getNoopOverlay() {
   return {
     close: () => {},
-    refresh: async () => {},
     show: async () => false,
     hide: () => false,
+    update: async () => {},
     toggle: async () => false,
     isVisible: () => false,
   };
@@ -50,7 +50,11 @@ function spawnPowerShell(scriptPath) {
   );
 }
 
-export async function startQrOverlayWin32({ getUrl, robot, getConfig }) {
+export async function createQrOverlayWin32(services) {
+  const getUrl = () => services.getUrls().entryUrl;
+  const getConfig = () => services.getConfig();
+  const robot = services.getRobot();
+
   function getOverlayContext() {
     const config = getConfig?.() || {};
     const qrOverlayConfig = {
@@ -108,7 +112,7 @@ export async function startQrOverlayWin32({ getUrl, robot, getConfig }) {
     log.debug({ url: getUrl() }, 'QR overlay Windows rafraîchi');
   }
 
-  const refresh = async () => {
+  const update = async () => {
     if (!visible || !getOverlayContext().isSupported) {
       return;
     }
@@ -135,7 +139,7 @@ export async function startQrOverlayWin32({ getUrl, robot, getConfig }) {
       return visible;
     }
     visible = true;
-    await refresh();
+    await update();
     return visible;
   };
 
@@ -150,9 +154,9 @@ export async function startQrOverlayWin32({ getUrl, robot, getConfig }) {
 
   return {
     close,
-    refresh,
     show,
     hide,
+    update,
     toggle,
     isVisible: () => visible,
   };

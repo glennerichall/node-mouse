@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html data-i18n-page-title="adminConfig.pageTitle">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -11,19 +11,19 @@
   <main class="config-page">
     <header class="config-hero">
       <div>
-        <p class="eyebrow">Administration</p>
-        <h1>Configuration persistante</h1>
-        <p class="hero-copy">Les champs ci-dessous sont stockes en base de donnees et regroupes selon la structure de l'objet de configuration.</p>
+        <p class="eyebrow" data-i18n="adminConfig.eyebrow">Administration</p>
+        <h1 data-i18n="adminConfig.title">Configuration persistante</h1>
+        <p class="hero-copy" data-i18n="adminConfig.copy">Les champs ci-dessous sont stockes en base de donnees et regroupes selon la structure de l'objet de configuration.</p>
       </div>
       <div class="hero-actions">
-        <a class="secondary-link" href="/">Retour remote</a>
-        <button id="reload-config" type="button">Recharger</button>
-        <button id="restart-service" type="button">Redemarrer le service</button>
+        <a class="secondary-link" href="/" data-i18n="adminConfig.back">Retour remote</a>
+        <button id="reload-config" type="button" data-i18n="adminConfig.reload">Recharger</button>
+        <button id="restart-service" type="button" data-i18n="adminConfig.restart">Redemarrer le service</button>
       </div>
     </header>
 
     <section class="status-bar" aria-live="polite">
-      <p id="config-status">Chargement de la configuration...</p>
+      <p id="config-status" data-i18n="adminConfig.loading">Chargement de la configuration...</p>
     </section>
 
     <form id="config-form" class="config-grid"></form>
@@ -38,7 +38,7 @@
             <h2></h2>
             <p class="section-description"></p>
           </div>
-          <button class="section-toggle" type="button" aria-expanded="false" aria-label="Afficher la section" title="Afficher la section">Afficher</button>
+          <button class="section-toggle" type="button" aria-expanded="false" aria-label="Afficher la section" title="Afficher la section" data-i18n="adminConfig.showSection">Afficher</button>
         </div>
       </div>
       <div class="section-fields"></div>
@@ -53,7 +53,7 @@
       </span>
       <span class="field-body">
         <span class="field-control"></span>
-        <button class="field-reset" type="button">Default</button>
+        <button class="field-reset" type="button" data-i18n="adminConfig.defaultButton">Defaut</button>
       </span>
     </div>
   </template>

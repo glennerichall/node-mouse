@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html data-i18n-page-title="main.pageTitle">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
@@ -18,89 +18,89 @@
 </head>
 <body>
   <main id="app">
-    <section id="workspace" aria-label="Remote workspace">
-      <aside id="left-menu" aria-label="Actions serveur">
-        <div class="admin-group admin-group-updates" aria-label="Mises a jour">
-          <button id="btn-force-update-check" type="button" title="Forcer la vérification de mise à jour" aria-label="Forcer la vérification de mise à jour">Vérifier MAJ</button>
-          <button id="btn-install-update" type="button" title="Installer la mise à jour" aria-label="Installer la mise à jour">Installer MAJ</button>
-          <button id="btn-restart-service" type="button" title="Redémarrer le service" aria-label="Redémarrer le service">Redémarrer service</button>
+    <section id="workspace" data-i18n-aria-label="main.workspaceAria">
+      <aside id="left-menu" data-i18n-aria-label="main.serverActionsAria">
+        <div class="admin-group admin-group-updates" data-i18n-aria-label="main.updatesAria">
+          <button id="btn-force-update-check" type="button" data-i18n="main.updateCheckButton" data-i18n-title="main.updateCheckButtonTitle" data-i18n-aria-label="main.updateCheckButtonTitle">Verifier MAJ</button>
+          <button id="btn-install-update" type="button" data-i18n="main.installUpdateButton" data-i18n-title="main.installUpdateButtonTitle" data-i18n-aria-label="main.installUpdateButtonTitle">Installer MAJ</button>
+          <button id="btn-restart-service" type="button" data-i18n="main.restartServiceButton" data-i18n-title="main.restartServiceButtonTitle" data-i18n-aria-label="main.restartServiceButtonTitle">Redemarrer service</button>
         </div>
         <hr class="admin-separator" aria-hidden="true" />
-        <div class="admin-group admin-group-display" aria-label="Affichage et informations">
+        <div class="admin-group admin-group-display" data-i18n-aria-label="main.displayInfoAria">
           <div class="admin-split-row">
-            <button id="btn-open-qr-browser-server" type="button" title="Ouvrir la page QR sur le serveur" aria-label="Ouvrir la page QR sur le serveur">QR serveur</button>
-            <button id="btn-open-qr-browser-client" type="button" title="Ouvrir la page QR sur le client" aria-label="Ouvrir la page QR sur le client">QR client</button>
+            <button id="btn-open-qr-browser-server" type="button" data-i18n="main.openQrServer" data-i18n-title="main.openQrServerTitle" data-i18n-aria-label="main.openQrServerTitle">QR serveur</button>
+            <button id="btn-open-qr-browser-client" type="button" data-i18n="main.openQrClient" data-i18n-title="main.openQrClientTitle" data-i18n-aria-label="main.openQrClientTitle">QR client</button>
           </div>
           <div class="admin-split-row">
-            <button id="btn-open-server-info-browser-server" type="button" title="Ouvrir la page server info sur le serveur" aria-label="Ouvrir la page server info sur le serveur">Info serveur</button>
-            <button id="btn-open-server-info-browser-client" type="button" title="Ouvrir la page server info sur le client" aria-label="Ouvrir la page server info sur le client">Info client</button>
+            <button id="btn-open-server-info-browser-server" type="button" data-i18n="main.openServerInfoServer" data-i18n-title="main.openServerInfoServerTitle" data-i18n-aria-label="main.openServerInfoServerTitle">Info serveur</button>
+            <button id="btn-open-server-info-browser-client" type="button" data-i18n="main.openServerInfoClient" data-i18n-title="main.openServerInfoClientTitle" data-i18n-aria-label="main.openServerInfoClientTitle">Info client</button>
           </div>
-          <button id="btn-open-config-page" type="button" title="Ouvrir la page de configuration" aria-label="Ouvrir la page de configuration">Configuration</button>
+          <button id="btn-open-config-page" type="button" data-i18n="main.openConfig" data-i18n-title="main.openConfigTitle" data-i18n-aria-label="main.openConfigTitle">Configuration</button>
         </div>
         <hr class="admin-separator" aria-hidden="true" />
-        <div class="admin-group admin-group-access" aria-label="Acces">
-          <button id="btn-toggle-qr-overlay" type="button" title="Masquer/Afficher l'overlay QR" aria-label="Masquer/Afficher l'overlay QR">Toggle QR overlay</button>
-          <button id="btn-rotate-entry-token" type="button" title="Forcer la rotation du token d'entrée" aria-label="Forcer la rotation du token d'entrée">Changer le jeton d'entrée</button>
+        <div class="admin-group admin-group-access" data-i18n-aria-label="main.accessAria">
+          <button id="btn-toggle-qr-overlay" type="button" data-i18n="main.toggleQrOverlay" data-i18n-title="main.toggleQrOverlayTitle" data-i18n-aria-label="main.toggleQrOverlayTitle">Afficher QR</button>
+          <button id="btn-rotate-entry-token" type="button" data-i18n="main.rotateEntryToken" data-i18n-title="main.rotateEntryTokenTitle" data-i18n-aria-label="main.rotateEntryTokenTitle">Changer le jeton d'entree</button>
         </div>
-        <p id="admin-app-version" aria-label="Version du programme">Version: --</p>
+        <p id="admin-app-version" data-i18n-aria-label="common.version" data-i18n="main.adminAppVersion">Version: --</p>
       </aside>
 
       <section id="touch-area">
         <div id="admin-drawer-scrim" aria-hidden="true"></div>
-        <nav id="browser-shortcuts" aria-label="Raccourcis navigateur">
-          <button id="btn-open-brave" type="button" aria-label="Ouvrir ou focus Brave" title="Brave">
+        <nav id="browser-shortcuts" data-i18n-aria-label="main.browserShortcutsAria">
+          <button id="btn-open-brave" type="button" data-i18n-aria-label="main.openBrave" title="Brave">
             <img src="./brave-icon.svg" alt="" aria-hidden="true" />
           </button>
-          <button id="btn-browser-back" type="button" aria-label="Page précédente" title="Alt+Left">⟵</button>
-          <button id="btn-browser-forward" type="button" aria-label="Page suivante" title="Alt+Right">⟶</button>
-          <button id="btn-prev-tab" type="button" aria-label="Onglet précédent" title="Ctrl+Shift+Tab">◀</button>
-          <button id="btn-next-tab" type="button" aria-label="Onglet suivant" title="Ctrl+Tab">▶</button>
-          <button id="btn-new-tab" type="button" aria-label="Nouvel onglet" title="Ctrl+T">＋</button>
-          <button id="btn-close-tab" type="button" aria-label="Fermer onglet" title="Ctrl+W">✕</button>
-          <button id="btn-address-bar" type="button" aria-label="Barre d'adresse" title="Ctrl+L">⌕</button>
-          <button id="btn-hard-reload" type="button" aria-label="Recharger" title="Ctrl+F5">↻</button>
-          <button id="btn-fullscreen" type="button" aria-label="Plein écran" title="F11">⛶</button>
+          <button id="btn-browser-back" type="button" data-i18n-aria-label="main.browserBack" title="Alt+Left">⟵</button>
+          <button id="btn-browser-forward" type="button" data-i18n-aria-label="main.browserForward" title="Alt+Right">⟶</button>
+          <button id="btn-prev-tab" type="button" data-i18n-aria-label="main.prevTab" title="Ctrl+Shift+Tab">◀</button>
+          <button id="btn-next-tab" type="button" data-i18n-aria-label="main.nextTab" title="Ctrl+Tab">▶</button>
+          <button id="btn-new-tab" type="button" data-i18n-aria-label="main.newTab" title="Ctrl+T">＋</button>
+          <button id="btn-close-tab" type="button" data-i18n-aria-label="main.closeTab" title="Ctrl+W">✕</button>
+          <button id="btn-address-bar" type="button" data-i18n-aria-label="main.addressBar" title="Ctrl+L">⌕</button>
+          <button id="btn-hard-reload" type="button" data-i18n-aria-label="main.reload" title="Ctrl+F5">↻</button>
+          <button id="btn-fullscreen" type="button" data-i18n-aria-label="main.fullscreen" title="F11">⛶</button>
         </nav>
-        <section id="tv-controls" aria-label="Controle TV Samsung">
-          <p class="section-label">Samsung TV</p>
+        <section id="tv-controls" data-i18n-aria-label="main.tvControlsAria">
+          <p class="section-label" data-i18n="main.tvSectionLabel">Samsung TV</p>
           <div class="tv-actions">
-            <button id="btn-samsung-on" type="button" aria-label="Allumer la television Samsung">On</button>
-            <button id="btn-samsung-off" type="button" aria-label="Eteindre la television Samsung">Off</button>
-            <button id="btn-samsung-volup" type="button" aria-label="Augmenter le volume Samsung">Vol+</button>
-            <button id="btn-samsung-voldown" type="button" aria-label="Diminuer le volume Samsung">Vol-</button>
-            <button id="btn-samsung-input" type="button" aria-label="Changer la source Samsung">Source</button>
-            <button id="btn-samsung-enter" type="button" aria-label="Valider le menu Samsung">Enter</button>
-            <button id="btn-samsung-pc-input" type="button" aria-label="Basculer vers l entree PC Samsung">PC</button>
+            <button id="btn-samsung-on" type="button" data-i18n-aria-label="main.samsungOn">On</button>
+            <button id="btn-samsung-off" type="button" data-i18n-aria-label="main.samsungOff">Off</button>
+            <button id="btn-samsung-volup" type="button" data-i18n-aria-label="main.samsungVolUp">Vol+</button>
+            <button id="btn-samsung-voldown" type="button" data-i18n-aria-label="main.samsungVolDown">Vol-</button>
+            <button id="btn-samsung-input" type="button" data-i18n-aria-label="main.samsungInput">Source</button>
+            <button id="btn-samsung-enter" type="button" data-i18n-aria-label="main.samsungEnter">Enter</button>
+            <button id="btn-samsung-pc-input" type="button" data-i18n-aria-label="main.samsungPcInput">PC</button>
           </div>
         </section>
         <canvas id="touchpad"></canvas>
-        <section id="cursor-preview" aria-label="Aperçu sous curseur">
+        <section id="cursor-preview" data-i18n-aria-label="main.cursorPreviewAria">
           <canvas id="preview-canvas" width="128" height="84"></canvas>
         </section>
       </section>
     </section>
 
-    <section id="keyboard-panel" class="hidden" aria-label="Clavier">
-      <textarea id="text-input" placeholder="Saisir du texte à envoyer"></textarea>
-      <button id="send-text" type="button">Envoyer</button>
+    <section id="keyboard-panel" class="hidden" data-i18n-aria-label="main.keyboardPanelAria">
+      <textarea id="text-input" data-i18n-placeholder="main.textInputPlaceholder" placeholder="Saisir du texte a envoyer"></textarea>
+      <button id="send-text" type="button" data-i18n="main.sendText">Envoyer</button>
     </section>
 
-    <nav id="menu" aria-label="Actions">
-      <button id="btn-keyboard" type="button">Clavier</button>
-      <button id="btn-left" type="button">Clic G</button>
-      <button id="btn-right" type="button">Clic D</button>
-      <button id="btn-enter" type="button">Entrée</button>
+    <nav id="menu" data-i18n-aria-label="main.menuAria">
+      <button id="btn-keyboard" type="button" data-i18n="main.keyboard">Clavier</button>
+      <button id="btn-left" type="button" data-i18n="main.leftClick">Clic G</button>
+      <button id="btn-right" type="button" data-i18n="main.rightClick">Clic D</button>
+      <button id="btn-enter" type="button" data-i18n="main.enter">Entree</button>
       <button id="btn-backspace" type="button">⌫</button>
     </nav>
 
     <section id="connection-overlay" aria-live="polite">
       <div class="connection-card">
-        <h2 data-connection-title>Serveur inaccessible</h2>
-        <p data-connection-message>En attente de connexion...</p>
+        <h2 data-connection-title data-i18n="main.connectionUnavailableTitle">Serveur inaccessible</h2>
+        <p data-connection-message data-i18n="main.connectionWaiting">En attente de connexion...</p>
       </div>
     </section>
 
-    <section id="client-notifications" aria-live="polite" aria-label="Notifications"></section>
+    <section id="client-notifications" aria-live="polite" data-i18n-aria-label="main.notificationsAria"></section>
   </main>
 
   <script src="/socket.io/socket.io.js"></script>

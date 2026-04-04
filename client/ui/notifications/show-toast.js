@@ -1,9 +1,12 @@
+import {getClientI18n} from '../../i18n/index.js';
+
 export function showToast(root, payload = {}) {
   if (!root) {
     return;
   }
+  const {t} = getClientI18n();
 
-  const title = String(payload.title || 'Notification');
+  const title = String(payload.title || t('common.notification'));
   const message = String(payload.message || '').trim();
   if (!message) {
     return;

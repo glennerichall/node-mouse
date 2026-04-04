@@ -10,7 +10,7 @@
   "description": "Controle souris/clavier a distance depuis mobile.",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/icon-192.png",-
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"

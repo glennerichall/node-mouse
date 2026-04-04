@@ -178,6 +178,94 @@ describe('server cli', () => {
     });
   });
 
+  it('detects a samsung tv without persisting host/mac', async () => {
+    const result = await executeCliCommand({
+      getConfig: () => ({
+        samsungTv: {
+          alwaysAutoResolve: true,
+          host: '',
+          mac: '',
+          discoveryTimeoutMs: 3000,
+        },
+      }),
+      getRemotes: () => ({
+        adminActions: {},
+        samsung: {
+          discoverDevices: async () => ([
+            {
+              name: 'Salon',
+              model: 'QN90',
+              ip: '192.168.1.20',
+              mac: 'AA:BB:CC:DD:EE:02',
+            },
+          ]),
+        },
+      }),
+    }, 'samsung-detect');
+
+    expect(result).toEqual({
+      ok: true,
+      message: 'TV Samsung detectee.',
+      data: {
+        name: 'Salon',
+        model: 'QN90',
+        host: '192.168.1.20',
+        mac: 'AA:BB:CC:DD:EE:02',
+      },
+    });
+  });
+
+  it('returns a clear error when several samsung tvs are detected', async () => {
+    const result = await executeCliCommand({
+      getConfig: () => ({
+        samsungTv: {
+          alwaysAutoResolve: true,
+          host: '',
+          mac: '',
+          discoveryTimeoutMs: 3000,
+        },
+      }),
+      getRemotes: () => ({
+        adminActions: {},
+        samsung: {
+          discoverDevices: async () => ([
+            {
+              name: 'Salon',
+              model: 'QN90',
+              ip: '192.168.1.20',
+              mac: 'AA:BB:CC:DD:EE:02',
+            },
+            {
+              name: 'Bureau',
+              model: 'Frame',
+              ip: '192.168.1.21',
+              mac: 'AA:BB:CC:DD:EE:03',
+            },
+          ]),
+        },
+      }),
+    }, 'samsung-detect');
+
+    expect(result).toEqual({
+      ok: false,
+      message: 'Plusieurs TV Samsung detectees. Configurez samsungTv.host ou samsungTv.mac, ou desactivez alwaysAutoResolve.',
+      data: [
+        {
+          name: 'Salon',
+          model: 'QN90',
+          host: '192.168.1.20',
+          mac: 'AA:BB:CC:DD:EE:02',
+        },
+        {
+          name: 'Bureau',
+          model: 'Frame',
+          host: '192.168.1.21',
+          mac: 'AA:BB:CC:DD:EE:03',
+        },
+      ],
+    });
+  });
+
   it('returns the task manager snapshot for tasks command', async () => {
     const result = await executeCliCommand({
       getTaskManager: () => ({

@@ -6,6 +6,10 @@ import {
   getValueAtPath,
 } from '../connection/api/admin-config.shared.js';
 import {setNestedValue} from '../../utils/shared/objet.utils.js';
+import {
+  getSamsungDeviceMac,
+  pickSamsungDevice,
+} from '../remotes/samsung/device-config.js';
 
 function buildHelpMessage() {
   return [
@@ -17,6 +21,7 @@ function buildHelpMessage() {
     '  sys-config Affiche la configuration système',
     '  tasks    Affiche les informations du task manager',
     '  task-manager Alias de tasks',
+    '  samsung-detect Detecte une TV Samsung',
     '  tokens   Liste les tokens en base',
     '  open-qr  Ouvre la page du code QR sur le serveur',
     '  qr       Alias de open-qr',
@@ -163,6 +168,55 @@ export async function executeCliCommand(services, input) {
         tasks: services.getTaskManager().getTasksSnapshot().map(mapTask),
       },
     };
+  }
+
+  if (command === 'samsung-detect') {
+    try {
+      const samsungConfig = services.getConfig().samsungTv;
+      const devices = await services.getRemotes().samsung.discoverDevices();
+      const selected = pickSamsungDevice(
+        devices,
+        samsungConfig.alwaysAutoResolve
+          ? {...samsungConfig, host: '', mac: ''}
+          : samsungConfig,
+      );
+
+      if (!selected) {
+        if (!devices.length) {
+          return {
+            ok: false,
+            message: 'Aucune TV Samsung detectee.',
+          };
+        }
+
+        return {
+          ok: false,
+          message: 'Plusieurs TV Samsung detectees. Configurez samsungTv.host ou samsungTv.mac, ou desactivez alwaysAutoResolve.',
+          data: devices.map((device) => ({
+            name: String(device?.name || '').trim(),
+            model: String(device?.model || '').trim(),
+            host: String(device?.ip || '').trim(),
+            mac: getSamsungDeviceMac(device),
+          })),
+        };
+      }
+
+      return {
+        ok: true,
+        message: 'TV Samsung detectee.',
+        data: {
+          name: String(selected?.name || '').trim(),
+          model: String(selected?.model || '').trim(),
+          host: String(selected?.ip || '').trim(),
+          mac: getSamsungDeviceMac(selected),
+        },
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        message: String(error?.message || error || 'Decouverte Samsung impossible.'),
+      };
+    }
   }
 
   if (command === 'tokens') {
