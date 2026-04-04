@@ -1,5 +1,4 @@
 import {createStaticShareRouter} from '../connection/api/client.router.js';
-import express from 'express';
 import path from 'node:path';
 import {
     clientDir,
@@ -18,14 +17,6 @@ import {createAdminApiRouter} from "./createAdminApiRouter.js";
 import {readPackageVersion} from '../utils/env.js';
 
 const packageJsonPath = path.join(projectRoot, 'package.json');
-const publicPwaAssets = [
-    '/manifest.webmanifest',
-    '/sw.js',
-    '/favicon.svg',
-    '/icon-192.png',
-    '/icon-512.png',
-    '/apple-touch-icon.png',
-];
 
 export function bootstrapApi(services) {
     const {
@@ -56,9 +47,13 @@ export function bootstrapApi(services) {
         secureCookies: systemConfig.https.enabled,
     }));
 
-    app.use(publicPwaAssets, express.static(publicDir, {index: false}));
-
     app.use('/api/sessions', createSessionRouter(services));
+
+    app.use(createStaticShareRouter({
+        publicDir,
+        clientDir,
+        sharedUtilsDir
+    }));
 
     app.use(createSessionGuard(services));
 
@@ -70,12 +65,6 @@ export function bootstrapApi(services) {
         }
         next();
     });
-
-    app.use(createStaticShareRouter({
-        publicDir,
-        clientDir,
-        sharedUtilsDir
-    }));
 
     app.use('/api/admin', createAdminApiRouter(services));
     app.use('/ui/admin', createAdminUiRouter(services));
