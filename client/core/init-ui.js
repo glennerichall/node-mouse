@@ -10,15 +10,44 @@ import { bindClientNotifications } from '../ui/notifications/bind-client-notific
 import { bindAdminDrawer } from '../ui/admin-drawer.js';
 import { bindAdminVersion } from '../ui/admin-version.js';
 import { getClientInputConfig } from '../config/client-config.js';
+import { getClientHandedness } from '../i18n/index.js';
 
 export function initUi(socket) {
   const dom = getDom();
   const canvasUI = createCanvasUI(dom.touchpad);
+  let showRemoteTimer = null;
+
+  const hideRemotes = () => {
+    if (!dom.remoteStack) {
+      return;
+    }
+    if (showRemoteTimer) {
+      clearTimeout(showRemoteTimer);
+      showRemoteTimer = null;
+    }
+    dom.remoteStack.classList.add('is-hidden');
+  };
+
+  const showRemotes = () => {
+    if (!dom.remoteStack) {
+      return;
+    }
+    if (showRemoteTimer) {
+      clearTimeout(showRemoteTimer);
+    }
+    showRemoteTimer = window.setTimeout(() => {
+      dom.remoteStack.classList.remove('is-hidden');
+      showRemoteTimer = null;
+    }, 120);
+  };
 
   const preview = bindPreviewStream(socket, dom);
   bindTouchpad(socket, dom.touchpad, {
     onMouseMove: preview.onMouseMoveActivity,
+    onInteractionStart: hideRemotes,
+    onInteractionEnd: showRemotes,
     getInputConfig: getClientInputConfig,
+    getHandedness: getClientHandedness,
   });
   bindKeyboardPanel(socket, dom);
   bindMouseButtons(socket, dom);

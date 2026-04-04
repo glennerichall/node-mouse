@@ -8,6 +8,9 @@
   --scroll-zone-width: 36px;
   --scroll-zone-edge-gap: 10px;
   --preview-gap-from-scroll: 8px;
+  --touch-ui-gap: 10px;
+  --remote-max-width: 320px;
+  --remote-cell-width: 63px;
 }
 
 html[data-theme="light"] {
@@ -162,6 +165,27 @@ html[data-theme="light"] #left-menu button:active {
   flex: 1;
 }
 
+#touch-chrome {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--scroll-zone-width);
+  grid-template-rows: minmax(0, 1fr);
+  gap: var(--touch-ui-gap);
+  align-items: start;
+  padding:
+    calc(env(safe-area-inset-top) + 8px)
+    calc(env(safe-area-inset-right) + var(--scroll-zone-edge-gap))
+    calc(env(safe-area-inset-bottom) + 8px)
+    calc(env(safe-area-inset-left) + var(--scroll-zone-edge-gap));
+  pointer-events: none;
+}
+
+html[data-handedness="left"] #touch-chrome {
+  grid-template-columns: var(--scroll-zone-width) minmax(0, 1fr);
+}
+
 #admin-drawer-scrim {
   position: absolute;
   inset: 0;
@@ -177,45 +201,94 @@ html[data-theme="light"] #left-menu button:active {
   pointer-events: auto;
 }
 
-#browser-shortcuts {
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
+#remote-stack {
   display: flex;
-  gap: 6px;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  justify-self: stretch;
+  align-self: start;
+  pointer-events: auto;
+  transition: opacity 180ms ease, transform 220ms ease;
+}
+
+html[data-handedness="left"] #remote-stack {
+  grid-column: 2;
+}
+
+#remote-stack.is-hidden {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.97);
   pointer-events: none;
-  z-index: 20;
-  padding: 6px;
-  border-radius: 14px;
-  background: rgba(10, 16, 20, 0.45);
-  backdrop-filter: blur(6px);
 }
 
-html[data-theme="light"] #browser-shortcuts {
-  background: rgba(248, 252, 255, 0.72);
+#scroll-zone-indicator {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  width: var(--scroll-zone-width);
+  height: 100%;
+  min-width: 0;
+  border-radius: 16px;
+  background: rgba(75, 212, 255, 0.14);
+  border: 1px solid rgba(75, 212, 255, 0.34);
+  box-shadow: inset 0 0 0 1px rgba(75, 212, 255, 0.08);
 }
 
-#tv-controls {
-  position: absolute;
-  top: 62px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 20;
+html[data-handedness="left"] #scroll-zone-indicator {
+  grid-column: 1;
+}
+
+html[data-theme="light"] #scroll-zone-indicator {
+  background: rgba(10, 134, 184, 0.11);
+  border-color: rgba(10, 134, 184, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(10, 134, 184, 0.06);
+}
+
+#scroll-zone-label {
+  color: rgba(75, 212, 255, 0.85);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: center;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  user-select: none;
+}
+
+html[data-theme="light"] #scroll-zone-label {
+  color: rgba(10, 134, 184, 0.92);
+}
+
+.remote-panel {
   display: grid;
   gap: 6px;
-  width: min(92vw, 340px);
+  width: 100%;
   padding: 8px;
   border-radius: 16px;
-  background: rgba(10, 16, 20, 0.5);
+  background: rgba(10, 16, 20, 0.48);
   backdrop-filter: blur(6px);
 }
 
-html[data-theme="light"] #tv-controls {
+#browser-shortcuts {
+  display: grid;
+  pointer-events: none;
+}
+
+html[data-theme="light"] .remote-panel {
   background: rgba(248, 252, 255, 0.74);
 }
 
-.section-label {
+#tv-controls[hidden] {
+  display: none;
+}
+
+.remote-panel-title {
   margin: 0;
   font-size: 0.75rem;
   letter-spacing: 0.08em;
@@ -224,70 +297,128 @@ html[data-theme="light"] #tv-controls {
   opacity: 0.74;
 }
 
-.tv-actions {
+.remote-panel-actions {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 6px;
 }
 
-.tv-actions button {
-  appearance: none;
-  border: none;
-  border-radius: 9px;
-  color: var(--fg);
-  background: rgba(44, 57, 67, 0.92);
-  font-size: 0.82rem;
-  font-weight: 700;
-  min-height: 38px;
-  padding: 0 8px;
+.tv-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
 }
 
+#browser-shortcuts button,
+.tv-actions button,
+#menu button,
+#keyboard-panel button {
+  appearance: none;
+  border: none;
+  border-radius: 10px;
+  color: var(--fg);
+  background: rgba(44, 57, 67, 0.92);
+  font-size: 0.76rem;
+  font-weight: 700;
+  min-height: 30px;
+  padding: 0 4px;
+  touch-action: none;
+  user-select: none;
+}
+
+#browser-shortcuts button,
+.tv-actions button {
+  width: 100%;
+  min-width: 0;
+  height: 30px;
+}
+
+#browser-shortcuts button:active,
 .tv-actions button:active {
   transform: translateY(1px);
   background: rgba(56, 73, 85, 0.96);
 }
 
-html[data-theme="light"] .tv-actions button {
+html[data-theme="light"] #browser-shortcuts button,
+html[data-theme="light"] .tv-actions button,
+html[data-theme="light"] #menu button,
+html[data-theme="light"] #keyboard-panel button {
   color: var(--fg);
   background: rgba(216, 229, 237, 0.96);
 }
 
-html[data-theme="light"] .tv-actions button:active {
+html[data-theme="light"] #browser-shortcuts button:active,
+html[data-theme="light"] .tv-actions button:active,
+html[data-theme="light"] #menu button:active,
+html[data-theme="light"] #keyboard-panel button:active {
   background: rgba(198, 217, 228, 0.98);
 }
 
 #browser-shortcuts button {
   pointer-events: auto;
-  appearance: none;
-  border: none;
-  border-radius: 9px;
-  color: var(--fg);
-  background: rgba(44, 57, 67, 0.92);
-  font-size: 1rem;
-  font-weight: 700;
-  width: 38px;
-  height: 38px;
-  padding: 0;
   line-height: 1;
 }
 
-#browser-shortcuts button:active {
-  transform: translateY(1px);
-  background: rgba(56, 73, 85, 0.96);
+.tv-actions button {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.1;
 }
 
-html[data-theme="light"] #browser-shortcuts button {
-  color: var(--fg);
-  background: rgba(216, 229, 237, 0.96);
+.browser-actions {
+  width: 100%;
+  max-width: 272px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  margin-left: auto;
+  margin-right: 0;
 }
 
-html[data-theme="light"] #browser-shortcuts button:active {
-  background: rgba(198, 217, 228, 0.98);
+html[data-handedness="left"] .browser-actions {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.tv-actions {
+  width: 100%;
+  max-width: 272px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+html[data-handedness="left"] .tv-actions {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.remote-grid-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--remote-cell-width);
+  gap: 6px;
+  width: max-content;
+  justify-content: end;
+}
+
+.browser-actions .remote-grid-row,
+.tv-actions .remote-grid-row {
+  margin-left: auto;
+}
+
+html[data-handedness="left"] .browser-actions .remote-grid-row,
+html[data-handedness="left"] .tv-actions .remote-grid-row {
+  margin-left: 0;
+  margin-right: auto;
 }
 
 #btn-open-brave img {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   display: block;
   margin: 0 auto;
   pointer-events: none;
@@ -306,18 +437,71 @@ html[data-theme="light"] #browser-shortcuts button:active {
   background-position: 0 0, 0 16px, 16px -16px, -16px 0;
 }
 
+#touchpad-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 272px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 10px 8px 0;
+  pointer-events: none;
+}
+
+#touchpad-hint > * {
+  margin: 0;
+  text-align: center;
+}
+
+#touchpad-hint-title {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 1.12rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+#touchpad-hint-subtitle {
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+html[data-theme="light"] #touchpad-hint-title {
+  color: rgba(24, 35, 44, 0.74);
+}
+
+html[data-theme="light"] #touchpad-hint-subtitle {
+  color: rgba(24, 35, 44, 0.54);
+}
+
 #cursor-preview {
   position: fixed;
-  right: calc(var(--scroll-zone-edge-gap) + var(--scroll-zone-width) + var(--preview-gap-from-scroll));
   bottom: calc(var(--menu-h) + env(safe-area-inset-bottom) + var(--scroll-zone-edge-gap));
+  left: calc(env(safe-area-inset-left) + 6px);
+  right: auto;
   z-index: 18;
   display: grid;
   gap: 4px;
-  justify-items: end;
+  justify-items: start;
   opacity: 0;
   transform: translateY(8px) scale(0.96);
   transition: opacity 180ms ease, transform 220ms ease;
   pointer-events: none;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(7, 11, 14, 0.95);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+html[data-handedness="left"] #cursor-preview {
+  right: calc(env(safe-area-inset-right) + 6px);
+  left: auto;
+  justify-items: end;
 }
 
 #cursor-preview.is-visible {
@@ -328,13 +512,11 @@ html[data-theme="light"] #browser-shortcuts button:active {
 #preview-canvas {
   width: 128px;
   height: 84px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(7, 11, 14, 0.95);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  display: block;
+  border-radius: inherit;
 }
 
-html[data-theme="light"] #preview-canvas {
+html[data-theme="light"] #cursor-preview {
   border-color: rgba(24, 35, 44, 0.16);
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 6px 18px rgba(40, 76, 97, 0.16);
@@ -351,34 +533,10 @@ html[data-theme="light"] #preview-canvas {
   border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-#menu button,
-#keyboard-panel button {
-  appearance: none;
-  border: none;
-  border-radius: 10px;
-  color: var(--fg);
-  background: #2c3943;
-  font-size: 0.86rem;
-  font-weight: 600;
-  touch-action: none;
-  user-select: none;
-}
-
 #menu button:active,
 #keyboard-panel button:active {
   transform: translateY(1px);
-  background: #384955;
-}
-
-html[data-theme="light"] #menu button,
-html[data-theme="light"] #keyboard-panel button {
-  color: var(--fg);
-  background: #d5e2ea;
-}
-
-html[data-theme="light"] #menu button:active,
-html[data-theme="light"] #keyboard-panel button:active {
-  background: #c2d4de;
+  background: rgba(56, 73, 85, 0.96);
 }
 
 #keyboard-panel {
@@ -421,12 +579,56 @@ html[data-theme="light"] #text-input {
 }
 
 @media (max-width: 640px) {
-  #tv-controls {
-    width: min(94vw, 420px);
+  #remote-stack {
+    max-width: 100%;
   }
 
   .tv-actions {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+    max-width: 272px;
+  }
+
+  .browser-actions {
+    width: 100%;
+    max-width: 272px;
+  }
+}
+
+@media (max-width: 640px) and (orientation: portrait) {
+  #touch-chrome {
+    grid-template-columns: minmax(0, 1fr) var(--scroll-zone-width);
+  }
+
+  html[data-handedness="left"] #touch-chrome {
+    grid-template-columns: var(--scroll-zone-width) minmax(0, 1fr);
+  }
+
+  #remote-stack {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #scroll-zone-indicator {
+    min-height: 100%;
+  }
+}
+
+@media (orientation: landscape) {
+  #touch-chrome {
+    padding-top: calc(env(safe-area-inset-top) + 8px);
+    padding-bottom: calc(env(safe-area-inset-bottom) + 8px);
+  }
+
+  #remote-stack {
+    width: min(
+      calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right) - (var(--scroll-zone-width) + var(--touch-ui-gap) + (var(--scroll-zone-edge-gap) * 2))),
+      var(--remote-max-width)
+    );
+    justify-self: end;
+  }
+
+  html[data-handedness="left"] #remote-stack {
+    justify-self: start;
   }
 }
 

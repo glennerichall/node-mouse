@@ -22,13 +22,47 @@ function drawCursorOverlay(ctx, width, height) {
     ctx.restore();
 }
 
+function readCssPx(name, fallback = 0) {
+    const value = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name));
+    return Number.isFinite(value) ? value : fallback;
+}
+
+function getPreviewViewportSize(width, height) {
+    const outerEdgePx = 6;
+    const previewGapPx = readCssPx('--preview-gap-from-scroll', 8);
+    const scrollZoneWidthPx = readCssPx('--scroll-zone-width', 36);
+    const scrollZoneEdgeGapPx = readCssPx('--scroll-zone-edge-gap', 10);
+    const menuHeightPx = readCssPx('--menu-h', 58);
+    const reservedSidePx = scrollZoneWidthPx + scrollZoneEdgeGapPx + previewGapPx + 12;
+    const availableWidth = Math.max(48, window.innerWidth - outerEdgePx - reservedSidePx);
+    const availableHeight = Math.max(48, window.innerHeight - menuHeightPx - scrollZoneEdgeGapPx - 20);
+
+    return {
+        width: Math.min(width, availableWidth),
+        height: Math.min(height, availableHeight),
+    };
+}
+
 export function drawPreviewFrame({ctx, previewCanvas, previewLabel, frame}) {
     const {width, height, rgba, x, y} = frame;
     if (previewCanvas.width !== width || previewCanvas.height !== height) {
         previewCanvas.width = width;
         previewCanvas.height = height;
-        previewCanvas.style.width = `${width}px`;
-        previewCanvas.style.height = `${height}px`;
+    }
+
+    const viewportSize = getPreviewViewportSize(width, height);
+    const offsetX = Math.max(0, Math.round((width - viewportSize.width) / 2));
+    const offsetY = Math.max(0, Math.round((height - viewportSize.height) / 2));
+
+    previewCanvas.style.width = `${width}px`;
+    previewCanvas.style.height = `${height}px`;
+    previewCanvas.style.marginLeft = `${-offsetX}px`;
+    previewCanvas.style.marginTop = `${-offsetY}px`;
+
+    const previewRoot = previewCanvas.closest('#cursor-preview');
+    if (previewRoot) {
+        previewRoot.style.width = `${viewportSize.width}px`;
+        previewRoot.style.height = `${viewportSize.height}px`;
     }
 
     const imageData = new ImageData(rgba, width, height);

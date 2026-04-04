@@ -8,6 +8,21 @@ const DEFAULT_CLIENT_CONFIG = {
 let configState = structuredClone(DEFAULT_CLIENT_CONFIG);
 let subscriptionId = '';
 let configStream = null;
+const listeners = new Set();
+
+function getConfigObjectFromEntries(entries) {
+  const config = {};
+
+  for (const entry of entries || []) {
+    if (!entry?.id) {
+      continue;
+    }
+
+    setValueAtPath(config, entry.id, entry.value);
+  }
+
+  return config;
+}
 
 function setValueAtPath(target, path, value) {
   const segments = String(path || '').split('.').filter(Boolean);
@@ -34,6 +49,13 @@ function applyConfigEntries(entries = []) {
     }
     setValueAtPath(configState, entry.path, entry.value);
   }
+  notifyListeners();
+}
+
+function notifyListeners() {
+  for (const listener of listeners) {
+    listener(configState);
+  }
 }
 
 async function loadClientConfig() {
@@ -43,10 +65,12 @@ async function loadClientConfig() {
   }
 
   const payload = await response.json();
+  const loadedConfig = payload?.config || getConfigObjectFromEntries(payload?.configs);
   configState = {
     ...structuredClone(DEFAULT_CLIENT_CONFIG),
-    ...(payload?.config || {}),
+    ...loadedConfig,
   };
+  notifyListeners();
 }
 
 async function subscribeToConfigEvents() {
@@ -111,4 +135,19 @@ export async function initClientConfig() {
 
 export function getClientInputConfig() {
   return configState.input || DEFAULT_CLIENT_CONFIG.input;
+}
+
+export function getClientSamsungConfig() {
+  return configState.samsungTv || {};
+}
+
+export function onClientConfigChange(listener) {
+  if (typeof listener !== 'function') {
+    return () => {};
+  }
+
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
 }

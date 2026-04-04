@@ -47,32 +47,60 @@
 
       <section id="touch-area">
         <div id="admin-drawer-scrim" aria-hidden="true"></div>
-        <nav id="browser-shortcuts" data-i18n-aria-label="main.browserShortcutsAria">
-          <button id="btn-open-brave" type="button" data-i18n-aria-label="main.openBrave" title="Brave">
-            <img src="./brave-icon.svg" alt="" aria-hidden="true" />
-          </button>
-          <button id="btn-browser-back" type="button" data-i18n-aria-label="main.browserBack" title="Alt+Left">⟵</button>
-          <button id="btn-browser-forward" type="button" data-i18n-aria-label="main.browserForward" title="Alt+Right">⟶</button>
-          <button id="btn-prev-tab" type="button" data-i18n-aria-label="main.prevTab" title="Ctrl+Shift+Tab">◀</button>
-          <button id="btn-next-tab" type="button" data-i18n-aria-label="main.nextTab" title="Ctrl+Tab">▶</button>
-          <button id="btn-new-tab" type="button" data-i18n-aria-label="main.newTab" title="Ctrl+T">＋</button>
-          <button id="btn-close-tab" type="button" data-i18n-aria-label="main.closeTab" title="Ctrl+W">✕</button>
-          <button id="btn-address-bar" type="button" data-i18n-aria-label="main.addressBar" title="Ctrl+L">⌕</button>
-          <button id="btn-hard-reload" type="button" data-i18n-aria-label="main.reload" title="Ctrl+F5">↻</button>
-          <button id="btn-fullscreen" type="button" data-i18n-aria-label="main.fullscreen" title="F11">⛶</button>
-        </nav>
-        <section id="tv-controls" data-i18n-aria-label="main.tvControlsAria">
-          <p class="section-label" data-i18n="main.tvSectionLabel">Samsung TV</p>
-          <div class="tv-actions">
-            <button id="btn-samsung-on" type="button" data-i18n-aria-label="main.samsungOn">On</button>
-            <button id="btn-samsung-off" type="button" data-i18n-aria-label="main.samsungOff">Off</button>
-            <button id="btn-samsung-volup" type="button" data-i18n-aria-label="main.samsungVolUp">Vol+</button>
-            <button id="btn-samsung-voldown" type="button" data-i18n-aria-label="main.samsungVolDown">Vol-</button>
-            <button id="btn-samsung-input" type="button" data-i18n-aria-label="main.samsungInput">Source</button>
-            <button id="btn-samsung-enter" type="button" data-i18n-aria-label="main.samsungEnter">Enter</button>
-            <button id="btn-samsung-pc-input" type="button" data-i18n-aria-label="main.samsungPcInput">PC</button>
+        <div id="touch-chrome">
+          <div id="remote-stack">
+            <section id="browser-shortcuts" class="remote-panel" data-i18n-aria-label="main.browserShortcutsAria">
+              <p class="remote-panel-title" data-i18n="main.browserShortcutsLabel">Navigateur</p>
+              <div class="browser-actions">
+                <div class="remote-grid-row">
+                  <button id="btn-open-brave" type="button" data-i18n-aria-label="main.openBrave" title="Brave">
+                    <img src="./brave-icon.svg" alt="" aria-hidden="true" />
+                  </button>
+                </div>
+                <div class="remote-grid-row">
+                  <button id="btn-close-tab" type="button" data-i18n-aria-label="main.closeTab" title="Ctrl+W">✕</button>
+                  <button id="btn-new-tab" type="button" data-i18n-aria-label="main.newTab" title="Ctrl+T">＋</button>
+                  <button id="btn-fullscreen" type="button" data-i18n-aria-label="main.fullscreen" title="F11">⛶</button>
+                </div>
+                <div class="remote-grid-row">
+                  <button id="btn-prev-tab" type="button" data-i18n-aria-label="main.prevTab" title="Ctrl+Shift+Tab">◀</button>
+                  <button id="btn-next-tab" type="button" data-i18n-aria-label="main.nextTab" title="Ctrl+Tab">▶</button>
+                </div>
+                <div class="remote-grid-row">
+                  <button id="btn-browser-back" type="button" data-i18n-aria-label="main.browserBack" title="Alt+Left">⟵</button>
+                  <button id="btn-browser-forward" type="button" data-i18n-aria-label="main.browserForward" title="Alt+Right">⟶</button>
+                  <button id="btn-address-bar" type="button" data-i18n-aria-label="main.addressBar" title="Ctrl+L">⌕</button>
+                  <button id="btn-hard-reload" type="button" data-i18n-aria-label="main.reload" title="Ctrl+F5">↻</button>
+                </div>
+              </div>
+            </section>
+            <section id="tv-controls" class="remote-panel" data-i18n-aria-label="main.tvControlsAria">
+              <p class="remote-panel-title" data-i18n="main.tvSectionLabel">Samsung TV</p>
+              <div class="tv-actions">
+                <div class="remote-grid-row">
+                  <button id="btn-samsung-on" type="button" data-i18n-aria-label="main.samsungOn">On</button>
+                  <button id="btn-samsung-off" type="button" data-i18n-aria-label="main.samsungOff">Off</button>
+                </div>
+                <div class="remote-grid-row">
+                  <button id="btn-samsung-input" type="button" data-i18n-aria-label="main.samsungInput">Source</button>
+                  <button id="btn-samsung-enter" type="button" data-i18n-aria-label="main.samsungEnter">Enter</button>
+                  <button id="btn-samsung-pc-input" type="button" data-i18n-aria-label="main.samsungPcInput">PC</button>
+                </div>
+                <div class="remote-grid-row">
+                  <button id="btn-samsung-volup" type="button" data-i18n-aria-label="main.samsungVolUp">Vol+</button>
+                  <button id="btn-samsung-voldown" type="button" data-i18n-aria-label="main.samsungVolDown">Vol-</button>
+                </div>
+              </div>
+            </section>
+            <div id="touchpad-hint" aria-hidden="true">
+              <p id="touchpad-hint-title" data-i18n="main.canvas.dragMouse">Glisser : souris</p>
+              <p id="touchpad-hint-subtitle" data-i18n="main.canvas.touchHelp">Touchez pour cliquer, maintenez pour glisser</p>
+            </div>
           </div>
-        </section>
+          <div id="scroll-zone-indicator" aria-hidden="true">
+            <span id="scroll-zone-label" data-i18n="main.canvas.oneFingerScroll">SCROLL 1 DOIGT</span>
+          </div>
+        </div>
         <canvas id="touchpad"></canvas>
         <section id="cursor-preview" data-i18n-aria-label="main.cursorPreviewAria">
           <canvas id="preview-canvas" width="128" height="84"></canvas>

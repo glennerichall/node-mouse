@@ -16,6 +16,10 @@ function createNoopTouchHandler() {
     return {
         buttonState: () => {
         },
+        interactionStart: () => {
+        },
+        interactionEnd: () => {
+        },
         move: () => {
         },
         scroll: () => {
@@ -36,6 +40,7 @@ function createInitialTouchState() {
         moved: false,
         dragActive: false,
         dragEligible: false,
+        interactionActive: false,
         touchStartedAt: 0,
         lastMoveAt: 0,
     };
@@ -54,9 +59,20 @@ export function createSocketTouchHandler(socket, options = {}) {
         ? options.onMouseMove
         : () => {
         };
+    const onInteractionStart = typeof options.onInteractionStart === 'function'
+        ? options.onInteractionStart
+        : () => {
+        };
+    const onInteractionEnd = typeof options.onInteractionEnd === 'function'
+        ? options.onInteractionEnd
+        : () => {
+        };
     const getInputConfig = typeof options.getInputConfig === 'function'
         ? options.getInputConfig
         : () => ({});
+    const getHandedness = typeof options.getHandedness === 'function'
+        ? options.getHandedness
+        : () => 'right';
 
     const moveEmitter = createAccumulatedThrottle(
         (payload) => {
@@ -77,6 +93,12 @@ export function createSocketTouchHandler(socket, options = {}) {
         buttonState: (button, state) => {
             emitWithTimestamp(socket, REMOTE_EVENT_MOUSE_BUTTON, {button, state});
         },
+        interactionStart: () => {
+            onInteractionStart();
+        },
+        interactionEnd: () => {
+            onInteractionEnd();
+        },
         move: (dx, dy) => {
             moveEmitter.addDelta(dx, dy);
         },
@@ -87,6 +109,7 @@ export function createSocketTouchHandler(socket, options = {}) {
             emitWithTimestamp(socket, REMOTE_EVENT_MOUSE_CLICK, {button});
         },
         getInputConfig,
+        getHandedness,
         flush: () => {
             moveEmitter.flushNow();
             scrollEmitter.flushNow();

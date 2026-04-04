@@ -1,4 +1,4 @@
-import { getRightScrollZoneLayout } from './gesture-zone.js';
+import { getScrollZoneLayout } from './gesture-zone.js';
 import {
   applyNonLinearAcceleration,
   distance2D,
@@ -39,10 +39,15 @@ export function handleTouchStart(event, { touchpad, state, handler }) {
   event.preventDefault();
   const touches = event.touches;
 
+  if (!state.interactionActive && touches.length > 0) {
+    state.interactionActive = true;
+    handler.interactionStart();
+  }
+
   if (touches.length === 1) {
     const t = touches[0];
     const rect = touchpad.getBoundingClientRect();
-    const layout = getRightScrollZoneLayout(rect.width, rect.height);
+    const layout = getScrollZoneLayout(rect.width, rect.height, handler.getHandedness?.());
     const localX = t.clientX - rect.left;
     const localY = t.clientY - rect.top;
     const inRightZone =
@@ -159,6 +164,8 @@ export function handleTouchEnd(event, { state, handler }) {
     state.moved = false;
     state.dragActive = false;
     state.dragEligible = false;
+    state.interactionActive = false;
     handler.flush();
+    handler.interactionEnd();
   }
 }

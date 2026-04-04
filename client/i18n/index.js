@@ -2,12 +2,16 @@ import {localePrefixes, localeRegistry} from './locale-registry.js';
 
 const LOCALE_STORAGE_KEY = 'remote-mouse.locale';
 const THEME_STORAGE_KEY = 'remote-mouse.theme';
+const HANDEDNESS_STORAGE_KEY = 'remote-mouse.handedness';
 const I18N_CHANGED_EVENT = 'i18n:changed';
 const THEME_CHANGED_EVENT = 'theme:changed';
+const HANDEDNESS_CHANGED_EVENT = 'handedness:changed';
 const SUPPORTED_THEMES = new Set(['dark', 'light']);
+const SUPPORTED_HANDEDNESS = new Set(['right', 'left']);
 
 let cachedI18n = null;
 let cachedTheme = '';
+let cachedHandedness = '';
 
 function safeReadStoredLocale() {
   try {
@@ -41,6 +45,22 @@ function safeWriteStoredTheme(theme) {
   }
 }
 
+function safeReadStoredHandedness() {
+  try {
+    return window.localStorage.getItem(HANDEDNESS_STORAGE_KEY);
+  } catch (_error) {
+    return '';
+  }
+}
+
+function safeWriteStoredHandedness(handedness) {
+  try {
+    window.localStorage.setItem(HANDEDNESS_STORAGE_KEY, handedness);
+  } catch (_error) {
+    // Best effort.
+  }
+}
+
 function resolveLocale(value = safeReadStoredLocale() || navigator.language) {
   const normalized = String(value || '').toLowerCase();
 
@@ -69,12 +89,27 @@ function resolveTheme(value = safeReadStoredTheme()) {
   return 'dark';
 }
 
+function resolveHandedness(value = safeReadStoredHandedness()) {
+  const normalized = String(value || '').trim().toLowerCase();
+  if (SUPPORTED_HANDEDNESS.has(normalized)) {
+    return normalized;
+  }
+  return 'right';
+}
+
 function applyClientTheme(theme) {
   const normalizedTheme = resolveTheme(theme);
   cachedTheme = normalizedTheme;
   document.documentElement.dataset.theme = normalizedTheme;
   document.documentElement.style.colorScheme = normalizedTheme;
   return normalizedTheme;
+}
+
+function applyClientHandedness(handedness) {
+  const normalizedHandedness = resolveHandedness(handedness);
+  cachedHandedness = normalizedHandedness;
+  document.documentElement.dataset.handedness = normalizedHandedness;
+  return normalizedHandedness;
 }
 
 function interpolate(template, params = {}) {
@@ -111,6 +146,10 @@ export function initClientTheme(theme = resolveTheme()) {
   return applyClientTheme(theme);
 }
 
+export function initClientHandedness(handedness = resolveHandedness()) {
+  return applyClientHandedness(handedness);
+}
+
 export async function setClientLocale(locale) {
   const normalizedLocale = resolveLocale(locale);
   safeWriteStoredLocale(normalizedLocale);
@@ -133,6 +172,10 @@ export function getClientTheme() {
   return cachedTheme || resolveTheme();
 }
 
+export function getClientHandedness() {
+  return cachedHandedness || resolveHandedness();
+}
+
 export function setClientTheme(theme) {
   const normalizedTheme = resolveTheme(theme);
   const previousTheme = getClientTheme();
@@ -146,6 +189,21 @@ export function setClientTheme(theme) {
     },
   }));
   return normalizedTheme;
+}
+
+export function setClientHandedness(handedness) {
+  const normalizedHandedness = resolveHandedness(handedness);
+  const previousHandedness = getClientHandedness();
+  safeWriteStoredHandedness(normalizedHandedness);
+  applyClientHandedness(normalizedHandedness);
+  mountClientPreferences();
+  window.dispatchEvent(new CustomEvent(HANDEDNESS_CHANGED_EVENT, {
+    detail: {
+      handedness: normalizedHandedness,
+      previousHandedness,
+    },
+  }));
+  return normalizedHandedness;
 }
 
 export function getClientI18n() {
@@ -289,9 +347,68 @@ export function mountThemeSwitcher() {
   }
 }
 
+export function mountHandednessSwitcher() {
+  const handedness = getClientHandedness();
+  const {t} = getClientI18n();
+  const host = document.querySelector('[data-client-prefs-host]') || document.querySelector('[data-language-switcher-host]');
+
+  let root = document.querySelector('[data-handedness-switcher]');
+  if (!root) {
+    root = document.createElement('div');
+    root.dataset.handednessSwitcher = 'true';
+    root.style.display = 'flex';
+    root.style.alignItems = 'center';
+    root.style.gap = '6px';
+
+    const label = document.createElement('span');
+    label.dataset.handednessLabel = 'true';
+    label.style.fontSize = '12px';
+    label.style.color = 'rgba(233, 241, 248, 0.78)';
+
+    const select = document.createElement('select');
+    select.dataset.handednessSelect = 'true';
+    select.style.fontSize = '12px';
+    select.style.borderRadius = '8px';
+    select.style.padding = '3px 8px';
+    select.style.border = '1px solid rgba(255, 255, 255, 0.16)';
+    select.style.background = 'rgba(255, 255, 255, 0.08)';
+    select.style.color = '#e9f1f8';
+
+    for (const nextHandedness of SUPPORTED_HANDEDNESS) {
+      const option = document.createElement('option');
+      option.value = nextHandedness;
+      option.textContent = t(`common.handedness.${nextHandedness}`);
+      select.appendChild(option);
+    }
+
+    select.addEventListener('change', () => {
+      setClientHandedness(select.value);
+    });
+
+    root.appendChild(label);
+    root.appendChild(select);
+    (host || document.body).appendChild(root);
+  }
+
+  const select = root.querySelector('[data-handedness-select]');
+  if (select) {
+    select.value = handedness;
+    select.setAttribute('aria-label', t('common.handedness'));
+    Array.from(select.options).forEach((option) => {
+      option.textContent = t(`common.handedness.${option.value}`);
+    });
+  }
+
+  const label = root.querySelector('[data-handedness-label]');
+  if (label) {
+    label.textContent = t('common.handednessShort');
+  }
+}
+
 export function mountClientPreferences() {
   mountLanguageSwitcher();
   mountThemeSwitcher();
+  mountHandednessSwitcher();
 }
 
 export function onClientI18nChange(listener) {
@@ -321,5 +438,20 @@ export function onClientThemeChange(listener) {
   window.addEventListener(THEME_CHANGED_EVENT, handler);
   return () => {
     window.removeEventListener(THEME_CHANGED_EVENT, handler);
+  };
+}
+
+export function onClientHandednessChange(listener) {
+  if (typeof listener !== 'function') {
+    return () => {};
+  }
+
+  const handler = (event) => {
+    listener(event.detail || {});
+  };
+
+  window.addEventListener(HANDEDNESS_CHANGED_EVENT, handler);
+  return () => {
+    window.removeEventListener(HANDEDNESS_CHANGED_EVENT, handler);
   };
 }

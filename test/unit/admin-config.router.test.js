@@ -7,6 +7,8 @@ import {DEFAULT_PERSISTED_CONFIG} from '../../server/services/config/defaultConf
 describe('admin config router helpers', () => {
   it('coerces booleans, integers and numbers', () => {
     expect(coerceConfigValue(true, {type: 'boolean'})).toBe(true);
+    expect(coerceConfigValue('false', {type: 'boolean'})).toBe(false);
+    expect(coerceConfigValue('true', {type: 'boolean'})).toBe(true);
     expect(coerceConfigValue('42', {type: 'integer'})).toBe(42);
     expect(coerceConfigValue('1.75', {type: 'number'})).toBeCloseTo(1.75);
     expect(coerceConfigValue('  info  ', {type: 'string'})).toBe('info');

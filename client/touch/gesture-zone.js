@@ -1,13 +1,16 @@
 import { clamp } from '../../utils/shared/math.js';
 
-export function getRightScrollZoneWidth(width) {
+export function getScrollZoneWidth(width) {
   return clamp(Math.round(width * 0.11), 36, 64);
 }
 
-export function getRightScrollZoneLayout(width, height) {
+export function getScrollZoneLayout(width, height, handedness = 'right') {
   const edgeGap = clamp(Math.round(width * 0.012), 10, 14);
-  const zoneWidth = getRightScrollZoneWidth(width);
-  const x = Math.max(0, width - zoneWidth - edgeGap);
+  const zoneWidth = getScrollZoneWidth(width);
+  const isLeftHanded = String(handedness || '').toLowerCase() === 'left';
+  const x = isLeftHanded
+    ? edgeGap
+    : Math.max(0, width - zoneWidth - edgeGap);
   const y = edgeGap;
   const h = Math.max(24, height - edgeGap * 2);
 
@@ -18,4 +21,8 @@ export function getRightScrollZoneLayout(width, height) {
     height: h,
     edgeGap,
   };
+}
+
+export function getRightScrollZoneLayout(width, height) {
+  return getScrollZoneLayout(width, height, 'right');
 }

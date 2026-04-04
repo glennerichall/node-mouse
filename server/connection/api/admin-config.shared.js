@@ -18,6 +18,16 @@ export function coerceConfigValue(rawValue, field) {
   }
 
   if (field.type === 'boolean') {
+    if (typeof rawValue === 'string') {
+      const normalized = rawValue.trim().toLowerCase();
+      if (normalized === 'true' || normalized === '1' || normalized === 'yes' || normalized === 'on') {
+        return true;
+      }
+      if (normalized === 'false' || normalized === '0' || normalized === 'no' || normalized === 'off') {
+        return false;
+      }
+      throw new Error('must be a boolean');
+    }
     return Boolean(rawValue);
   }
 

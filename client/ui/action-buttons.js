@@ -1,4 +1,5 @@
 import { emitWithTimestamp } from '../core/socket-emit.js';
+import { getClientSamsungConfig, onClientConfigChange } from '../config/client-config.js';
 import {
   REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT,
   REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER,
@@ -75,6 +76,7 @@ function bindBrowserRemoteButtons(
 function bindSamsungRemoteButtons(
   socket,
   {
+    tvControls,
     btnSamsungOn,
     btnSamsungOff,
     btnSamsungVolUp,
@@ -84,6 +86,14 @@ function bindSamsungRemoteButtons(
     btnSamsungPcInput,
   },
 ) {
+  const syncSamsungVisibility = () => {
+    if (!tvControls) {
+      return;
+    }
+    const samsungConfig = getClientSamsungConfig();
+    tvControls.hidden = !samsungConfig.enabled;
+  };
+
   btnSamsungOn.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_ON));
   btnSamsungOff.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_OFF));
   btnSamsungVolUp.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_VOL_UP));
@@ -91,6 +101,8 @@ function bindSamsungRemoteButtons(
   btnSamsungInput.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_INPUT));
   btnSamsungEnter.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_ENTER));
   btnSamsungPcInput.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_PC_INPUT));
+  syncSamsungVisibility();
+  onClientConfigChange(syncSamsungVisibility);
 }
 
 function bindAdminRemoteButtons(
