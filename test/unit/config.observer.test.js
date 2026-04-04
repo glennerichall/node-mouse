@@ -43,6 +43,12 @@ describe('config observer', () => {
         type: PUBSUB_EVENT_CONFIG_UPDATED,
         changeType: 'updated',
         changedKeys: ['logging.level'],
+        entries: [
+          {
+            path: 'logging.level',
+            value: 'debug',
+          },
+        ],
         config: {
           logging: {
             level: 'debug',

@@ -8,6 +8,7 @@ export const CONFIG_PATHS = [
     'notifications.client',
     'notifications.ttlMs',
     'samsungTv.enabled',
+    'samsungTv.alwaysAutoResolve',
     'samsungTv.host',
     'samsungTv.mac',
     'samsungTv.port',

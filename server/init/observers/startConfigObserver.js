@@ -1,5 +1,12 @@
 import {PUBSUB_SERVICE_CONFIG} from '../../services/pubsub/serviceEventConstants.js';
 
+function getValueAtPath(source, dottedPath) {
+  return String(dottedPath || '')
+    .split('.')
+    .filter(Boolean)
+    .reduce((cursor, segment) => (cursor == null ? undefined : cursor[segment]), source);
+}
+
 export function startConfigObserver(services) {
   if (typeof services.getPubSub !== 'function' || typeof services.getSseService !== 'function') {
     return () => {};
@@ -9,6 +16,8 @@ export function startConfigObserver(services) {
 
   return bus.subscribe((event) => {
     const sse = services.getSseService();
+    const config = services.getConfig();
+    const changedKeys = Array.isArray(event.payload?.changedKeys) ? event.payload.changedKeys : [];
     sse.emit({
       name: 'config.changed',
       service: event.service,
@@ -18,8 +27,12 @@ export function startConfigObserver(services) {
         at: event.at,
         type: event.type,
         changeType: event.payload?.changeType || '',
-        changedKeys: Array.isArray(event.payload?.changedKeys) ? event.payload.changedKeys : [],
-        config: services.getConfig(),
+        changedKeys,
+        entries: changedKeys.map((path) => ({
+          path,
+          value: getValueAtPath(config, path),
+        })),
+        config,
         sysConfig: services.getSystemConfig(),
       },
     });

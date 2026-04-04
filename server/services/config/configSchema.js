@@ -75,6 +75,10 @@ export const CONFIG_SCHEMA = {
         label: 'Activer Samsung TV',
         type: 'boolean',
       },
+      alwaysAutoResolve: {
+        label: 'Toujours auto-resoudre',
+        type: 'boolean',
+      },
       host: {
         label: 'Adresse IP',
         type: 'string',

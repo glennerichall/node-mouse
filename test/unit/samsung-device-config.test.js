@@ -2,6 +2,7 @@ import sinon from 'sinon';
 
 import {
   createSamsungDeviceConfigResolver,
+  discoverSamsungDevices,
   normalizeMac,
   pickSamsungDevice,
 } from '../../server/remotes/samsung/device-config.js';
@@ -55,6 +56,54 @@ describe('samsung device config', () => {
     });
     expect(getLastConnectedDeviceFn.called).toBe(false);
     expect(getAwakeSamsungDevicesFn.called).toBe(false);
+  });
+
+  it('deduplicates discovered devices with the last connected candidate first', async () => {
+    const discoverDevices = discoverSamsungDevices({
+      getConfig: () => ({
+        discoveryTimeoutMs: 3000,
+      }),
+      getLastConnectedDeviceFn: sandbox.stub().returns({
+        ip: '192.168.1.10',
+        wifiMac: 'AA:BB:CC:DD:EE:01',
+        name: 'Salon',
+      }),
+      getAwakeSamsungDevicesFn: sandbox.stub().resolves([
+        {ip: '192.168.1.10', wifiMac: 'AA:BB:CC:DD:EE:01', name: 'Salon'},
+        {ip: '192.168.1.20', wifiMac: 'AA:BB:CC:DD:EE:02', name: 'Bureau'},
+      ]),
+    });
+
+    await expect(discoverDevices()).resolves.toEqual([
+      {ip: '192.168.1.10', wifiMac: 'AA:BB:CC:DD:EE:01', name: 'Salon'},
+      {ip: '192.168.1.20', wifiMac: 'AA:BB:CC:DD:EE:02', name: 'Bureau'},
+    ]);
+  });
+
+  it('ignores configured host and mac when always auto resolve is enabled', async () => {
+    const getLastConnectedDeviceFn = sandbox.stub().returns(null);
+    const getAwakeSamsungDevicesFn = sandbox.stub().resolves([
+      {ip: '192.168.1.20', wifiMac: 'AA:BB:CC:DD:EE:02', name: 'Bureau'},
+    ]);
+    const getLogger = () => ({info: sandbox.stub()});
+
+    const resolveDeviceConfig = createSamsungDeviceConfigResolver({
+      getConfig: () => ({
+        alwaysAutoResolve: true,
+        host: '192.168.1.55',
+        mac: 'AA:BB:CC:DD:EE:FF',
+        discoveryTimeoutMs: 3000,
+      }),
+      getLogger,
+      getLastConnectedDeviceFn,
+      getAwakeSamsungDevicesFn,
+    });
+
+    await expect(resolveDeviceConfig()).resolves.toEqual({
+      ip: '192.168.1.20',
+      mac: 'AA:BB:CC:DD:EE:02',
+    });
+    expect(getAwakeSamsungDevicesFn.calledOnce).toBe(true);
   });
 
   it('throws when several devices are discovered without a selector', async () => {

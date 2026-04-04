@@ -32,9 +32,14 @@
   <template id="section-template">
     <section class="config-section">
       <div class="section-header">
-        <p class="section-key"></p>
-        <h2></h2>
-        <p class="section-description"></p>
+        <div class="section-heading">
+          <div class="section-heading-copy">
+            <p class="section-key"></p>
+            <h2></h2>
+            <p class="section-description"></p>
+          </div>
+          <button class="section-toggle" type="button" aria-expanded="false" aria-label="Afficher la section" title="Afficher la section">Afficher</button>
+        </div>
       </div>
       <div class="section-fields"></div>
     </section>

@@ -11,6 +11,7 @@ export function createSamsungRemoteGetter({
     return async function getRemote() {
         const config = getConfig();
         const nextKey = JSON.stringify({
+            alwaysAutoResolve: config.alwaysAutoResolve,
             appName: config.appName,
             host: config.host,
             mac: config.mac,

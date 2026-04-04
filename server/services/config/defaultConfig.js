@@ -56,6 +56,7 @@ export const DEFAULT_PERSISTED_CONFIG = {
     },
     samsungTv: {
         enabled: false,
+        alwaysAutoResolve: true,
         host: '',
         mac: '',
         port: 8002,

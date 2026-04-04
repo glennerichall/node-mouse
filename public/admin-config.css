@@ -135,13 +135,54 @@ button[hidden] {
 }
 
 .section-header {
+  position: relative;
+}
+
+.section-heading {
+  position: relative;
+  padding-right: 86px;
+}
+
+.section-heading-copy {
   display: grid;
   gap: 6px;
+}
+
+.section-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-width: 74px;
+  min-height: 24px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(21, 29, 35, 0.5);
+  font-size: 0.72rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.config-section.is-collapsed .section-fields {
+  display: none;
 }
 
 .section-fields {
   display: grid;
   gap: 12px;
+}
+
+.section-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.section-action-button {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 0.82rem;
 }
 
 .field-card {
@@ -189,6 +230,13 @@ button[hidden] {
   color: var(--text);
   padding: 0 12px;
   font: inherit;
+}
+
+.field-control input:disabled,
+.field-control select:disabled,
+.toggle-row:has(input:disabled) {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .field-reset {

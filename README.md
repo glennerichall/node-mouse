@@ -88,6 +88,10 @@ Useful CLI commands:
 - `open-qr` opens the QR page on the server
 - `qr` is an alias of `open-qr`
 
+Example:
+
+- `remote-mouse config get logging.level`
+
 ## Routes
 
 The server exposes two main HTTP surfaces:

@@ -14,6 +14,9 @@ let configSubscriptionId = '';
 let configReloadInFlight = false;
 let configReloadPending = false;
 let configMutationDepth = 0;
+let pendingConfigEventPayload = null;
+const collapsedSections = new Set();
+const fieldContexts = new Map();
 
 function getValueAtPath(source, dottedPath) {
   return String(dottedPath || '')
@@ -95,13 +98,47 @@ function setActionsDisabled(disabled) {
   restartButton.disabled = disabled;
 }
 
+function isSamsungAutoResolveEnabled() {
+  return Boolean(getValueAtPath(currentConfig, 'samsungTv.alwaysAutoResolve'));
+}
+
+function syncSamsungFieldAvailability(pathKey, input, resetButton) {
+  const shouldDisable = isSamsungAutoResolveEnabled()
+    && (pathKey === 'samsungTv.host' || pathKey === 'samsungTv.mac');
+  if (!input) {
+    return;
+  }
+  input.disabled = shouldDisable;
+  resetButton.disabled = shouldDisable;
+}
+
+function syncSamsungFieldsAvailability() {
+  for (const [pathKey, context] of fieldContexts.entries()) {
+    syncSamsungFieldAvailability(pathKey, context.input, context.resetButton);
+  }
+}
+
+function syncSectionCollapseState(sectionNode, sectionKey, toggleButton) {
+  const collapsed = collapsedSections.has(sectionKey);
+  sectionNode.classList.toggle('is-collapsed', collapsed);
+  toggleButton.setAttribute('aria-expanded', String(!collapsed));
+  const label = collapsed ? 'Afficher la section' : 'Masquer la section';
+  toggleButton.setAttribute('aria-label', label);
+  toggleButton.setAttribute('title', label);
+  toggleButton.textContent = collapsed ? 'Afficher' : 'Masquer';
+}
+
 function beginConfigMutation() {
   configMutationDepth += 1;
 }
 
 function endConfigMutation() {
   configMutationDepth = Math.max(0, configMutationDepth - 1);
-  if (configMutationDepth === 0 && configReloadPending) {
+  if (configMutationDepth === 0 && pendingConfigEventPayload) {
+    queueMicrotask(() => {
+      applyConfigEventPayload(pendingConfigEventPayload);
+    });
+  } else if (configMutationDepth === 0 && configReloadPending) {
     queueMicrotask(() => {
       refreshConfigFromServer({silent: true});
     });
@@ -139,8 +176,125 @@ async function patchField(pathKey, value) {
     throw new Error(payload.message || `Erreur de synchronisation pour ${pathKey}.`);
   }
 
-  setConfigValue(pathKey, payload.config?.value);
+  applyConfigEntry(pathKey, payload.config?.value);
   return payload;
+}
+
+async function saveConfigEntries(entries) {
+  beginConfigMutation();
+  setActionsDisabled(true);
+
+  try {
+    for (const [pathKey, value] of entries) {
+      await patchField(pathKey, value);
+    }
+  } finally {
+    setActionsDisabled(false);
+    endConfigMutation();
+  }
+}
+
+function applyConfigEntry(pathKey, value) {
+  setConfigValue(pathKey, value);
+  const context = fieldContexts.get(pathKey);
+  if (!context) {
+    return;
+  }
+
+  const existingTimer = syncTimers.get(pathKey);
+  if (existingTimer) {
+    clearTimeout(existingTimer);
+    syncTimers.delete(pathKey);
+  }
+
+  setInputValue(context.input, context.field, value);
+  syncResetButtonVisibility(context);
+  syncSamsungFieldAvailability(pathKey, context.input, context.resetButton);
+}
+
+function applyConfigEventPayload(payload) {
+  if (configMutationDepth > 0) {
+    pendingConfigEventPayload = payload;
+    return;
+  }
+
+  pendingConfigEventPayload = null;
+  const entries = Array.isArray(payload?.entries) ? payload.entries : [];
+  if (!entries.length) {
+    refreshConfigFromServer({silent: true});
+    return;
+  }
+
+  for (const entry of entries) {
+    if (!entry?.path) {
+      continue;
+    }
+    applyConfigEntry(entry.path, entry.value);
+  }
+
+  syncSamsungFieldsAvailability();
+}
+
+function formatSamsungDeviceLabel(device, index) {
+  const parts = [
+    `${index + 1}.`,
+    device.name || 'TV Samsung',
+    device.model ? `(${device.model})` : '',
+    device.host ? `IP ${device.host}` : '',
+    device.mac ? `MAC ${device.mac}` : '',
+  ].filter(Boolean);
+  return parts.join(' ');
+}
+
+async function discoverSamsungDevice() {
+  setStatus('Decouverte des TV Samsung...', 'pending');
+
+  const response = await fetch('/api/admin/configs/samsung/discover', {
+    method: 'POST',
+  });
+  const payload = await response.json();
+  if (!response.ok || !payload.ok) {
+    throw new Error(payload.message || 'Decouverte Samsung impossible.');
+  }
+
+  const devices = Array.isArray(payload.devices) ? payload.devices : [];
+  if (!devices.length) {
+    throw new Error('Aucune TV Samsung detectee.');
+  }
+
+  let selectedIndex = devices.findIndex((device) => device.isSelected);
+  if (devices.length === 1) {
+    const accepted = window.confirm(
+      `TV detectee:\n${formatSamsungDeviceLabel(devices[0], 0)}\n\nAppliquer cette configuration ?`,
+    );
+    if (!accepted) {
+      setStatus('Selection Samsung annulee.');
+      return;
+    }
+    selectedIndex = 0;
+  } else {
+    const suggestedIndex = selectedIndex >= 0 ? selectedIndex + 1 : 1;
+    const choice = window.prompt(
+      `TV Samsung detectees:\n${devices.map(formatSamsungDeviceLabel).join('\n')}\n\nEntrez le numero a appliquer :`,
+      String(suggestedIndex),
+    );
+    if (choice == null) {
+      setStatus('Selection Samsung annulee.');
+      return;
+    }
+
+    selectedIndex = Number.parseInt(String(choice).trim(), 10) - 1;
+    if (!Number.isInteger(selectedIndex) || selectedIndex < 0 || selectedIndex >= devices.length) {
+      throw new Error('Selection Samsung invalide.');
+    }
+  }
+
+  const selectedDevice = devices[selectedIndex];
+  await saveConfigEntries([
+    ['samsungTv.host', selectedDevice.host || ''],
+    ['samsungTv.mac', selectedDevice.mac || ''],
+  ]);
+  setStatus(`TV Samsung appliquee: ${selectedDevice.name || selectedDevice.host || 'inconnue'}.`, 'success');
 }
 
 async function syncField({pathKey, field, input, defaultValue, resetButton}) {
@@ -249,15 +403,37 @@ function createInput(pathKey, field, value) {
 
 function renderConfigForm(config, schema) {
   currentConfig = config || {};
+  fieldContexts.clear();
   form.replaceChildren();
 
   for (const [sectionKey, section] of Object.entries(schema)) {
+    if (!collapsedSections.has(sectionKey)) {
+      collapsedSections.add(sectionKey);
+    }
+
     const sectionNode = sectionTemplate.content.firstElementChild.cloneNode(true);
     sectionNode.querySelector('.section-key').textContent = sectionKey;
     sectionNode.querySelector('h2').textContent = section.title;
     sectionNode.querySelector('.section-description').textContent = section.description || '';
+    const sectionToggleButton = sectionNode.querySelector('.section-toggle');
 
     const fieldsNode = sectionNode.querySelector('.section-fields');
+
+    if (sectionKey === 'samsungTv') {
+      const sectionActionsNode = document.createElement('div');
+      sectionActionsNode.className = 'section-actions';
+      const discoverButton = document.createElement('button');
+      discoverButton.type = 'button';
+      discoverButton.className = 'section-action-button';
+      discoverButton.textContent = 'Detecter TV';
+      discoverButton.addEventListener('click', () => {
+        discoverSamsungDevice().catch((error) => {
+          setStatus(error.message || 'Decouverte Samsung impossible.', 'error');
+        });
+      });
+      sectionActionsNode.append(discoverButton);
+      fieldsNode.append(sectionActionsNode);
+    }
 
     for (const [fieldKey, field] of Object.entries(section.fields)) {
       const pathKey = `${sectionKey}.${fieldKey}`;
@@ -284,6 +460,7 @@ function renderConfigForm(config, schema) {
         defaultValue,
         resetButton,
       };
+      fieldContexts.set(pathKey, fieldContext);
 
       input?.addEventListener('input', () => {
         syncVisibility();
@@ -296,6 +473,7 @@ function renderConfigForm(config, schema) {
         scheduleFieldSync(fieldContext, {immediate: true});
       });
       syncVisibility();
+      syncSamsungFieldAvailability(pathKey, input, resetButton);
 
       resetButton.addEventListener('click', () => {
         resetField({
@@ -309,6 +487,16 @@ function renderConfigForm(config, schema) {
 
       fieldsNode.append(fieldNode);
     }
+
+    sectionToggleButton.addEventListener('click', () => {
+      if (collapsedSections.has(sectionKey)) {
+        collapsedSections.delete(sectionKey);
+      } else {
+        collapsedSections.add(sectionKey);
+      }
+      syncSectionCollapseState(sectionNode, sectionKey, sectionToggleButton);
+    });
+    syncSectionCollapseState(sectionNode, sectionKey, sectionToggleButton);
 
     form.append(sectionNode);
   }
@@ -421,8 +609,12 @@ async function subscribeToConfigEvents() {
 
   configStream?.close();
   configStream = new EventSource(payload.eventsUrl);
-  configStream.addEventListener('config.changed', () => {
-    refreshConfigFromServer({silent: true});
+  configStream.addEventListener('config.changed', (event) => {
+    try {
+      applyConfigEventPayload(JSON.parse(event.data || '{}'));
+    } catch (_error) {
+      refreshConfigFromServer({silent: true});
+    }
   });
 }
 
