@@ -1,7 +1,8 @@
-import {applyPageTranslations, getClientI18n, initClientI18n, mountLanguageSwitcher, onClientI18nChange} from '../i18n/index.js';
+import {applyPageTranslations, getClientI18n, initClientI18n, initClientTheme, mountClientPreferences, onClientI18nChange} from '../i18n/index.js';
 
 await initClientI18n();
-mountLanguageSwitcher();
+initClientTheme();
+mountClientPreferences();
 
 const form = document.getElementById('config-form');
 const statusNode = document.getElementById('config-status');

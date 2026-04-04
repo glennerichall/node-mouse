@@ -10,6 +10,14 @@
   --preview-gap-from-scroll: 8px;
 }
 
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg: #eff5f8;
+  --bg-2: #dfe8ee;
+  --fg: #18232c;
+  --accent: #0a86b8;
+}
+
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
@@ -56,6 +64,11 @@ body {
   transition: transform 220ms ease;
 }
 
+html[data-theme="light"] #left-menu {
+  background: color-mix(in srgb, var(--bg-2) 92%, white);
+  border-right-color: rgba(24, 35, 44, 0.12);
+}
+
 #app.admin-drawer-open #left-menu {
   transform: translateX(0);
 }
@@ -99,6 +112,15 @@ body {
 #left-menu button:active {
   transform: translateY(1px);
   background: #384955;
+}
+
+html[data-theme="light"] #left-menu button {
+  color: var(--fg);
+  background: #c9d8e2;
+}
+
+html[data-theme="light"] #left-menu button:active {
+  background: #b7cad6;
 }
 
 .admin-group-updates button {
@@ -157,7 +179,7 @@ body {
 
 #browser-shortcuts {
   position: absolute;
-  top: calc(8px + env(safe-area-inset-top));
+  top: 8px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -170,9 +192,13 @@ body {
   backdrop-filter: blur(6px);
 }
 
+html[data-theme="light"] #browser-shortcuts {
+  background: rgba(248, 252, 255, 0.72);
+}
+
 #tv-controls {
   position: absolute;
-  top: calc(62px + env(safe-area-inset-top));
+  top: 62px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
@@ -183,6 +209,10 @@ body {
   border-radius: 16px;
   background: rgba(10, 16, 20, 0.5);
   backdrop-filter: blur(6px);
+}
+
+html[data-theme="light"] #tv-controls {
+  background: rgba(248, 252, 255, 0.74);
 }
 
 .section-label {
@@ -217,6 +247,15 @@ body {
   background: rgba(56, 73, 85, 0.96);
 }
 
+html[data-theme="light"] .tv-actions button {
+  color: var(--fg);
+  background: rgba(216, 229, 237, 0.96);
+}
+
+html[data-theme="light"] .tv-actions button:active {
+  background: rgba(198, 217, 228, 0.98);
+}
+
 #browser-shortcuts button {
   pointer-events: auto;
   appearance: none;
@@ -235,6 +274,15 @@ body {
 #browser-shortcuts button:active {
   transform: translateY(1px);
   background: rgba(56, 73, 85, 0.96);
+}
+
+html[data-theme="light"] #browser-shortcuts button {
+  color: var(--fg);
+  background: rgba(216, 229, 237, 0.96);
+}
+
+html[data-theme="light"] #browser-shortcuts button:active {
+  background: rgba(198, 217, 228, 0.98);
 }
 
 #btn-open-brave img {
@@ -286,6 +334,12 @@ body {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
+html[data-theme="light"] #preview-canvas {
+  border-color: rgba(24, 35, 44, 0.16);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 6px 18px rgba(40, 76, 97, 0.16);
+}
+
 #menu {
   grid-row: 2;
   height: var(--menu-h);
@@ -314,6 +368,17 @@ body {
   background: #384955;
 }
 
+html[data-theme="light"] #menu button,
+html[data-theme="light"] #keyboard-panel button {
+  color: var(--fg);
+  background: #d5e2ea;
+}
+
+html[data-theme="light"] #menu button:active,
+html[data-theme="light"] #keyboard-panel button:active {
+  background: #c2d4de;
+}
+
 #keyboard-panel {
   position: fixed;
   left: 0;
@@ -340,6 +405,11 @@ body {
   color: var(--fg);
   resize: none;
   font: inherit;
+}
+
+html[data-theme="light"] #text-input {
+  border-color: rgba(24, 35, 44, 0.14);
+  background: #ffffff;
 }
 
 #send-text {
@@ -378,6 +448,15 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: rgba(19, 27, 33, 0.88);
   text-align: center;
+}
+
+html[data-theme="light"] #connection-overlay {
+  background: rgba(234, 241, 245, 0.7);
+}
+
+html[data-theme="light"] .connection-card {
+  border-color: rgba(24, 35, 44, 0.14);
+  background: rgba(255, 255, 255, 0.94);
 }
 
 .connection-card h2 {

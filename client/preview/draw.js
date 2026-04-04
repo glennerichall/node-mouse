@@ -27,6 +27,8 @@ export function drawPreviewFrame({ctx, previewCanvas, previewLabel, frame}) {
     if (previewCanvas.width !== width || previewCanvas.height !== height) {
         previewCanvas.width = width;
         previewCanvas.height = height;
+        previewCanvas.style.width = `${width}px`;
+        previewCanvas.style.height = `${height}px`;
     }
 
     const imageData = new ImageData(rgba, width, height);

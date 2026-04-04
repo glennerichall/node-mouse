@@ -14,6 +14,15 @@
       --line: rgba(255,255,255,.12);
       --accent: #5fd3ff;
     }
+    html[data-theme="light"] {
+      color-scheme: light;
+      --bg: #eef4f8;
+      --panel: #ffffff;
+      --text: #17303a;
+      --muted: #607b8a;
+      --line: rgba(23, 48, 58, .12);
+      --accent: #0a87b8;
+    }
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -132,9 +141,9 @@
   </main>
 
   <script type="module">
-    import {applyPageTranslations, getClientI18n, initClientI18n, mountLanguageSwitcher, onClientI18nChange} from '/client/i18n/index.js';
+    import {applyPageTranslations, getClientI18n, initClientI18n, initClientTheme, onClientI18nChange} from '/client/i18n/index.js';
     await initClientI18n();
-    mountLanguageSwitcher();
+    initClientTheme();
     const {t} = getClientI18n();
     applyPageTranslations(document);
     const versionEl = document.getElementById('version');

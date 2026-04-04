@@ -4,6 +4,10 @@ export const en = {
   'common.notification': 'Notification',
   'common.language': 'Language',
   'common.languageShort': 'Lang',
+  'common.theme': 'Theme',
+  'common.themeShort': 'Theme',
+  'common.theme.dark': 'Dark',
+  'common.theme.light': 'Light',
 
   'main.pageTitle': 'Remote Mouse',
   'main.workspaceAria': 'Remote workspace',

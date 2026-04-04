@@ -1,9 +1,13 @@
 import {localePrefixes, localeRegistry} from './locale-registry.js';
 
 const LOCALE_STORAGE_KEY = 'remote-mouse.locale';
+const THEME_STORAGE_KEY = 'remote-mouse.theme';
 const I18N_CHANGED_EVENT = 'i18n:changed';
+const THEME_CHANGED_EVENT = 'theme:changed';
+const SUPPORTED_THEMES = new Set(['dark', 'light']);
 
 let cachedI18n = null;
+let cachedTheme = '';
 
 function safeReadStoredLocale() {
   try {
@@ -16,6 +20,22 @@ function safeReadStoredLocale() {
 function safeWriteStoredLocale(locale) {
   try {
     window.localStorage.setItem(LOCALE_STORAGE_KEY, locale);
+  } catch (_error) {
+    // Best effort.
+  }
+}
+
+function safeReadStoredTheme() {
+  try {
+    return window.localStorage.getItem(THEME_STORAGE_KEY);
+  } catch (_error) {
+    return '';
+  }
+}
+
+function safeWriteStoredTheme(theme) {
+  try {
+    window.localStorage.setItem(THEME_STORAGE_KEY, theme);
   } catch (_error) {
     // Best effort.
   }
@@ -39,6 +59,22 @@ function resolveLocale(value = safeReadStoredLocale() || navigator.language) {
 
 async function loadDictionary(locale) {
   return localeRegistry[locale]?.load() || localeRegistry.fr.load();
+}
+
+function resolveTheme(value = safeReadStoredTheme()) {
+  const normalized = String(value || '').trim().toLowerCase();
+  if (SUPPORTED_THEMES.has(normalized)) {
+    return normalized;
+  }
+  return 'dark';
+}
+
+function applyClientTheme(theme) {
+  const normalizedTheme = resolveTheme(theme);
+  cachedTheme = normalizedTheme;
+  document.documentElement.dataset.theme = normalizedTheme;
+  document.documentElement.style.colorScheme = normalizedTheme;
+  return normalizedTheme;
 }
 
 function interpolate(template, params = {}) {
@@ -71,6 +107,10 @@ export async function initClientI18n(locale = resolveLocale()) {
   return cachedI18n;
 }
 
+export function initClientTheme(theme = resolveTheme()) {
+  return applyClientTheme(theme);
+}
+
 export async function setClientLocale(locale) {
   const normalizedLocale = resolveLocale(locale);
   safeWriteStoredLocale(normalizedLocale);
@@ -87,6 +127,25 @@ export async function setClientLocale(locale) {
   }));
 
   return i18n;
+}
+
+export function getClientTheme() {
+  return cachedTheme || resolveTheme();
+}
+
+export function setClientTheme(theme) {
+  const normalizedTheme = resolveTheme(theme);
+  const previousTheme = getClientTheme();
+  safeWriteStoredTheme(normalizedTheme);
+  applyClientTheme(normalizedTheme);
+  mountClientPreferences();
+  window.dispatchEvent(new CustomEvent(THEME_CHANGED_EVENT, {
+    detail: {
+      theme: normalizedTheme,
+      previousTheme,
+    },
+  }));
+  return normalizedTheme;
 }
 
 export function getClientI18n() {
@@ -120,36 +179,28 @@ export function applyPageTranslations(root = document) {
 export function mountLanguageSwitcher() {
   const {locale} = getClientI18n();
   const {t} = getClientI18n();
+  const host = document.querySelector('[data-client-prefs-host]') || document.querySelector('[data-language-switcher-host]');
 
   let root = document.querySelector('[data-language-switcher]');
   if (!root) {
     root = document.createElement('div');
     root.dataset.languageSwitcher = 'true';
-    root.style.position = 'fixed';
-    root.style.top = '10px';
-    root.style.right = '10px';
-    root.style.zIndex = '9999';
     root.style.display = 'flex';
     root.style.alignItems = 'center';
     root.style.gap = '6px';
-    root.style.padding = '6px 8px';
-    root.style.borderRadius = '999px';
-    root.style.background = 'rgba(15, 20, 25, 0.86)';
-    root.style.border = '1px solid rgba(255, 255, 255, 0.14)';
-    root.style.backdropFilter = 'blur(6px)';
 
     const label = document.createElement('span');
     label.dataset.languageLabel = 'true';
     label.style.fontSize = '12px';
-    label.style.color = '#e9f1f8';
+    label.style.color = 'rgba(233, 241, 248, 0.78)';
 
     const select = document.createElement('select');
     select.dataset.languageSelect = 'true';
     select.style.fontSize = '12px';
-    select.style.borderRadius = '999px';
-    select.style.padding = '2px 8px';
-    select.style.border = '1px solid rgba(255, 255, 255, 0.18)';
-    select.style.background = 'rgba(255, 255, 255, 0.06)';
+    select.style.borderRadius = '8px';
+    select.style.padding = '3px 8px';
+    select.style.border = '1px solid rgba(255, 255, 255, 0.16)';
+    select.style.background = 'rgba(255, 255, 255, 0.08)';
     select.style.color = '#e9f1f8';
 
     for (const nextLocale of Object.keys(localeRegistry)) {
@@ -165,7 +216,7 @@ export function mountLanguageSwitcher() {
 
     root.appendChild(label);
     root.appendChild(select);
-    document.body.appendChild(root);
+    (host || document.body).appendChild(root);
   }
 
   const select = root.querySelector('[data-language-select]');
@@ -180,6 +231,69 @@ export function mountLanguageSwitcher() {
   }
 }
 
+export function mountThemeSwitcher() {
+  const theme = getClientTheme();
+  const {t} = getClientI18n();
+  const host = document.querySelector('[data-client-prefs-host]') || document.querySelector('[data-language-switcher-host]');
+
+  let root = document.querySelector('[data-theme-switcher]');
+  if (!root) {
+    root = document.createElement('div');
+    root.dataset.themeSwitcher = 'true';
+    root.style.display = 'flex';
+    root.style.alignItems = 'center';
+    root.style.gap = '6px';
+
+    const label = document.createElement('span');
+    label.dataset.themeLabel = 'true';
+    label.style.fontSize = '12px';
+    label.style.color = 'rgba(233, 241, 248, 0.78)';
+
+    const select = document.createElement('select');
+    select.dataset.themeSelect = 'true';
+    select.style.fontSize = '12px';
+    select.style.borderRadius = '8px';
+    select.style.padding = '3px 8px';
+    select.style.border = '1px solid rgba(255, 255, 255, 0.16)';
+    select.style.background = 'rgba(255, 255, 255, 0.08)';
+    select.style.color = '#e9f1f8';
+
+    for (const nextTheme of SUPPORTED_THEMES) {
+      const option = document.createElement('option');
+      option.value = nextTheme;
+      option.textContent = t(`common.theme.${nextTheme}`);
+      select.appendChild(option);
+    }
+
+    select.addEventListener('change', () => {
+      setClientTheme(select.value);
+    });
+
+    root.appendChild(label);
+    root.appendChild(select);
+    (host || document.body).appendChild(root);
+  }
+
+  const select = root.querySelector('[data-theme-select]');
+  if (select) {
+    select.value = theme;
+    select.setAttribute('aria-label', t('common.theme'));
+    Array.from(select.options).forEach((option) => {
+      option.textContent = t(`common.theme.${option.value}`);
+    });
+  }
+
+  const label = root.querySelector('[data-theme-label]');
+  if (label) {
+    label.textContent = t('common.themeShort');
+  }
+}
+
+export function mountClientPreferences() {
+  mountLanguageSwitcher();
+  mountThemeSwitcher();
+}
+
 export function onClientI18nChange(listener) {
   if (typeof listener !== 'function') {
     return () => {};
@@ -192,5 +306,20 @@ export function onClientI18nChange(listener) {
   window.addEventListener(I18N_CHANGED_EVENT, handler);
   return () => {
     window.removeEventListener(I18N_CHANGED_EVENT, handler);
+  };
+}
+
+export function onClientThemeChange(listener) {
+  if (typeof listener !== 'function') {
+    return () => {};
+  }
+
+  const handler = (event) => {
+    listener(event.detail || {});
+  };
+
+  window.addEventListener(THEME_CHANGED_EVENT, handler);
+  return () => {
+    window.removeEventListener(THEME_CHANGED_EVENT, handler);
   };
 }

@@ -1,11 +1,11 @@
 import { initSocketIo } from './core/init-socket-io.js';
 import { initUi } from './core/init-ui.js';
-import {applyPageTranslations, initClientI18n, mountLanguageSwitcher} from './i18n/index.js';
+import {applyPageTranslations, initClientI18n, initClientTheme} from './i18n/index.js';
 
 async function initClient() {
   await initClientI18n();
+  initClientTheme();
   applyPageTranslations(document);
-  mountLanguageSwitcher();
   const socket = initSocketIo();
   initUi(socket);
 }
