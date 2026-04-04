@@ -159,6 +159,8 @@ export const fr = {
   'adminConfig.section.logging.description': 'Format et niveau de verbosite.',
   'adminConfig.field.input.mouseSpeed': 'Vitesse souris',
   'adminConfig.field.input.scrollSpeed': 'Vitesse scroll',
+  'adminConfig.field.input.touchDragHoldMs': 'Delai drag tactile (ms)',
+  'adminConfig.field.input.touchDragStillDistancePx': 'Tolerance immobile drag tactile (px)',
   'adminConfig.field.preview.width': 'Largeur',
   'adminConfig.field.preview.height': 'Hauteur',
   'adminConfig.field.preview.fps': 'FPS',

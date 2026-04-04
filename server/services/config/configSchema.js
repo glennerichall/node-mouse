@@ -17,6 +17,20 @@ export const CONFIG_SCHEMA = {
         max: 5,
         step: 0.05,
       },
+      touchDragHoldMs: {
+        label: 'Delai drag tactile (ms)',
+        type: 'integer',
+        min: 100,
+        max: 1500,
+        step: 10,
+      },
+      touchDragStillDistancePx: {
+        label: 'Tolerance immobile drag tactile (px)',
+        type: 'integer',
+        min: 1,
+        max: 40,
+        step: 1,
+      },
     },
   },
   preview: {

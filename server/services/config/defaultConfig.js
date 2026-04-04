@@ -43,6 +43,8 @@ export const DEFAULT_PERSISTED_CONFIG = {
     input: {
         mouseSpeed: 1.3,
         scrollSpeed: 0.25,
+        touchDragHoldMs: 420,
+        touchDragStillDistancePx: 8,
     },
     preview: {
         width: 128,

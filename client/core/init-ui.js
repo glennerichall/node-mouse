@@ -9,6 +9,7 @@ import { bindPreviewStream } from '../preview/preview-stream.js';
 import { bindClientNotifications } from '../ui/notifications/bind-client-notifications.js';
 import { bindAdminDrawer } from '../ui/admin-drawer.js';
 import { bindAdminVersion } from '../ui/admin-version.js';
+import { getClientInputConfig } from '../config/client-config.js';
 
 export function initUi(socket) {
   const dom = getDom();
@@ -17,6 +18,7 @@ export function initUi(socket) {
   const preview = bindPreviewStream(socket, dom);
   bindTouchpad(socket, dom.touchpad, {
     onMouseMove: preview.onMouseMoveActivity,
+    getInputConfig: getClientInputConfig,
   });
   bindKeyboardPanel(socket, dom);
   bindMouseButtons(socket, dom);

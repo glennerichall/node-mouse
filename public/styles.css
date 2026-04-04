@@ -360,6 +360,8 @@ html[data-theme="light"] #preview-canvas {
   background: #2c3943;
   font-size: 0.86rem;
   font-weight: 600;
+  touch-action: none;
+  user-select: none;
 }
 
 #menu button:active,

@@ -1,5 +1,6 @@
 import sinon from 'sinon';
 import {createSocketActionResponder} from '../../server/connection/socket/socket-action-responder.js';
+import { REMOTE_EVENT_ADMIN_RESULT } from '../../utils/shared/remoteCommands.js';
 
 describe('createSocketActionResponder', () => {
   let sandbox;
@@ -21,7 +22,7 @@ describe('createSocketActionResponder', () => {
     respond('update-check', {ok: true, message: 'done'});
 
     expect(emit.calledOnce).toBe(true);
-    expect(emit.firstCall.args[0]).toBe('admin:result');
+    expect(emit.firstCall.args[0]).toBe(REMOTE_EVENT_ADMIN_RESULT);
     expect(emit.firstCall.args[1]).toEqual({
       action: 'update-check',
       ok: true,

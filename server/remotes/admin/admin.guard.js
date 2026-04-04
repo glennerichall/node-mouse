@@ -1,3 +1,5 @@
+import { REMOTE_EVENT_ADMIN_PREFIX } from '../../../utils/shared/remoteCommands.js';
+
 export function createAdminEventGuardMiddleware({
   isAdminActionsEnabled,
   client,
@@ -6,7 +8,7 @@ export function createAdminEventGuardMiddleware({
 }) {
   return function adminEventGuard(packet, next) {
     const eventName = String(packet?.[0] || '');
-    if (!eventName.startsWith('admin:')) {
+    if (!eventName.startsWith(REMOTE_EVENT_ADMIN_PREFIX)) {
       next();
       return;
     }
@@ -16,7 +18,7 @@ export function createAdminEventGuardMiddleware({
       return;
     }
 
-    const action = eventName.replace('admin:', '');
+    const action = eventName.replace(REMOTE_EVENT_ADMIN_PREFIX, '');
     log.warn({ client, action }, 'Action admin refusée: ADMIN_ACTIONS_ENABLED=false');
     respondAdminAction(action, {
       ok: false,

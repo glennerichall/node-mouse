@@ -159,6 +159,8 @@ export const en = {
   'adminConfig.section.logging.description': 'Verbosity level and format.',
   'adminConfig.field.input.mouseSpeed': 'Mouse speed',
   'adminConfig.field.input.scrollSpeed': 'Scroll speed',
+  'adminConfig.field.input.touchDragHoldMs': 'Touch drag hold delay (ms)',
+  'adminConfig.field.input.touchDragStillDistancePx': 'Touch drag still tolerance (px)',
   'adminConfig.field.preview.width': 'Width',
   'adminConfig.field.preview.height': 'Height',
   'adminConfig.field.preview.fps': 'FPS',

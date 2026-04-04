@@ -1,4 +1,6 @@
-export function createSocketActionResponder({ socket, eventName = 'admin:result' }) {
+import { REMOTE_EVENT_ADMIN_RESULT } from '../../../utils/shared/remoteCommands.js';
+
+export function createSocketActionResponder({ socket, eventName = REMOTE_EVENT_ADMIN_RESULT }) {
   return function respondAction(action, result = {}) {
     socket.emit(eventName, {
       action,

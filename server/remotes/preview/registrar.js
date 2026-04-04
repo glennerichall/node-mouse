@@ -1,3 +1,8 @@
+import {
+  REMOTE_EVENT_PREVIEW_START,
+  REMOTE_EVENT_PREVIEW_STOP,
+} from '../../../utils/shared/remoteCommands.js';
+
 export function createPreviewEventRegistrar({ preview }) {
   return function registerPreviewEvents(socket) {
     let previewSession = null;
@@ -17,8 +22,8 @@ export function createPreviewEventRegistrar({ preview }) {
       previewSession = null;
     }
 
-    socket.on('preview:start', startPreview);
-    socket.on('preview:stop', stopPreview);
+    socket.on(REMOTE_EVENT_PREVIEW_START, startPreview);
+    socket.on(REMOTE_EVENT_PREVIEW_STOP, stopPreview);
     socket.on('disconnect', stopPreview);
   };
 }

@@ -1,6 +1,8 @@
 export const CONFIG_PATHS = [
     'input.mouseSpeed',
     'input.scrollSpeed',
+    'input.touchDragHoldMs',
+    'input.touchDragStillDistancePx',
     'preview.width',
     'preview.height',
     'preview.fps',

@@ -1,5 +1,10 @@
 import sinon from 'sinon';
 import {createAdminEventGuardMiddleware} from '../../server/remotes/admin/admin.guard.js';
+import {
+  REMOTE_EVENT_ADMIN_SERVICE_RESTART,
+  REMOTE_EVENT_ADMIN_UPDATE_CHECK,
+  REMOTE_EVENT_MOUSE_MOVE,
+} from '../../utils/shared/remoteCommands.js';
 
 describe('createAdminEventGuardMiddleware', () => {
   let sandbox;
@@ -23,7 +28,7 @@ describe('createAdminEventGuardMiddleware', () => {
       respondAdminAction,
     });
 
-    guard(['mouse:move', {dx: 1, dy: 2}], next);
+    guard([REMOTE_EVENT_MOUSE_MOVE, {dx: 1, dy: 2}], next);
 
     expect(next.calledOnceWithExactly()).toBe(true);
     expect(warn.called).toBe(false);
@@ -41,7 +46,7 @@ describe('createAdminEventGuardMiddleware', () => {
       respondAdminAction,
     });
 
-    guard(['admin:update-check', {}], next);
+    guard([REMOTE_EVENT_ADMIN_UPDATE_CHECK, {}], next);
 
     expect(next.calledOnceWithExactly()).toBe(true);
     expect(warn.called).toBe(false);
@@ -59,7 +64,7 @@ describe('createAdminEventGuardMiddleware', () => {
       respondAdminAction,
     });
 
-    guard(['admin:service-restart', {}], next);
+    guard([REMOTE_EVENT_ADMIN_SERVICE_RESTART, {}], next);
 
     expect(warn.calledOnce).toBe(true);
     expect(respondAdminAction.calledOnce).toBe(true);

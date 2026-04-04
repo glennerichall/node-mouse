@@ -225,6 +225,36 @@ describe('service builders resolve providers only in methods', () => {
     expect(getRobot).toHaveBeenCalled();
   });
 
+  it('mouse controller uses drag when left button is held', () => {
+    const robot = {
+      getScreenSize: jest.fn(() => ({width: 100, height: 100})),
+      getMousePos: jest.fn(() => ({x: 10, y: 10})),
+      moveMouse: jest.fn(),
+      dragMouse: jest.fn(),
+      mouseToggle: jest.fn(),
+      scrollMouse: jest.fn(),
+      mouseClick: jest.fn(),
+    };
+    const mouse = createMouseController({
+      getRobot: () => robot,
+      getConfig: () => ({
+        input: {
+          mouseSpeed: 1,
+          scrollSpeed: 1,
+        },
+      }),
+    });
+
+    mouse.setButtonState('left', 'down');
+    mouse.move(5, 4);
+    mouse.setButtonState('left', 'up');
+
+    expect(robot.mouseToggle).toHaveBeenNthCalledWith(1, 'down', 'left');
+    expect(robot.dragMouse).toHaveBeenCalledWith(15, 14);
+    expect(robot.mouseToggle).toHaveBeenNthCalledWith(2, 'up', 'left');
+    expect(robot.moveMouse).not.toHaveBeenCalled();
+  });
+
   it('keyboard controller serializes text and special key input', async () => {
     const calls = [];
     const robot = {

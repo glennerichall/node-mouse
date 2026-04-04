@@ -1,6 +1,11 @@
 import sinon from 'sinon';
 import { createSamsungRegistrar } from '../../server/remotes/samsung/registrar.js';
 import { createBrowserRegistrar } from '../../server/remotes/browser/registrar.js';
+import {
+  REMOTE_EVENT_BROWSER_BRAVE,
+  REMOTE_EVENT_SAMSUNG_ON,
+  REMOTE_EVENT_SAMSUNG_VOL_DOWN,
+} from '../../utils/shared/remoteCommands.js';
 
 describe('remote command registrars', () => {
   let sandbox;
@@ -33,8 +38,8 @@ describe('remote command registrars', () => {
       },
     });
 
-    await handlers.get('samsung:on')();
-    await handlers.get('samsung:voldown')();
+    await handlers.get(REMOTE_EVENT_SAMSUNG_ON)();
+    await handlers.get(REMOTE_EVENT_SAMSUNG_VOL_DOWN)();
 
     expect(samsung.turnOn.calledOnce).toBe(true);
     expect(samsung.volumeDown.calledOnce).toBe(true);
@@ -55,7 +60,7 @@ describe('remote command registrars', () => {
       },
     });
 
-    await handlers.get('browser:brave')();
+    await handlers.get(REMOTE_EVENT_BROWSER_BRAVE)();
 
     expect(browser.focusOrLaunchBrave.calledOnce).toBe(true);
   });

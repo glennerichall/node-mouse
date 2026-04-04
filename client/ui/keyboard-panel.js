@@ -1,4 +1,5 @@
 import { emitWithTimestamp } from '../core/socket-emit.js';
+import { REMOTE_EVENT_KEYBOARD_TEXT } from '../../utils/shared/remoteCommands.js';
 
 export function bindKeyboardPanel(socket, { keyboardPanel, textInput, btnKeyboard, btnSendText }) {
   function toggleKeyboard() {
@@ -14,7 +15,7 @@ export function bindKeyboardPanel(socket, { keyboardPanel, textInput, btnKeyboar
       return;
     }
 
-    emitWithTimestamp(socket, 'keyboard:text', { text });
+    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_TEXT, { text });
     textInput.value = '';
     textInput.focus();
   }

@@ -1,6 +1,12 @@
 import {createAccumulatedThrottle} from './throttle.js';
 import {emitWithTimestamp} from '../core/socket-emit.js';
 import {
+    REMOTE_EVENT_MOUSE_BUTTON,
+    REMOTE_EVENT_MOUSE_CLICK,
+    REMOTE_EVENT_MOUSE_MOVE,
+    REMOTE_EVENT_MOUSE_SCROLL,
+} from '../../utils/shared/remoteCommands.js';
+import {
     handleTouchEnd,
     handleTouchMove,
     handleTouchStart,
@@ -8,6 +14,8 @@ import {
 
 function createNoopTouchHandler() {
     return {
+        buttonState: () => {
+        },
         move: () => {
         },
         scroll: () => {
@@ -22,9 +30,12 @@ function createNoopTouchHandler() {
 function createInitialTouchState() {
     return {
         oneFinger: null,
+        oneFingerStart: null,
         oneFingerMode: 'move',
         twoFinger: null,
         moved: false,
+        dragActive: false,
+        dragEligible: false,
         touchStartedAt: 0,
         lastMoveAt: 0,
     };
@@ -32,7 +43,7 @@ function createInitialTouchState() {
 
 function createTouchpadEventHandlers({touchpad, state, handler}) {
     return {
-        onTouchStart: (event) => handleTouchStart(event, {touchpad, state}),
+        onTouchStart: (event) => handleTouchStart(event, {touchpad, state, handler}),
         onTouchMove: (event) => handleTouchMove(event, {state, handler}),
         onTouchEnd: (event) => handleTouchEnd(event, {state, handler}),
     };
@@ -43,23 +54,29 @@ export function createSocketTouchHandler(socket, options = {}) {
         ? options.onMouseMove
         : () => {
         };
+    const getInputConfig = typeof options.getInputConfig === 'function'
+        ? options.getInputConfig
+        : () => ({});
 
     const moveEmitter = createAccumulatedThrottle(
         (payload) => {
             onMouseMove(payload);
-            emitWithTimestamp(socket, 'mouse:move', payload);
+            emitWithTimestamp(socket, REMOTE_EVENT_MOUSE_MOVE, payload);
         },
         16,
     );
     const scrollEmitter = createAccumulatedThrottle(
         (payload) => {
             onMouseMove(payload);
-            emitWithTimestamp(socket, 'mouse:scroll', {dy: payload.dy});
+            emitWithTimestamp(socket, REMOTE_EVENT_MOUSE_SCROLL, {dy: payload.dy});
         },
         12,
     );
 
     return {
+        buttonState: (button, state) => {
+            emitWithTimestamp(socket, REMOTE_EVENT_MOUSE_BUTTON, {button, state});
+        },
         move: (dx, dy) => {
             moveEmitter.addDelta(dx, dy);
         },
@@ -67,8 +84,9 @@ export function createSocketTouchHandler(socket, options = {}) {
             scrollEmitter.addDelta(0, dy);
         },
         click: (button) => {
-            emitWithTimestamp(socket, 'mouse:click', {button});
+            emitWithTimestamp(socket, REMOTE_EVENT_MOUSE_CLICK, {button});
         },
+        getInputConfig,
         flush: () => {
             moveEmitter.flushNow();
             scrollEmitter.flushNow();

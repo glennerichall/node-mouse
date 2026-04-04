@@ -1,12 +1,32 @@
 import { emitWithTimestamp } from '../core/socket-emit.js';
+import {
+  REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT,
+  REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER,
+  REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_CLIENT,
+  REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER,
+  REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN,
+  REMOTE_EVENT_ADMIN_SERVICE_RESTART,
+  REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY,
+  REMOTE_EVENT_ADMIN_UPDATE_CHECK,
+  REMOTE_EVENT_ADMIN_UPDATE_INSTALL,
+  REMOTE_EVENT_BROWSER_BRAVE,
+  REMOTE_EVENT_KEYBOARD_KEY,
+  REMOTE_EVENT_SAMSUNG_ENTER,
+  REMOTE_EVENT_SAMSUNG_INPUT,
+  REMOTE_EVENT_SAMSUNG_OFF,
+  REMOTE_EVENT_SAMSUNG_ON,
+  REMOTE_EVENT_SAMSUNG_PC_INPUT,
+  REMOTE_EVENT_SAMSUNG_VOL_DOWN,
+  REMOTE_EVENT_SAMSUNG_VOL_UP,
+} from '../../utils/shared/remoteCommands.js';
 
 function bindKeyboardRemoteButtons(socket, { keyboardPanel, btnEnter, btnBackspace }) {
   btnEnter.addEventListener('click', () => {
-    emitWithTimestamp(socket, 'keyboard:key', { key: 'enter' });
+    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'enter' });
     keyboardPanel.classList.add('hidden');
   });
 
-  btnBackspace.addEventListener('click', () => emitWithTimestamp(socket, 'keyboard:key', { key: 'backspace' }));
+  btnBackspace.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'backspace' }));
 }
 
 function bindBrowserRemoteButtons(
@@ -24,32 +44,32 @@ function bindBrowserRemoteButtons(
     btnFullscreen,
   },
 ) {
-  btnOpenBrave.addEventListener('click', () => emitWithTimestamp(socket, 'browser:brave'));
+  btnOpenBrave.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_BROWSER_BRAVE));
   btnBrowserBack.addEventListener('click', () =>
-    emitWithTimestamp(socket, 'keyboard:key', { key: 'left', modifiers: ['alt'] }),
+    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'left', modifiers: ['alt'] }),
   );
   btnBrowserForward.addEventListener('click', () =>
-    emitWithTimestamp(socket, 'keyboard:key', { key: 'right', modifiers: ['alt'] }),
+    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'right', modifiers: ['alt'] }),
   );
   btnPrevTab.addEventListener('click', () =>
-    emitWithTimestamp(socket, 'keyboard:key', { key: 'tab', modifiers: ['control', 'shift'] }),
+    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'tab', modifiers: ['control', 'shift'] }),
   );
   btnNextTab.addEventListener('click', () =>
-    emitWithTimestamp(socket, 'keyboard:key', { key: 'tab', modifiers: ['control'] }),
+    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'tab', modifiers: ['control'] }),
   );
   btnNewTab.addEventListener('click', () =>
-    emitWithTimestamp(socket, 'keyboard:key', { key: 't', modifiers: ['control'] }),
+    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 't', modifiers: ['control'] }),
   );
   btnCloseTab.addEventListener('click', () =>
-    emitWithTimestamp(socket, 'keyboard:key', { key: 'w', modifiers: ['control'] }),
+    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'w', modifiers: ['control'] }),
   );
   btnAddressBar.addEventListener('click', () =>
-    emitWithTimestamp(socket, 'keyboard:key', { key: 'l', modifiers: ['control'] }),
+    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'l', modifiers: ['control'] }),
   );
   btnHardReload.addEventListener('click', () =>
-    emitWithTimestamp(socket, 'keyboard:key', { key: 'f5', modifiers: ['control'] }),
+    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'f5', modifiers: ['control'] }),
   );
-  btnFullscreen.addEventListener('click', () => emitWithTimestamp(socket, 'keyboard:key', { key: 'f11' }));
+  btnFullscreen.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'f11' }));
 }
 
 function bindSamsungRemoteButtons(
@@ -64,13 +84,13 @@ function bindSamsungRemoteButtons(
     btnSamsungPcInput,
   },
 ) {
-  btnSamsungOn.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:on'));
-  btnSamsungOff.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:off'));
-  btnSamsungVolUp.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:volup'));
-  btnSamsungVolDown.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:voldown'));
-  btnSamsungInput.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:input'));
-  btnSamsungEnter.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:enter'));
-  btnSamsungPcInput.addEventListener('click', () => emitWithTimestamp(socket, 'samsung:pc-input'));
+  btnSamsungOn.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_ON));
+  btnSamsungOff.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_OFF));
+  btnSamsungVolUp.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_VOL_UP));
+  btnSamsungVolDown.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_VOL_DOWN));
+  btnSamsungInput.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_INPUT));
+  btnSamsungEnter.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_ENTER));
+  btnSamsungPcInput.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_PC_INPUT));
 }
 
 function bindAdminRemoteButtons(
@@ -88,18 +108,18 @@ function bindAdminRemoteButtons(
     btnRotateEntryToken,
   },
 ) {
-  btnForceUpdateCheck.addEventListener('click', () => emitWithTimestamp(socket, 'admin:update-check'));
-  btnInstallUpdate.addEventListener('click', () => emitWithTimestamp(socket, 'admin:update-install'));
-  btnRestartService.addEventListener('click', () => emitWithTimestamp(socket, 'admin:service-restart'));
-  btnOpenQrBrowserServer.addEventListener('click', () => emitWithTimestamp(socket, 'admin:open-qr-browser-server'));
-  btnOpenQrBrowserClient.addEventListener('click', () => emitWithTimestamp(socket, 'admin:open-qr-browser-client'));
-  btnToggleQrOverlay.addEventListener('click', () => emitWithTimestamp(socket, 'admin:toggle-qr-overlay'));
-  btnOpenServerInfoBrowserServer.addEventListener('click', () => emitWithTimestamp(socket, 'admin:open-server-info-browser-server'));
-  btnOpenServerInfoBrowserClient.addEventListener('click', () => emitWithTimestamp(socket, 'admin:open-server-info-browser-client'));
+  btnForceUpdateCheck.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_ADMIN_UPDATE_CHECK));
+  btnInstallUpdate.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_ADMIN_UPDATE_INSTALL));
+  btnRestartService.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_ADMIN_SERVICE_RESTART));
+  btnOpenQrBrowserServer.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER));
+  btnOpenQrBrowserClient.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT));
+  btnToggleQrOverlay.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY));
+  btnOpenServerInfoBrowserServer.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER));
+  btnOpenServerInfoBrowserClient.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_CLIENT));
   btnOpenConfigPage.addEventListener('click', () => {
     window.location.href = '/ui/admin/config';
   });
-  btnRotateEntryToken.addEventListener('click', () => emitWithTimestamp(socket, 'admin:rotate-entry-token'));
+  btnRotateEntryToken.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN));
 }
 
 export function bindActionButtons(socket, elements) {

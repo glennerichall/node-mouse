@@ -1,13 +1,13 @@
-const CACHE_NAME = 'remote-mouse-shell-v3';
+const CACHE_NAME = 'remote-mouse-shell-v4';
 const SHELL_ASSETS = [
   '/',
-  '/styles.css?v=20260330b',
+  '/styles.css?v=20260404a',
   '/favicon.svg',
   '/icon-192.png',
   '/icon-512.png',
   '/apple-touch-icon.png',
   '/manifest.webmanifest',
-  '/client/main.js?v=20260330b',
+  '/client/main.js?v=20260404a',
 ];
 
 self.addEventListener('install', (event) => {
@@ -45,6 +45,23 @@ self.addEventListener('fetch', (event) => {
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request).catch(() => caches.match('/')),
+    );
+    return;
+  }
+
+  if (
+    request.destination === 'script'
+    || request.destination === 'style'
+    || url.pathname.startsWith('/client/')
+  ) {
+    event.respondWith(
+      fetch(request).then((response) => {
+        const responseClone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(request, responseClone).catch(() => {});
+        });
+        return response;
+      }).catch(() => caches.match(request)),
     );
     return;
   }
