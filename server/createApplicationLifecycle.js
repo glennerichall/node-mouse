@@ -6,6 +6,7 @@ import {startCliServer} from './cli/startCliServer.js';
 import {startConfigObserver} from './init/observers/startConfigObserver.js';
 import {startNotificationObserver} from './init/observers/startNotificationObserver.js';
 import {startQrOverlayRefreshObserver} from "./init/observers/startQrOverlayRefreshObserver.js";
+import { notifyIfRestarted } from './remotes/admin/restart-marker.js';
 
 export function createApplicationLifecycle(services) {
     const {
@@ -108,6 +109,7 @@ export function createApplicationLifecycle(services) {
         stopConfigObserver = startConfigObserver(services);
         stopNotificationObserver = startNotificationObserver(services);
         stopQrOverlayRefreshObserver = startQrOverlayRefreshObserver(services);
+        notifyIfRestarted(services.getEvents());
 
         tokenManager.createToken();
 

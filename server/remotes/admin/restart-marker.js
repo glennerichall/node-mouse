@@ -7,6 +7,8 @@ import {
 } from '../../services/pubsub/serviceEventConstants.js';
 
 const RESTART_MARKER_FILE = path.join(os.tmpdir(), 'remote-mouse-restarted.marker');
+const RECENT_RESTART_WINDOW_MS = 60_000;
+let lastRestartDetectedAt = 0;
 
 export function writeRestartMarker() {
   try {
@@ -30,6 +32,11 @@ function readAndClearRestartMarker() {
 
 export function notifyIfRestarted(events) {
   if (readAndClearRestartMarker()) {
+    lastRestartDetectedAt = Date.now();
     events.publishEvent(PUBSUB_SERVICE_ADMIN_RESTART_SERVICE, PUBSUB_EVENT_ADMIN_RESTART_DETECTED, {});
   }
+}
+
+export function hasRecentRestart() {
+  return lastRestartDetectedAt > 0 && (Date.now() - lastRestartDetectedAt) <= RECENT_RESTART_WINDOW_MS;
 }

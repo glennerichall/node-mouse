@@ -13,6 +13,7 @@ export function createInstallUpdateAction(services) {
   return async function installUpdate({ clientId } = {}) {
     const events = services.getEvents();
     const updateManager = services.getUpdateManager();
+    const restartService = services.getRemotes().adminActions.restartService;
     log.info('Début install update');
 
     events.publishEvent(PUBSUB_SERVICE_ADMIN_INSTALL_UPDATE, PUBSUB_EVENT_ADMIN_STARTED, {
@@ -24,7 +25,17 @@ export function createInstallUpdateAction(services) {
       events.publishEvent(PUBSUB_SERVICE_ADMIN_INSTALL_UPDATE, PUBSUB_EVENT_ADMIN_COMPLETED, {
         clientId,
       });
-      return { ok: true, message: result.message || 'Installation terminee.' };
+      const restartResult = await restartService({ clientId });
+      if (!restartResult?.ok) {
+        return {
+          ok: false,
+          message: restartResult?.message || 'Installation terminee, mais le redemarrage a echoue.',
+        };
+      }
+      return {
+        ok: true,
+        message: result.message || 'Installation terminee. Redemarrage demande.',
+      };
     }
 
     if (result?.status === 'no-command') {

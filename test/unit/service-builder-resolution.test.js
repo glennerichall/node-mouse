@@ -183,18 +183,26 @@ describe('service builders resolve providers only in methods', () => {
         status: 'no-command',
       })),
     }));
+    const getRemotes = jest.fn(() => ({
+      adminActions: {
+        restartService: jest.fn(),
+      },
+    }));
 
     const action = createInstallUpdateAction({
       getEvents,
       getUpdateManager,
+      getRemotes,
     });
 
     expect(getEvents).not.toHaveBeenCalled();
     expect(getUpdateManager).not.toHaveBeenCalled();
+    expect(getRemotes).not.toHaveBeenCalled();
 
     await action({clientId: 'client-a'});
     expect(getEvents).toHaveBeenCalled();
     expect(getUpdateManager).toHaveBeenCalled();
+    expect(getRemotes).toHaveBeenCalled();
   });
 
   it('input builders do not read robot during builder creation', () => {

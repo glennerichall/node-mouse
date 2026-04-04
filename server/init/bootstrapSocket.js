@@ -1,10 +1,12 @@
 import {createSocketSessionAuthMiddleware} from '../connection/socket/createSocketSessionAuthMiddleware.js';
 import {createSocketActionRegistrars} from './createSocketActionRegistrars.js';
 import {socketTimestampGuardMiddleware} from "../connection/socket/socket.timestamp-middleware.js";
+import { hasRecentRestart } from '../remotes/admin/restart-marker.js';
 import {
     PUBSUB_EVENT_SOCKET_CLIENT_CONNECTED,
     PUBSUB_SERVICE_SOCKET
 } from "../services/pubsub/serviceEventConstants.js";
+import { REMOTE_EVENT_SYSTEM_RELOAD } from '../../utils/shared/remoteCommands.js';
 
 function broadcast(...functions) {
     return (...args) => functions.flatMap(f => f).map(f => f(...args));
@@ -19,6 +21,11 @@ function createNotificationHandler(services) {
         events.publishEvent(PUBSUB_SERVICE_SOCKET, PUBSUB_EVENT_SOCKET_CLIENT_CONNECTED, {
             clientId: socket.id,
         });
+        if (hasRecentRestart()) {
+            socket.emit(REMOTE_EVENT_SYSTEM_RELOAD, {
+                reason: 'service-restarted',
+            });
+        }
     }
 }
 
