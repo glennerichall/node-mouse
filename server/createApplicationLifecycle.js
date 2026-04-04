@@ -23,10 +23,13 @@ export function createApplicationLifecycle(services) {
     const config = getConfig();
     const systemConfig = getSystemConfig();
     const log = getLogger('server');
-    const httpServer = getServer().server;
+    const serverBundle = getServer();
+    const httpServer = serverBundle.server;
+    const io = serverBundle.io;
     const qrOverlay = getQrOverlay();
     const taskManager = getTaskManager();
     const tokenManager = getTokenManager();
+    const sseService = services.getSseService?.();
 
     let cliServer = null;
     let shuttingDown = false;
@@ -98,8 +101,39 @@ export function createApplicationLifecycle(services) {
             log.error({err: error}, 'Erreur a la fermeture du QR overlay');
         }
 
+        try {
+            sseService?.closeAll?.();
+        } catch (error) {
+            log.error({err: error}, 'Erreur a la fermeture des connexions SSE');
+        }
+
+        try {
+            await new Promise((resolve) => {
+                io?.close?.(() => resolve());
+            });
+        } catch (error) {
+            log.error({err: error}, 'Erreur a la fermeture de Socket.IO');
+        }
+
+        try {
+            serverBundle.closeIdleConnections?.();
+        } catch (error) {
+            log.error({err: error}, 'Erreur a la fermeture des connexions HTTP inactives');
+        }
+
         await new Promise((resolve) => {
-            httpServer.close(() => resolve());
+            const forceShutdownTimer = setTimeout(() => {
+                try {
+                    serverBundle.destroyConnections?.();
+                } catch (error) {
+                    log.error({err: error}, 'Erreur a la destruction forcee des connexions HTTP');
+                }
+            }, 1_500);
+
+            httpServer.close(() => {
+                clearTimeout(forceShutdownTimer);
+                resolve();
+            });
         });
 
         process.exit(0);

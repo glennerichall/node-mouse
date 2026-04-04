@@ -79,10 +79,18 @@ export function createSseService() {
     return true;
   }
 
+  function closeAll() {
+    for (const [id, subscription] of subscriptions.entries()) {
+      subscription.response?.end();
+      subscriptions.delete(id);
+    }
+  }
+
   return {
     createSubscription,
     connect,
     deleteSubscription,
     emit,
+    closeAll,
   };
 }

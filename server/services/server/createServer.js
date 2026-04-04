@@ -18,8 +18,16 @@ export async function createServer(services) {
     const server = config.https.enabled
         ? createHttpsServer(app, config)
         : http.createServer(app);
+    const sockets = new Set();
 
     const io = new Server(server, {});
+
+    server.on('connection', (socket) => {
+        sockets.add(socket);
+        socket.on('close', () => {
+            sockets.delete(socket);
+        });
+    });
 
     const basePublicUrl = getPublicUrl(
         config.port,
@@ -32,7 +40,16 @@ export async function createServer(services) {
         app,
         basePublicUrl,
         serverStartedAt,
-        cookieParser: cookies
+        cookieParser: cookies,
+        closeIdleConnections: () => {
+            server.closeIdleConnections?.();
+        },
+        destroyConnections: () => {
+            for (const socket of sockets) {
+                socket.destroy();
+            }
+            sockets.clear();
+        }
     };
 }
     
