@@ -7,6 +7,7 @@ import {handleOpenServerInfoBrowserEvent} from "../../services/notifier/handleOp
 import {handleRestartServiceEvent} from "../../services/notifier/handleRestartServiceEvent.js";
 import {handleToggleQrOverlayEvent} from "../../services/notifier/handleToggleQrOverlayEvent.js";
 import {handleRotateEntryTokenEvent} from "../../services/notifier/handleRotateEntryTokenEvent.js";
+import {handleSessionEvent} from "../../services/notifier/handleSessionEvent.js";
 import {
   PUBSUB_SERVICE_ADMIN_FORCE_UPDATE_CHECK,
   PUBSUB_SERVICE_ADMIN_INSTALL_UPDATE,
@@ -15,6 +16,7 @@ import {
   PUBSUB_SERVICE_ADMIN_RESTART_SERVICE,
   PUBSUB_SERVICE_ADMIN_ROTATE_ENTRY_TOKEN,
   PUBSUB_SERVICE_ADMIN_TOGGLE_QR_OVERLAY,
+  PUBSUB_SERVICE_SESSION,
   PUBSUB_SERVICE_SOCKET,
   PUBSUB_SERVICE_UPDATE_MANAGER,
 } from "../../services/pubsub/serviceEventConstants.js";
@@ -29,6 +31,7 @@ const NOTIFICATION_HANDLERS = {
   [PUBSUB_SERVICE_ADMIN_RESTART_SERVICE]: handleRestartServiceEvent,
   [PUBSUB_SERVICE_ADMIN_TOGGLE_QR_OVERLAY]: handleToggleQrOverlayEvent,
   [PUBSUB_SERVICE_ADMIN_ROTATE_ENTRY_TOKEN]: handleRotateEntryTokenEvent,
+  [PUBSUB_SERVICE_SESSION]: handleSessionEvent,
 };
 
 export function startNotificationObserver(services) {

@@ -10,10 +10,12 @@ import {
     PUBSUB_EVENT_ADMIN_SERVER_OPENED
 } from "../pubsub/serviceEventConstants.js";
 import {NOTIFICATION_TITLE_QR} from "./notificationTitles.js";
+import { NOTIFICATION_ID_QR } from '../../../utils/shared/notificationSettings.js';
 
 export function handleOpenQrBrowserEvent(notifier, event) {
     if (event.type === PUBSUB_EVENT_ADMIN_CLIENT_OPENED) {
         notify(notifier, NOTIFIER_TARGET_CLIENT, {
+            notificationId: NOTIFICATION_ID_QR,
             level: NOTIFIER_LEVEL_INFO,
             title: NOTIFICATION_TITLE_QR,
             titleKey: 'notification.qr.title',
@@ -23,6 +25,7 @@ export function handleOpenQrBrowserEvent(notifier, event) {
         }, {clientId: event.payload?.clientId});
     } else if (event.type === PUBSUB_EVENT_ADMIN_SERVER_OPEN_FAILED) {
         notify(notifier, NOTIFIER_TARGET_CLIENT, {
+            notificationId: NOTIFICATION_ID_QR,
             level: NOTIFIER_LEVEL_ERROR,
             title: NOTIFICATION_TITLE_QR,
             message: "Impossible d'ouvrir le navigateur du serveur sur /qr.",
@@ -32,6 +35,7 @@ export function handleOpenQrBrowserEvent(notifier, event) {
         }, {clientId: event.payload?.clientId});
     } else if (event.type === PUBSUB_EVENT_ADMIN_SERVER_OPENED) {
         notify(notifier, NOTIFIER_TARGET_CLIENT, {
+            notificationId: NOTIFICATION_ID_QR,
             level: NOTIFIER_LEVEL_INFO,
             title: NOTIFICATION_TITLE_QR,
             message: 'Page QR ouverte sur le serveur.',

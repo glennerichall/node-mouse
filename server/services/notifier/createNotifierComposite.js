@@ -1,5 +1,10 @@
 import {DEFAULT_PERSISTED_CONFIG} from '../config/defaultConfig.js';
 import {createLogger} from '../log/logger.js';
+import {
+    isNotificationTargetEnabled,
+    NOTIFICATION_TARGET_CLIENT as CONFIG_NOTIFICATION_TARGET_CLIENT,
+    NOTIFICATION_TARGET_HOST as CONFIG_NOTIFICATION_TARGET_HOST,
+} from '../../../utils/shared/notificationSettings.js';
 
 const log = createLogger('notifier:composite');
 
@@ -30,10 +35,18 @@ export function createNotifierComposite({clientNotifier, serverNotifier, getNoti
             ?? DEFAULT_PERSISTED_CONFIG.notifications.ttlMs;
     }
 
+    function shouldNotifyTarget(notificationsConfig, notificationId, target) {
+        if (!notificationId) {
+            return true;
+        }
+        return isNotificationTargetEnabled(notificationsConfig, notificationId, target);
+    }
+
     function createTargetNotifier(selectedTarget) {
         return {
             notify({
                        title = 'Remote Mouse',
+                       notificationId,
                        titleKey,
                        message,
                        messageKey,
@@ -59,10 +72,21 @@ export function createNotifierComposite({clientNotifier, serverNotifier, getNoti
 
                 const resolvedTarget = String(selectedTarget ?? NOTIFIER_TARGET_ALL).toLowerCase();
                 const clientId = options.clientId;
+                const notificationsConfig = getNotificationsConfig?.() || DEFAULT_PERSISTED_CONFIG.notifications;
+                const shouldNotifyClient = shouldNotifyTarget(
+                    notificationsConfig,
+                    notificationId,
+                    CONFIG_NOTIFICATION_TARGET_CLIENT,
+                );
+                const shouldNotifyHost = shouldNotifyTarget(
+                    notificationsConfig,
+                    notificationId,
+                    CONFIG_NOTIFICATION_TARGET_HOST,
+                );
 
                 if ((resolvedTarget === NOTIFIER_TARGET_ALL ||
                     resolvedTarget === NOTIFIER_TARGET_ALL_CLIENTS ||
-                    resolvedTarget === NOTIFIER_TARGET_CLIENT) && clientNotifier) {
+                    resolvedTarget === NOTIFIER_TARGET_CLIENT) && clientNotifier && shouldNotifyClient) {
                     clientNotifier.notify(payload, {
                         scope: resolvedTarget === NOTIFIER_TARGET_CLIENT ?
                             NOTIFIER_TARGET_CLIENT : NOTIFIER_TARGET_ALL_CLIENTS,
@@ -71,7 +95,7 @@ export function createNotifierComposite({clientNotifier, serverNotifier, getNoti
                 }
 
                 if ((resolvedTarget === NOTIFIER_TARGET_ALL ||
-                    resolvedTarget === NOTIFIER_TARGET_SERVER) && serverNotifier) {
+                    resolvedTarget === NOTIFIER_TARGET_SERVER) && serverNotifier && shouldNotifyHost) {
                     serverNotifier.notify(payload);
                 }
 

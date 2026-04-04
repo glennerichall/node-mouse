@@ -1,6 +1,37 @@
 import {
     packageJson
 } from "./bootstrapConfig.js";
+import {
+    createDefaultNotificationSettings,
+    NOTIFICATION_ID_UPDATE_AVAILABLE,
+    NOTIFICATION_ID_UPDATE_INSTALL,
+    NOTIFICATION_ID_SERVICE_RESTARTED,
+    NOTIFICATION_ID_SERVICE_RESTARTING,
+    NOTIFICATION_ID_SESSION_CREATED,
+} from '../../../utils/shared/notificationSettings.js';
+
+const DEFAULT_NOTIFICATION_SETTINGS = createDefaultNotificationSettings(false);
+
+DEFAULT_NOTIFICATION_SETTINGS[NOTIFICATION_ID_SERVICE_RESTARTING] = {
+    host: true,
+    client: true,
+};
+DEFAULT_NOTIFICATION_SETTINGS[NOTIFICATION_ID_SESSION_CREATED] = {
+    host: true,
+    client: true,
+};
+DEFAULT_NOTIFICATION_SETTINGS[NOTIFICATION_ID_SERVICE_RESTARTED] = {
+    host: true,
+    client: true,
+};
+DEFAULT_NOTIFICATION_SETTINGS[NOTIFICATION_ID_UPDATE_INSTALL] = {
+    host: true,
+    client: true,
+};
+DEFAULT_NOTIFICATION_SETTINGS[NOTIFICATION_ID_UPDATE_AVAILABLE] = {
+    host: true,
+    client: true,
+};
 
 export const DEFAULT_SYSTEM_CONFIG = {
     port: 3000,
@@ -52,9 +83,8 @@ export const DEFAULT_PERSISTED_CONFIG = {
         fps: 6,
     },
     notifications: {
-        desktop: true,
-        client: true,
         ttlMs: 2200,
+        ...DEFAULT_NOTIFICATION_SETTINGS,
     },
     samsungTv: {
         enabled: false,

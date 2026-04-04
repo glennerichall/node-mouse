@@ -22,17 +22,12 @@ describe('admin config router helpers', () => {
   it('builds a nested payload from flat values', () => {
     const payload = buildManagedConfigPayload({
       'input.mouseSpeed': '1.5',
-      'notifications.client': true,
+      'notifications.clientConnected.client': true,
       'logging.level': 'debug',
     }, {
       input: {
         fields: {
           mouseSpeed: {type: 'number'},
-        },
-      },
-      notifications: {
-        fields: {
-          client: {type: 'boolean'},
         },
       },
       logging: {
@@ -47,7 +42,9 @@ describe('admin config router helpers', () => {
         mouseSpeed: 1.5,
       },
       notifications: {
-        client: true,
+        clientConnected: {
+          client: true,
+        },
       },
       logging: {
         level: 'debug',

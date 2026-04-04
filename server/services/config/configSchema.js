@@ -1,3 +1,5 @@
+import { getNotificationPaths } from '../../../utils/shared/notificationSettings.js';
+
 export const CONFIG_SCHEMA = {
   input: {
     title: 'Souris et entree',
@@ -62,16 +64,8 @@ export const CONFIG_SCHEMA = {
   },
   notifications: {
     title: 'Notifications',
-    description: 'Reglage des notifications serveur et client.',
+    description: 'Reglage des notifications par evenement pour le host et le client.',
     fields: {
-      desktop: {
-        label: 'Notifications desktop',
-        type: 'boolean',
-      },
-      client: {
-        label: 'Notifications client',
-        type: 'boolean',
-      },
       ttlMs: {
         label: 'Duree affichage (ms)',
         type: 'integer',
@@ -225,4 +219,20 @@ export function getManagedConfigSchema(managedPaths = []) {
   }
 
   return sections;
+}
+
+const CONFIG_FIELD_DEFINITIONS = new Map();
+
+for (const [sectionKey, section] of Object.entries(CONFIG_SCHEMA)) {
+  for (const [fieldKey, field] of Object.entries(section.fields)) {
+    CONFIG_FIELD_DEFINITIONS.set(`${sectionKey}.${fieldKey}`, field);
+  }
+}
+
+for (const pathKey of getNotificationPaths()) {
+  CONFIG_FIELD_DEFINITIONS.set(pathKey, { type: 'boolean' });
+}
+
+export function getConfigFieldDefinition(pathKey) {
+  return CONFIG_FIELD_DEFINITIONS.get(String(pathKey || '').trim()) || null;
 }

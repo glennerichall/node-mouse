@@ -1,3 +1,5 @@
+import { getNotificationPaths } from '../../../utils/shared/notificationSettings.js';
+
 export const CONFIG_PATHS = [
     'input.mouseSpeed',
     'input.scrollSpeed',
@@ -6,9 +8,8 @@ export const CONFIG_PATHS = [
     'preview.width',
     'preview.height',
     'preview.fps',
-    'notifications.desktop',
-    'notifications.client',
     'notifications.ttlMs',
+    ...getNotificationPaths(),
     'samsungTv.enabled',
     'samsungTv.alwaysAutoResolve',
     'samsungTv.host',

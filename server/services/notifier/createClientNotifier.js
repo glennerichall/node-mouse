@@ -3,10 +3,6 @@ import {NOTIFIER_TARGET_ALL_CLIENTS, NOTIFIER_TARGET_CLIENT} from './createNotif
 export function createClientNotifier(services) {
   return {
     notify(payload, options = {}) {
-      const notifications = services.getConfig().notifications;
-      if (!notifications.client) {
-        return;
-      }
       const scope = String(options.scope || NOTIFIER_TARGET_ALL_CLIENTS);
       const clientId = String(options.clientId || '').trim();
 

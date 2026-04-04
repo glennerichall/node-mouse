@@ -8,4 +8,5 @@ export const NOTIFICATION_TITLE_UPDATE_CHECK = 'Check update';
 export const NOTIFICATION_TITLE_UPDATE_INSTALL = 'Update install';
 export const NOTIFICATION_TITLE_CLIENT_CONNECTED = 'Client connecte';
 export const NOTIFICATION_TITLE_CLIENT_DISCONNECTED = 'Client deconnecte';
+export const NOTIFICATION_TITLE_SESSION_CREATED = 'Nouvelle connexion';
 export const NOTIFICATION_TITLE_UPDATE = 'Update';

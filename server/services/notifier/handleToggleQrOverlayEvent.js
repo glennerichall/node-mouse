@@ -5,6 +5,7 @@ import {
 } from "./createNotifierComposite.js";
 import {PUBSUB_EVENT_ADMIN_TOGGLED} from "../pubsub/serviceEventConstants.js";
 import {NOTIFICATION_TITLE_QR_OVERLAY} from "./notificationTitles.js";
+import { NOTIFICATION_ID_QR_OVERLAY } from '../../../utils/shared/notificationSettings.js';
 
 export function handleToggleQrOverlayEvent(notifier, event) {
     if (event.type !== PUBSUB_EVENT_ADMIN_TOGGLED) {
@@ -12,6 +13,7 @@ export function handleToggleQrOverlayEvent(notifier, event) {
     }
 
     notify(notifier, NOTIFIER_TARGET_CLIENT, {
+        notificationId: NOTIFICATION_ID_QR_OVERLAY,
         level: NOTIFIER_LEVEL_INFO,
         title: NOTIFICATION_TITLE_QR_OVERLAY,
         titleKey: 'notification.qrOverlay.title',

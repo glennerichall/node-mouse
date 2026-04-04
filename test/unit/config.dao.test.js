@@ -43,19 +43,23 @@ describe('config dao pubsub', () => {
         level: 'debug',
       },
       notifications: {
-        client: false,
+        clientConnected: {
+          client: false,
+        },
       },
-    }, ['logging.level', 'notifications.client']);
+    }, ['logging.level', 'notifications.clientConnected.client']);
 
     expect(publish).toHaveBeenCalledWith(PUBSUB_SERVICE_CONFIG, {
       changeType: 'updated',
-      changedKeys: ['logging.level', 'notifications.client'],
+      changedKeys: ['logging.level', 'notifications.clientConnected.client'],
       storedConfig: {
         logging: {
           level: 'debug',
         },
         notifications: {
-          client: false,
+          clientConnected: {
+            client: false,
+          },
         },
       },
     }, {

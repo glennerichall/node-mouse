@@ -223,6 +223,53 @@ button[hidden] {
   justify-content: flex-end;
 }
 
+.notifications-matrix {
+  overflow-x: auto;
+}
+
+.notifications-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  background: var(--panel-strong);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.notifications-table th,
+.notifications-table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.notifications-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.notifications-table th {
+  color: var(--muted);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.notifications-table-label {
+  min-width: 220px;
+  font-weight: 600;
+}
+
+.notifications-table-toggle {
+  width: 96px;
+  text-align: center;
+}
+
+.notifications-table-toggle input {
+  width: 20px;
+  height: 20px;
+}
+
 .section-action-button {
   min-height: 36px;
   padding: 0 12px;

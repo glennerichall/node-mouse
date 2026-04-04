@@ -5,6 +5,7 @@ import {
   NOTIFIER_TARGET_CLIENT,
   NOTIFIER_TARGET_SERVER,
 } from '../../server/services/notifier/createNotifierComposite.js';
+import { NOTIFICATION_ID_CLIENT_CONNECTED } from '../../utils/shared/notificationSettings.js';
 
 describe('createNotifierComposite', () => {
   let sandbox;
@@ -113,6 +114,31 @@ describe('createNotifierComposite', () => {
     });
 
     expect(clientNotify.called).toBe(false);
+    expect(serverNotify.called).toBe(false);
+  });
+
+  it('filters notification targets per event config', () => {
+    const clientNotify = sandbox.stub();
+    const serverNotify = sandbox.stub();
+    const notifier = createNotifierComposite({
+      clientNotifier: {notify: clientNotify},
+      serverNotifier: {notify: serverNotify},
+      getNotificationsConfig: () => ({
+        ttlMs: 2200,
+        clientConnected: {
+          host: false,
+          client: true,
+        },
+      }),
+    });
+
+    notifier.notify({
+      notificationId: NOTIFICATION_ID_CLIENT_CONNECTED,
+      title: 'Broadcast',
+      message: 'Hello',
+    });
+
+    expect(clientNotify.calledOnce).toBe(true);
     expect(serverNotify.called).toBe(false);
   });
 });

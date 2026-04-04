@@ -12,10 +12,12 @@ import {
     PUBSUB_EVENT_ADMIN_STARTED
 } from "../../pubsub/serviceEventConstants.js";
 import {NOTIFICATION_TITLE_UPDATE_INSTALL} from "../notificationTitles.js";
+import { NOTIFICATION_ID_UPDATE_INSTALL } from '../../../../utils/shared/notificationSettings.js';
 
 export function handleInstallUpdateEvent(notifier, event) {
     if (event.type === PUBSUB_EVENT_ADMIN_REJECTED_NO_COMMAND) {
         notify(notifier, NOTIFIER_TARGET_CLIENT, {
+            notificationId: NOTIFICATION_ID_UPDATE_INSTALL,
             level: NOTIFIER_LEVEL_ERROR,
             title: NOTIFICATION_TITLE_UPDATE_INSTALL,
             titleKey: 'notification.updateInstall.title',
@@ -25,6 +27,7 @@ export function handleInstallUpdateEvent(notifier, event) {
         }, {clientId: event.payload?.clientId});
     } else if (event.type === PUBSUB_EVENT_ADMIN_STARTED) {
         notify(notifier, NOTIFIER_TARGET_CLIENT, {
+            notificationId: NOTIFICATION_ID_UPDATE_INSTALL,
             level: NOTIFIER_LEVEL_WARNING,
             title: NOTIFICATION_TITLE_UPDATE_INSTALL,
             titleKey: 'notification.updateInstall.title',
@@ -34,6 +37,7 @@ export function handleInstallUpdateEvent(notifier, event) {
         }, {clientId: event.payload?.clientId});
     } else if (event.type === PUBSUB_EVENT_ADMIN_COMPLETED) {
         notify(notifier, NOTIFIER_TARGET_CLIENT, {
+            notificationId: NOTIFICATION_ID_UPDATE_INSTALL,
             level: NOTIFIER_LEVEL_INFO,
             title: NOTIFICATION_TITLE_UPDATE_INSTALL,
             titleKey: 'notification.updateInstall.title',
@@ -43,6 +47,7 @@ export function handleInstallUpdateEvent(notifier, event) {
         }, {clientId: event.payload?.clientId});
     } else if (event.type === PUBSUB_EVENT_ADMIN_FAILED) {
         notify(notifier, NOTIFIER_TARGET_CLIENT, {
+            notificationId: NOTIFICATION_ID_UPDATE_INSTALL,
             level: NOTIFIER_LEVEL_ERROR,
             title: NOTIFICATION_TITLE_UPDATE_INSTALL,
             message: `Echec installation: ${event.payload?.details || 'Erreur inconnue'}`,

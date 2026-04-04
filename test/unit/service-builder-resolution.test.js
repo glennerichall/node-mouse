@@ -302,28 +302,20 @@ describe('service builders resolve providers only in methods', () => {
       to: jest.fn(() => ({emit: jest.fn()})),
     };
     const getServer = jest.fn(() => ({io}));
-    const getConfig = jest.fn(() => ({
-      notifications: {
-        client: true,
-      },
-    }));
     const getLogger = jest.fn(() => ({
       warn: jest.fn(),
     }));
 
     const notifier = createClientNotifier({
       getServer,
-      getConfig,
       getLogger,
     });
 
     expect(getServer).not.toHaveBeenCalled();
-    expect(getConfig).not.toHaveBeenCalled();
     expect(getLogger).not.toHaveBeenCalled();
 
     notifier.notify({message: 'hello'});
     expect(getServer).toHaveBeenCalled();
-    expect(getConfig).toHaveBeenCalled();
     expect(getLogger).not.toHaveBeenCalled();
   });
 });

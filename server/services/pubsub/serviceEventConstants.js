@@ -1,4 +1,5 @@
 export const PUBSUB_SERVICE_SOCKET = 'socket';
+export const PUBSUB_SERVICE_SESSION = 'session';
 export const PUBSUB_SERVICE_TASK_MANAGER = 'task-manager';
 export const PUBSUB_SERVICE_TOKEN_MANAGER = 'token-manager';
 export const PUBSUB_SERVICE_UPDATE_MANAGER = 'update-manager';
@@ -15,6 +16,7 @@ export const PUBSUB_EVENT_STATE_CHANGED = 'state.changed';
 
 export const PUBSUB_EVENT_SOCKET_CLIENT_CONNECTED = 'client.connected';
 export const PUBSUB_EVENT_SOCKET_CLIENT_DISCONNECTED = 'client.disconnected';
+export const PUBSUB_EVENT_SESSION_CREATED = 'session.created';
 
 export const PUBSUB_EVENT_UPDATE_CHECK = 'update.check';
 export const PUBSUB_EVENT_UPDATE_AVAILABLE = 'update.available';

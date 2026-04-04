@@ -1,4 +1,10 @@
 import {applyPageTranslations, getClientI18n, initClientI18n, initClientTheme, mountClientPreferences, onClientI18nChange} from '../i18n/index.js';
+import {
+  NOTIFICATION_EVENT_DEFINITIONS,
+  NOTIFICATION_TARGET_CLIENT,
+  NOTIFICATION_TARGET_HOST,
+  getNotificationTargetPath,
+} from '../../utils/shared/notificationSettings.js';
 
 await initClientI18n();
 initClientTheme();
@@ -106,6 +112,9 @@ function setInputValue(input, field, value) {
 }
 
 function syncResetButtonVisibility({input, field, defaultValue, resetButton}) {
+  if (!resetButton) {
+    return;
+  }
   resetButton.hidden = valuesMatch(getCurrentInputValue(input, field), defaultValue);
 }
 
@@ -423,6 +432,80 @@ function createInput(pathKey, field, value) {
   return input;
 }
 
+function createNotificationMatrixCheckbox(pathKey, value) {
+  const input = document.createElement('input');
+  input.type = 'checkbox';
+  input.name = pathKey;
+  input.checked = Boolean(value);
+  return input;
+}
+
+function renderNotificationsMatrix(fieldsNode) {
+  const matrix = document.createElement('div');
+  matrix.className = 'notifications-matrix';
+
+  const table = document.createElement('table');
+  table.className = 'notifications-table';
+
+  const thead = document.createElement('thead');
+  thead.innerHTML = `
+    <tr>
+      <th>${t('adminConfig.notificationsTable.event')}</th>
+      <th>${t('adminConfig.notificationsTable.host')}</th>
+      <th>${t('adminConfig.notificationsTable.client')}</th>
+    </tr>
+  `;
+  table.append(thead);
+
+  const tbody = document.createElement('tbody');
+
+  for (const definition of NOTIFICATION_EVENT_DEFINITIONS) {
+    const row = document.createElement('tr');
+    const hostPathKey = getNotificationTargetPath(definition.id, NOTIFICATION_TARGET_HOST);
+    const clientPathKey = getNotificationTargetPath(definition.id, NOTIFICATION_TARGET_CLIENT);
+    const hostDefaultValue = getValueAtPath(currentDefaults, hostPathKey);
+    const clientDefaultValue = getValueAtPath(currentDefaults, clientPathKey);
+    const hostInput = createNotificationMatrixCheckbox(hostPathKey, getValueAtPath(currentConfig, hostPathKey));
+    const clientInput = createNotificationMatrixCheckbox(clientPathKey, getValueAtPath(currentConfig, clientPathKey));
+
+    const labelCell = document.createElement('td');
+    labelCell.className = 'notifications-table-label';
+    labelCell.textContent = t(definition.labelKey);
+
+    const hostCell = document.createElement('td');
+    hostCell.className = 'notifications-table-toggle';
+    hostCell.append(hostInput);
+
+    const clientCell = document.createElement('td');
+    clientCell.className = 'notifications-table-toggle';
+    clientCell.append(clientInput);
+
+    row.append(labelCell, hostCell, clientCell);
+    tbody.append(row);
+
+    for (const [pathKey, input, defaultValue] of [
+      [hostPathKey, hostInput, hostDefaultValue],
+      [clientPathKey, clientInput, clientDefaultValue],
+    ]) {
+      const fieldContext = {
+        pathKey,
+        field: { type: 'boolean' },
+        input,
+        defaultValue,
+        resetButton: null,
+      };
+      fieldContexts.set(pathKey, fieldContext);
+      input.addEventListener('change', () => {
+        scheduleFieldSync(fieldContext, { immediate: true });
+      });
+    }
+  }
+
+  table.append(tbody);
+  matrix.append(table);
+  fieldsNode.append(matrix);
+}
+
 function renderConfigForm(config, schema) {
   currentConfig = config || {};
   fieldContexts.clear();
@@ -455,6 +538,10 @@ function renderConfigForm(config, schema) {
       });
       sectionActionsNode.append(discoverButton);
       fieldsNode.append(sectionActionsNode);
+    }
+
+    if (sectionKey === 'notifications') {
+      renderNotificationsMatrix(fieldsNode);
     }
 
     for (const [fieldKey, field] of Object.entries(section.fields)) {

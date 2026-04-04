@@ -1,5 +1,5 @@
 import {CONFIG_PATHS} from '../../services/config/configPaths.js';
-import {getManagedConfigSchema} from '../../services/config/configSchema.js';
+import {getConfigFieldDefinition, getManagedConfigSchema} from '../../services/config/configSchema.js';
 import {DEFAULT_PERSISTED_CONFIG} from '../../services/config/defaultConfig.js';
 import {setNestedValue} from '../../../utils/shared/objet.utils.js';
 
@@ -48,15 +48,13 @@ export function coerceConfigValue(rawValue, field) {
 export function buildManagedConfigPayload(rawValues, schema = adminConfigSchema) {
   const payload = {};
 
-  for (const [sectionKey, section] of Object.entries(schema)) {
-    for (const [fieldKey, field] of Object.entries(section.fields)) {
-      const pathKey = `${sectionKey}.${fieldKey}`;
-      if (!Object.hasOwn(rawValues, pathKey)) {
-        continue;
-      }
-      const coercedValue = coerceConfigValue(rawValues[pathKey], field);
-      setNestedValue(payload, pathKey, coercedValue);
+  for (const [pathKey, rawValue] of Object.entries(rawValues || {})) {
+    const field = getFieldDefinition(schema, pathKey);
+    if (!field) {
+      continue;
     }
+    const coercedValue = coerceConfigValue(rawValue, field);
+    setNestedValue(payload, pathKey, coercedValue);
   }
 
   return payload;
@@ -74,7 +72,7 @@ export function getManagedConfigSnapshot(config, managedPaths = CONFIG_PATHS) {
 
 export function getFieldDefinition(schema, pathKey) {
   const [sectionKey, fieldKey] = String(pathKey || '').split('.');
-  return schema?.[sectionKey]?.fields?.[fieldKey] || null;
+  return schema?.[sectionKey]?.fields?.[fieldKey] || getConfigFieldDefinition(pathKey);
 }
 
 export function buildConfigEntry(pathKey, schema, config, defaults) {

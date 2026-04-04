@@ -1,5 +1,9 @@
 import express from 'express';
 import {sendUnauthorizedResponse} from './unauthorized-response.js';
+import {
+    PUBSUB_EVENT_SESSION_CREATED,
+    PUBSUB_SERVICE_SESSION
+} from '../../services/pubsub/serviceEventConstants.js';
 
 function isLocalAddress(value) {
     const address = String(value || '').toLowerCase();
@@ -70,6 +74,12 @@ export function createSessionRouter(services) {
             sendUnauthorizedResponse(req, res);
             return;
         }
+        const forwarded = getForwardedFor(req);
+        const clientIp = forwarded || req.ip || req.socket?.remoteAddress || '';
+        services.getEvents?.().publishEvent(PUBSUB_SERVICE_SESSION, PUBSUB_EVENT_SESSION_CREATED, {
+            address: String(clientIp || '').trim(),
+            token,
+        });
         res.createSession(token);
         res.redirect('/');
     });
