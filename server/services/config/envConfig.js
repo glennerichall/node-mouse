@@ -23,6 +23,7 @@ export function getEnvConfig() {
         },
         adminActionsEnabled: readOptionalBoolean('ADMIN_ACTIONS_ENABLED'),
         serviceName: readOptionalString('SERVICE_NAME'),
+        serviceRestartCommand: readOptionalString('SERVICE_RESTART_COMMAND'),
         https: {
             enabled: readOptionalBoolean('HTTPS'),
             sslKeyPath: readOptionalString('SSL_KEY_PATH'),

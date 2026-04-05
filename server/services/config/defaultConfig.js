@@ -51,6 +51,7 @@ export const DEFAULT_SYSTEM_CONFIG = {
     },
     adminActionsEnabled: true,
     serviceName: 'remote-mouse.service',
+    serviceRestartCommand: '',
     updateCheck: {
         checkCommand: '',
         checkTimeoutSec: 20,

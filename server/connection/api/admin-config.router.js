@@ -7,11 +7,6 @@ import {
     normalizeMac,
     pickSamsungDevice
 } from '../../remotes/samsung/device-config.js';
-import {
-    commandExists,
-    spawnDetached
-} from '../../utils/process.js';
-import {writeRestartMarker} from '../../remotes/admin/notifyIfRestarted.js';
 
 export {
     buildManagedConfigPayload,
@@ -68,34 +63,12 @@ export function createAdminConfigActionsRouter(services) {
     });
 
     router.post('/restart-service', async (_req, res) => {
-        const config = services.getConfig();
-
-        if (!(await commandExists('systemctl'))) {
-            res.status(400).json({
-                ok: false,
-                message: 'systemctl is unavailable.',
-            });
-            return;
-        }
-
-        writeRestartMarker();
-        const spawned = await spawnDetached(
-            'bash',
-            ['-lc', `sleep 0.8; systemctl --user restart ${config.serviceName}`],
-        );
-
-        if (!spawned) {
-            res.status(500).json({
-                ok: false,
-                message: 'Unable to start the restart command.',
-            });
-            return;
-        }
-
-        res.json({
-            ok: true,
-            message: `Restart requested for ${config.serviceName}.`,
+        const result = await services.getApplicationDaemonService().restart({
+            cause: 'user',
+            source: 'admin-http',
         });
+
+        res.status(result?.ok ? 200 : 500).json(result);
     });
 
     return router;

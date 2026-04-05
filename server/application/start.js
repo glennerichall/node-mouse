@@ -43,7 +43,7 @@ export function createApplicationStart(services) {
     state.stopConfigObserver = startConfigObserver(services);
     state.stopNotificationObserver = startNotificationObserver(services);
     state.stopQrOverlayRefreshObserver = startQrOverlayRefreshObserver(services);
-    notifyIfRestarted(services.getEvents());
+    notifyIfRestarted(services);
 
     tokenManager.createToken();
 

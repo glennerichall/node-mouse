@@ -1,6 +1,7 @@
 import {createConfigDao} from './createConfigDao.js';
 import {createEntryTokenDao} from './createEntryTokenDao.js';
 import {createDatabaseProvider} from './createDatabaseProvider.js';
+import {createRestartLogDao} from './createRestartLogDao.js';
 
 export function createPersistence(services) {
     const getDatabase = createDatabaseProvider({
@@ -14,5 +15,6 @@ export function createPersistence(services) {
             getPubSub: () => services.getPubSub(),
         }),
         entryTokenDao: createEntryTokenDao({getDatabase}),
+        restartLogDao: createRestartLogDao({getDatabase}),
     };
 }

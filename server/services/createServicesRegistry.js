@@ -16,6 +16,7 @@ import {createPubSub} from './pubsub/createPubSub.js';
 import {createEventStore} from './pubsub/createEventStore.js';
 import {createServiceEvents} from './pubsub/createServiceEvents.js';
 import {createSseService} from './sse/createSseService.js';
+import {createApplicationDaemonService} from './application/createApplicationDaemonService.js';
 
 
 export function createServicesRegistry() {
@@ -35,6 +36,7 @@ export function createServicesRegistry() {
         createTaskManager,
         createQrOverlay,
         createUpdateManager,
+        createApplicationDaemonService,
         createServer,
         createInputController,
         createRemotes

@@ -102,7 +102,7 @@ export function createServerInfoRouter(services) {
     res.sendFile(path.join(publicDir, 'server-info.html'));
   });
 
-  router.get('/data', (_req, res) => {
+  router.get('/data', async (_req, res) => {
     const clients = getConnectedClients(services.getServer().io);
     const rawConfig = services.getConfig();
     const rawSystemConfig = services.getSystemConfig?.() || {};
@@ -112,8 +112,10 @@ export function createServerInfoRouter(services) {
     const version = readPackageVersion(packageJsonPath);
     const tasks = services.getTaskManager().getTasksSnapshot();
     const tokenEntries = services.getPersistence().entryTokenDao.loadEntryTokens();
+    const restarts = services.getPersistence().restartLogDao.listRecentRestartRecords(20);
     const currentToken = services.getTokenManager().getToken();
     const entryPathConfig = services.getSystemConfig().entryPath;
+    const daemon = await services.getApplicationDaemonService().getInfo();
     const tokens = buildTokenEntries({
       entries: tokenEntries,
       currentToken,
@@ -129,6 +131,8 @@ export function createServerInfoRouter(services) {
       clients,
       tasks,
       tokens,
+      daemon,
+      restarts,
       config,
       sysConfig,
       logs,

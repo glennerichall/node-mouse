@@ -71,6 +71,7 @@
       <span id="online-since">Online since: -</span>
       <span id="uptime">Uptime: -</span>
       <span id="clients-count">Clients: 0</span>
+      <span id="daemon-state">Daemon: -</span>
     </div>
 
     <section>
@@ -125,6 +126,26 @@
     </section>
 
     <section>
+      <h2>Recent lifecycle events</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Event</th>
+              <th>Requested</th>
+              <th>Detected</th>
+              <th>Status</th>
+              <th>Cause</th>
+              <th>Source</th>
+            </tr>
+          </thead>
+          <tbody id="restarts-table"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
       <h2 data-i18n="serverInfo.section.config">Configuration</h2>
       <pre id="config"></pre>
     </section>
@@ -151,9 +172,11 @@
     const onlineSinceEl = document.getElementById('online-since');
     const uptimeEl = document.getElementById('uptime');
     const clientsCountEl = document.getElementById('clients-count');
+    const daemonStateEl = document.getElementById('daemon-state');
     const clientsTable = document.getElementById('clients-table');
     const tasksTable = document.getElementById('tasks-table');
     const tokensTable = document.getElementById('tokens-table');
+    const restartsTable = document.getElementById('restarts-table');
     const configEl = document.getElementById('config');
     const sysConfigEl = document.getElementById('sys-config');
     const logsEl = document.getElementById('logs');
@@ -273,6 +296,30 @@
       }
     }
 
+    function renderRestarts(restarts) {
+      restartsTable.innerHTML = '';
+      if (!Array.isArray(restarts) || restarts.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="7">No recorded lifecycle event.</td>';
+        restartsTable.appendChild(row);
+        return;
+      }
+
+      for (const restart of restarts) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${restart.id ?? ''}</td>
+          <td>${restart.eventType || '-'}</td>
+          <td>${formatDateTime(restart.requestedAt)}</td>
+          <td>${formatDateTime(restart.detectedAt)}</td>
+          <td>${restart.status || '-'}</td>
+          <td>${restart.cause || '-'}</td>
+          <td>${restart.source || '-'}</td>
+        `;
+        restartsTable.appendChild(row);
+      }
+    }
+
     function renderLogs(logs) {
       const previousScrollTop = logsEl.scrollTop;
       const shouldAutoScroll = logsAutoScroll;
@@ -346,9 +393,11 @@
         onlineSinceEl.textContent = t('serverInfo.onlineSince', {value: formatDateTime(data.onlineSince)});
         uptimeEl.textContent = t('serverInfo.uptime', {value: formatDuration(data.uptimeSec)});
         clientsCountEl.textContent = t('serverInfo.clientsCount', {value: Number(data.clientsConnected) || 0});
+        daemonStateEl.textContent = `Daemon: ${data.daemon?.runningAsDaemon ? 'yes' : 'no'}${data.daemon?.installed ? ' (installed)' : ''}`;
         renderClients(data.clients || []);
         renderTasks(data.tasks || []);
         renderTokens(data.tokens || []);
+        renderRestarts(data.restarts || []);
         scheduleConfigPayload({
           config: data.config,
           sysConfig: data.sysConfig,

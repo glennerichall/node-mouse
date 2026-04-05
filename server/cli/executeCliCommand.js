@@ -19,6 +19,10 @@ function buildHelpMessage() {
     '  config get <path> Affiche une valeur de configuration',
     '  config set <path> <value> Met a jour une valeur de configuration',
     '  sys-config Affiche la configuration système',
+    '  service install Installe le daemon/service local',
+    '  service disable Desactive le daemon/service local',
+    '  service uninstall Desinstalle le daemon/service local',
+    '  service restart Redemarre le daemon/service local',
     '  tasks    Affiche les informations du task manager',
     '  task-manager Alias de tasks',
     '  samsung-detect Detecte une TV Samsung',
@@ -157,6 +161,25 @@ export async function executeCliCommand(services, input) {
       message: 'Configuration système.',
       data: services.getSystemConfig(),
     };
+  }
+
+  if (primaryCommand === 'service' && normalizeSubcommand(tokens[1]) === 'install') {
+    return services.getApplicationDaemonService().install();
+  }
+
+  if (primaryCommand === 'service' && normalizeSubcommand(tokens[1]) === 'disable') {
+    return services.getApplicationDaemonService().disable();
+  }
+
+  if (primaryCommand === 'service' && normalizeSubcommand(tokens[1]) === 'uninstall') {
+    return services.getApplicationDaemonService().uninstall();
+  }
+
+  if (primaryCommand === 'service' && normalizeSubcommand(tokens[1]) === 'restart') {
+    return services.getApplicationDaemonService().restart({
+      cause: 'user',
+      source: 'cli',
+    });
   }
 
   if (command === 'tasks' || command === 'task-manager') {

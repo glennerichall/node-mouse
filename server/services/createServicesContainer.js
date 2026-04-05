@@ -70,6 +70,7 @@ export async function createServicesContainer({
                                                   createTaskManager,
                                                   createQrOverlay,
                                                   createUpdateManager,
+                                                  createApplicationDaemonService,
                                                   createServer,
                                                   createInputController,
                                                   createRemotes
@@ -90,6 +91,7 @@ export async function createServicesContainer({
         getTaskManager: createLazy(() => createTaskManager(container)),
         getQrOverlay: createLazy(() => createQrOverlay(container)),
         getUpdateManager: createLazy(() => createUpdateManager(container)),
+        getApplicationDaemonService: createLazy(() => createApplicationDaemonService(container)),
         getUrls: () => urlFactory(container),
         getLogger: scope => loggerFactory(container)(scope),
         getInputController: createLazy(() => createInputController(container)),

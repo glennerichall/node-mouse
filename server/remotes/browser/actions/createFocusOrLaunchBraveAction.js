@@ -1,4 +1,4 @@
-import os from 'os';
+import os from 'node:os';
 import { focusOrLaunchBraveLinux } from '../platforms/linux.js';
 import { focusOrLaunchBraveDarwin } from '../platforms/darwin.js';
 import { focusOrLaunchBraveWin32 } from '../platforms/win32.js';

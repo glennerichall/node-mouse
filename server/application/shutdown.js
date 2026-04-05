@@ -26,6 +26,18 @@ export function createApplicationShutdown(services) {
 
     state.shuttingDown = true;
     log.info({signal}, 'Arret du serveur');
+    services.getPersistence?.().restartLogDao?.createLifecycleEvent({
+      eventAt: Date.now(),
+      eventType: 'stop',
+      cause: 'user',
+      source: signal ? `signal:${signal}` : 'shutdown',
+      status: 'completed',
+      details: {
+        signal: signal || null,
+        graceful: true,
+        processUptimeSec: Math.floor(process.uptime()),
+      },
+    });
 
     await Promise.allSettled([
       runShutdownStep('Erreur a l arret du task manager', () => taskManager.stop()),

@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import {createAdminEventGuardMiddleware} from '../../server/remotes/admin/admin.guard.js';
+import {createAdminEventGuardMiddleware} from '../../server/remotes/admin/createAdminEventGuardMiddleware.js';
 import {
   REMOTE_EVENT_ADMIN_SERVICE_RESTART,
   REMOTE_EVENT_ADMIN_UPDATE_CHECK,

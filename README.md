@@ -82,6 +82,10 @@ Useful CLI commands:
 - `config get <path>` prints one persisted configuration value
 - `config set <path> <value>` updates one persisted configuration value
 - `sys-config` prints the system configuration
+- `service install` installs the local daemon/service
+- `service disable` disables the local daemon/service
+- `service uninstall` uninstalls the local daemon/service
+- `service restart` restarts the local daemon/service
 - `tasks` prints the task manager snapshot
 - `task-manager` is an alias of `tasks`
 - `samsung-detect` detects Samsung TVs available on the network
@@ -122,7 +126,7 @@ The server exposes two main HTTP surfaces:
 - `POST /api/admin/subs/configs` creates a config SSE subscription and returns its id plus the stream URL
 - `GET /api/admin/subs/:id` opens the SSE stream for a previously created subscription
 - `DELETE /api/admin/subs/:id` deletes a previously created subscription
-- `POST /api/admin/restart-service` requests a local service restart through `systemctl --user`
+- `POST /api/admin/restart-service` requests a local service restart through the application daemon service
 
 ### Health Route
 
@@ -138,7 +142,16 @@ After session validation, static assets are also available through:
 
 ## Linux Deployment
 
-The server can be run as a `systemd --user` service. Minimal example:
+The application can manage its own `systemd --user` service.
+
+Typical setup:
+
+1. Install dependencies in the project directory with `npm install`.
+2. Create a `.env` file based on [`.env.example`](./.env.example).
+3. Run `remote-mouse service install`.
+4. Use `remote-mouse service restart`, `remote-mouse service disable`, or `remote-mouse service uninstall` as needed.
+
+The generated unit is equivalent to the following:
 
 ```ini
 [Unit]
@@ -151,6 +164,7 @@ Type=simple
 ExecStart=/path/to/remote-mouse/bin/remote-mouse.js
 Restart=on-failure
 RestartSec=2
+Environment=PATH=/path/to/nodejs:/usr/local/bin:/usr/bin:/bin
 Environment=NODE_ENV=production
 PassEnvironment=DISPLAY WAYLAND_DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS
 
@@ -164,29 +178,28 @@ An X11 session is required for the Linux desktop control features.
 
 ## Windows Deployment
 
-On Windows, the simplest deployment approach is to run the application at user logon with Task Scheduler.
+On Windows, the application manages a Task Scheduler entry that runs at user logon.
 
 Typical setup:
 
 1. Install dependencies in the project directory with `npm install`.
 2. Create a `.env` file based on [`.env.example`](./.env.example).
-3. Create a scheduled task that runs at logon for the target user.
-4. Start the application with `node index.js` from the project directory.
+3. Run `remote-mouse service install`.
+4. Use `remote-mouse service restart`, `remote-mouse service disable`, or `remote-mouse service uninstall` as needed.
 
-Suggested Task Scheduler settings:
+The generated scheduled task follows this model:
 
 - Trigger: `At log on`
-- Action: `Start a program`
-- Program/script: path to `node.exe`
-- Add arguments: `index.js`
-- Start in: path to the project directory
+- Action: `schtasks /Create`
+- Task name: the configured `serviceName`
+- Command: launches the `remote-mouse` entrypoint with `REMOTE_MOUSE_DAEMON=1`
 - Run only when the user is logged on
 
 Notes:
 
 - running in a user session is usually preferable because mouse, keyboard, browser, and overlay integrations depend on an interactive desktop session
 - if you rely on the QR overlay or browser-opening actions, make sure the task runs in the same desktop session as the logged-in user
-- if you installed the app globally and prefer the CLI entrypoint, you can use the `remote-mouse` executable instead of `node index.js`
+- if you installed the app globally, the generated task uses the `remote-mouse` CLI entrypoint directly
 
 ## Notes
 
