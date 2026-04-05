@@ -60,6 +60,13 @@ export const CONFIG_SCHEMA = {
         max: 30,
         step: 1,
       },
+      hideDelayMs: {
+        label: 'Delai de masque (ms)',
+        type: 'integer',
+        min: 200,
+        max: 60000,
+        step: 100,
+      },
     },
   },
   notifications: {

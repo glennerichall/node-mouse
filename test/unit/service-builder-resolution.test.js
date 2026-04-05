@@ -1,8 +1,8 @@
 import {jest} from '@jest/globals';
 
 import {createSocketSessionAuthMiddleware} from '../../server/connection/socket/createSocketSessionAuthMiddleware.js';
-import {createInstallUpdateAction} from '../../server/remotes/admin/install-update.js';
-import {createRotateEntryTokenAction} from '../../server/remotes/admin/rotate-entry-token.js';
+import {createInstallUpdateAction} from '../../server/remotes/admin/createInstallUpdateAction.js';
+import {createRotateEntryTokenAction} from '../../server/remotes/admin/createRotateEntryTokenAction.js';
 import {createPreviewStreamer} from '../../server/remotes/preview/createPreviewStreamer.js';
 import {createKeyboardController} from '../../server/services/input/createKeyboardController.js';
 import {createMouseController} from '../../server/services/input/createMouseController.js';

@@ -12,14 +12,16 @@ describe('admin browser actions', () => {
   });
 
   it('returns a client-side openUrl for QR client action', async () => {
-    const {createOpenQrBrowserAction} = await import('../../server/remotes/admin/open-qr-browser.js');
+    const {createOpenQrBrowserAction} = await import('../../server/remotes/admin/createOpenQrBrowserAction.js');
     const events = {
       publishEvent: jest.fn(),
     };
     const browser = {openUrlOnHost: jest.fn()};
 
     const openQrBrowser = createOpenQrBrowserAction({
-      events,
+      getEvents: () => events,
+      getSystemConfig: () => ({protocol: 'http', port: 3000}),
+    }, {
       browser,
       target: NOTIFIER_TARGET_CLIENT,
     });
@@ -38,14 +40,16 @@ describe('admin browser actions', () => {
   });
 
   it('returns a client-side openUrl for server info client action', async () => {
-    const {createOpenServerInfoBrowserAction} = await import('../../server/remotes/admin/open-server-info-browser.js');
+    const {createOpenServerInfoBrowserAction} = await import('../../server/remotes/admin/createOpenServerInfoBrowserAction.js');
     const events = {
       publishEvent: jest.fn(),
     };
     const browser = {openUrlOnHost: jest.fn()};
 
     const openServerInfoBrowser = createOpenServerInfoBrowserAction({
-      events,
+      getEvents: () => events,
+      getSystemConfig: () => ({protocol: 'http', port: 3000}),
+    }, {
       browser,
       target: NOTIFIER_TARGET_CLIENT,
     });

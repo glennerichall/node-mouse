@@ -1,11 +1,11 @@
-import {createForceUpdateCheckAction} from './force-update-check.js';
-import {createInstallUpdateAction} from './install-update.js';
-import {createRestartServiceAction} from './restart-service.js';
-import {createOpenQrBrowserAction} from './open-qr-browser.js';
-import {createOpenServerInfoBrowserAction} from './open-server-info-browser.js';
-import {createRotateEntryTokenAction} from './rotate-entry-token.js';
-import {createToggleQrOverlayAction} from './toggle-qr-overlay.js';
-import {notifyIfRestarted} from './restart-marker.js';
+import {createForceUpdateCheckAction} from './createForceUpdateCheckAction.js';
+import {createInstallUpdateAction} from './createInstallUpdateAction.js';
+import {createRestartServiceAction} from './createRestartServiceAction.js';
+import {createOpenQrBrowserAction} from './createOpenQrBrowserAction.js';
+import {createOpenServerInfoBrowserAction} from './createOpenServerInfoBrowserAction.js';
+import {createRotateEntryTokenAction} from './createRotateEntryTokenAction.js';
+import {createToggleQrOverlayAction} from './createToggleQrOverlayAction.js';
+import {notifyIfRestarted} from './notifyIfRestarted.js';
 
 export {notifyIfRestarted};
 

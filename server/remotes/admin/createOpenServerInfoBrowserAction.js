@@ -12,18 +12,12 @@ import {
 
 const log = createLogger('admin:open-server-info-browser');
 
-export function createOpenServerInfoBrowserAction(servicesOrOptions, options = {}) {
-  const getEvents = servicesOrOptions?.getEvents
-    ? () => servicesOrOptions.getEvents()
-    : () => servicesOrOptions.events;
-  const browser = options.browser || servicesOrOptions?.browser;
-  const target = options.target || servicesOrOptions?.target || NOTIFIER_TARGET_SERVER;
-  const getSystemConfig = servicesOrOptions?.getSystemConfig
-    ? () => servicesOrOptions.getSystemConfig()
-    : () => servicesOrOptions?.systemConfig;
+export function createOpenServerInfoBrowserAction(services, options = {}) {
+  const browser = options.browser;
+  const target = options.target || NOTIFIER_TARGET_SERVER;
 
   return async function openServerInfoBrowser({ clientId } = {}) {
-    const events = getEvents();
+    const events = services.getEvents();
     const isClientTarget = target === NOTIFIER_TARGET_CLIENT;
     const clientInfoUrl = '/ui/admin/server-info';
 
@@ -39,7 +33,7 @@ export function createOpenServerInfoBrowserAction(servicesOrOptions, options = {
       };
     }
 
-    const config = getSystemConfig();
+    const config = services.getSystemConfig();
     const localInfoUrl = `${config.protocol}://127.0.0.1:${config.port}/ui/admin/server-info`;
     log.info({ localInfoUrl }, 'Ouverture de la page server info sur le serveur');
 

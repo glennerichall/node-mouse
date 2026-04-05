@@ -8,6 +8,7 @@ export const CONFIG_PATHS = [
     'preview.width',
     'preview.height',
     'preview.fps',
+    'preview.hideDelayMs',
     'notifications.ttlMs',
     ...getNotificationPaths(),
     'samsungTv.enabled',

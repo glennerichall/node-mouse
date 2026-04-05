@@ -6,13 +6,9 @@ import {
 
 const log = createLogger('admin:toggle-qr-overlay');
 
-export function createToggleQrOverlayAction(servicesOrOptions) {
-  const getEvents = servicesOrOptions?.getEvents
-    ? () => servicesOrOptions.getEvents()
-    : () => servicesOrOptions.events;
-  const getQrOverlay = servicesOrOptions?.getQrOverlay
-    ? () => servicesOrOptions.getQrOverlay()
-    : () => servicesOrOptions.qrOverlay;
+export function createToggleQrOverlayAction(services) {
+  const getEvents = services.getEvents;
+  const getQrOverlay = services.getQrOverlay;
 
   return async function toggleQrOverlay({ clientId } = {}) {
     const events = getEvents();

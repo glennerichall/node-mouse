@@ -1,5 +1,6 @@
 import {createPreviewFrameReceiver} from "./create-preview-frame-receiver.js";
 import {emitWithTimestamp} from "../core/socket-emit.js";
+import { getClientPreviewConfig, onClientConfigChange } from '../config/client-config.js';
 import {
   REMOTE_EVENT_PREVIEW_START,
   REMOTE_EVENT_PREVIEW_STOP,
@@ -15,9 +16,16 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }) {
   const ctx = previewCanvas.getContext('2d');
   const onPreviewFrame = createPreviewFrameReceiver({ ctx, previewCanvas, previewLabel });
   const previewRoot = previewCanvas.closest('#cursor-preview');
-  const inactivityDelayMs = 10_000;
   let isPreviewActive = false;
   let stopTimer = null;
+
+  const getInactivityDelayMs = () => {
+    const configuredDelay = Number(getClientPreviewConfig()?.hideDelayMs);
+    if (Number.isFinite(configuredDelay) && configuredDelay >= 200) {
+      return configuredDelay;
+    }
+    return 10_000;
+  };
 
   const showPreview = () => {
     if (previewRoot) {
@@ -51,7 +59,7 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }) {
     clearStopTimer();
     stopTimer = setTimeout(() => {
       stopPreview();
-    }, inactivityDelayMs);
+    }, getInactivityDelayMs());
   };
 
   const startPreview = () => {
@@ -73,6 +81,11 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }) {
   socket.on('preview:frame', onPreviewFrame);
   socket.on('disconnect', stopPreview);
   window.addEventListener('beforeunload', stopPreview);
+  onClientConfigChange(() => {
+    if (isPreviewActive) {
+      armInactivityStop();
+    }
+  });
 
   hidePreview();
 

@@ -11,7 +11,7 @@ import {
     commandExists,
     spawnDetached
 } from '../../utils/process.js';
-import {writeRestartMarker} from '../../remotes/admin/restart-marker.js';
+import {writeRestartMarker} from '../../remotes/admin/notifyIfRestarted.js';
 
 export {
     buildManagedConfigPayload,

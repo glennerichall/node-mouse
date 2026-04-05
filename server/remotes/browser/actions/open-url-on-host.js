@@ -1,4 +1,4 @@
-import os from 'os';
+import os from 'node:os';
 import {commandExists, execFileAsync, spawnDetached} from '../../../utils/process.js';
 
 export async function openUrlOnHost(url) {

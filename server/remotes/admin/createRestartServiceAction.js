@@ -1,21 +1,14 @@
 import { commandExists, spawnDetached } from '../../utils/process.js';
-import { writeRestartMarker } from './restart-marker.js';
+import { writeRestartMarker } from './notifyIfRestarted.js';
 import {
   PUBSUB_EVENT_ADMIN_STARTED,
   PUBSUB_SERVICE_ADMIN_RESTART_SERVICE,
 } from '../../services/pubsub/serviceEventConstants.js';
 
-export function createRestartServiceAction(servicesOrOptions) {
-  const getEvents = servicesOrOptions?.getEvents
-    ? () => servicesOrOptions.getEvents()
-    : () => servicesOrOptions.events;
-  const getSystemConfig = servicesOrOptions?.getSystemConfig
-    ? () => servicesOrOptions.getSystemConfig()
-    : () => servicesOrOptions?.systemConfig;
-
+export function createRestartServiceAction(services) {
   return async function restartService({ clientId } = {}) {
-    const config = getSystemConfig();
-    const events = getEvents();
+    const config = services.getSystemConfig();
+    const events = services.getEvents();
     if (!(await commandExists('systemctl'))) {
       return { ok: false, message: 'systemctl indisponible.' };
     }

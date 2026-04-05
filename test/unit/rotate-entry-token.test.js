@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import {createRotateEntryTokenAction} from '../../server/remotes/admin/rotate-entry-token.js';
+import {createRotateEntryTokenAction} from '../../server/remotes/admin/createRotateEntryTokenAction.js';
 import {
   PUBSUB_EVENT_ADMIN_REJECTED_DISABLED,
   PUBSUB_EVENT_ADMIN_ROTATED,

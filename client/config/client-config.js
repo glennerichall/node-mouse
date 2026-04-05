@@ -3,6 +3,9 @@ const DEFAULT_CLIENT_CONFIG = {
     touchDragHoldMs: 420,
     touchDragStillDistancePx: 8,
   },
+  preview: {
+    hideDelayMs: 10000,
+  },
 };
 
 let configState = structuredClone(DEFAULT_CLIENT_CONFIG);
@@ -139,6 +142,10 @@ export function getClientInputConfig() {
 
 export function getClientSamsungConfig() {
   return configState.samsungTv || {};
+}
+
+export function getClientPreviewConfig() {
+  return configState.preview || DEFAULT_CLIENT_CONFIG.preview;
 }
 
 export function onClientConfigChange(listener) {

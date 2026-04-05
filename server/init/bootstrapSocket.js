@@ -1,7 +1,7 @@
 import {createSocketSessionAuthMiddleware} from '../connection/socket/createSocketSessionAuthMiddleware.js';
 import {createSocketActionRegistrars} from './createSocketActionRegistrars.js';
 import {socketTimestampGuardMiddleware} from "../connection/socket/socket.timestamp-middleware.js";
-import { hasRecentRestart } from '../remotes/admin/restart-marker.js';
+import { hasRecentRestart } from '../remotes/admin/notifyIfRestarted.js';
 import {
     PUBSUB_EVENT_SOCKET_CLIENT_CONNECTED,
     PUBSUB_SERVICE_SOCKET

@@ -21,18 +21,12 @@ function publishClientEvent(events, type, clientId) {
   });
 }
 
-export function createOpenQrBrowserAction(servicesOrOptions, options = {}) {
-  const getEvents = servicesOrOptions?.getEvents
-    ? () => servicesOrOptions.getEvents()
-    : () => servicesOrOptions.events;
-  const browser = options.browser || servicesOrOptions?.browser;
-  const target = options.target || servicesOrOptions?.target || NOTIFIER_TARGET_SERVER;
-  const getSystemConfig = servicesOrOptions?.getSystemConfig
-    ? () => servicesOrOptions.getSystemConfig()
-    : () => servicesOrOptions?.systemConfig;
+export function createOpenQrBrowserAction(services, options = {}) {
+  const browser = options.browser;
+  const target = options.target || NOTIFIER_TARGET_SERVER;
 
   return async function openQrBrowser({ clientId } = {}) {
-    const events = getEvents();
+    const events = services.getEvents();
     const isClientTarget = target === NOTIFIER_TARGET_CLIENT;
     const clientQrUrl = '/qr';
 
@@ -48,7 +42,7 @@ export function createOpenQrBrowserAction(servicesOrOptions, options = {}) {
       };
     }
 
-    const config = getSystemConfig();
+    const config = services.getSystemConfig();
     const localQrUrl = `${config.protocol}://127.0.0.1:${config.port}/qr`;
     log.info({ localQrUrl }, 'Ouverture de la page QR sur le serveur');
 
