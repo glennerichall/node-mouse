@@ -26,9 +26,9 @@ export const ja = {
   'main.connectionWaiting': '接続を待機中...',
   'main.connectionExpiredTitle': '接続の有効期限切れ',
   'main.connectionExpiredMessage': 'サーバーのQRコードを再度読み取ってください。',
-  'main.canvas.oneFingerScroll': '1本指スクロール',
+  'main.canvas.oneFingerScroll': 'スクロール',
   'main.canvas.dragMouse': 'ドラッグ: マウス',
-  'main.canvas.touchHelp': 'タップ: 左クリック | 2本指: スクロール / 右クリック | 右端: スクロール',
+  'main.canvas.touchHelp': 'タップ: 左クリック\n2本指: スクロール / 右クリック\n右端: スクロール',
 
   'adminConfig.eyebrow': '管理',
   'adminConfig.title': '永続設定',

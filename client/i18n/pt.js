@@ -26,9 +26,9 @@ export const pt = {
   'main.connectionWaiting': 'Aguardando conexao...',
   'main.connectionExpiredTitle': 'Conexao expirada',
   'main.connectionExpiredMessage': 'Escaneie novamente o QR code do servidor.',
-  'main.canvas.oneFingerScroll': 'SCROLL 1 DEDO',
+  'main.canvas.oneFingerScroll': 'Scroll',
   'main.canvas.dragMouse': 'Deslizar: mouse',
-  'main.canvas.touchHelp': 'Toque: clique esquerdo | 2 dedos: scroll / clique direito | Faixa direita: scroll',
+  'main.canvas.touchHelp': 'Toque: clique esquerdo\n2 dedos: scroll / clique direito\nFaixa direita: scroll',
 
   'adminConfig.eyebrow': 'Administracao',
   'adminConfig.title': 'Configuracao persistente',

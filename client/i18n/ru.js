@@ -26,9 +26,9 @@ export const ru = {
   'main.connectionWaiting': 'Ожидание подключения...',
   'main.connectionExpiredTitle': 'Срок подключения истек',
   'main.connectionExpiredMessage': 'Повторно отсканируйте QR-код сервера.',
-  'main.canvas.oneFingerScroll': 'ПРОКРУТКА 1 ПАЛЕЦ',
+  'main.canvas.oneFingerScroll': 'Скролл',
   'main.canvas.dragMouse': 'Свайп: мышь',
-  'main.canvas.touchHelp': 'Касание: левый клик | 2 пальца: прокрутка / правый клик | Правая зона: прокрутка',
+  'main.canvas.touchHelp': 'Касание: левый клик\n2 пальца: прокрутка / правый клик\nПравая зона: прокрутка',
 
   'adminConfig.eyebrow': 'Администрирование',
   'adminConfig.title': 'Постоянная конфигурация',

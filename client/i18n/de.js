@@ -28,9 +28,9 @@ export const de = {
   'main.connectionWaiting': 'Warte auf Verbindung...',
   'main.connectionExpiredTitle': 'Verbindung abgelaufen',
   'main.connectionExpiredMessage': 'QR-Code des Servers erneut scannen.',
-  'main.canvas.oneFingerScroll': '1-FINGER-SCROLLEN',
+  'main.canvas.oneFingerScroll': 'Scroll',
   'main.canvas.dragMouse': 'Ziehen: Maus',
-  'main.canvas.touchHelp': 'Tippen: Linksklick | 2 Finger: Scroll / Rechtsklick | Rechter Rand: Scroll',
+  'main.canvas.touchHelp': 'Tippen: Linksklick\n2 Finger: Scroll / Rechtsklick\nRechter Rand: Scroll',
 
   'adminConfig.eyebrow': 'Administration',
   'adminConfig.title': 'Persistente Konfiguration',

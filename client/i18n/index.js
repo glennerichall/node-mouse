@@ -3,15 +3,22 @@ import {localePrefixes, localeRegistry} from './locale-registry.js';
 const LOCALE_STORAGE_KEY = 'remote-mouse.locale';
 const THEME_STORAGE_KEY = 'remote-mouse.theme';
 const HANDEDNESS_STORAGE_KEY = 'remote-mouse.handedness';
+const REMOTE_AUTO_HIDE_STORAGE_KEY = 'remote-mouse.remote-auto-hide';
+const REMOTE_VISIBILITY_STORAGE_KEY = 'remote-mouse.remote-visibility';
 const I18N_CHANGED_EVENT = 'i18n:changed';
 const THEME_CHANGED_EVENT = 'theme:changed';
 const HANDEDNESS_CHANGED_EVENT = 'handedness:changed';
+const REMOTE_AUTO_HIDE_CHANGED_EVENT = 'remote-auto-hide:changed';
+const REMOTE_VISIBILITY_CHANGED_EVENT = 'remote-visibility:changed';
 const SUPPORTED_THEMES = new Set(['dark', 'light']);
 const SUPPORTED_HANDEDNESS = new Set(['right', 'left']);
 
 let cachedI18n = null;
 let cachedTheme = '';
 let cachedHandedness = '';
+let cachedRemoteAutoHide = true;
+let cachedRemoteVisibility = {};
+let remoteVisibilityStorageBound = false;
 
 function applySwitcherLabelStyle(label) {
   label.style.fontSize = '12px';
@@ -75,6 +82,38 @@ function safeWriteStoredHandedness(handedness) {
   }
 }
 
+function safeReadStoredRemoteAutoHide() {
+  try {
+    return window.localStorage.getItem(REMOTE_AUTO_HIDE_STORAGE_KEY);
+  } catch (_error) {
+    return '';
+  }
+}
+
+function safeWriteStoredRemoteAutoHide(value) {
+  try {
+    window.localStorage.setItem(REMOTE_AUTO_HIDE_STORAGE_KEY, value);
+  } catch (_error) {
+    // Best effort.
+  }
+}
+
+function safeReadStoredRemoteVisibility() {
+  try {
+    return window.localStorage.getItem(REMOTE_VISIBILITY_STORAGE_KEY);
+  } catch (_error) {
+    return '';
+  }
+}
+
+function safeWriteStoredRemoteVisibility(value) {
+  try {
+    window.localStorage.setItem(REMOTE_VISIBILITY_STORAGE_KEY, value);
+  } catch (_error) {
+    // Best effort.
+  }
+}
+
 function resolveLocale(value = safeReadStoredLocale() || navigator.language) {
   const normalized = String(value || '').toLowerCase();
 
@@ -111,6 +150,54 @@ function resolveHandedness(value = safeReadStoredHandedness()) {
   return 'right';
 }
 
+function resolveRemoteAutoHide(value = safeReadStoredRemoteAutoHide()) {
+  const normalized = String(value || '').trim().toLowerCase();
+  if (!normalized) {
+    return true;
+  }
+  if (normalized === 'false' || normalized === '0' || normalized === 'off' || normalized === 'no') {
+    return false;
+  }
+  return true;
+}
+
+function resolveRemoteVisibilityState(value = safeReadStoredRemoteVisibility()) {
+  if (!value) {
+    return {};
+  }
+
+  try {
+    const parsed = JSON.parse(value);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return {};
+    }
+
+    return Object.fromEntries(
+      Object.entries(parsed).map(([key, entryValue]) => [key, Boolean(entryValue)]),
+    );
+  } catch (_error) {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (normalized === 'false' || normalized === '0' || normalized === 'off') {
+      return {
+        browser: false,
+        samsung: false,
+        preview: false,
+      };
+    }
+    return {};
+  }
+}
+
+function resolveRemoteVisibility(remoteId, fallback = true) {
+  const state = cachedRemoteVisibility && typeof cachedRemoteVisibility === 'object'
+    ? cachedRemoteVisibility
+    : resolveRemoteVisibilityState();
+  if (Object.hasOwn(state, remoteId)) {
+    return Boolean(state[remoteId]);
+  }
+  return Boolean(fallback);
+}
+
 function applyClientTheme(theme) {
   const normalizedTheme = resolveTheme(theme);
   cachedTheme = normalizedTheme;
@@ -124,6 +211,44 @@ function applyClientHandedness(handedness) {
   cachedHandedness = normalizedHandedness;
   document.documentElement.dataset.handedness = normalizedHandedness;
   return normalizedHandedness;
+}
+
+function applyClientRemoteAutoHide(value) {
+  const normalizedValue = typeof value === 'boolean' ? value : resolveRemoteAutoHide(value);
+  cachedRemoteAutoHide = normalizedValue;
+  document.documentElement.dataset.remoteAutoHide = normalizedValue ? 'true' : 'false';
+  return normalizedValue;
+}
+
+function applyClientRemoteVisibilityState(value) {
+  const nextState = typeof value === 'object' && value !== null && !Array.isArray(value)
+    ? Object.fromEntries(Object.entries(value).map(([key, entryValue]) => [key, Boolean(entryValue)]))
+    : resolveRemoteVisibilityState(value);
+  cachedRemoteVisibility = nextState;
+  return nextState;
+}
+
+function bindRemoteVisibilityStorageSync() {
+  if (remoteVisibilityStorageBound || typeof window === 'undefined') {
+    return;
+  }
+
+  window.addEventListener('storage', (event) => {
+    if (event.key !== REMOTE_VISIBILITY_STORAGE_KEY) {
+      return;
+    }
+
+    const previousState = cachedRemoteVisibility;
+    const nextState = applyClientRemoteVisibilityState(event.newValue || '');
+    window.dispatchEvent(new CustomEvent(REMOTE_VISIBILITY_CHANGED_EVENT, {
+      detail: {
+        previousState,
+        nextState,
+      },
+    }));
+  });
+
+  remoteVisibilityStorageBound = true;
 }
 
 function interpolate(template, params = {}) {
@@ -164,6 +289,15 @@ export function initClientHandedness(handedness = resolveHandedness()) {
   return applyClientHandedness(handedness);
 }
 
+export function initClientRemoteAutoHide(value = resolveRemoteAutoHide()) {
+  return applyClientRemoteAutoHide(value);
+}
+
+export function initClientRemoteVisibilityState(value = resolveRemoteVisibilityState()) {
+  bindRemoteVisibilityStorageSync();
+  return applyClientRemoteVisibilityState(value);
+}
+
 export async function setClientLocale(locale) {
   const normalizedLocale = resolveLocale(locale);
   safeWriteStoredLocale(normalizedLocale);
@@ -188,6 +322,14 @@ export function getClientTheme() {
 
 export function getClientHandedness() {
   return cachedHandedness || resolveHandedness();
+}
+
+export function getClientRemoteAutoHide() {
+  return typeof cachedRemoteAutoHide === 'boolean' ? cachedRemoteAutoHide : resolveRemoteAutoHide();
+}
+
+export function getClientRemoteVisibility(remoteId, fallback = true) {
+  return resolveRemoteVisibility(remoteId, fallback);
 }
 
 export function setClientTheme(theme) {
@@ -218,6 +360,39 @@ export function setClientHandedness(handedness) {
     },
   }));
   return normalizedHandedness;
+}
+
+export function setClientRemoteAutoHide(value) {
+  const normalizedValue = Boolean(value);
+  const previousValue = getClientRemoteAutoHide();
+  safeWriteStoredRemoteAutoHide(normalizedValue ? 'true' : 'false');
+  applyClientRemoteAutoHide(normalizedValue);
+  mountClientPreferences();
+  window.dispatchEvent(new CustomEvent(REMOTE_AUTO_HIDE_CHANGED_EVENT, {
+    detail: {
+      enabled: normalizedValue,
+      previousEnabled: previousValue,
+    },
+  }));
+  return normalizedValue;
+}
+
+export function setClientRemoteVisibility(remoteId, value) {
+  const previousVisible = getClientRemoteVisibility(remoteId, true);
+  const nextState = {
+    ...cachedRemoteVisibility,
+    [remoteId]: Boolean(value),
+  };
+  safeWriteStoredRemoteVisibility(JSON.stringify(nextState));
+  applyClientRemoteVisibilityState(nextState);
+  window.dispatchEvent(new CustomEvent(REMOTE_VISIBILITY_CHANGED_EVENT, {
+    detail: {
+      remoteId,
+      visible: Boolean(value),
+      previousVisible,
+    },
+  }));
+  return Boolean(value);
 }
 
 export function getClientI18n() {
@@ -401,6 +576,60 @@ export function mountHandednessSwitcher() {
   }
 }
 
+export function mountRemoteAutoHideSwitcher() {
+  const enabled = getClientRemoteAutoHide();
+  const {t} = getClientI18n();
+  const host = document.querySelector('[data-remote-auto-hide-host]')
+    || document.querySelector('[data-client-prefs-host]')
+    || document.querySelector('[data-language-switcher-host]');
+
+  let root = document.querySelector('[data-remote-auto-hide-switcher]');
+  if (!root) {
+    root = document.createElement('div');
+    root.dataset.remoteAutoHideSwitcher = 'true';
+    root.style.display = 'flex';
+    root.style.alignItems = 'center';
+    root.style.gap = '6px';
+
+    const label = document.createElement('span');
+    label.dataset.remoteAutoHideLabel = 'true';
+    applySwitcherLabelStyle(label);
+
+    const select = document.createElement('select');
+    select.dataset.remoteAutoHideSelect = 'true';
+    applySwitcherSelectStyle(select);
+
+    for (const [value, key] of [['true', 'common.enabled'], ['false', 'common.disabled']]) {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = t(key);
+      select.appendChild(option);
+    }
+
+    select.addEventListener('change', () => {
+      setClientRemoteAutoHide(select.value === 'true');
+    });
+
+    root.appendChild(label);
+    root.appendChild(select);
+    (host || document.body).appendChild(root);
+  }
+
+  const select = root.querySelector('[data-remote-auto-hide-select]');
+  if (select) {
+    select.value = enabled ? 'true' : 'false';
+    select.setAttribute('aria-label', t('common.remoteAutoHide'));
+    Array.from(select.options).forEach((option) => {
+      option.textContent = t(option.value === 'true' ? 'common.enabled' : 'common.disabled');
+    });
+  }
+
+  const label = root.querySelector('[data-remote-auto-hide-label]');
+  if (label) {
+    label.textContent = t('common.remoteAutoHideShort');
+  }
+}
+
 export function mountClientPreferences() {
   mountLanguageSwitcher();
   mountThemeSwitcher();
@@ -449,5 +678,35 @@ export function onClientHandednessChange(listener) {
   window.addEventListener(HANDEDNESS_CHANGED_EVENT, handler);
   return () => {
     window.removeEventListener(HANDEDNESS_CHANGED_EVENT, handler);
+  };
+}
+
+export function onClientRemoteAutoHideChange(listener) {
+  if (typeof listener !== 'function') {
+    return () => {};
+  }
+
+  const handler = (event) => {
+    listener(event.detail || {});
+  };
+
+  window.addEventListener(REMOTE_AUTO_HIDE_CHANGED_EVENT, handler);
+  return () => {
+    window.removeEventListener(REMOTE_AUTO_HIDE_CHANGED_EVENT, handler);
+  };
+}
+
+export function onClientRemoteVisibilityChange(listener) {
+  if (typeof listener !== 'function') {
+    return () => {};
+  }
+
+  const handler = (event) => {
+    listener(event.detail || {});
+  };
+
+  window.addEventListener(REMOTE_VISIBILITY_CHANGED_EVENT, handler);
+  return () => {
+    window.removeEventListener(REMOTE_VISIBILITY_CHANGED_EVENT, handler);
   };
 }

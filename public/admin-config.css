@@ -64,11 +64,56 @@ body {
   justify-items: stretch;
 }
 
-.page-toolbar-actions[data-client-prefs-host] > div {
+.page-toolbar-actions[data-client-prefs-host] > div,
+.page-toolbar-actions[data-remote-auto-hide-host] > div {
   display: grid !important;
   grid-template-columns: minmax(110px, 140px) minmax(0, 1fr);
   gap: 10px !important;
   align-items: center !important;
+}
+
+.preferences-remotes-settings {
+  display: grid;
+  gap: 12px;
+  justify-items: stretch;
+}
+
+.preferences-section-separator {
+  width: 100%;
+  height: 1px;
+  margin: -4px 0 0;
+  border: 0;
+  background: var(--border);
+}
+
+.preferences-remotes-list {
+  display: grid;
+  gap: 12px;
+}
+
+.preferences-remote-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 140px) minmax(0, 1fr);
+  gap: 10px;
+  align-items: center !important;
+}
+
+.preferences-remote-label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.preferences-remote-select {
+  width: 100%;
+  font: inherit;
+  font-size: 12px;
+  border-radius: 8px;
+  min-height: 0;
+  padding: 3px 8px;
+  border: 1px solid var(--border);
+  background: var(--panel-strong);
+  color: var(--text);
 }
 
 .config-page {

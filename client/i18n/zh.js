@@ -26,9 +26,9 @@ export const zh = {
   'main.connectionWaiting': '等待连接中...',
   'main.connectionExpiredTitle': '连接已过期',
   'main.connectionExpiredMessage': '请重新扫描服务器二维码。',
-  'main.canvas.oneFingerScroll': '单指滚动',
+  'main.canvas.oneFingerScroll': '滚动',
   'main.canvas.dragMouse': '拖动: 鼠标',
-  'main.canvas.touchHelp': '点击: 左键 | 双指: 滚动 / 右键 | 右侧区域: 滚动',
+  'main.canvas.touchHelp': '点击: 左键\n双指: 滚动 / 右键\n右侧区域: 滚动',
 
   'adminConfig.eyebrow': '管理',
   'adminConfig.title': '持久化配置',

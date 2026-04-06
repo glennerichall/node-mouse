@@ -29,9 +29,9 @@ export const es = {
   'main.connectionWaiting': 'Esperando conexion...',
   'main.connectionExpiredTitle': 'Conexion expirada',
   'main.connectionExpiredMessage': 'Vuelva a escanear el codigo QR del servidor.',
-  'main.canvas.oneFingerScroll': 'SCROLL 1 DEDO',
+  'main.canvas.oneFingerScroll': 'Scroll',
   'main.canvas.dragMouse': 'Deslizar: raton',
-  'main.canvas.touchHelp': 'Toque: clic izquierdo | 2 dedos: scroll / clic derecho | Banda derecha: scroll',
+  'main.canvas.touchHelp': 'Toque: clic izquierdo\n2 dedos: scroll / clic derecho\nBanda derecha: scroll',
 
   'adminConfig.eyebrow': 'Administracion',
   'adminConfig.title': 'Configuracion persistente',

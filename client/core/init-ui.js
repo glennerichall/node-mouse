@@ -10,27 +10,73 @@ import { bindClientNotifications } from '../ui/notifications/bind-client-notific
 import { bindAdminDrawer } from '../ui/admin-drawer.js';
 import { bindAdminVersion } from '../ui/admin-version.js';
 import { getClientInputConfig } from '../config/client-config.js';
-import { getClientHandedness } from '../i18n/index.js';
+import {
+  getClientHandedness,
+  getClientRemoteAutoHide,
+  getClientRemoteVisibility,
+  initClientRemoteAutoHide,
+  initClientRemoteVisibilityState,
+  onClientRemoteAutoHideChange,
+  onClientRemoteVisibilityChange,
+} from '../i18n/index.js';
 
 export function initUi(socket) {
   const dom = getDom();
   const canvasUI = createCanvasUI(dom.touchpad);
+  initClientRemoteAutoHide();
+  initClientRemoteVisibilityState();
+  let hideRemoteTimer = null;
   let showRemoteTimer = null;
+  const REMOTE_HIDE_DELAY_MS = 120;
+  const SHOW_REMOTE_DELAY = 120;
+
+  const applyRemoteVisibilityState = () => {
+    const browserVisible = getClientRemoteVisibility('browser', true);
+    const samsungVisible = getClientRemoteVisibility('samsung', true);
+    const previewVisible = getClientRemoteVisibility('preview', true);
+
+    if (dom.browserShortcuts) {
+      dom.browserShortcuts.hidden = !browserVisible;
+    }
+    if (dom.tvControls) {
+      dom.tvControls.hidden = !samsungVisible;
+    }
+    if (dom.cursorPreview) {
+      dom.cursorPreview.hidden = !previewVisible;
+      if (!previewVisible) {
+        dom.cursorPreview.classList.remove('is-visible');
+      }
+    }
+  };
 
   const hideRemotes = () => {
     if (!dom.remoteStack) {
+      return;
+    }
+    if (!getClientRemoteAutoHide()) {
+      dom.remoteStack.classList.remove('is-hidden');
+      return;
+    }
+    if (hideRemoteTimer) {
       return;
     }
     if (showRemoteTimer) {
       clearTimeout(showRemoteTimer);
       showRemoteTimer = null;
     }
-    dom.remoteStack.classList.add('is-hidden');
+    hideRemoteTimer = window.setTimeout(() => {
+      dom.remoteStack.classList.add('is-hidden');
+      hideRemoteTimer = null;
+    }, REMOTE_HIDE_DELAY_MS);
   };
 
   const showRemotes = () => {
     if (!dom.remoteStack) {
       return;
+    }
+    if (hideRemoteTimer) {
+      clearTimeout(hideRemoteTimer);
+      hideRemoteTimer = null;
     }
     if (showRemoteTimer) {
       clearTimeout(showRemoteTimer);
@@ -38,7 +84,21 @@ export function initUi(socket) {
     showRemoteTimer = window.setTimeout(() => {
       dom.remoteStack.classList.remove('is-hidden');
       showRemoteTimer = null;
-    }, 120);
+    }, SHOW_REMOTE_DELAY);
+  };
+
+  const applyRemoteAutoHideState = () => {
+    if (!getClientRemoteAutoHide()) {
+      if (hideRemoteTimer) {
+        clearTimeout(hideRemoteTimer);
+        hideRemoteTimer = null;
+      }
+      if (showRemoteTimer) {
+        clearTimeout(showRemoteTimer);
+        showRemoteTimer = null;
+      }
+      dom.remoteStack?.classList.remove('is-hidden');
+    }
   };
 
   const preview = bindPreviewStream(socket, dom);
@@ -63,6 +123,10 @@ export function initUi(socket) {
     adminPanel: dom.leftMenu,
   });
   bindAdminVersion(dom.adminAppVersion);
+  onClientRemoteAutoHideChange(applyRemoteAutoHideState);
+  onClientRemoteVisibilityChange(applyRemoteVisibilityState);
+  applyRemoteAutoHideState();
+  applyRemoteVisibilityState();
 
   window.addEventListener('resize', canvasUI.resize);
   canvasUI.resize();

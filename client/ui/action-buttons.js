@@ -5,6 +5,10 @@ import {
   onClientConfigChange,
 } from '../config/client-config.js';
 import {
+  getClientRemoteVisibility,
+  onClientRemoteVisibilityChange,
+} from '../i18n/index.js';
+import {
   REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT,
   REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER,
   REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_CLIENT,
@@ -86,7 +90,8 @@ function bindSamsungRemoteButtons(
       return;
     }
     const samsungConfig = getClientSamsungConfig();
-    tvControls.hidden = !samsungConfig.enabled;
+    const locallyVisible = getClientRemoteVisibility('samsung', true);
+    tvControls.hidden = !samsungConfig.enabled || !locallyVisible;
   };
 
   btnSamsungOn.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_ON));
@@ -98,6 +103,7 @@ function bindSamsungRemoteButtons(
   btnSamsungPcInput.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_PC_INPUT));
   syncSamsungVisibility();
   onClientConfigChange(syncSamsungVisibility);
+  onClientRemoteVisibilityChange(syncSamsungVisibility);
 }
 
 function bindAdminRemoteButtons(

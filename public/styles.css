@@ -308,12 +308,14 @@ html[data-theme="light"] #scroll-zone-label {
   pointer-events: none;
 }
 
-html[data-theme="light"] .remote-panel {
-  background: rgba(248, 252, 255, 0.74);
+#browser-shortcuts[hidden],
+#tv-controls[hidden],
+#cursor-preview[hidden] {
+  display: none !important;
 }
 
-#tv-controls[hidden] {
-  display: none;
+html[data-theme="light"] .remote-panel {
+  background: rgba(248, 252, 255, 0.74);
 }
 
 .remote-panel-title {
@@ -514,6 +516,7 @@ html[data-handedness="left"] .tv-actions .remote-grid-row {
   font-size: 0.9rem;
   font-weight: 500;
   line-height: 1.3;
+  white-space: pre-line;
 }
 
 html[data-theme="light"] #touchpad-hint-title {
