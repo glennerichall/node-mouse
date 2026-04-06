@@ -3,7 +3,7 @@ import {createLogger} from '../log/logger.js';
 import {createQrOverlayYad} from './qr-overlay-yad.js';
 import {createQrOverlayWin32} from './qr-overlay-win32.js';
 
-const log = createLogger('qr-overlay');
+const getLogger = () => createLogger('qr-overlay');
 
 function createNoopOverlay() {
   return {
@@ -27,6 +27,6 @@ export async function createQrOverlay(services) {
     return createQrOverlayWin32(services);
   }
 
-  log.info({ platform }, 'QR overlay non supporté sur cette plateforme');
+  getLogger().info({ platform }, 'QR overlay non supporté sur cette plateforme');
   return createNoopOverlay();
 }

@@ -1,7 +1,7 @@
 import {execShell} from '../../utils/process.js';
 import {createLogger} from '../log/logger.js';
 
-const log = createLogger('update-check:command-source');
+const getLogger = () => createLogger('update-check:command-source');
 
 function normalizeCommandResult(rawText, fallbackTitle) {
   const text = String(rawText || '').trim();
@@ -63,7 +63,7 @@ export class CommandUpdateSource {
 
     const result = await execShell(this.checkCommand, this.timeoutMs);
     if (!result.ok) {
-      log.warn({ stderr: result.stderr, stdout: result.stdout }, 'Update check command failed');
+      getLogger().warn({ stderr: result.stderr, stdout: result.stdout }, 'Update check command failed');
       return { hasUpdate: false };
     }
 

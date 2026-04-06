@@ -6,7 +6,7 @@ import {DEFAULT_PERSISTED_CONFIG} from '../config/defaultConfig.js';
 import { commandExists } from '../../utils/process.js';
 import {createLogger} from '../log/logger.js';
 
-const log = createLogger('qr-overlay:yad');
+const getLogger = () => createLogger('qr-overlay:yad');
 
 function getNoopOverlay() {
   return {
@@ -47,7 +47,7 @@ export async function createQrOverlayYad(services) {
 
   const hasYad = await commandExists('yad');
   if (!hasYad) {
-    log.warn('Overlay QR non lancé: "yad" est introuvable.');
+    getLogger().warn('Overlay QR non lancé: "yad" est introuvable.');
     return getNoopOverlay();
   }
 
@@ -95,7 +95,7 @@ export async function createQrOverlayYad(services) {
     ];
 
     child = spawn('yad', args, { stdio: 'ignore' });
-    log.debug({ url: getUrl() }, 'QR overlay rafraîchi');
+    getLogger().debug({ url: getUrl() }, 'QR overlay rafraîchi');
   }
 
   const update = async () => {

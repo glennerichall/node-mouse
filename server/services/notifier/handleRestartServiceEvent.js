@@ -2,8 +2,7 @@ import {notify} from "./mapper/notify.js";
 import {
     NOTIFIER_LEVEL_INFO,
     NOTIFIER_LEVEL_WARNING,
-    NOTIFIER_TARGET_ALL,
-    NOTIFIER_TARGET_CLIENT
+    NOTIFIER_TARGET_ALL
 } from "./createNotifierComposite.js";
 import {
     PUBSUB_EVENT_ADMIN_RESTART_DETECTED,
@@ -20,7 +19,7 @@ import {
 
 export function handleRestartServiceEvent(notifier, event) {
     if (event.type === PUBSUB_EVENT_ADMIN_STARTED) {
-        notify(notifier, NOTIFIER_TARGET_CLIENT, {
+        notify(notifier, NOTIFIER_TARGET_ALL, {
             notificationId: NOTIFICATION_ID_SERVICE_RESTARTING,
             level: NOTIFIER_LEVEL_WARNING,
             title: NOTIFICATION_TITLE_SERVICE_RESTARTING,

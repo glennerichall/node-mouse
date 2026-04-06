@@ -6,7 +6,7 @@ import QRCode from 'qrcode';
 import {DEFAULT_PERSISTED_CONFIG} from '../config/defaultConfig.js';
 import {createLogger} from '../log/logger.js';
 
-const log = createLogger('qr-overlay:win32');
+const getLogger = () => createLogger('qr-overlay:win32');
 
 function getNoopOverlay() {
   return {
@@ -107,9 +107,9 @@ export async function createQrOverlayWin32(services) {
 
     child = spawnPowerShell(scriptPath);
     child.once('error', (error) => {
-      log.warn({ err: error }, 'Impossible de lancer PowerShell pour QR overlay');
+      getLogger().warn({ err: error }, 'Impossible de lancer PowerShell pour QR overlay');
     });
-    log.debug({ url: getUrl() }, 'QR overlay Windows rafraîchi');
+    getLogger().debug({ url: getUrl() }, 'QR overlay Windows rafraîchi');
   }
 
   const update = async () => {

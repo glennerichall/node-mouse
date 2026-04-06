@@ -2,7 +2,7 @@ import {notify} from "./notify.js";
 import {
     NOTIFIER_LEVEL_INFO,
     NOTIFIER_LEVEL_WARNING,
-    NOTIFIER_TARGET_CLIENT
+    NOTIFIER_TARGET_ALL
 } from "../createNotifierComposite.js";
 import {PUBSUB_EVENT_ADMIN_COMPLETED} from "../../pubsub/serviceEventConstants.js";
 import {NOTIFICATION_TITLE_UPDATE_CHECK} from "../notificationTitles.js";
@@ -13,7 +13,7 @@ export function handleForceUpdateCheckEvent(notifier, event) {
         return;
     }
 
-    notify(notifier, NOTIFIER_TARGET_CLIENT, {
+    notify(notifier, NOTIFIER_TARGET_ALL, {
         notificationId: NOTIFICATION_ID_FORCE_UPDATE_CHECK,
         level: event.payload?.hasUpdate ? NOTIFIER_LEVEL_WARNING : NOTIFIER_LEVEL_INFO,
         title: NOTIFICATION_TITLE_UPDATE_CHECK,

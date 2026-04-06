@@ -1,6 +1,6 @@
 import {createLogger} from '../../services/log/logger.js';
 
-const log = createLogger('socket:timestamp');
+const getLogger = () => createLogger('socket:timestamp');
 
 export function socketTimestampGuardMiddleware({ maxEventAgeMs = 1200, socketId } = {}) {
   return function enforceSocketEventTimestamp(packet, next) {
@@ -10,14 +10,14 @@ export function socketTimestampGuardMiddleware({ maxEventAgeMs = 1200, socketId 
       : NaN;
 
     if (!Number.isFinite(ts)) {
-      log.warn({ socketId, event: packet[0] }, 'Message socket sans timestamp');
+      getLogger().warn({ socketId, event: packet[0] }, 'Message socket sans timestamp');
       next(new Error('missing_timestamp'));
       return;
     }
 
     const ageMs = Date.now() - ts;
     if (ageMs > maxEventAgeMs) {
-      log.warn({ socketId, event: packet[0], ageMs, maxEventAgeMs }, 'Message socket expiré');
+      getLogger().warn({ socketId, event: packet[0], ageMs, maxEventAgeMs }, 'Message socket expiré');
       next(new Error('stale_event'));
       return;
     }

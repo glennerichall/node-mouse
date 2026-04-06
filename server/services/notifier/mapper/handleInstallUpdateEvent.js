@@ -3,7 +3,7 @@ import {
     NOTIFIER_LEVEL_ERROR,
     NOTIFIER_LEVEL_INFO,
     NOTIFIER_LEVEL_WARNING,
-    NOTIFIER_TARGET_CLIENT
+    NOTIFIER_TARGET_ALL
 } from "../createNotifierComposite.js";
 import {
     PUBSUB_EVENT_ADMIN_COMPLETED,
@@ -16,7 +16,7 @@ import { NOTIFICATION_ID_UPDATE_INSTALL } from '../../../../utils/shared/notific
 
 export function handleInstallUpdateEvent(notifier, event) {
     if (event.type === PUBSUB_EVENT_ADMIN_REJECTED_NO_COMMAND) {
-        notify(notifier, NOTIFIER_TARGET_CLIENT, {
+        notify(notifier, NOTIFIER_TARGET_ALL, {
             notificationId: NOTIFICATION_ID_UPDATE_INSTALL,
             level: NOTIFIER_LEVEL_ERROR,
             title: NOTIFICATION_TITLE_UPDATE_INSTALL,
@@ -26,7 +26,7 @@ export function handleInstallUpdateEvent(notifier, event) {
             ttlMs: 3600,
         }, {clientId: event.payload?.clientId});
     } else if (event.type === PUBSUB_EVENT_ADMIN_STARTED) {
-        notify(notifier, NOTIFIER_TARGET_CLIENT, {
+        notify(notifier, NOTIFIER_TARGET_ALL, {
             notificationId: NOTIFICATION_ID_UPDATE_INSTALL,
             level: NOTIFIER_LEVEL_WARNING,
             title: NOTIFICATION_TITLE_UPDATE_INSTALL,
@@ -36,7 +36,7 @@ export function handleInstallUpdateEvent(notifier, event) {
             ttlMs: 2200,
         }, {clientId: event.payload?.clientId});
     } else if (event.type === PUBSUB_EVENT_ADMIN_COMPLETED) {
-        notify(notifier, NOTIFIER_TARGET_CLIENT, {
+        notify(notifier, NOTIFIER_TARGET_ALL, {
             notificationId: NOTIFICATION_ID_UPDATE_INSTALL,
             level: NOTIFIER_LEVEL_INFO,
             title: NOTIFICATION_TITLE_UPDATE_INSTALL,
@@ -46,7 +46,7 @@ export function handleInstallUpdateEvent(notifier, event) {
             ttlMs: 3200,
         }, {clientId: event.payload?.clientId});
     } else if (event.type === PUBSUB_EVENT_ADMIN_FAILED) {
-        notify(notifier, NOTIFIER_TARGET_CLIENT, {
+        notify(notifier, NOTIFIER_TARGET_ALL, {
             notificationId: NOTIFICATION_ID_UPDATE_INSTALL,
             level: NOTIFIER_LEVEL_ERROR,
             title: NOTIFICATION_TITLE_UPDATE_INSTALL,

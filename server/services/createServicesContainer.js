@@ -72,8 +72,8 @@ export async function createServicesContainer({
                                                   createUpdateManager,
                                                   createApplicationDaemonService,
                                                   createServer,
-                                                  createInputController,
-                                                  createRemotes
+                                              createInputController,
+                                              createRemotes
                                               }) {
 
     let container = {

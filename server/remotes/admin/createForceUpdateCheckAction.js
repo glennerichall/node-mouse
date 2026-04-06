@@ -4,7 +4,7 @@ import {
     PUBSUB_SERVICE_ADMIN_FORCE_UPDATE_CHECK
 } from "../../services/pubsub/serviceEventConstants.js";
 
-const log = createLogger('admin:force-update-check');
+const getLogger = () => createLogger('admin:force-update-check');
 
 export function createForceUpdateCheckAction(services) {
     const {
@@ -12,11 +12,11 @@ export function createForceUpdateCheckAction(services) {
         getUpdateManager
     } = services;
     return async function forceUpdateCheck({clientId} = {}) {
-        log.info('Début force update check');
+        getLogger().info('Début force update check');
         const result = await getUpdateManager().check();
 
         if (result && result.checked && result.hasUpdate) {
-            log.info('Force update check: mise à jour détectée');
+            getLogger().info('Force update check: mise à jour détectée');
             getEvents().publishEvent(PUBSUB_SERVICE_ADMIN_FORCE_UPDATE_CHECK, PUBSUB_EVENT_ADMIN_COMPLETED, {
                 clientId,
                 hasUpdate: true,
@@ -24,7 +24,7 @@ export function createForceUpdateCheckAction(services) {
             return {ok: true, message: 'Mise a jour detectee.'};
         }
 
-        log.info('Force update check: aucune mise à jour détectée');
+        getLogger().info('Force update check: aucune mise à jour détectée');
         getEvents().publishEvent(PUBSUB_SERVICE_ADMIN_FORCE_UPDATE_CHECK, PUBSUB_EVENT_ADMIN_COMPLETED, {
             clientId,
             hasUpdate: false,

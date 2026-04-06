@@ -1,7 +1,7 @@
 import {notify} from "./mapper/notify.js";
 import {
     NOTIFIER_LEVEL_INFO,
-    NOTIFIER_TARGET_CLIENT
+    NOTIFIER_TARGET_ALL
 } from "./createNotifierComposite.js";
 import {PUBSUB_EVENT_ADMIN_TOGGLED} from "../pubsub/serviceEventConstants.js";
 import {NOTIFICATION_TITLE_QR_OVERLAY} from "./notificationTitles.js";
@@ -12,7 +12,7 @@ export function handleToggleQrOverlayEvent(notifier, event) {
         return;
     }
 
-    notify(notifier, NOTIFIER_TARGET_CLIENT, {
+    notify(notifier, NOTIFIER_TARGET_ALL, {
         notificationId: NOTIFICATION_ID_QR_OVERLAY,
         level: NOTIFIER_LEVEL_INFO,
         title: NOTIFICATION_TITLE_QR_OVERLAY,

@@ -6,6 +6,7 @@ const maxStoredMessageLength = 2_000;
 const maxStoredDataLength = 8_000;
 const recentLogs = [];
 let rootLogger = null;
+let defaultConfigProvider = getSystemConfig;
 
 const levelNamesByValue = {
   10: 'trace',
@@ -70,6 +71,13 @@ function createDestination(logFormat) {
   return undefined;
 }
 
+function syncLoggerConfig(logger, nextConfig) {
+  const nextLevel = nextConfig?.logging?.level;
+  if (nextLevel && logger.level !== nextLevel) {
+    logger.level = nextLevel;
+  }
+}
+
 function buildRootLogger(configProvider) {
   const initialConfig = configProvider();
   const logLevel = initialConfig?.logging?.level || 'info';
@@ -97,27 +105,33 @@ function buildRootLogger(configProvider) {
     createDestination(logFormat),
   );
 
-  if (typeof configProvider.onChange === 'function') {
-    configProvider.onChange((next) => {
-      const nextLevel = next?.logging?.level;
-      if (nextLevel && logger.level !== nextLevel) {
-        logger.level = nextLevel;
-      }
-    });
-  }
-
   return logger;
 }
 
-export function bootstrapLogger(configProvider) {
+export function setDefaultLoggerConfigProvider(configProvider) {
+  if (typeof configProvider !== 'function') {
+    return;
+  }
+
+  defaultConfigProvider = configProvider;
+
+  if (rootLogger) {
+    syncLoggerConfig(rootLogger, defaultConfigProvider());
+  }
+}
+
+export function bootstrapLogger(configProvider = defaultConfigProvider) {
+  setDefaultLoggerConfigProvider(configProvider);
+
   if (!rootLogger) {
-    rootLogger = buildRootLogger(configProvider);
+    rootLogger = buildRootLogger(defaultConfigProvider);
   }
   return rootLogger;
 }
 
-export function createLogger(scope, configProvider = getSystemConfig) {
+export function createLogger(scope, configProvider = defaultConfigProvider) {
   const logger = bootstrapLogger(configProvider);
+  syncLoggerConfig(logger, configProvider());
   return logger.child({ scope });
 }
 

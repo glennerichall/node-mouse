@@ -6,7 +6,7 @@ import {
     NOTIFICATION_TARGET_HOST as CONFIG_NOTIFICATION_TARGET_HOST,
 } from '../../../utils/shared/notificationSettings.js';
 
-const log = createLogger('notifier:composite');
+const getLogger = () => createLogger('notifier:composite');
 
 export const NOTIFIER_TARGET_ALL = 'all';
 export const NOTIFIER_TARGET_ALL_CLIENTS = 'all-clients';
@@ -100,7 +100,7 @@ export function createNotifierComposite({clientNotifier, serverNotifier, getNoti
                 }
 
                 if (!NOTIFIER_TARGETS.includes(resolvedTarget)) {
-                    log.warn({target: resolvedTarget}, 'Target de notification inconnu');
+                    getLogger().warn({target: resolvedTarget}, 'Target de notification inconnu');
                 }
             },
         };

@@ -7,14 +7,14 @@ import {
   PUBSUB_SERVICE_ADMIN_INSTALL_UPDATE,
 } from '../../services/pubsub/serviceEventConstants.js';
 
-const log = createLogger('admin:install-update');
+const getLogger = () => createLogger('admin:install-update');
 
 export function createInstallUpdateAction(services) {
   return async function installUpdate({ clientId } = {}) {
     const events = services.getEvents();
     const updateManager = services.getUpdateManager();
     const restartService = services.getRemotes().adminActions.restartService;
-    log.info('Début install update');
+    getLogger().info('Début install update');
 
     events.publishEvent(PUBSUB_SERVICE_ADMIN_INSTALL_UPDATE, PUBSUB_EVENT_ADMIN_STARTED, {
       clientId,
@@ -39,7 +39,7 @@ export function createInstallUpdateAction(services) {
     }
 
     if (result?.status === 'no-command') {
-      log.warn('Install update impossible: aucune commande disponible');
+      getLogger().warn('Install update impossible: aucune commande disponible');
       events.publishEvent(PUBSUB_SERVICE_ADMIN_INSTALL_UPDATE, PUBSUB_EVENT_ADMIN_REJECTED_NO_COMMAND, {
         clientId,
       });
