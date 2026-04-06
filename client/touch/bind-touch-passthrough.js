@@ -60,6 +60,11 @@ export function bindTouchPassthrough(buttons, touchpad) {
     let suppressNextClick = false;
 
     const resetState = () => {
+      console.debug('[touch-passthrough] reset', {
+        buttonId: button.id || '(unknown)',
+        activeTouchId,
+        isPassthrough,
+      });
       activeTouchId = null;
       startTouch = null;
       isPassthrough = false;
@@ -73,18 +78,30 @@ export function bindTouchPassthrough(buttons, touchpad) {
         return;
       }
 
-      if (!isPassthrough && distanceFrom(startTouch, trackedTouch) < MOVE_THRESHOLD_PX) {
+      const distance = distanceFrom(startTouch, trackedTouch);
+      if (!isPassthrough && distance < MOVE_THRESHOLD_PX) {
         return;
       }
 
       if (!isPassthrough) {
         isPassthrough = true;
         suppressNextClick = true;
+        console.debug('[touch-passthrough] start passthrough', {
+          buttonId: button.id || '(unknown)',
+          activeTouchId,
+          distance,
+        });
         dispatchSyntheticTouch(touchpad, 'touchstart', startTouch);
       }
 
       event.preventDefault();
       event.stopImmediatePropagation();
+      console.debug('[touch-passthrough] move passthrough', {
+        buttonId: button.id || '(unknown)',
+        activeTouchId,
+        x: trackedTouch.clientX,
+        y: trackedTouch.clientY,
+      });
       dispatchSyntheticTouch(touchpad, 'touchmove', trackedTouch);
     };
 
@@ -93,6 +110,11 @@ export function bindTouchPassthrough(buttons, touchpad) {
       if (isPassthrough && trackedTouch) {
         event.preventDefault();
         event.stopImmediatePropagation();
+        console.debug('[touch-passthrough] end passthrough', {
+          buttonId: button.id || '(unknown)',
+          activeTouchId,
+          type: event.type,
+        });
         dispatchSyntheticTouch(touchpad, event.type === 'touchcancel' ? 'touchcancel' : 'touchend', trackedTouch);
       }
 
@@ -108,14 +130,26 @@ export function bindTouchPassthrough(buttons, touchpad) {
       activeTouchId = touch.identifier;
       startTouch = touch;
       isPassthrough = false;
+      console.debug('[touch-passthrough] touchstart', {
+        buttonId: button.id || '(unknown)',
+        activeTouchId,
+        x: touch.clientX,
+        y: touch.clientY,
+      });
     };
 
     const onClickCapture = (event) => {
       if (!suppressNextClick) {
+        console.debug('[touch-passthrough] allow click', {
+          buttonId: button.id || '(unknown)',
+        });
         return;
       }
 
       suppressNextClick = false;
+      console.debug('[touch-passthrough] suppress click', {
+        buttonId: button.id || '(unknown)',
+      });
       event.preventDefault();
       event.stopImmediatePropagation();
     };

@@ -56,6 +56,9 @@ export function bindSamsungRemoteButtons(
 
     const applySamsungPowerState = (powerState) => {
         currentSamsungPowerState = powerState || 'unknown';
+        console.debug('[samsung-remote] apply power state', {
+            powerState: currentSamsungPowerState,
+        });
         const isOn = powerState === 'on' || powerState === 'unknown';
         for (const button of requiresOnButtons) {
             button.hidden = !isOn;
@@ -71,19 +74,24 @@ export function bindSamsungRemoteButtons(
         }
 
         try {
+            console.debug('[samsung-remote] refresh power state');
             const response = await fetch('/api/remotes/samsung/status', {cache: 'no-store'});
             if (!response.ok) {
+                console.debug('[samsung-remote] status http error', {status: response.status});
                 applySamsungPowerState('unknown');
                 return;
             }
             const payload = await response.json();
+            console.debug('[samsung-remote] status payload', payload);
             applySamsungPowerState(payload?.power || 'unknown');
         } catch (_error) {
+            console.debug('[samsung-remote] status fetch failed');
             applySamsungPowerState('unknown');
         }
     };
 
     const startExpeditedSamsungPolling = (targetPowerState) => {
+        console.debug('[samsung-remote] start expedited polling', {targetPowerState});
         clearExpeditedSamsungPolling();
         const delaysMs = [0, 350, 900, 1800, 3200, 5200];
 
@@ -120,10 +128,12 @@ export function bindSamsungRemoteButtons(
     };
 
     btnSamsungOn.addEventListener('click', () => {
+        console.debug('[samsung-remote] click on');
         emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_ON);
         startExpeditedSamsungPolling('on');
     });
     btnSamsungOff.addEventListener('click', () => {
+        console.debug('[samsung-remote] click off');
         emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_OFF);
         startExpeditedSamsungPolling('off');
     });
