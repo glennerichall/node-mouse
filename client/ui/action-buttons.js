@@ -21,15 +21,6 @@ import {
   REMOTE_EVENT_SAMSUNG_VOL_UP,
 } from '../../utils/shared/remoteCommands.js';
 
-function bindKeyboardRemoteButtons(socket, { keyboardPanel, btnEnter, btnBackspace }) {
-  btnEnter.addEventListener('click', () => {
-    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'enter' });
-    keyboardPanel.classList.add('hidden');
-  });
-
-  btnBackspace.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'backspace' }));
-}
-
 function bindBrowserRemoteButtons(
   socket,
   {
@@ -135,7 +126,6 @@ function bindAdminRemoteButtons(
 }
 
 export function bindActionButtons(socket, elements) {
-  bindKeyboardRemoteButtons(socket, elements);
   bindBrowserRemoteButtons(socket, elements);
   bindSamsungRemoteButtons(socket, elements);
   bindAdminRemoteButtons(socket, elements);

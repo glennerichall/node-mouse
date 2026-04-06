@@ -44,12 +44,14 @@ export function initUi(socket) {
   const preview = bindPreviewStream(socket, dom);
   bindTouchpad(socket, dom.touchpad, {
     onMouseMove: preview.onMouseMoveActivity,
-    onInteractionStart: hideRemotes,
+    onMovementStart: hideRemotes,
     onInteractionEnd: showRemotes,
     getInputConfig: getClientInputConfig,
     getHandedness: getClientHandedness,
   });
-  bindKeyboardPanel(socket, dom);
+  bindKeyboardPanel(socket, dom, {
+    setPreviewActive: preview.setKeyboardPreviewActive,
+  });
   bindMouseButtons(socket, dom);
   bindActionButtons(socket, dom);
   bindConnectionOverlay(socket, dom.connectionOverlay);

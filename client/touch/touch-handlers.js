@@ -6,6 +6,7 @@ import {
 } from '../../utils/shared/math.js';
 
 const SCROLL_GAIN = 1.1;
+const REMOTE_HIDE_MOVEMENT_THRESHOLD_PX = 10;
 
 function getDragHoldMs(handler) {
   const value = Number(handler.getInputConfig?.().touchDragHoldMs);
@@ -35,13 +36,25 @@ function stopDrag(state, handler) {
   handler.buttonState('left', 'up');
 }
 
+function notifyMovementStartIfNeeded(state, handler, distancePx) {
+  if (state.movementStarted) {
+    return;
+  }
+
+  if (!Number.isFinite(distancePx) || distancePx < REMOTE_HIDE_MOVEMENT_THRESHOLD_PX) {
+    return;
+  }
+
+  state.movementStarted = true;
+  handler.interactionStart();
+}
+
 export function handleTouchStart(event, { touchpad, state, handler }) {
   event.preventDefault();
   const touches = event.touches;
 
   if (!state.interactionActive && touches.length > 0) {
     state.interactionActive = true;
-    handler.interactionStart();
   }
 
   if (touches.length === 1) {
@@ -59,6 +72,7 @@ export function handleTouchStart(event, { touchpad, state, handler }) {
     state.oneFingerStart = { x: t.clientX, y: t.clientY };
     state.oneFingerMode = inRightZone ? 'scroll' : 'move';
     state.twoFinger = null;
+    state.movementStarted = false;
     state.moved = false;
     state.dragEligible = !inRightZone;
     state.touchStartedAt = Date.now();
@@ -73,6 +87,7 @@ export function handleTouchStart(event, { touchpad, state, handler }) {
       p1: { x: t1.clientX, y: t1.clientY },
       p2: { x: t2.clientX, y: t2.clientY },
     };
+    state.movementStarted = false;
     state.oneFinger = null;
     state.oneFingerStart = null;
     state.touchStartedAt = Date.now();
@@ -101,6 +116,8 @@ export function handleTouchMove(event, { state, handler }) {
       state.dragEligible = false;
     }
 
+    notifyMovementStartIfNeeded(state, handler, travelFromStart);
+
     if (state.oneFingerMode === 'scroll') {
       if (Math.abs(dy) > 0.12) {
         state.moved = true;
@@ -126,9 +143,13 @@ export function handleTouchMove(event, { state, handler }) {
   if (touches.length === 2 && state.twoFinger) {
     const t1 = { x: touches[0].clientX, y: touches[0].clientY };
     const t2 = { x: touches[1].clientX, y: touches[1].clientY };
+    const travelP1 = distance2D(state.twoFinger.p1, t1);
+    const travelP2 = distance2D(state.twoFinger.p2, t2);
     const prevMidY = (state.twoFinger.p1.y + state.twoFinger.p2.y) / 2;
     const nextMidY = (t1.y + t2.y) / 2;
     const deltaY = nextMidY - prevMidY;
+
+    notifyMovementStartIfNeeded(state, handler, Math.max(travelP1, travelP2));
 
     if (Math.abs(deltaY) > 0.12) {
       state.moved = true;
@@ -161,6 +182,7 @@ export function handleTouchEnd(event, { state, handler }) {
     state.oneFingerStart = null;
     state.oneFingerMode = 'move';
     state.twoFinger = null;
+    state.movementStarted = false;
     state.moved = false;
     state.dragActive = false;
     state.dragEligible = false;

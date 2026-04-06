@@ -10,6 +10,7 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }) {
   if (!previewCanvas) {
     return {
       onMouseMoveActivity: () => {},
+      setKeyboardPreviewActive: () => {},
     };
   }
 
@@ -18,6 +19,7 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }) {
   const previewRoot = previewCanvas.closest('#cursor-preview');
   let isPreviewActive = false;
   let stopTimer = null;
+  let keyboardPreviewActive = false;
 
   const getInactivityDelayMs = () => {
     const configuredDelay = Number(getClientPreviewConfig()?.hideDelayMs);
@@ -48,6 +50,9 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }) {
 
   const stopPreview = () => {
     clearStopTimer();
+    if (keyboardPreviewActive) {
+      return;
+    }
     if (isPreviewActive) {
       emitWithTimestamp(socket, REMOTE_EVENT_PREVIEW_STOP);
       isPreviewActive = false;
@@ -56,6 +61,9 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }) {
   };
 
   const armInactivityStop = () => {
+    if (keyboardPreviewActive) {
+      return;
+    }
     clearStopTimer();
     stopTimer = setTimeout(() => {
       stopPreview();
@@ -78,6 +86,18 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }) {
     startPreview();
   };
 
+  const setKeyboardPreviewActive = (active) => {
+    keyboardPreviewActive = active;
+
+    if (active) {
+      startPreview();
+      clearStopTimer();
+      return;
+    }
+
+    armInactivityStop();
+  };
+
   socket.on('preview:frame', onPreviewFrame);
   socket.on('disconnect', stopPreview);
   window.addEventListener('beforeunload', stopPreview);
@@ -91,5 +111,6 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }) {
 
   return {
     onMouseMoveActivity,
+    setKeyboardPreviewActive,
   };
 }

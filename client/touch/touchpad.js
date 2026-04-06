@@ -37,6 +37,7 @@ function createInitialTouchState() {
         oneFingerStart: null,
         oneFingerMode: 'move',
         twoFinger: null,
+        movementStarted: false,
         moved: false,
         dragActive: false,
         dragEligible: false,
@@ -59,8 +60,8 @@ export function createSocketTouchHandler(socket, options = {}) {
         ? options.onMouseMove
         : () => {
         };
-    const onInteractionStart = typeof options.onInteractionStart === 'function'
-        ? options.onInteractionStart
+    const onMovementStart = typeof options.onMovementStart === 'function'
+        ? options.onMovementStart
         : () => {
         };
     const onInteractionEnd = typeof options.onInteractionEnd === 'function'
@@ -88,13 +89,12 @@ export function createSocketTouchHandler(socket, options = {}) {
         },
         12,
     );
-
     return {
         buttonState: (button, state) => {
             emitWithTimestamp(socket, REMOTE_EVENT_MOUSE_BUTTON, {button, state});
         },
         interactionStart: () => {
-            onInteractionStart();
+            onMovementStart();
         },
         interactionEnd: () => {
             onInteractionEnd();

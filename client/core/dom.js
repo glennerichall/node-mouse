@@ -12,7 +12,21 @@ function getLayoutDom() {
     browserShortcuts: getElement('browser-shortcuts'),
     tvControls: getElement('tv-controls'),
     keyboardPanel: getElement('keyboard-panel'),
+    keyboardPanelPreview: getElement('keyboard-panel-preview'),
+    keyboardTextMode: getElement('keyboard-text-mode'),
+    keyboardLiveMode: getElement('keyboard-live-mode'),
     textInput: getElement('text-input'),
+    liveTextInput: getElement('live-text-input'),
+    textModeEsc: getElement('text-mode-esc'),
+    textModeTab: getElement('text-mode-tab'),
+    textModeShift: getElement('text-mode-shift'),
+    textModeAlt: getElement('text-mode-alt'),
+    textModeCtrl: getElement('text-mode-ctrl'),
+    liveModeEsc: getElement('live-mode-esc'),
+    liveModeTab: getElement('live-mode-tab'),
+    liveModeShift: getElement('live-mode-shift'),
+    liveModeAlt: getElement('live-mode-alt'),
+    liveModeCtrl: getElement('live-mode-ctrl'),
     connectionOverlay: getElement('connection-overlay'),
     notificationsRoot: getElement('client-notifications'),
     previewCanvas: getElement('preview-canvas'),
@@ -23,18 +37,14 @@ function getLayoutDom() {
 
 function getMouseControlsDom() {
   return {
-    btnKeyboard: getElement('btn-keyboard'),
-    btnLeft: getElement('btn-left'),
-    btnRight: getElement('btn-right'),
+    btnTextEntry: getElement('btn-text-entry'),
+    btnLiveKeyboard: getElement('btn-live-keyboard'),
     btnSendText: getElement('send-text'),
   };
 }
 
 function getKeyboardRemoteDom() {
-  return {
-    btnEnter: getElement('btn-enter'),
-    btnBackspace: getElement('btn-backspace'),
-  };
+  return {};
 }
 
 function getBrowserRemoteDom() {
