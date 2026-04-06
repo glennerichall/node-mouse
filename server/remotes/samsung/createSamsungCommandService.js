@@ -7,12 +7,64 @@ import {
     toSamsungErrorMessage,
 } from "./utils.js";
 
-export function createSamsungCommandService({getConfig, discoverDevices, getRemote, getLogger, createDisabledRemote}) {
+export function createSamsungCommandService({getConfig, discoverDevices, getSamsungTv, getLogger, createDisabledRemote}) {
+    let powerStateCache = {
+        value: 'unknown',
+        checkedAt: 0,
+    };
+    let powerStatePromise = null;
+
     function getEnabledRemote() {
         if (getConfig().enabled) {
             return null;
         }
         return createDisabledRemote?.();
+    }
+
+    function invalidatePowerState() {
+        powerStateCache = {
+            value: 'unknown',
+            checkedAt: 0,
+        };
+    }
+
+    async function computePowerState() {
+        const disabledRemote = getEnabledRemote();
+        if (disabledRemote) {
+            return 'disabled';
+        }
+
+        try {
+            const samsungTv = await getSamsungTv();
+            return samsungTv.getPowerState();
+        } catch (error) {
+            getLogger().warn({err: error?.message || String(error)}, 'Etat Samsung indisponible');
+            return 'unknown';
+        }
+    }
+
+    async function getPowerState(options = {}) {
+        const maxAgeMs = Number(options.maxAgeMs);
+        const now = Date.now();
+        if (Number.isFinite(maxAgeMs) && maxAgeMs >= 0 && (now - powerStateCache.checkedAt) <= maxAgeMs) {
+            return powerStateCache.value;
+        }
+
+        if (!powerStatePromise) {
+            powerStatePromise = computePowerState()
+                .then((value) => {
+                    powerStateCache = {
+                        value,
+                        checkedAt: Date.now(),
+                    };
+                    return value;
+                })
+                .finally(() => {
+                    powerStatePromise = null;
+                });
+        }
+
+        return powerStatePromise;
     }
 
     async function sendKey(key, successMessage) {
@@ -21,8 +73,9 @@ export function createSamsungCommandService({getConfig, discoverDevices, getRemo
             return disabledRemote.turnOn();
         }
         try {
-            const remote = await getRemote();
-            await remote.sendKey(key);
+            const samsungTv = await getSamsungTv();
+            await samsungTv.sendKey(key);
+            invalidatePowerState();
             getLogger().info({key}, 'Commande Samsung envoyee');
             return createSamsungResult(successMessage);
         } catch (error) {
@@ -41,8 +94,9 @@ export function createSamsungCommandService({getConfig, discoverDevices, getRemo
             return disabledRemote.turnOn();
         }
         try {
-            const remote = await getRemote();
-            await remote.sendKeys(keys);
+            const samsungTv = await getSamsungTv();
+            await samsungTv.sendKeys(keys);
+            invalidatePowerState();
             getLogger().info({keys}, 'Sequence Samsung envoyee');
             return createSamsungResult(successMessage);
         } catch (error) {
@@ -59,6 +113,9 @@ export function createSamsungCommandService({getConfig, discoverDevices, getRemo
         isEnabled() {
             return Boolean(getConfig().enabled);
         },
+        async getPowerState(options) {
+            return getPowerState(options);
+        },
         async discoverDevices() {
             return discoverDevices();
         },
@@ -68,8 +125,9 @@ export function createSamsungCommandService({getConfig, discoverDevices, getRemo
                 return disabledRemote.turnOn();
             }
             try {
-                const remote = await getRemote();
-                await remote.wakeTV();
+                const samsungTv = await getSamsungTv();
+                await samsungTv.wakeTV();
+                invalidatePowerState();
                 getLogger().info('Wake-on-LAN Samsung envoye');
                 return createSamsungResult("Demande d'allumage envoyee a la TV Samsung.");
             } catch (error) {

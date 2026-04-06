@@ -60,6 +60,8 @@ function getBrowserRemoteDom() {
     btnAddressBar: getElement('btn-address-bar'),
     btnHardReload: getElement('btn-hard-reload'),
     btnFullscreen: getElement('btn-fullscreen'),
+    btnVideoPlayPause: getElement('btn-video-play-pause'),
+    btnVideoFullscreen: getElement('btn-video-fullscreen'),
   };
 }
 

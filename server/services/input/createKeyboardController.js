@@ -8,6 +8,7 @@ const ALLOWED_KEYS = new Set([
     'down',
     'left',
     'right',
+    'f',
     't',
     'w',
     'l',

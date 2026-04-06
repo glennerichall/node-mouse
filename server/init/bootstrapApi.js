@@ -14,6 +14,7 @@ import {
 import {createQrPageHandler} from '../connection/api/qr-page.handler.js';
 import {createAdminUiRouter} from "./createAdminUiRouter.js";
 import {createAdminApiRouter} from "./createAdminApiRouter.js";
+import { createRemotesRouter } from '../connection/api/remotes.router.js';
 import {readPackageVersion} from '../utils/env.js';
 
 const packageJsonPath = path.join(projectRoot, 'package.json');
@@ -66,6 +67,7 @@ export function bootstrapApi(services) {
         next();
     });
 
+    app.use('/api/remotes', createRemotesRouter(services));
     app.use('/api/admin', createAdminApiRouter(services));
     app.use('/ui/admin', createAdminUiRouter(services));
 

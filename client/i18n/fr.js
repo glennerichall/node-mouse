@@ -93,6 +93,8 @@ export const fr = {
   'main.addressBar': "Barre d'adresse",
   'main.reload': 'Recharger',
   'main.fullscreen': 'Plein ecran',
+  'main.videoPlayPause': 'Lecture/Pause',
+  'main.videoFullscreen': 'Video plein ecran',
   'main.tvControlsAria': 'Controle TV Samsung',
   'main.tvSectionLabel': 'Samsung TV',
   'main.samsungOn': 'Allumer la television Samsung',
