@@ -238,7 +238,7 @@ html[data-handedness="left"] #touch-chrome {
   max-width: 100%;
   justify-self: stretch;
   align-self: start;
-  pointer-events: auto;
+  pointer-events: none;
   transition: opacity 180ms ease, transform 220ms ease;
 }
 
@@ -301,6 +301,7 @@ html[data-theme="light"] #scroll-zone-label {
   border-radius: 16px;
   background: rgba(10, 16, 20, 0.48);
   backdrop-filter: blur(6px);
+  pointer-events: none;
 }
 
 #browser-shortcuts {
@@ -408,6 +409,7 @@ html[data-theme="light"] #keyboard-panel button:active {
 }
 
 .tv-actions button {
+  pointer-events: auto;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -422,6 +424,7 @@ html[data-theme="light"] #keyboard-panel button:active {
   gap: 6px;
   margin-left: auto;
   margin-right: 0;
+  pointer-events: none;
 }
 
 html[data-handedness="left"] .browser-actions {
@@ -437,6 +440,7 @@ html[data-handedness="left"] .browser-actions {
   gap: 6px;
   margin-left: auto;
   margin-right: 0;
+  pointer-events: none;
 }
 
 html[data-handedness="left"] .tv-actions {
@@ -451,6 +455,7 @@ html[data-handedness="left"] .tv-actions {
   gap: 6px;
   width: max-content;
   justify-content: end;
+  pointer-events: none;
 }
 
 .browser-actions .remote-grid-row,

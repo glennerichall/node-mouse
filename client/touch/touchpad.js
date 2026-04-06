@@ -93,8 +93,8 @@ export function createSocketTouchHandler(socket, options = {}) {
         buttonState: (button, state) => {
             emitWithTimestamp(socket, REMOTE_EVENT_MOUSE_BUTTON, {button, state});
         },
-        interactionStart: () => {
-            onMovementStart();
+        interactionStart: (kind = 'move') => {
+            onMovementStart(kind);
         },
         interactionEnd: () => {
             onInteractionEnd();

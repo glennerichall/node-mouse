@@ -36,7 +36,7 @@ function stopDrag(state, handler) {
   handler.buttonState('left', 'up');
 }
 
-function notifyMovementStartIfNeeded(state, handler, distancePx) {
+function notifyMovementStartIfNeeded(state, handler, distancePx, kind = 'move') {
   if (state.movementStarted) {
     return;
   }
@@ -46,7 +46,7 @@ function notifyMovementStartIfNeeded(state, handler, distancePx) {
   }
 
   state.movementStarted = true;
-  handler.interactionStart();
+  handler.interactionStart(kind);
 }
 
 export function handleTouchStart(event, { touchpad, state, handler }) {
@@ -116,7 +116,7 @@ export function handleTouchMove(event, { state, handler }) {
       state.dragEligible = false;
     }
 
-    notifyMovementStartIfNeeded(state, handler, travelFromStart);
+    notifyMovementStartIfNeeded(state, handler, travelFromStart, state.oneFingerMode === 'scroll' ? 'scroll' : 'move');
 
     if (state.oneFingerMode === 'scroll') {
       if (Math.abs(dy) > 0.12) {
@@ -149,7 +149,7 @@ export function handleTouchMove(event, { state, handler }) {
     const nextMidY = (t1.y + t2.y) / 2;
     const deltaY = nextMidY - prevMidY;
 
-    notifyMovementStartIfNeeded(state, handler, Math.max(travelP1, travelP2));
+    notifyMovementStartIfNeeded(state, handler, Math.max(travelP1, travelP2), 'scroll');
 
     if (Math.abs(deltaY) > 0.12) {
       state.moved = true;

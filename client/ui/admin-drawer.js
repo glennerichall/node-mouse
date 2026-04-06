@@ -1,4 +1,5 @@
 const EDGE_START_PX = 46;
+const PANEL_CLOSE_EDGE_PX = 46;
 const SWIPE_OPEN_PX = 64;
 const SWIPE_CLOSE_PX = 54;
 const MAX_VERTICAL_DRIFT_PX = 44;
@@ -29,11 +30,24 @@ export function bindAdminDrawer({ app, touchpad, scrim, adminPanel }) {
     const localX = t.clientX - rect.left;
     const isOpen = app.classList.contains('admin-drawer-open');
     const fromLeftEdge = localX >= 0 && localX <= EDGE_START_PX;
+    const panelRect = adminPanel?.getBoundingClientRect?.();
+    const fromPanelCloseEdge = isOpen
+      && panelRect
+      && t.clientX >= panelRect.right - PANEL_CLOSE_EDGE_PX
+      && t.clientX <= panelRect.right;
 
     if (!isOpen && !fromLeftEdge) {
       gesture = null;
       return;
     }
+
+    if (isOpen && !fromPanelCloseEdge) {
+      gesture = null;
+      return;
+    }
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
 
     gesture = {
       startX: t.clientX,
@@ -47,6 +61,9 @@ export function bindAdminDrawer({ app, touchpad, scrim, adminPanel }) {
     if (!gesture || gesture.cancelled || event.touches.length !== 1) {
       return;
     }
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
 
     const t = event.touches[0];
     const dx = t.clientX - gesture.startX;
@@ -68,7 +85,11 @@ export function bindAdminDrawer({ app, touchpad, scrim, adminPanel }) {
     }
   }
 
-  function onTouchEnd() {
+  function onTouchEnd(event) {
+    if (gesture) {
+      event?.preventDefault?.();
+      event?.stopImmediatePropagation?.();
+    }
     gesture = null;
   }
 
@@ -82,16 +103,16 @@ export function bindAdminDrawer({ app, touchpad, scrim, adminPanel }) {
     }
   }
 
-  touchpad.addEventListener('touchstart', onTouchStart, { passive: true });
-  touchpad.addEventListener('touchmove', onTouchMove, { passive: true });
-  touchpad.addEventListener('touchend', onTouchEnd, { passive: true });
-  touchpad.addEventListener('touchcancel', onTouchEnd, { passive: true });
+  touchpad.addEventListener('touchstart', onTouchStart, { passive: false, capture: true });
+  touchpad.addEventListener('touchmove', onTouchMove, { passive: false, capture: true });
+  touchpad.addEventListener('touchend', onTouchEnd, { passive: false, capture: true });
+  touchpad.addEventListener('touchcancel', onTouchEnd, { passive: false, capture: true });
 
   if (adminPanel) {
-    adminPanel.addEventListener('touchstart', onTouchStart, { passive: true });
-    adminPanel.addEventListener('touchmove', onTouchMove, { passive: true });
-    adminPanel.addEventListener('touchend', onTouchEnd, { passive: true });
-    adminPanel.addEventListener('touchcancel', onTouchEnd, { passive: true });
+    adminPanel.addEventListener('touchstart', onTouchStart, { passive: false, capture: true });
+    adminPanel.addEventListener('touchmove', onTouchMove, { passive: false, capture: true });
+    adminPanel.addEventListener('touchend', onTouchEnd, { passive: false, capture: true });
+    adminPanel.addEventListener('touchcancel', onTouchEnd, { passive: false, capture: true });
   }
 
   if (scrim) {

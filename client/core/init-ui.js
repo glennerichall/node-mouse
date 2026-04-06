@@ -27,8 +27,8 @@ export function initUi(socket) {
   initClientRemoteVisibilityState();
   let hideRemoteTimer = null;
   let showRemoteTimer = null;
-  const REMOTE_HIDE_DELAY_MS = 120;
-  const SHOW_REMOTE_DELAY = 120;
+  const REMOTE_HIDE_DELAY_MS = 300;
+  const SHOW_REMOTE_DELAY = 500;
 
   const applyRemoteVisibilityState = () => {
     const browserVisible = getClientRemoteVisibility('browser', true);
@@ -49,8 +49,11 @@ export function initUi(socket) {
     }
   };
 
-  const hideRemotes = () => {
+  const hideRemotes = (interactionKind = 'move') => {
     if (!dom.remoteStack) {
+      return;
+    }
+    if (interactionKind !== 'move') {
       return;
     }
     if (!getClientRemoteAutoHide()) {
