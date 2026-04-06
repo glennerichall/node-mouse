@@ -30,6 +30,7 @@ export const CONFIG_PATHS = [
     'qrOverlay.autoHideOnHover',
     'qrOverlay.hoverEntryMarginPx',
     'qrOverlay.hoverExitMarginPx',
+    'qrOverlay.hoverShowDelayMs',
     'logging.level',
     'logging.format',
 ];

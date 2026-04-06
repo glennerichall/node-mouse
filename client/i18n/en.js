@@ -224,6 +224,7 @@ export const en = {
   'adminConfig.field.qrOverlay.autoHideOnHover': 'Auto-hide on hover',
   'adminConfig.field.qrOverlay.hoverEntryMarginPx': 'Hover entry margin (px)',
   'adminConfig.field.qrOverlay.hoverExitMarginPx': 'Hover exit margin (px)',
+  'adminConfig.field.qrOverlay.hoverShowDelayMs': 'Hover show delay (ms)',
   'adminConfig.field.logging.level': 'Level',
   'adminConfig.field.logging.format': 'Format',
 

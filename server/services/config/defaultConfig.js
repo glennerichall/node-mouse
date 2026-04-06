@@ -112,6 +112,7 @@ export const DEFAULT_PERSISTED_CONFIG = {
         autoHideOnHover: true,
         hoverEntryMarginPx: 10,
         hoverExitMarginPx: 18,
+        hoverShowDelayMs: 5000
     },
     logging: {
         level: 'info',

@@ -224,6 +224,7 @@ export const fr = {
   'adminConfig.field.qrOverlay.autoHideOnHover': 'Masquage auto au survol',
   'adminConfig.field.qrOverlay.hoverEntryMarginPx': "Marge d'entree hover (px)",
   'adminConfig.field.qrOverlay.hoverExitMarginPx': 'Marge de sortie hover (px)',
+  'adminConfig.field.qrOverlay.hoverShowDelayMs': 'Delai de reaffichage hover (ms)',
   'adminConfig.field.logging.level': 'Niveau',
   'adminConfig.field.logging.format': 'Format',
 

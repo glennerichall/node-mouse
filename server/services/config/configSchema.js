@@ -204,6 +204,13 @@ export const CONFIG_SCHEMA = {
         max: 150,
         step: 1,
       },
+      hoverShowDelayMs: {
+        label: 'Delai de reaffichage hover (ms)',
+        type: 'integer',
+        min: 0,
+        max: 10000,
+        step: 50,
+      },
     },
   },
   logging: {
