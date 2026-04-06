@@ -1,4 +1,5 @@
 import {emitWithTimestamp} from "../core/socket-emit.js";
+import { bindTouchPassthrough } from '../touch/bind-touch-passthrough.js';
 import {
     REMOTE_EVENT_BROWSER_BRAVE,
     REMOTE_EVENT_KEYBOARD_KEY
@@ -19,8 +20,24 @@ export function bindBrowserRemoteButtons(
         btnFullscreen,
         btnVideoPlayPause,
         btnVideoFullscreen,
+        touchpad,
     },
 ) {
+    bindTouchPassthrough([
+        btnOpenBrave,
+        btnBrowserBack,
+        btnBrowserForward,
+        btnPrevTab,
+        btnNextTab,
+        btnNewTab,
+        btnCloseTab,
+        btnAddressBar,
+        btnHardReload,
+        btnFullscreen,
+        btnVideoPlayPause,
+        btnVideoFullscreen,
+    ], touchpad);
+
     btnOpenBrave.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_BROWSER_BRAVE));
     btnBrowserBack.addEventListener('click', () =>
         emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, {key: 'left', modifiers: ['alt']}),

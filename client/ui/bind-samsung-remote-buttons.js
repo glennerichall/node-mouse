@@ -16,6 +16,7 @@ import {
     REMOTE_EVENT_SAMSUNG_VOL_DOWN,
     REMOTE_EVENT_SAMSUNG_VOL_UP
 } from "../../utils/shared/remoteCommands.js";
+import { bindTouchPassthrough } from '../touch/bind-touch-passthrough.js';
 
 export function bindSamsungRemoteButtons(
     socket,
@@ -28,8 +29,19 @@ export function bindSamsungRemoteButtons(
         btnSamsungInput,
         btnSamsungEnter,
         btnSamsungPcInput,
+        touchpad,
     },
 ) {
+    bindTouchPassthrough([
+        btnSamsungOn,
+        btnSamsungOff,
+        btnSamsungVolUp,
+        btnSamsungVolDown,
+        btnSamsungInput,
+        btnSamsungEnter,
+        btnSamsungPcInput,
+    ], touchpad);
+
     const requiresOnButtons = Array.from(tvControls?.querySelectorAll('[data-samsung-requires-on="true"]') || []);
     let samsungStatusInterval = null;
     let currentSamsungPowerState = 'unknown';

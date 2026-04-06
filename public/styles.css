@@ -792,6 +792,21 @@ html[data-theme="light"] #connection-overlay {
   background: rgba(234, 241, 245, 0.7);
 }
 
+#orientation-lock-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(8, 12, 16, 0.88);
+}
+
+html[data-theme="light"] #orientation-lock-overlay {
+  background: rgba(234, 241, 245, 0.92);
+}
+
 html[data-theme="light"] .connection-card {
   border-color: rgba(24, 35, 44, 0.14);
   background: rgba(255, 255, 255, 0.94);
@@ -807,6 +822,16 @@ html[data-theme="light"] .connection-card {
   margin: 0;
   opacity: 0.85;
   font-size: 0.9rem;
+}
+
+@media (orientation: landscape) {
+  #app {
+    display: none;
+  }
+
+  #orientation-lock-overlay {
+    display: flex;
+  }
 }
 
 #client-notifications {

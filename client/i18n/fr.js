@@ -122,6 +122,8 @@ export const fr = {
   'main.enter': 'Entree',
   'main.connectionUnavailableTitle': 'Serveur inaccessible',
   'main.connectionWaiting': 'En attente de connexion...',
+  'main.orientationLockTitle': 'Le mode paysage n est pas supporte',
+  'main.orientationLockMessage': 'Remettez l appareil en portrait pour utiliser la remote.',
   'main.connectionExpiredTitle': 'Connexion expiree',
   'main.connectionExpiredMessage': 'Rescannez le code QR du serveur.',
   'main.notificationsAria': 'Notifications',
