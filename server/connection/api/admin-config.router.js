@@ -13,16 +13,6 @@ export {
     coerceConfigValue,
 } from './admin-config.shared.js';
 
-export function createAdminConfigRouter({publicDir} = {}) {
-    const router = express.Router();
-
-    router.get('/', (_req, res) => {
-        res.sendFile(path.join(publicDir, 'admin-config.html'));
-    });
-
-    return router;
-}
-
 export function createAdminConfigActionsRouter(services) {
     const router = express.Router();
 

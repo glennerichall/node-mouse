@@ -1,4 +1,7 @@
 const DEFAULT_CLIENT_CONFIG = {
+  system: {
+    adminActionsEnabled: true,
+  },
   input: {
     touchDragHoldMs: 420,
     touchDragStillDistancePx: 8,
@@ -72,6 +75,10 @@ async function loadClientConfig() {
   configState = {
     ...structuredClone(DEFAULT_CLIENT_CONFIG),
     ...loadedConfig,
+    system: {
+      ...DEFAULT_CLIENT_CONFIG.system,
+      ...payload?.systemConfig,
+    },
   };
   notifyListeners();
 }
@@ -146,6 +153,10 @@ export function getClientSamsungConfig() {
 
 export function getClientPreviewConfig() {
   return configState.preview || DEFAULT_CLIENT_CONFIG.preview;
+}
+
+export function getClientSystemConfig() {
+  return configState.system || DEFAULT_CLIENT_CONFIG.system;
 }
 
 export function onClientConfigChange(listener) {

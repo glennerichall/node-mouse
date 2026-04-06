@@ -31,6 +31,7 @@ function getLayoutDom() {
     notificationsRoot: getElement('client-notifications'),
     previewCanvas: getElement('preview-canvas'),
     cursorPreview: getElement('cursor-preview'),
+    adminActionsDisabledMessage: getElement('admin-actions-disabled-message'),
     adminAppVersion: getElement('admin-app-version'),
   };
 }
@@ -85,6 +86,7 @@ function getAdminRemoteDom() {
     btnOpenServerInfoBrowserServer: getElement('btn-open-server-info-browser-server'),
     btnOpenServerInfoBrowserClient: getElement('btn-open-server-info-browser-client'),
     btnOpenConfigPage: getElement('btn-open-config-page'),
+    btnOpenPreferencesPage: getElement('btn-open-preferences-page'),
     btnRotateEntryToken: getElement('btn-rotate-entry-token'),
   };
 }

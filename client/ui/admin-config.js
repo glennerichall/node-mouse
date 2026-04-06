@@ -1,4 +1,4 @@
-import {applyPageTranslations, getClientI18n, initClientHandedness, initClientI18n, initClientTheme, mountClientPreferences, onClientI18nChange} from '../i18n/index.js';
+import {applyPageTranslations, getClientI18n, initClientHandedness, initClientI18n, initClientTheme, onClientI18nChange} from '../i18n/index.js';
 import {
   NOTIFICATION_EVENT_DEFINITIONS,
   NOTIFICATION_TARGET_CLIENT,
@@ -9,7 +9,6 @@ import {
 await initClientI18n();
 initClientTheme();
 initClientHandedness();
-mountClientPreferences();
 
 const form = document.getElementById('config-form');
 const statusNode = document.getElementById('config-status');

@@ -13,6 +13,7 @@ import {
 
 export function createAdminConfigsRouter(services) {
   const getConfig = services.getConfig;
+  const getSystemConfig = services.getSystemConfig;
   const router = express.Router();
 
   router.get('/', (_req, res) => {
@@ -22,6 +23,9 @@ export function createAdminConfigsRouter(services) {
       defaults: adminConfigDefaults,
       schema: adminConfigSchema,
       managedPaths: CONFIG_PATHS,
+      systemConfig: {
+        adminActionsEnabled: Boolean(getSystemConfig().adminActionsEnabled),
+      },
     });
   });
 

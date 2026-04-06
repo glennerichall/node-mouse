@@ -58,6 +58,19 @@ body {
   align-items: center;
 }
 
+.page-toolbar-actions[data-client-prefs-host] {
+  display: grid;
+  gap: 12px;
+  justify-items: stretch;
+}
+
+.page-toolbar-actions[data-client-prefs-host] > div {
+  display: grid !important;
+  grid-template-columns: minmax(110px, 140px) minmax(0, 1fr);
+  gap: 10px !important;
+  align-items: center !important;
+}
+
 .config-page {
   width: min(1200px, 100%);
   margin: 0 auto;

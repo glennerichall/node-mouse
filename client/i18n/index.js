@@ -13,6 +13,20 @@ let cachedI18n = null;
 let cachedTheme = '';
 let cachedHandedness = '';
 
+function applySwitcherLabelStyle(label) {
+  label.style.fontSize = '12px';
+  label.style.color = 'var(--muted)';
+}
+
+function applySwitcherSelectStyle(select) {
+  select.style.fontSize = '12px';
+  select.style.borderRadius = '8px';
+  select.style.padding = '3px 8px';
+  select.style.border = '1px solid var(--border, rgba(255, 255, 255, 0.16))';
+  select.style.background = 'var(--panel-strong, rgba(255, 255, 255, 0.08))';
+  select.style.color = 'var(--text)';
+}
+
 function safeReadStoredLocale() {
   try {
     return window.localStorage.getItem(LOCALE_STORAGE_KEY);
@@ -249,17 +263,11 @@ export function mountLanguageSwitcher() {
 
     const label = document.createElement('span');
     label.dataset.languageLabel = 'true';
-    label.style.fontSize = '12px';
-    label.style.color = 'rgba(233, 241, 248, 0.78)';
+    applySwitcherLabelStyle(label);
 
     const select = document.createElement('select');
     select.dataset.languageSelect = 'true';
-    select.style.fontSize = '12px';
-    select.style.borderRadius = '8px';
-    select.style.padding = '3px 8px';
-    select.style.border = '1px solid rgba(255, 255, 255, 0.16)';
-    select.style.background = 'rgba(255, 255, 255, 0.08)';
-    select.style.color = '#e9f1f8';
+    applySwitcherSelectStyle(select);
 
     for (const nextLocale of Object.keys(localeRegistry)) {
       const option = document.createElement('option');
@@ -304,17 +312,11 @@ export function mountThemeSwitcher() {
 
     const label = document.createElement('span');
     label.dataset.themeLabel = 'true';
-    label.style.fontSize = '12px';
-    label.style.color = 'rgba(233, 241, 248, 0.78)';
+    applySwitcherLabelStyle(label);
 
     const select = document.createElement('select');
     select.dataset.themeSelect = 'true';
-    select.style.fontSize = '12px';
-    select.style.borderRadius = '8px';
-    select.style.padding = '3px 8px';
-    select.style.border = '1px solid rgba(255, 255, 255, 0.16)';
-    select.style.background = 'rgba(255, 255, 255, 0.08)';
-    select.style.color = '#e9f1f8';
+    applySwitcherSelectStyle(select);
 
     for (const nextTheme of SUPPORTED_THEMES) {
       const option = document.createElement('option');
@@ -362,17 +364,11 @@ export function mountHandednessSwitcher() {
 
     const label = document.createElement('span');
     label.dataset.handednessLabel = 'true';
-    label.style.fontSize = '12px';
-    label.style.color = 'rgba(233, 241, 248, 0.78)';
+    applySwitcherLabelStyle(label);
 
     const select = document.createElement('select');
     select.dataset.handednessSelect = 'true';
-    select.style.fontSize = '12px';
-    select.style.borderRadius = '8px';
-    select.style.padding = '3px 8px';
-    select.style.border = '1px solid rgba(255, 255, 255, 0.16)';
-    select.style.background = 'rgba(255, 255, 255, 0.08)';
-    select.style.color = '#e9f1f8';
+    applySwitcherSelectStyle(select);
 
     for (const nextHandedness of SUPPORTED_HANDEDNESS) {
       const option = document.createElement('option');

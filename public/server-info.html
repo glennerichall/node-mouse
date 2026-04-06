@@ -72,7 +72,12 @@
       <span id="uptime">Uptime: -</span>
       <span id="clients-count">Clients: 0</span>
       <span id="daemon-state">Daemon: -</span>
+      <span id="admin-actions-state">Admin actions: -</span>
     </div>
+
+    <section id="admin-actions-note" hidden>
+      <p id="admin-actions-note-text" style="margin:0; color: var(--muted);" data-i18n="serverInfo.adminActions.localConfigOnly">When admin actions are disabled, the Configuration page remains available for local browser preferences.</p>
+    </section>
 
     <section>
       <h2 data-i18n="serverInfo.section.clients">Clients connectes</h2>
@@ -173,6 +178,8 @@
     const uptimeEl = document.getElementById('uptime');
     const clientsCountEl = document.getElementById('clients-count');
     const daemonStateEl = document.getElementById('daemon-state');
+    const adminActionsStateEl = document.getElementById('admin-actions-state');
+    const adminActionsNoteEl = document.getElementById('admin-actions-note');
     const clientsTable = document.getElementById('clients-table');
     const tasksTable = document.getElementById('tasks-table');
     const tokensTable = document.getElementById('tokens-table');
@@ -394,6 +401,11 @@
         uptimeEl.textContent = t('serverInfo.uptime', {value: formatDuration(data.uptimeSec)});
         clientsCountEl.textContent = t('serverInfo.clientsCount', {value: Number(data.clientsConnected) || 0});
         daemonStateEl.textContent = `Daemon: ${data.daemon?.runningAsDaemon ? 'yes' : 'no'}${data.daemon?.installed ? ' (installed)' : ''}`;
+        const adminActionsEnabled = Boolean(data?.sysConfig?.adminActionsEnabled);
+        adminActionsStateEl.textContent = t('serverInfo.adminActions', {
+          value: t(adminActionsEnabled ? 'serverInfo.adminActions.enabled' : 'serverInfo.adminActions.disabled'),
+        });
+        adminActionsNoteEl.hidden = adminActionsEnabled;
         renderClients(data.clients || []);
         renderTasks(data.tasks || []);
         renderTokens(data.tokens || []);

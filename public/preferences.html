@@ -1,0 +1,35 @@
+<!doctype html>
+<html data-i18n-page-title="preferences.pageTitle">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Remote Mouse Preferences</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/admin-config.css?v=20260405a" />
+</head>
+<body>
+  <main class="config-page">
+    <header class="config-hero">
+      <div>
+        <p class="eyebrow" data-i18n="preferences.eyebrow">Preferences</p>
+        <h1 data-i18n="preferences.title">Preferences locales</h1>
+        <p class="hero-copy" data-i18n="preferences.copy">Ces reglages sont stockes localement dans ce navigateur et ne modifient pas la configuration serveur.</p>
+      </div>
+      <div class="hero-actions">
+        <a class="secondary-link" href="/" data-i18n="preferences.back">Retour remote</a>
+      </div>
+    </header>
+
+    <section class="config-section">
+      <div class="section-heading-copy">
+        <p class="section-key" data-i18n="preferences.section.local.key">Local</p>
+        <h2 data-i18n="preferences.section.local.title">Preferences du navigateur</h2>
+        <p class="section-description" data-i18n="preferences.section.local.description">Choisissez la langue, le theme et la main dominante utilises sur cet appareil.</p>
+      </div>
+      <div class="page-toolbar-actions" data-client-prefs-host></div>
+    </section>
+  </main>
+
+  <script type="module" src="/client/ui/preferences.js?v=20260405a"></script>
+</body>
+</html>
