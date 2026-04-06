@@ -10,7 +10,7 @@ export const REMOTE_EVENT_PREVIEW_START = 'preview:start';
 export const REMOTE_EVENT_PREVIEW_STOP = 'preview:stop';
 export const REMOTE_EVENT_SYSTEM_RELOAD = 'system:reload';
 
-export const REMOTE_EVENT_BROWSER_BRAVE = 'browser:brave';
+export const REMOTE_EVENT_BROWSER_OPEN = 'browser:open';
 
 export const REMOTE_EVENT_SAMSUNG_ON = 'samsung:on';
 export const REMOTE_EVENT_SAMSUNG_OFF = 'samsung:off';

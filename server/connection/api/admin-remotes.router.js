@@ -3,6 +3,11 @@ import express from 'express';
 export function createAdminRemotesRouter(services) {
   const router = express.Router();
 
+  router.get('/browsers', async (_req, res) => {
+    const browsers = await services.getRemotes().browser.listBrowsers();
+    res.json({ browsers });
+  });
+
   router.get('/', (_req, res) => {
     const config = services.getConfig();
     const remotes = [

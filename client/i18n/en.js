@@ -83,7 +83,7 @@ export const en = {
   'main.adminAppVersion': 'Version: --',
   'main.browserShortcutsAria': 'Browser shortcuts',
   'main.browserShortcutsLabel': 'Browser',
-  'main.openBrave': 'Open or focus Brave',
+  'main.openBrowser': 'Open or focus browser',
   'main.browserBack': 'Previous page',
   'main.browserForward': 'Next page',
   'main.prevTab': 'Previous tab',
@@ -221,6 +221,9 @@ export const en = {
   'adminConfig.field.qrOverlay.size': 'Size',
   'adminConfig.field.qrOverlay.margin': 'Margin',
   'adminConfig.field.qrOverlay.topOffsetPx': 'Top offset (px)',
+  'adminConfig.field.qrOverlay.autoHideOnHover': 'Auto-hide on hover',
+  'adminConfig.field.qrOverlay.hoverEntryMarginPx': 'Hover entry margin (px)',
+  'adminConfig.field.qrOverlay.hoverExitMarginPx': 'Hover exit margin (px)',
   'adminConfig.field.logging.level': 'Level',
   'adminConfig.field.logging.format': 'Format',
 

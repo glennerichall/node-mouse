@@ -44,6 +44,7 @@ export function createApplicationShutdown(services) {
       runShutdownStep('Erreur a l arret de l observateur de configuration', () => state.stopConfigObserver()),
       runShutdownStep('Erreur a l arret de l observateur de notifications', () => state.stopNotificationObserver()),
       runShutdownStep('Erreur a l arret de l observateur du QR overlay', () => state.stopQrOverlayRefreshObserver()),
+      runShutdownStep('Erreur a l arret de l observateur du survol QR overlay', () => state.stopQrOverlayHoverObserver()),
       runShutdownStep('Erreur a la fermeture du socket CLI', () => state.cliServer?.close()),
       runShutdownStep('Erreur a la fermeture du QR overlay', () => qrOverlay.close()),
       runShutdownStep('Erreur a la fermeture des connexions SSE', () => sseService?.closeAll?.()),

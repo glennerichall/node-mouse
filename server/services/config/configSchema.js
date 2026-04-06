@@ -186,6 +186,24 @@ export const CONFIG_SCHEMA = {
         max: 500,
         step: 1,
       },
+      autoHideOnHover: {
+        label: 'Masquage auto au survol',
+        type: 'boolean',
+      },
+      hoverEntryMarginPx: {
+        label: "Marge d'entree hover (px)",
+        type: 'integer',
+        min: 0,
+        max: 100,
+        step: 1,
+      },
+      hoverExitMarginPx: {
+        label: 'Marge de sortie hover (px)',
+        type: 'integer',
+        min: 0,
+        max: 150,
+        step: 1,
+      },
     },
   },
   logging: {

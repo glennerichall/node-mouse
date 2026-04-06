@@ -2,7 +2,7 @@ import sinon from 'sinon';
 import { createSamsungRegistrar } from '../../server/remotes/samsung/registrar.js';
 import { createBrowserRegistrar } from '../../server/remotes/browser/registrar.js';
 import {
-  REMOTE_EVENT_BROWSER_BRAVE,
+  REMOTE_EVENT_BROWSER_OPEN,
   REMOTE_EVENT_SAMSUNG_ON,
   REMOTE_EVENT_SAMSUNG_VOL_DOWN,
 } from '../../utils/shared/remoteCommands.js';
@@ -48,7 +48,7 @@ describe('remote command registrars', () => {
   it('registers browser shortcut handling', async () => {
     const handlers = new Map();
     const browser = {
-      focusOrLaunchBrave: sandbox.stub().resolves(),
+      focusOrLaunchBrowser: sandbox.stub().resolves(),
     };
 
     const register = createBrowserRegistrar({ browser });
@@ -60,8 +60,8 @@ describe('remote command registrars', () => {
       },
     });
 
-    await handlers.get(REMOTE_EVENT_BROWSER_BRAVE)();
+    await handlers.get(REMOTE_EVENT_BROWSER_OPEN)({ browserId: 'firefox' });
 
-    expect(browser.focusOrLaunchBrave.calledOnce).toBe(true);
+    expect(browser.focusOrLaunchBrowser.calledOnceWithExactly('firefox')).toBe(true);
   });
 });

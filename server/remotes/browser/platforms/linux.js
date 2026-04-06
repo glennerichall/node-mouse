@@ -1,29 +1,38 @@
 import { commandExists, execFileAsync, spawnDetached } from '../../../utils/process.js';
+import { BROWSER_CATALOG, getBrowserCatalogEntry } from '../browserCatalog.js';
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function isBraveRunningLinux() {
-  const checks = [
-    await execFileAsync('pgrep', ['-x', 'brave-browser']),
-    await execFileAsync('pgrep', ['-x', 'brave']),
-    await execFileAsync('pgrep', ['-f', 'brave-browser']),
-  ];
+async function isBrowserRunningLinux(browser) {
+  const processNames = browser.linuxProcessNames ?? browser.linuxCommands ?? [];
+  const checks = [];
+
+  for (const processName of processNames) {
+    checks.push(await execFileAsync('pgrep', ['-x', processName]));
+    checks.push(await execFileAsync('pgrep', ['-f', processName]));
+  }
+
   return checks.some((result) => result.ok);
 }
 
-function parseWmctrlWindowIds(output) {
+function parseWmctrlWindowIds(output, browser) {
+  const patterns = [
+    ...(browser.linuxWindowClasses ?? []),
+    ...(browser.linuxWindowNames ?? []),
+  ].map((value) => String(value).toLowerCase());
+
   return output
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => line.length > 0)
-    .filter((line) => /brave/i.test(line))
+    .filter((line) => patterns.some((pattern) => line.toLowerCase().includes(pattern)))
     .map((line) => line.split(/\s+/)[0])
     .filter((id) => /^0x[0-9a-f]+$/i.test(id));
 }
 
-async function focusBraveWithWmctrl() {
+async function focusBrowserWithWmctrl(browser) {
   if (!(await commandExists('wmctrl'))) {
     return false;
   }
@@ -33,7 +42,7 @@ async function focusBraveWithWmctrl() {
     return false;
   }
 
-  const windowIds = parseWmctrlWindowIds(list.stdout);
+  const windowIds = parseWmctrlWindowIds(list.stdout, browser);
   if (windowIds.length === 0) {
     return false;
   }
@@ -48,16 +57,28 @@ async function focusBraveWithWmctrl() {
   return true;
 }
 
-async function focusBraveWithXdotool() {
+async function focusBrowserWithXdotool(browser) {
   if (!(await commandExists('xdotool'))) {
     return false;
   }
 
-  const searchClassVisible = await execFileAsync('xdotool', ['search', '--onlyvisible', '--class', 'brave']);
-  const searchNameVisible = await execFileAsync('xdotool', ['search', '--onlyvisible', '--name', 'Brave']);
-  const searchClassAny = await execFileAsync('xdotool', ['search', '--class', 'brave']);
-  const searchNameAny = await execFileAsync('xdotool', ['search', '--name', 'Brave']);
-  const idsRaw = `${searchClassVisible.stdout}\n${searchNameVisible.stdout}\n${searchClassAny.stdout}\n${searchNameAny.stdout}`;
+  const matches = [];
+  const classPatterns = browser.linuxWindowClasses ?? [];
+  const namePatterns = browser.linuxWindowNames ?? [];
+
+  for (const classPattern of classPatterns) {
+    const searchClassVisible = await execFileAsync('xdotool', ['search', '--onlyvisible', '--class', classPattern]);
+    const searchClassAny = await execFileAsync('xdotool', ['search', '--class', classPattern]);
+    matches.push(searchClassVisible.stdout, searchClassAny.stdout);
+  }
+
+  for (const namePattern of namePatterns) {
+    const searchNameVisible = await execFileAsync('xdotool', ['search', '--onlyvisible', '--name', namePattern]);
+    const searchNameAny = await execFileAsync('xdotool', ['search', '--name', namePattern]);
+    matches.push(searchNameVisible.stdout, searchNameAny.stdout);
+  }
+
+  const idsRaw = matches.join('\n');
   const ids = idsRaw
     .split('\n')
     .map((value) => value.trim())
@@ -81,19 +102,19 @@ async function focusBraveWithXdotool() {
   return true;
 }
 
-async function focusOrMaximizeBraveLinux() {
-  if (await focusBraveWithWmctrl()) {
+async function focusOrMaximizeBrowserLinux(browser) {
+  if (await focusBrowserWithWmctrl(browser)) {
     return true;
   }
-  if (await focusBraveWithXdotool()) {
+  if (await focusBrowserWithXdotool(browser)) {
     return true;
   }
   return false;
 }
 
-async function ensureFocusedAndMaximizedAfterLaunch() {
+async function ensureFocusedAndMaximizedAfterLaunch(browser) {
   for (let attempt = 0; attempt < 10; attempt += 1) {
-    const done = await focusOrMaximizeBraveLinux();
+    const done = await focusOrMaximizeBrowserLinux(browser);
     if (done) {
       return true;
     }
@@ -102,11 +123,36 @@ async function ensureFocusedAndMaximizedAfterLaunch() {
   return false;
 }
 
-async function tryLaunchBrave() {
+async function resolveLinuxBrowser(browserId) {
+  const browser = getBrowserCatalogEntry(browserId);
+  if (!browser) {
+    return null;
+  }
+
+  for (const command of browser.linuxCommands ?? []) {
+    if (await commandExists(command)) {
+      return {
+        ...browser,
+        launchCommand: command,
+        launchArgs: [],
+      };
+    }
+  }
+
+  if (browser.linuxFlatpakAppId && await commandExists('flatpak')) {
+    return {
+      ...browser,
+      launchCommand: 'flatpak',
+      launchArgs: ['run', browser.linuxFlatpakAppId],
+    };
+  }
+
+  return null;
+}
+
+async function tryLaunchBrowser(browser) {
   const launchers = [
-    ['brave-browser', []],
-    ['brave', []],
-    ['flatpak', ['run', 'com.brave.Browser']],
+    [browser.launchCommand, browser.launchArgs ?? []],
   ];
 
   for (const [command, args] of launchers) {
@@ -119,16 +165,43 @@ async function tryLaunchBrave() {
   return false;
 }
 
-export async function focusOrLaunchBraveLinux() {
-  const running = await isBraveRunningLinux();
-  if (running) {
-    await focusOrMaximizeBraveLinux();
-    return;
+export async function listBrowsersLinux() {
+  const browsers = [];
+
+  for (const browser of BROWSER_CATALOG) {
+    const resolved = await resolveLinuxBrowser(browser.id);
+    if (!resolved) {
+      continue;
+    }
+
+    browsers.push({
+      id: browser.id,
+      name: browser.name,
+      shortLabel: browser.shortLabel,
+      command: resolved.launchCommand,
+    });
   }
 
-  const launched = await tryLaunchBrave();
+  return browsers;
+}
+
+export async function focusOrLaunchBrowserLinux(browserId) {
+  const browser = await resolveLinuxBrowser(browserId);
+  if (!browser) {
+    return false;
+  }
+
+  const running = await isBrowserRunningLinux(browser);
+  if (running) {
+    return focusOrMaximizeBrowserLinux(browser);
+  }
+
+  const launched = await tryLaunchBrowser(browser);
   if (launched) {
     await sleep(400);
-    await ensureFocusedAndMaximizedAfterLaunch();
+    await ensureFocusedAndMaximizedAfterLaunch(browser);
+    return true;
   }
+
+  return false;
 }

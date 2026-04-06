@@ -1,14 +1,14 @@
 import {emitWithTimestamp} from "../core/socket-emit.js";
 import { bindTouchPassthrough } from '../touch/bind-touch-passthrough.js';
 import {
-    REMOTE_EVENT_BROWSER_BRAVE,
+    REMOTE_EVENT_BROWSER_OPEN,
     REMOTE_EVENT_KEYBOARD_KEY
 } from "../../utils/shared/remoteCommands.js";
 
 export function bindBrowserRemoteButtons(
     socket,
     {
-        btnOpenBrave,
+        browserLaunchers,
         btnBrowserBack,
         btnBrowserForward,
         btnPrevTab,
@@ -23,8 +23,8 @@ export function bindBrowserRemoteButtons(
         touchpad,
     },
 ) {
-    bindTouchPassthrough([
-        btnOpenBrave,
+    let launcherButtons = [];
+    const staticButtons = [
         btnBrowserBack,
         btnBrowserForward,
         btnPrevTab,
@@ -36,9 +36,58 @@ export function bindBrowserRemoteButtons(
         btnFullscreen,
         btnVideoPlayPause,
         btnVideoFullscreen,
-    ], touchpad);
+    ];
 
-    btnOpenBrave.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_BROWSER_BRAVE));
+    bindTouchPassthrough(staticButtons, touchpad);
+
+    async function loadBrowserLaunchers() {
+        if (!browserLaunchers) {
+            return;
+        }
+
+        browserLaunchers.textContent = '';
+        launcherButtons = [];
+
+        try {
+            const response = await fetch('/api/admin/remotes/browsers', {
+                credentials: 'same-origin',
+            });
+            if (!response.ok) {
+                return;
+            }
+
+            const payload = await response.json();
+            const browsers = Array.isArray(payload?.browsers) ? payload.browsers : [];
+
+            for (const browser of browsers) {
+                if (!browser?.id) {
+                    continue;
+                }
+
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.textContent = String(browser.shortLabel || browser.name || browser.id);
+                button.title = String(browser.name || browser.id);
+                button.setAttribute('aria-label', String(browser.name || browser.id));
+                button.dataset.browserId = browser.id;
+                button.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_BROWSER_OPEN, {
+                    browserId: browser.id,
+                }));
+                browserLaunchers.appendChild(button);
+                launcherButtons.push(button);
+            }
+
+            if (launcherButtons.length > 0) {
+                bindTouchPassthrough(launcherButtons, touchpad);
+            }
+        } catch (_error) {
+            browserLaunchers.textContent = '';
+            launcherButtons = [];
+        }
+    }
+
+    void loadBrowserLaunchers();
+    
     btnBrowserBack.addEventListener('click', () =>
         emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, {key: 'left', modifiers: ['alt']}),
     );

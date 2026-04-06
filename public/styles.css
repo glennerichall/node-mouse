@@ -469,12 +469,17 @@ html[data-handedness="left"] .tv-actions .remote-grid-row {
   margin-right: auto;
 }
 
-#btn-open-brave img {
-  width: 18px;
-  height: 18px;
-  display: block;
-  margin: 0 auto;
-  pointer-events: none;
+.remote-browser-launchers {
+  grid-auto-columns: minmax(var(--remote-cell-width), max-content);
+}
+
+.remote-browser-launchers:empty {
+  display: none;
+}
+
+.remote-browser-launchers button {
+  min-width: var(--remote-cell-width);
+  padding-inline: 10px;
 }
 
 #touchpad {

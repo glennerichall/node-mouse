@@ -14,8 +14,11 @@ function getNoopOverlay() {
     show: async () => false,
     hide: () => false,
     update: async () => {},
+    setSuppressed: () => false,
     toggle: async () => false,
     isVisible: () => false,
+    isSuppressed: () => false,
+    getBounds: () => null,
   };
 }
 
@@ -55,6 +58,8 @@ export async function createQrOverlayYad(services) {
   let child = null;
   let refreshChain = Promise.resolve();
   let visible = getOverlayContext().startsVisible;
+  let suppressed = false;
+  let overlayBounds = null;
 
   const close = () => {
     if (child && !child.killed) {
@@ -77,6 +82,12 @@ export async function createQrOverlayYad(services) {
     const screen = robot.getScreenSize();
     const posX = Math.max(0, screen.width - size - margin);
     const posY = Math.max(0, margin + topBarOffset);
+    overlayBounds = {
+      x: posX,
+      y: posY,
+      width: size,
+      height: size,
+    };
 
     const args = [
       '--class=remote-mouse-qr-overlay',
@@ -99,7 +110,7 @@ export async function createQrOverlayYad(services) {
   }
 
   const update = async () => {
-    if (!visible || !getOverlayContext().isSupported) {
+    if (!visible || suppressed || !getOverlayContext().isSupported) {
       return;
     }
 
@@ -129,6 +140,22 @@ export async function createQrOverlayYad(services) {
     return visible;
   };
 
+  const setSuppressed = (nextSuppressed) => {
+    const normalized = Boolean(nextSuppressed);
+    if (suppressed === normalized) {
+      return suppressed;
+    }
+
+    suppressed = normalized;
+    if (suppressed) {
+      close();
+      return suppressed;
+    }
+
+    void update();
+    return suppressed;
+  };
+
   const toggle = async () => {
     if (visible) {
       hide();
@@ -143,7 +170,10 @@ export async function createQrOverlayYad(services) {
     show,
     hide,
     update,
+    setSuppressed,
     toggle,
     isVisible: () => visible,
+    isSuppressed: () => suppressed,
+    getBounds: () => overlayBounds,
   };
 }

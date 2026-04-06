@@ -109,6 +109,9 @@ export const DEFAULT_PERSISTED_CONFIG = {
         size: 75,
         margin: 14,
         topOffsetPx: 32,
+        autoHideOnHover: true,
+        hoverEntryMarginPx: 10,
+        hoverExitMarginPx: 18,
     },
     logging: {
         level: 'info',

@@ -50,7 +50,7 @@ function getKeyboardRemoteDom() {
 
 function getBrowserRemoteDom() {
   return {
-    btnOpenBrave: getElement('btn-open-brave'),
+    browserLaunchers: getElement('browser-launchers'),
     btnBrowserBack: getElement('btn-browser-back'),
     btnBrowserForward: getElement('btn-browser-forward'),
     btnPrevTab: getElement('btn-prev-tab'),

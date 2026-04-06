@@ -1,13 +1,15 @@
 import { createBrowserReceiverState } from './state.js';
-import { createFocusOrLaunchBraveAction } from './actions/createFocusOrLaunchBraveAction.js';
+import { createFocusOrLaunchBrowserAction } from './actions/createFocusOrLaunchBrowserAction.js';
 import {openUrlOnHost} from './actions/openUrlOnHost.js';
+import { listBrowsersOnHost } from './listBrowsersOnHost.js';
 
 export function createBrowser() {
   const state = createBrowserReceiverState();
-  const focusOrLaunchBrave = createFocusOrLaunchBraveAction(state);
+  const focusOrLaunchBrowser = createFocusOrLaunchBrowserAction(state);
 
   return {
-    focusOrLaunchBrave,
+    focusOrLaunchBrowser,
+    listBrowsers: listBrowsersOnHost,
     openUrlOnHost,
   };
 }
