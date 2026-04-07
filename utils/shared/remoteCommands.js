@@ -16,6 +16,7 @@ export const REMOTE_EVENT_SAMSUNG_ON = 'samsung:on';
 export const REMOTE_EVENT_SAMSUNG_OFF = 'samsung:off';
 export const REMOTE_EVENT_SAMSUNG_VOL_UP = 'samsung:volup';
 export const REMOTE_EVENT_SAMSUNG_VOL_DOWN = 'samsung:voldown';
+export const REMOTE_EVENT_SAMSUNG_MUTE = 'samsung:mute';
 export const REMOTE_EVENT_SAMSUNG_INPUT = 'samsung:input';
 export const REMOTE_EVENT_SAMSUNG_ENTER = 'samsung:enter';
 export const REMOTE_EVENT_SAMSUNG_PC_INPUT = 'samsung:pc-input';

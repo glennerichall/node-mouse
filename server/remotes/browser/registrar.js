@@ -3,18 +3,20 @@ import { REMOTE_EVENT_BROWSER_OPEN } from '../../../utils/shared/remoteCommands.
 
 const getLogger = () => createLogger('browser:remote');
 
+function isBrowserEnabled(config, browserId) {
+    return config?.browser?.enabled !== false && config?.browser?.[browserId] !== false;
+}
 
 export const createBrowserRegistrar = ({browser, getConfig = () => ({})}) => {
     return socket => {
         const client = socket.id.slice(0, 8);
 
         socket.on(REMOTE_EVENT_BROWSER_OPEN, async (payload = {}) => {
-            if (getConfig()?.browser?.enabled === false) {
-                getLogger().info({client}, 'Browser remote ignoree: desactivee par configuration.');
+            const browserId = typeof payload?.browserId === 'string' ? payload.browserId : 'brave';
+            if (!isBrowserEnabled(getConfig(), browserId)) {
+                getLogger().info({client, browserId}, 'Browser ignore: desactive par configuration.');
                 return;
             }
-
-            const browserId = typeof payload?.browserId === 'string' ? payload.browserId : 'brave';
             getLogger().info({client, browserId}, `Demande ${REMOTE_EVENT_BROWSER_OPEN}`);
             await browser.focusOrLaunchBrowser(browserId);
         });

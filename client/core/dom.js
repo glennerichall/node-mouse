@@ -12,6 +12,7 @@ function getLayoutDom() {
     scrollZoneIndicator: getElement('scroll-zone-indicator'),
     browserShortcuts: getElement('browser-shortcuts'),
     tvControls: getElement('tv-controls'),
+    systemControls: getElement('system-controls'),
     menu: getElement('menu'),
     keyboardPanel: getElement('keyboard-panel'),
     keyboardShortcutsBar: getElement('keyboard-shortcuts-bar'),
@@ -60,7 +61,19 @@ function getBrowserRemoteDom() {
     btnHardReload: getElement('btn-hard-reload'),
     btnFullscreen: getElement('btn-fullscreen'),
     btnVideoPlayPause: getElement('btn-video-play-pause'),
+    btnVideoMute: getElement('btn-video-mute'),
     btnVideoFullscreen: getElement('btn-video-fullscreen'),
+  };
+}
+
+function getSystemRemoteDom() {
+  return {
+    btnSystemShowDesktop: getElement('btn-system-show-desktop'),
+    btnSystemWindowLeft: getElement('btn-system-window-left'),
+    btnSystemWindowRight: getElement('btn-system-window-right'),
+    btnSystemStartMenu: getElement('btn-system-start-menu'),
+    btnSystemSettings: getElement('btn-system-settings'),
+    btnSystemNotifications: getElement('btn-system-notifications'),
   };
 }
 
@@ -70,6 +83,7 @@ function getSamsungRemoteDom() {
     btnSamsungOff: getElement('btn-samsung-off'),
     btnSamsungVolUp: getElement('btn-samsung-volup'),
     btnSamsungVolDown: getElement('btn-samsung-voldown'),
+    btnSamsungMute: getElement('btn-samsung-mute'),
     btnSamsungInput: getElement('btn-samsung-input'),
     btnSamsungEnter: getElement('btn-samsung-enter'),
     btnSamsungPcInput: getElement('btn-samsung-pc-input'),
@@ -98,6 +112,7 @@ export function getDom() {
     ...getMouseControlsDom(),
     ...getKeyboardRemoteDom(),
     ...getBrowserRemoteDom(),
+    ...getSystemRemoteDom(),
     ...getSamsungRemoteDom(),
     ...getAdminRemoteDom(),
   };

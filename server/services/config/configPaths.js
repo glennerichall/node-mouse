@@ -1,4 +1,7 @@
 import { getNotificationPaths } from '../../../utils/shared/notificationSettings.js';
+import { BROWSER_CATALOG } from '../../remotes/browser/browserCatalog.js';
+
+const BROWSER_CONFIG_PATHS = BROWSER_CATALOG.map((browser) => `browser.${browser.id}`);
 
 export const CONFIG_PATHS = [
     'input.mouseSpeed',
@@ -6,6 +9,7 @@ export const CONFIG_PATHS = [
     'input.touchDragHoldMs',
     'input.touchDragStillDistancePx',
     'browser.enabled',
+    ...BROWSER_CONFIG_PATHS,
     'keyboard.enabled',
     'preview.enabled',
     'preview.width',

@@ -3,18 +3,19 @@ import express from 'express';
 export function createAdminRemotesRouter(services) {
   const router = express.Router();
 
+  function isBrowserEnabled(config, browserId) {
+    return config?.browser?.enabled !== false && config?.browser?.[browserId] !== false;
+  }
+
   router.get('/browsers', async (_req, res) => {
     const config = services.getConfig();
-    if (config?.browser?.enabled === false) {
-      res.status(403).json({
-        ok: false,
-        message: 'Browser remote disabled.',
-      });
-      return;
-    }
-
     const browsers = await services.getRemotes().browser.listBrowsers();
-    res.json({ browsers });
+    res.json({
+      browsers: browsers.map((browser) => ({
+        ...browser,
+        enabled: isBrowserEnabled(config, browser.id),
+      })),
+    });
   });
 
   router.get('/', (_req, res) => {

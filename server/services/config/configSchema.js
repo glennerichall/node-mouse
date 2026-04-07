@@ -1,4 +1,12 @@
 import { getNotificationPaths } from '../../../utils/shared/notificationSettings.js';
+import { BROWSER_CATALOG } from '../../remotes/browser/browserCatalog.js';
+
+const BROWSER_CONFIG_FIELDS = Object.fromEntries(
+  BROWSER_CATALOG.map((browser) => [browser.id, {
+    label: browser.name,
+    type: 'boolean',
+  }]),
+);
 
 export const CONFIG_SCHEMA = {
   input: {
@@ -43,6 +51,7 @@ export const CONFIG_SCHEMA = {
         label: 'Activer la remote navigateur',
         type: 'boolean',
       },
+      ...BROWSER_CONFIG_FIELDS,
     },
   },
   keyboard: {

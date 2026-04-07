@@ -10,6 +10,7 @@ import {emitWithTimestamp} from "../core/socket-emit.js";
 import {
     REMOTE_EVENT_SAMSUNG_ENTER,
     REMOTE_EVENT_SAMSUNG_INPUT,
+    REMOTE_EVENT_SAMSUNG_MUTE,
     REMOTE_EVENT_SAMSUNG_OFF,
     REMOTE_EVENT_SAMSUNG_ON,
     REMOTE_EVENT_SAMSUNG_PC_INPUT,
@@ -26,6 +27,7 @@ export function bindSamsungRemoteButtons(
         btnSamsungOff,
         btnSamsungVolUp,
         btnSamsungVolDown,
+        btnSamsungMute,
         btnSamsungInput,
         btnSamsungEnter,
         btnSamsungPcInput,
@@ -37,6 +39,7 @@ export function bindSamsungRemoteButtons(
         btnSamsungOff,
         btnSamsungVolUp,
         btnSamsungVolDown,
+        btnSamsungMute,
         btnSamsungInput,
         btnSamsungEnter,
         btnSamsungPcInput,
@@ -139,6 +142,7 @@ export function bindSamsungRemoteButtons(
     });
     btnSamsungVolUp.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_VOL_UP));
     btnSamsungVolDown.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_VOL_DOWN));
+    btnSamsungMute.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_MUTE));
     btnSamsungInput.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_INPUT));
     btnSamsungEnter.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_ENTER));
     btnSamsungPcInput.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_PC_INPUT));

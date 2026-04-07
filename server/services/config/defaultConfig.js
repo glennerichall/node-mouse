@@ -1,6 +1,7 @@
 import {
     packageJson
 } from "./bootstrapConfig.js";
+import { BROWSER_CATALOG } from '../../remotes/browser/browserCatalog.js';
 import {
     createDefaultNotificationSettings,
     NOTIFICATION_ID_UPDATE_AVAILABLE,
@@ -32,6 +33,10 @@ DEFAULT_NOTIFICATION_SETTINGS[NOTIFICATION_ID_UPDATE_AVAILABLE] = {
     host: true,
     client: true,
 };
+
+const DEFAULT_BROWSER_CONFIG = Object.fromEntries(
+    BROWSER_CATALOG.map((browser) => [browser.id, true]),
+);
 
 export const DEFAULT_SYSTEM_CONFIG = {
     port: 3000,
@@ -80,6 +85,7 @@ export const DEFAULT_PERSISTED_CONFIG = {
     },
     browser: {
         enabled: true,
+        ...DEFAULT_BROWSER_CONFIG,
     },
     keyboard: {
         enabled: true,

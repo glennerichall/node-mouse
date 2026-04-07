@@ -1,6 +1,7 @@
 import {emitWithTimestamp} from "../core/socket-emit.js";
 import { bindTouchPassthrough } from '../touch/bind-touch-passthrough.js';
 import { getClientBrowserConfig, onClientConfigChange } from '../config/client-config.js';
+import { getClientBrowserVisibility, onClientBrowserVisibilityChange } from '../i18n/index.js';
 import {
     REMOTE_EVENT_BROWSER_OPEN,
     REMOTE_EVENT_KEYBOARD_KEY
@@ -20,6 +21,7 @@ export function bindBrowserRemoteButtons(
         btnHardReload,
         btnFullscreen,
         btnVideoPlayPause,
+        btnVideoMute,
         btnVideoFullscreen,
         touchpad,
     },
@@ -36,6 +38,7 @@ export function bindBrowserRemoteButtons(
         btnHardReload,
         btnFullscreen,
         btnVideoPlayPause,
+        btnVideoMute,
         btnVideoFullscreen,
     ];
 
@@ -43,6 +46,12 @@ export function bindBrowserRemoteButtons(
 
     function isBrowserRemoteEnabled() {
         return getClientBrowserConfig().enabled !== false;
+    }
+
+    function isBrowserLauncherEnabled(browserId) {
+        return getClientBrowserConfig().enabled !== false
+            && getClientBrowserConfig()?.[browserId] !== false
+            && getClientBrowserVisibility(browserId, true);
     }
 
     async function loadBrowserLaunchers() {
@@ -69,7 +78,7 @@ export function bindBrowserRemoteButtons(
             const browsers = Array.isArray(payload?.browsers) ? payload.browsers : [];
 
             for (const browser of browsers) {
-                if (!browser?.id) {
+                if (!browser?.id || browser.enabled === false || !isBrowserLauncherEnabled(browser.id)) {
                     continue;
                 }
 
@@ -97,6 +106,9 @@ export function bindBrowserRemoteButtons(
 
     void loadBrowserLaunchers();
     onClientConfigChange(() => {
+        void loadBrowserLaunchers();
+    });
+    onClientBrowserVisibilityChange(() => {
         void loadBrowserLaunchers();
     });
     
@@ -127,6 +139,9 @@ export function bindBrowserRemoteButtons(
     btnFullscreen.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, {key: 'f11'}));
     btnVideoPlayPause.addEventListener('click', () =>
         emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, {key: 'space'}),
+    );
+    btnVideoMute.addEventListener('click', () =>
+        emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, {key: 'm'}),
     );
     btnVideoFullscreen.addEventListener('click', () =>
         emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, {key: 'f'}),

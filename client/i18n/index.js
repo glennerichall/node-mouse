@@ -5,11 +5,13 @@ const THEME_STORAGE_KEY = 'remote-mouse.theme';
 const HANDEDNESS_STORAGE_KEY = 'remote-mouse.handedness';
 const REMOTE_AUTO_HIDE_STORAGE_KEY = 'remote-mouse.remote-auto-hide';
 const REMOTE_VISIBILITY_STORAGE_KEY = 'remote-mouse.remote-visibility';
+const BROWSER_VISIBILITY_STORAGE_KEY = 'remote-mouse.browser-visibility';
 const I18N_CHANGED_EVENT = 'i18n:changed';
 const THEME_CHANGED_EVENT = 'theme:changed';
 const HANDEDNESS_CHANGED_EVENT = 'handedness:changed';
 const REMOTE_AUTO_HIDE_CHANGED_EVENT = 'remote-auto-hide:changed';
 const REMOTE_VISIBILITY_CHANGED_EVENT = 'remote-visibility:changed';
+const BROWSER_VISIBILITY_CHANGED_EVENT = 'browser-visibility:changed';
 const SUPPORTED_THEMES = new Set(['dark', 'light']);
 const SUPPORTED_HANDEDNESS = new Set(['right', 'left']);
 
@@ -18,7 +20,9 @@ let cachedTheme = '';
 let cachedHandedness = '';
 let cachedRemoteAutoHide = true;
 let cachedRemoteVisibility = {};
+let cachedBrowserVisibility = {};
 let remoteVisibilityStorageBound = false;
+let browserVisibilityStorageBound = false;
 
 function applySwitcherLabelStyle(label) {
   label.style.fontSize = '12px';
@@ -114,6 +118,22 @@ function safeWriteStoredRemoteVisibility(value) {
   }
 }
 
+function safeReadStoredBrowserVisibility() {
+  try {
+    return window.localStorage.getItem(BROWSER_VISIBILITY_STORAGE_KEY);
+  } catch (_error) {
+    return '';
+  }
+}
+
+function safeWriteStoredBrowserVisibility(value) {
+  try {
+    window.localStorage.setItem(BROWSER_VISIBILITY_STORAGE_KEY, value);
+  } catch (_error) {
+    // Best effort.
+  }
+}
+
 function resolveLocale(value = safeReadStoredLocale() || navigator.language) {
   const normalized = String(value || '').toLowerCase();
 
@@ -198,6 +218,35 @@ function resolveRemoteVisibility(remoteId, fallback = true) {
   return Boolean(fallback);
 }
 
+function resolveBrowserVisibilityState(value = safeReadStoredBrowserVisibility()) {
+  if (!value) {
+    return {};
+  }
+
+  try {
+    const parsed = JSON.parse(value);
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return {};
+    }
+
+    return Object.fromEntries(
+      Object.entries(parsed).map(([key, entryValue]) => [key, Boolean(entryValue)]),
+    );
+  } catch (_error) {
+    return {};
+  }
+}
+
+function resolveBrowserVisibility(browserId, fallback = true) {
+  const state = cachedBrowserVisibility && typeof cachedBrowserVisibility === 'object'
+    ? cachedBrowserVisibility
+    : resolveBrowserVisibilityState();
+  if (Object.hasOwn(state, browserId)) {
+    return Boolean(state[browserId]);
+  }
+  return Boolean(fallback);
+}
+
 function applyClientTheme(theme) {
   const normalizedTheme = resolveTheme(theme);
   cachedTheme = normalizedTheme;
@@ -228,6 +277,14 @@ function applyClientRemoteVisibilityState(value) {
   return nextState;
 }
 
+function applyClientBrowserVisibilityState(value) {
+  const nextState = typeof value === 'object' && value !== null && !Array.isArray(value)
+    ? Object.fromEntries(Object.entries(value).map(([key, entryValue]) => [key, Boolean(entryValue)]))
+    : resolveBrowserVisibilityState(value);
+  cachedBrowserVisibility = nextState;
+  return nextState;
+}
+
 function bindRemoteVisibilityStorageSync() {
   if (remoteVisibilityStorageBound || typeof window === 'undefined') {
     return;
@@ -249,6 +306,29 @@ function bindRemoteVisibilityStorageSync() {
   });
 
   remoteVisibilityStorageBound = true;
+}
+
+function bindBrowserVisibilityStorageSync() {
+  if (browserVisibilityStorageBound || typeof window === 'undefined') {
+    return;
+  }
+
+  window.addEventListener('storage', (event) => {
+    if (event.key !== BROWSER_VISIBILITY_STORAGE_KEY) {
+      return;
+    }
+
+    const previousState = cachedBrowserVisibility;
+    const nextState = applyClientBrowserVisibilityState(event.newValue || '');
+    window.dispatchEvent(new CustomEvent(BROWSER_VISIBILITY_CHANGED_EVENT, {
+      detail: {
+        previousState,
+        nextState,
+      },
+    }));
+  });
+
+  browserVisibilityStorageBound = true;
 }
 
 function interpolate(template, params = {}) {
@@ -298,6 +378,11 @@ export function initClientRemoteVisibilityState(value = resolveRemoteVisibilityS
   return applyClientRemoteVisibilityState(value);
 }
 
+export function initClientBrowserVisibilityState(value = resolveBrowserVisibilityState()) {
+  bindBrowserVisibilityStorageSync();
+  return applyClientBrowserVisibilityState(value);
+}
+
 export async function setClientLocale(locale) {
   const normalizedLocale = resolveLocale(locale);
   safeWriteStoredLocale(normalizedLocale);
@@ -330,6 +415,10 @@ export function getClientRemoteAutoHide() {
 
 export function getClientRemoteVisibility(remoteId, fallback = true) {
   return resolveRemoteVisibility(remoteId, fallback);
+}
+
+export function getClientBrowserVisibility(browserId, fallback = true) {
+  return resolveBrowserVisibility(browserId, fallback);
 }
 
 export function setClientTheme(theme) {
@@ -388,6 +477,24 @@ export function setClientRemoteVisibility(remoteId, value) {
   window.dispatchEvent(new CustomEvent(REMOTE_VISIBILITY_CHANGED_EVENT, {
     detail: {
       remoteId,
+      visible: Boolean(value),
+      previousVisible,
+    },
+  }));
+  return Boolean(value);
+}
+
+export function setClientBrowserVisibility(browserId, value) {
+  const previousVisible = getClientBrowserVisibility(browserId, true);
+  const nextState = {
+    ...cachedBrowserVisibility,
+    [browserId]: Boolean(value),
+  };
+  safeWriteStoredBrowserVisibility(JSON.stringify(nextState));
+  applyClientBrowserVisibilityState(nextState);
+  window.dispatchEvent(new CustomEvent(BROWSER_VISIBILITY_CHANGED_EVENT, {
+    detail: {
+      browserId,
       visible: Boolean(value),
       previousVisible,
     },
@@ -708,5 +815,20 @@ export function onClientRemoteVisibilityChange(listener) {
   window.addEventListener(REMOTE_VISIBILITY_CHANGED_EVENT, handler);
   return () => {
     window.removeEventListener(REMOTE_VISIBILITY_CHANGED_EVENT, handler);
+  };
+}
+
+export function onClientBrowserVisibilityChange(listener) {
+  if (typeof listener !== 'function') {
+    return () => {};
+  }
+
+  const handler = (event) => {
+    listener(event.detail || {});
+  };
+
+  window.addEventListener(BROWSER_VISIBILITY_CHANGED_EVENT, handler);
+  return () => {
+    window.removeEventListener(BROWSER_VISIBILITY_CHANGED_EVENT, handler);
   };
 }

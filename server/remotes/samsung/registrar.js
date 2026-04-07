@@ -2,6 +2,7 @@ import {createLogger} from "../../services/log/logger.js";
 import {
     REMOTE_EVENT_SAMSUNG_ENTER,
     REMOTE_EVENT_SAMSUNG_INPUT,
+    REMOTE_EVENT_SAMSUNG_MUTE,
     REMOTE_EVENT_SAMSUNG_OFF,
     REMOTE_EVENT_SAMSUNG_ON,
     REMOTE_EVENT_SAMSUNG_PC_INPUT,
@@ -33,6 +34,11 @@ export function createSamsungRegistrar({samsung}) {
         socket.on(REMOTE_EVENT_SAMSUNG_VOL_DOWN, async () => {
             getLogger().info({client}, `Demande ${REMOTE_EVENT_SAMSUNG_VOL_DOWN}`);
             await samsung.volumeDown();
+        });
+
+        socket.on(REMOTE_EVENT_SAMSUNG_MUTE, async () => {
+            getLogger().info({client}, `Demande ${REMOTE_EVENT_SAMSUNG_MUTE}`);
+            await samsung.mute();
         });
 
         socket.on(REMOTE_EVENT_SAMSUNG_INPUT, async () => {

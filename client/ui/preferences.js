@@ -1,7 +1,9 @@
 import {
   applyPageTranslations,
+  getClientBrowserVisibility,
   getClientI18n,
   getClientRemoteVisibility,
+  initClientBrowserVisibilityState,
   initClientHandedness,
   initClientI18n,
   initClientRemoteAutoHide,
@@ -9,8 +11,10 @@ import {
   initClientTheme,
   mountClientPreferences,
   mountRemoteAutoHideSwitcher,
+  onClientBrowserVisibilityChange,
   onClientI18nChange,
   onClientRemoteVisibilityChange,
+  setClientBrowserVisibility,
   setClientRemoteVisibility,
 } from '../i18n/index.js';
 
@@ -19,12 +23,15 @@ initClientTheme();
 initClientHandedness();
 initClientRemoteAutoHide();
 initClientRemoteVisibilityState();
+initClientBrowserVisibilityState();
 applyPageTranslations(document);
 mountClientPreferences();
 mountRemoteAutoHideSwitcher();
 
 const remotesRoot = document.getElementById('preferences-remotes');
+const browsersRoot = document.getElementById('preferences-browsers');
 let availableRemotes = [];
+let availableBrowsers = [];
 const LOCAL_REMOTE_DEFINITIONS = [
   { id: 'keyboard', labelKey: 'preferences.remote.keyboard' },
 ];
@@ -86,6 +93,39 @@ function createRemoteVisibilityRow(remote) {
   return row;
 }
 
+function createBrowserVisibilityRow(browser) {
+  const serverEnabled = browser?.enabled !== false;
+  const row = document.createElement('div');
+  row.className = 'preferences-remote-row';
+
+  const label = document.createElement('span');
+  label.className = 'preferences-remote-label';
+  label.textContent = String(browser.shortLabel || browser.name || browser.id);
+
+  const select = document.createElement('select');
+  select.className = 'preferences-remote-select';
+  select.setAttribute('aria-label', String(browser.name || browser.id));
+
+  for (const [value, key] of [
+    ['true', 'common.enabled'],
+    ['false', 'common.disabled'],
+  ]) {
+    const option = document.createElement('option');
+    option.value = value;
+    option.textContent = t(key);
+    select.appendChild(option);
+  }
+
+  select.value = serverEnabled && getClientBrowserVisibility(browser.id, true) ? 'true' : 'false';
+  select.disabled = !serverEnabled;
+  select.addEventListener('change', () => {
+    setClientBrowserVisibility(browser.id, select.value === 'true');
+  });
+
+  row.append(label, select);
+  return row;
+}
+
 function renderRemoteVisibilityList() {
   if (!remotesRoot) {
     return;
@@ -94,6 +134,17 @@ function renderRemoteVisibilityList() {
   remotesRoot.innerHTML = '';
   for (const remote of availableRemotes) {
     remotesRoot.appendChild(createRemoteVisibilityRow(remote));
+  }
+}
+
+function renderBrowserVisibilityList() {
+  if (!browsersRoot) {
+    return;
+  }
+
+  browsersRoot.innerHTML = '';
+  for (const browser of availableBrowsers) {
+    browsersRoot.appendChild(createBrowserVisibilityRow(browser));
   }
 }
 
@@ -108,15 +159,32 @@ async function loadAvailableRemotes() {
   renderRemoteVisibilityList();
 }
 
+async function loadAvailableBrowsers() {
+  const response = await fetch('/api/admin/remotes/browsers', { cache: 'no-store' });
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+
+  const payload = await response.json();
+  availableBrowsers = Array.isArray(payload?.browsers) ? payload.browsers : [];
+  renderBrowserVisibilityList();
+}
+
 onClientI18nChange(() => {
   applyPageTranslations(document);
   mountClientPreferences();
   mountRemoteAutoHideSwitcher();
   renderRemoteVisibilityList();
+  renderBrowserVisibilityList();
 });
 
 onClientRemoteVisibilityChange(() => {
   renderRemoteVisibilityList();
 });
 
+onClientBrowserVisibilityChange(() => {
+  renderBrowserVisibilityList();
+});
+
 await loadAvailableRemotes();
+await loadAvailableBrowsers();

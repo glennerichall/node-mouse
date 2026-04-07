@@ -160,6 +160,9 @@ export function createSamsungCommandService({getConfig, discoverDevices, getSams
         async volumeDown() {
             return sendKey(Keys.KEY_VOLDOWN, 'Volume Samsung diminue.');
         },
+        async mute() {
+            return sendKey(Keys.KEY_MUTE, 'Mute Samsung active/desactive.');
+        },
         async switchInput() {
             return sendKey(Keys.KEY_SOURCE, 'Changement de source Samsung demande.');
         },

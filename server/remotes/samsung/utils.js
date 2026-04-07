@@ -17,6 +17,9 @@ export function createDisabledSamsungRemote(reason) {
         async volumeDown() {
             return {ok: false, message: reason};
         },
+        async mute() {
+            return {ok: false, message: reason};
+        },
         async switchInput() {
             return {ok: false, message: reason};
         },

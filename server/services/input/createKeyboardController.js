@@ -8,12 +8,16 @@ const ALLOWED_KEYS = new Set([
     'down',
     'left',
     'right',
+    'a',
+    'd',
     'f',
+    'i',
     't',
     'w',
     'l',
     'f5',
     'f11',
+    'command',
 ]);
 const ALLOWED_MODIFIERS = new Set(['control', 'shift', 'alt', 'command']);
 const DEFAULT_KEYBOARD_DELAY_MS = 20;
