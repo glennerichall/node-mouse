@@ -18,7 +18,7 @@ export function createSocketActionRegistrars(services) {
         },
         (socket) => {
             const {browser} = services.getRemotes();
-            return createBrowserRegistrar({browser})(socket);
+            return createBrowserRegistrar({browser, getConfig: services.getConfig})(socket);
         },
         (socket) => {
             const {adminActions} = services.getRemotes();
@@ -26,7 +26,7 @@ export function createSocketActionRegistrars(services) {
         },
         (socket) => {
             const {preview} = services.getRemotes();
-            return createPreviewEventRegistrar({preview})(socket);
+            return createPreviewEventRegistrar({preview, getConfig: services.getConfig})(socket);
         },
         (socket) => {
             const {samsung} = services.getRemotes();

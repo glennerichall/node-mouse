@@ -78,7 +78,14 @@ export const DEFAULT_PERSISTED_CONFIG = {
         touchDragHoldMs: 420,
         touchDragStillDistancePx: 8,
     },
+    browser: {
+        enabled: true,
+    },
+    keyboard: {
+        enabled: true,
+    },
     preview: {
+        enabled: true,
         width: 128,
         height: 84,
         fps: 6,

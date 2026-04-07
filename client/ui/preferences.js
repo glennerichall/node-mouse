@@ -25,12 +25,35 @@ mountRemoteAutoHideSwitcher();
 
 const remotesRoot = document.getElementById('preferences-remotes');
 let availableRemotes = [];
+const LOCAL_REMOTE_DEFINITIONS = [
+  { id: 'keyboard', labelKey: 'preferences.remote.keyboard' },
+];
+
+function mergeAvailableRemotes(remotes = []) {
+  const byId = new Map();
+
+  for (const remote of remotes) {
+    if (!remote?.id) {
+      continue;
+    }
+    byId.set(remote.id, remote);
+  }
+
+  for (const remote of LOCAL_REMOTE_DEFINITIONS) {
+    if (!byId.has(remote.id)) {
+      byId.set(remote.id, remote);
+    }
+  }
+
+  return Array.from(byId.values());
+}
 
 function t(key, params) {
   return getClientI18n().t(key, params);
 }
 
 function createRemoteVisibilityRow(remote) {
+  const serverEnabled = remote?.enabled !== false;
   const row = document.createElement('div');
   row.className = 'preferences-remote-row';
 
@@ -52,7 +75,8 @@ function createRemoteVisibilityRow(remote) {
     select.appendChild(option);
   }
 
-  select.value = getClientRemoteVisibility(remote.id, true) ? 'true' : 'false';
+  select.value = serverEnabled && getClientRemoteVisibility(remote.id, true) ? 'true' : 'false';
+  select.disabled = !serverEnabled;
   select.addEventListener('change', () => {
     setClientRemoteVisibility(remote.id, select.value === 'true');
   });
@@ -80,7 +104,7 @@ async function loadAvailableRemotes() {
   }
 
   const payload = await response.json();
-  availableRemotes = Array.isArray(payload?.remotes) ? payload.remotes : [];
+  availableRemotes = mergeAvailableRemotes(Array.isArray(payload?.remotes) ? payload.remotes : []);
   renderRemoteVisibilityList();
 }
 

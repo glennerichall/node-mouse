@@ -25,7 +25,8 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }) {
   let stopTimer = null;
   let keyboardPreviewActive = false;
 
-  const isPreviewEnabled = () => getClientRemoteVisibility('preview', true);
+  const isPreviewEnabled = () =>
+    getClientPreviewConfig().enabled !== false && getClientRemoteVisibility('preview', true);
 
   const getInactivityDelayMs = () => {
     const configuredDelay = Number(getClientPreviewConfig()?.hideDelayMs);
@@ -115,6 +116,11 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }) {
   socket.on('disconnect', stopPreview);
   window.addEventListener('beforeunload', stopPreview);
   onClientConfigChange(() => {
+    if (!isPreviewEnabled()) {
+      stopPreview();
+      return;
+    }
+
     if (isPreviewActive) {
       armInactivityStop();
     }

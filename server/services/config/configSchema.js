@@ -35,10 +35,34 @@ export const CONFIG_SCHEMA = {
       },
     },
   },
+  browser: {
+    title: 'Navigateur',
+    description: 'Active ou masque la remote navigateur pour tous les clients.',
+    fields: {
+      enabled: {
+        label: 'Activer la remote navigateur',
+        type: 'boolean',
+      },
+    },
+  },
+  keyboard: {
+    title: 'Clavier',
+    description: 'Active ou masque la remote clavier pour tous les clients.',
+    fields: {
+      enabled: {
+        label: 'Activer la remote clavier',
+        type: 'boolean',
+      },
+    },
+  },
   preview: {
     title: 'Apercu curseur',
     description: "Qualite et cadence de l'apercu diffuse au client.",
     fields: {
+      enabled: {
+        label: 'Activer le preview curseur',
+        type: 'boolean',
+      },
       width: {
         label: 'Largeur',
         type: 'integer',

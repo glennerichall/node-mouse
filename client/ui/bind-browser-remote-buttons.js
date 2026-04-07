@@ -1,5 +1,6 @@
 import {emitWithTimestamp} from "../core/socket-emit.js";
 import { bindTouchPassthrough } from '../touch/bind-touch-passthrough.js';
+import { getClientBrowserConfig, onClientConfigChange } from '../config/client-config.js';
 import {
     REMOTE_EVENT_BROWSER_OPEN,
     REMOTE_EVENT_KEYBOARD_KEY
@@ -40,6 +41,10 @@ export function bindBrowserRemoteButtons(
 
     bindTouchPassthrough(staticButtons, touchpad);
 
+    function isBrowserRemoteEnabled() {
+        return getClientBrowserConfig().enabled !== false;
+    }
+
     async function loadBrowserLaunchers() {
         if (!browserLaunchers) {
             return;
@@ -47,6 +52,10 @@ export function bindBrowserRemoteButtons(
 
         browserLaunchers.textContent = '';
         launcherButtons = [];
+
+        if (!isBrowserRemoteEnabled()) {
+            return;
+        }
 
         try {
             const response = await fetch('/api/admin/remotes/browsers', {
@@ -87,6 +96,9 @@ export function bindBrowserRemoteButtons(
     }
 
     void loadBrowserLaunchers();
+    onClientConfigChange(() => {
+        void loadBrowserLaunchers();
+    });
     
     btnBrowserBack.addEventListener('click', () =>
         emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, {key: 'left', modifiers: ['alt']}),

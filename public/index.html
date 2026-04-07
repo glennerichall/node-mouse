@@ -113,36 +113,33 @@
       </section>
     </section>
 
-    <section id="keyboard-panel" class="hidden" data-i18n-aria-label="main.keyboardPanelAria">
+    <section id="keyboard-panel" class="hidden" data-i18n-aria-label="main.touchEntryPanelAria">
       <div id="keyboard-panel-preview" class="is-empty" aria-hidden="true"></div>
       <div id="keyboard-text-mode" class="keyboard-mode">
-        <div class="keyboard-controls">
-          <button id="text-mode-esc" type="button" data-i18n="main.escape">Esc</button>
-          <button id="text-mode-tab" type="button" data-i18n="main.tab">Tab</button>
-          <button id="text-mode-shift" type="button" data-i18n="main.shift">Shift</button>
-          <button id="text-mode-alt" type="button" data-i18n="main.alt">Alt</button>
-          <button id="text-mode-ctrl" type="button" data-i18n="main.ctrl">Ctrl</button>
-        </div>
-        <textarea id="text-input" data-i18n-placeholder="main.textInputPlaceholder" placeholder="Saisir du texte a envoyer"></textarea>
-        <div class="keyboard-panel-actions">
+        <div class="keyboard-text-entry-row">
+          <textarea id="text-input" data-i18n-placeholder="main.textInputPlaceholder" placeholder="Saisir du texte a envoyer"></textarea>
           <button id="send-text" type="button" data-i18n="main.sendText">Envoyer</button>
         </div>
       </div>
       <div id="keyboard-live-mode" class="keyboard-mode hidden">
-        <div class="keyboard-controls">
-          <button id="live-mode-esc" type="button" data-i18n="main.escape">Esc</button>
-          <button id="live-mode-tab" type="button" data-i18n="main.tab">Tab</button>
-          <button id="live-mode-shift" type="button" data-i18n="main.shift">Shift</button>
-          <button id="live-mode-alt" type="button" data-i18n="main.alt">Alt</button>
-          <button id="live-mode-ctrl" type="button" data-i18n="main.ctrl">Ctrl</button>
-        </div>
         <input id="live-text-input" type="text" enterkeyhint="done" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-i18n-placeholder="main.liveKeyboardPlaceholder" placeholder="Tapez ici" />
+      </div>
+    </section>
+
+    <section id="keyboard-shortcuts-bar" data-i18n-aria-label="main.touchEntryPanelAria">
+      <div class="keyboard-controls">
+        <button id="keyboard-esc" type="button" data-i18n="main.escape">Esc</button>
+        <button id="keyboard-tab" type="button" data-i18n="main.tab">Tab</button>
+        <button id="keyboard-enter" type="button" data-i18n="main.enter">Entree</button>
+        <button id="keyboard-shift" type="button" data-i18n="main.shift">Shift</button>
+        <button id="keyboard-alt" type="button" data-i18n="main.alt">Alt</button>
+        <button id="keyboard-ctrl" type="button" data-i18n="main.ctrl">Ctrl</button>
       </div>
     </section>
 
     <nav id="menu" data-i18n-aria-label="main.menuAria">
       <button id="btn-text-entry" type="button" data-i18n="main.textEntry">Saisie texte</button>
-      <button id="btn-live-keyboard" type="button" data-i18n="main.keyboard">Clavier</button>
+      <button id="btn-live-keyboard" type="button" data-i18n="main.touchEntry">Saisie touches</button>
     </nav>
 
     <section id="connection-overlay" aria-live="polite">

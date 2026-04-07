@@ -6,21 +6,18 @@ import {
 
 export function bindKeyboardPanel(socket, {
   keyboardPanel,
+  keyboardShortcutsBar,
   keyboardPanelPreview,
   keyboardTextMode,
   keyboardLiveMode,
   textInput,
   liveTextInput,
-  textModeEsc,
-  textModeTab,
-  textModeShift,
-  textModeAlt,
-  textModeCtrl,
-  liveModeEsc,
-  liveModeTab,
-  liveModeShift,
-  liveModeAlt,
-  liveModeCtrl,
+  keyboardEsc,
+  keyboardTab,
+  keyboardEnter,
+  keyboardShift,
+  keyboardAlt,
+  keyboardCtrl,
   btnTextEntry,
   btnLiveKeyboard,
   btnSendText,
@@ -33,6 +30,52 @@ export function bindKeyboardPanel(socket, {
     shift: false,
   };
   let activeMode = '';
+
+  function forceViewportLayout(input) {
+    if (!input) {
+      return;
+    }
+
+    const run = () => {
+      // Force a layout read before asking the browser to reposition the field.
+      void document.body.offsetHeight;
+      input.scrollIntoView({
+        block: 'end',
+        inline: 'nearest',
+      });
+      window.dispatchEvent(new Event('resize'));
+    };
+
+    window.setTimeout(run, 50);
+    window.setTimeout(run, 250);
+  }
+
+  function getActiveInput() {
+    return activeMode === 'live' ? liveTextInput : textInput;
+  }
+
+  function restoreInputFocus() {
+    const input = getActiveInput();
+    if (!input || keyboardPanel.classList.contains('hidden')) {
+      return;
+    }
+
+    window.setTimeout(() => {
+      input.focus();
+    }, 0);
+  }
+
+  function preserveKeyboard(button) {
+    if (!button) {
+      return;
+    }
+
+    const handleMouseDown = (event) => {
+      event.preventDefault();
+    };
+
+    button.addEventListener('mousedown', handleMouseDown);
+  }
 
   function syncModeButtons(mode = '') {
     btnTextEntry.classList.toggle('is-active', mode === 'text');
@@ -72,8 +115,11 @@ export function bindKeyboardPanel(socket, {
     setPreviewActive(true);
 
     const target = mode === 'live' ? liveTextInput : textInput;
-    updatePreview(mode === 'text' ? textInput.value : '');
-    setTimeout(() => target.focus(), 40);
+    updatePreview('');
+    setTimeout(() => {
+      target.focus();
+      forceViewportLayout(target);
+    }, 40);
   }
 
   function togglePanel(mode) {
@@ -114,12 +160,9 @@ export function bindKeyboardPanel(socket, {
 
   function syncModifierButtons() {
     const buttonMap = [
-      [textModeShift, modifierState.shift],
-      [liveModeShift, modifierState.shift],
-      [textModeAlt, modifierState.alt],
-      [liveModeAlt, modifierState.alt],
-      [textModeCtrl, modifierState.control],
-      [liveModeCtrl, modifierState.control],
+      [keyboardShift, modifierState.shift],
+      [keyboardAlt, modifierState.alt],
+      [keyboardCtrl, modifierState.control],
     ];
 
     for (const [button, active] of buttonMap) {
@@ -132,6 +175,7 @@ export function bindKeyboardPanel(socket, {
     modifierState[modifier] = !modifierState[modifier];
     syncModifierButtons();
     setPreviewActive(true);
+    restoreInputFocus();
   }
 
   function pressKeyboardAction(key) {
@@ -144,21 +188,28 @@ export function bindKeyboardPanel(socket, {
       modifierState.control = false;
       syncModifierButtons();
     }
+    restoreInputFocus();
   }
+
+  [
+    keyboardEsc,
+    keyboardTab,
+    keyboardEnter,
+    keyboardShift,
+    keyboardAlt,
+    keyboardCtrl,
+    btnSendText,
+  ].forEach(preserveKeyboard);
 
   btnTextEntry.addEventListener('click', () => togglePanel('text'));
   btnLiveKeyboard.addEventListener('click', () => togglePanel('live'));
   btnSendText.addEventListener('click', sendText);
-  textModeEsc.addEventListener('click', () => pressKeyboardAction('escape'));
-  liveModeEsc.addEventListener('click', () => pressKeyboardAction('escape'));
-  textModeTab.addEventListener('click', () => pressKeyboardAction('tab'));
-  liveModeTab.addEventListener('click', () => pressKeyboardAction('tab'));
-  textModeShift.addEventListener('click', () => toggleModifier('shift'));
-  liveModeShift.addEventListener('click', () => toggleModifier('shift'));
-  textModeAlt.addEventListener('click', () => toggleModifier('alt'));
-  liveModeAlt.addEventListener('click', () => toggleModifier('alt'));
-  textModeCtrl.addEventListener('click', () => toggleModifier('control'));
-  liveModeCtrl.addEventListener('click', () => toggleModifier('control'));
+  keyboardEsc.addEventListener('click', () => pressKeyboardAction('escape'));
+  keyboardTab.addEventListener('click', () => pressKeyboardAction('tab'));
+  keyboardEnter.addEventListener('click', () => pressKeyboardAction('enter'));
+  keyboardShift.addEventListener('click', () => toggleModifier('shift'));
+  keyboardAlt.addEventListener('click', () => toggleModifier('alt'));
+  keyboardCtrl.addEventListener('click', () => toggleModifier('control'));
 
   textInput.addEventListener('keydown', (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
@@ -168,21 +219,18 @@ export function bindKeyboardPanel(socket, {
   });
 
   textInput.addEventListener('input', () => {
-    updatePreview(textInput.value);
     setPreviewActive(true);
+  });
+
+  textInput.addEventListener('focus', () => {
+    forceViewportLayout(textInput);
   });
 
   liveTextInput.addEventListener('beforeinput', (event) => {
     const inputType = String(event.inputType || '');
 
     if (inputType.startsWith('delete')) {
-      event.preventDefault();
       pressKeyboardAction('backspace');
-      if (activeMode === 'text') {
-        updatePreview(keyboardPanelPreview.textContent.slice(0, -1));
-      } else {
-        updatePreview('');
-      }
       setPreviewActive(true);
       return;
     }
@@ -192,9 +240,7 @@ export function bindKeyboardPanel(socket, {
       return;
     }
 
-    event.preventDefault();
     emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_TEXT, { text });
-    updatePreview(activeMode === 'text' ? `${keyboardPanelPreview.textContent}${text}` : '');
     setPreviewActive(true);
   });
 
@@ -211,10 +257,8 @@ export function bindKeyboardPanel(socket, {
     }
   });
 
-  liveTextInput.addEventListener('input', () => {
-    if (liveTextInput.value) {
-      liveTextInput.value = '';
-    }
+  liveTextInput.addEventListener('focus', () => {
+    forceViewportLayout(liveTextInput);
   });
 
   syncModifierButtons();

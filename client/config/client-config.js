@@ -6,7 +6,14 @@ const DEFAULT_CLIENT_CONFIG = {
     touchDragHoldMs: 420,
     touchDragStillDistancePx: 8,
   },
+  browser: {
+    enabled: true,
+  },
+  keyboard: {
+    enabled: true,
+  },
   preview: {
+    enabled: true,
     hideDelayMs: 10000,
   },
 };
@@ -153,6 +160,14 @@ export function getClientSamsungConfig() {
 
 export function getClientPreviewConfig() {
   return configState.preview || DEFAULT_CLIENT_CONFIG.preview;
+}
+
+export function getClientBrowserConfig() {
+  return configState.browser || DEFAULT_CLIENT_CONFIG.browser;
+}
+
+export function getClientKeyboardConfig() {
+  return configState.keyboard || DEFAULT_CLIENT_CONFIG.keyboard;
 }
 
 export function getClientSystemConfig() {

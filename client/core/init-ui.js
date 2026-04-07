@@ -9,7 +9,13 @@ import { bindPreviewStream } from '../preview/preview-stream.js';
 import { bindClientNotifications } from '../ui/notifications/bind-client-notifications.js';
 import { bindAdminDrawer } from '../ui/admin-drawer.js';
 import { bindAdminVersion } from '../ui/admin-version.js';
-import { getClientInputConfig } from '../config/client-config.js';
+import {
+  getClientBrowserConfig,
+  getClientInputConfig,
+  getClientKeyboardConfig,
+  getClientPreviewConfig,
+  onClientConfigChange,
+} from '../config/client-config.js';
 import {
   getClientHandedness,
   getClientRemoteAutoHide,
@@ -31,12 +37,29 @@ export function initUi(socket) {
   const SHOW_REMOTE_DELAY = 500;
 
   const applyRemoteVisibilityState = () => {
-    const browserVisible = getClientRemoteVisibility('browser', true);
+    const browserVisible = getClientBrowserConfig().enabled !== false
+      && getClientRemoteVisibility('browser', true);
+    const keyboardVisible = getClientKeyboardConfig().enabled !== false
+      && getClientRemoteVisibility('keyboard', true);
     const samsungVisible = getClientRemoteVisibility('samsung', true);
-    const previewVisible = getClientRemoteVisibility('preview', true);
+    const previewVisible = getClientPreviewConfig().enabled !== false
+      && getClientRemoteVisibility('preview', true);
 
     if (dom.browserShortcuts) {
       dom.browserShortcuts.hidden = !browserVisible;
+    }
+    dom.app?.classList.toggle('keyboard-remote-hidden', !keyboardVisible);
+    if (dom.menu) {
+      dom.menu.style.display = keyboardVisible ? '' : 'none';
+    }
+    if (dom.keyboardShortcutsBar) {
+      dom.keyboardShortcutsBar.style.display = keyboardVisible ? '' : 'none';
+    }
+    if (dom.keyboardPanel) {
+      if (!keyboardVisible) {
+        dom.keyboardPanel.classList.add('hidden');
+      }
+      dom.keyboardPanel.style.display = keyboardVisible ? '' : 'none';
     }
     if (dom.tvControls) {
       dom.tvControls.hidden = !samsungVisible;
@@ -58,6 +81,7 @@ export function initUi(socket) {
     }
     if (!getClientRemoteAutoHide()) {
       dom.remoteStack.classList.remove('is-hidden');
+      dom.scrollZoneIndicator?.classList.remove('is-hidden');
       return;
     }
     if (hideRemoteTimer) {
@@ -69,6 +93,7 @@ export function initUi(socket) {
     }
     hideRemoteTimer = window.setTimeout(() => {
       dom.remoteStack.classList.add('is-hidden');
+      dom.scrollZoneIndicator?.classList.add('is-hidden');
       hideRemoteTimer = null;
     }, REMOTE_HIDE_DELAY_MS);
   };
@@ -86,6 +111,7 @@ export function initUi(socket) {
     }
     showRemoteTimer = window.setTimeout(() => {
       dom.remoteStack.classList.remove('is-hidden');
+      dom.scrollZoneIndicator?.classList.remove('is-hidden');
       showRemoteTimer = null;
     }, SHOW_REMOTE_DELAY);
   };
@@ -101,6 +127,7 @@ export function initUi(socket) {
         showRemoteTimer = null;
       }
       dom.remoteStack?.classList.remove('is-hidden');
+      dom.scrollZoneIndicator?.classList.remove('is-hidden');
     }
   };
 
@@ -128,6 +155,7 @@ export function initUi(socket) {
   bindAdminVersion(dom.adminAppVersion);
   onClientRemoteAutoHideChange(applyRemoteAutoHideState);
   onClientRemoteVisibilityChange(applyRemoteVisibilityState);
+  onClientConfigChange(applyRemoteVisibilityState);
   applyRemoteAutoHideState();
   applyRemoteVisibilityState();
 

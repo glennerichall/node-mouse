@@ -3,11 +3,16 @@ import {
   REMOTE_EVENT_PREVIEW_STOP,
 } from '../../../utils/shared/remoteCommands.js';
 
-export function createPreviewEventRegistrar({ preview }) {
+export function createPreviewEventRegistrar({ preview, getConfig = () => ({}) }) {
   return function registerPreviewEvents(socket) {
     let previewSession = null;
 
     function startPreview() {
+      if (getConfig()?.preview?.enabled === false) {
+        stopPreview();
+        return;
+      }
+
       if (previewSession) {
         return;
       }
