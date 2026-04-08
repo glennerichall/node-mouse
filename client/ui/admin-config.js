@@ -97,6 +97,18 @@ function getCurrentInputValue(input, field) {
   return normalizeFieldValue(field, field.type === 'boolean' ? input.checked : input.value);
 }
 
+function isDeferredSyncField(field) {
+  return field?.type !== 'boolean';
+}
+
+function isFieldBeingEdited(input, field) {
+  if (!input || !isDeferredSyncField(field)) {
+    return false;
+  }
+
+  return document.activeElement === input;
+}
+
 function setInputValue(input, field, value) {
   if (!input) {
     return;
@@ -232,7 +244,9 @@ function applyConfigEntry(pathKey, value) {
     syncTimers.delete(pathKey);
   }
 
-  setInputValue(context.input, context.field, value);
+  if (!isFieldBeingEdited(context.input, context.field)) {
+    setInputValue(context.input, context.field, value);
+  }
   syncResetButtonVisibility(context);
   syncSamsungFieldAvailability(pathKey, context.input, context.resetButton);
 }
@@ -573,11 +587,15 @@ function renderConfigForm(config, schema) {
 
       input?.addEventListener('input', () => {
         syncVisibility();
-        if (field.type !== 'boolean') {
-          scheduleFieldSync(fieldContext);
-        }
       });
       input?.addEventListener('change', () => {
+        syncVisibility();
+        scheduleFieldSync(fieldContext, {immediate: true});
+      });
+      input?.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' || !isDeferredSyncField(field)) {
+          return;
+        }
         syncVisibility();
         scheduleFieldSync(fieldContext, {immediate: true});
       });

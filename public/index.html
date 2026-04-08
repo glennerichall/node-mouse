@@ -58,61 +58,82 @@
         <img id="client-watermark" src="/icon-192.png" alt="" aria-hidden="true" width="34" height="34" />
         <div id="touch-chrome">
           <div id="remote-stack">
-            <section id="browser-shortcuts" class="remote-panel" data-i18n-aria-label="main.browserShortcutsAria">
-              <p class="remote-panel-title" data-i18n="main.browserShortcutsLabel">Navigateur</p>
-              <div class="browser-actions">
-                <div id="browser-launchers" class="remote-grid-row remote-browser-launchers"></div>
-                <div class="remote-grid-row">
-                  <button id="btn-close-tab" type="button" data-i18n-aria-label="main.closeTab" data-i18n-title="main.shortcut.closeTab">✕</button>
-                  <button id="btn-new-tab" type="button" data-i18n-aria-label="main.newTab" data-i18n-title="main.shortcut.newTab">＋</button>
-                  <button id="btn-fullscreen" type="button" data-i18n-aria-label="main.fullscreen" data-i18n-title="main.shortcut.fullscreen">⛶</button>
-                </div>
-                <div class="remote-grid-row">
-                  <button id="btn-prev-tab" type="button" data-i18n-aria-label="main.prevTab" data-i18n-title="main.shortcut.prevTab">◀</button>
-                  <button id="btn-next-tab" type="button" data-i18n-aria-label="main.nextTab" data-i18n-title="main.shortcut.nextTab">▶</button>
-                </div>
-                <div class="remote-grid-row">
-                  <button id="btn-browser-back" type="button" data-i18n-aria-label="main.browserBack" data-i18n-title="main.shortcut.browserBack">⟵</button>
-                  <button id="btn-browser-forward" type="button" data-i18n-aria-label="main.browserForward" data-i18n-title="main.shortcut.browserForward">⟶</button>
-                  <button id="btn-address-bar" type="button" data-i18n-aria-label="main.addressBar" data-i18n-title="main.shortcut.addressBar">⌕</button>
-                  <button id="btn-hard-reload" type="button" data-i18n-aria-label="main.reload" data-i18n-title="main.shortcut.reload">↻</button>
-                </div>
-                <div class="remote-grid-row">
-                  <button id="btn-video-play-pause" type="button" data-i18n-aria-label="main.videoPlayPause" data-i18n-title="main.shortcut.videoPlayPause">⏯</button>
-                  <button id="btn-video-mute" type="button" data-i18n-aria-label="main.videoMute" data-i18n-title="main.shortcut.videoMute">🔇︎</button>
-                  <button id="btn-video-fullscreen" type="button" data-i18n-aria-label="main.videoFullscreen" data-i18n-title="main.shortcut.videoFullscreen">⤢</button>
-                </div>
-              </div>
-            </section>
-            <section id="tv-controls" class="remote-panel" data-i18n-aria-label="main.tvControlsAria">
-              <p class="remote-panel-title" data-i18n="main.tvSectionLabel">Samsung TV</p>
-              <div class="tv-actions">
-                <div class="remote-grid-row">
-                  <button id="btn-samsung-on" type="button" data-i18n-aria-label="main.samsungOn">On</button>
-                  <button id="btn-samsung-off" type="button" data-i18n-aria-label="main.samsungOff" data-samsung-requires-on="true">Off</button>
-                </div>
-                <div class="remote-grid-row">
-                  <button id="btn-samsung-input" type="button" data-i18n-aria-label="main.samsungInput" data-samsung-requires-on="true">Source</button>
-                  <button id="btn-samsung-enter" type="button" data-i18n-aria-label="main.samsungEnter" data-samsung-requires-on="true">Enter</button>
-                  <button id="btn-samsung-pc-input" type="button" data-i18n-aria-label="main.samsungPcInput" data-samsung-requires-on="true">PC</button>
-                </div>
-                <div class="remote-grid-row">
-                  <button id="btn-samsung-volup" type="button" data-i18n-aria-label="main.samsungVolUp" data-samsung-requires-on="true">Vol+</button>
-                  <button id="btn-samsung-voldown" type="button" data-i18n-aria-label="main.samsungVolDown" data-samsung-requires-on="true">Vol-</button>
-                  <button id="btn-samsung-mute" type="button" data-i18n-aria-label="main.samsungMute" data-samsung-requires-on="true">Mute</button>
+            <section id="browser-shortcuts" class="remote-panel remote-panel-collapsible" data-i18n-aria-label="main.browserShortcutsAria">
+              <button class="remote-panel-toggle" type="button" aria-expanded="true">
+                <span class="remote-panel-title" data-i18n="main.browserShortcutsLabel">Navigateur</span>
+                <span class="remote-panel-chevron" aria-hidden="true"></span>
+              </button>
+              <div class="remote-panel-content">
+                <div class="remote-panel-content-inner">
+                  <div class="browser-actions">
+                    <div id="browser-launchers" class="remote-grid-row remote-browser-launchers"></div>
+                    <div class="remote-grid-row">
+                      <button id="btn-close-tab" type="button" data-i18n-aria-label="main.closeTab" data-i18n-title="main.shortcut.closeTab">✕</button>
+                      <button id="btn-new-tab" type="button" data-i18n-aria-label="main.newTab" data-i18n-title="main.shortcut.newTab">＋</button>
+                      <button id="btn-fullscreen" type="button" data-i18n-aria-label="main.fullscreen" data-i18n-title="main.shortcut.fullscreen">⛶</button>
+                    </div>
+                    <div class="remote-grid-row">
+                      <button id="btn-prev-tab" type="button" data-i18n-aria-label="main.prevTab" data-i18n-title="main.shortcut.prevTab">◀</button>
+                      <button id="btn-next-tab" type="button" data-i18n-aria-label="main.nextTab" data-i18n-title="main.shortcut.nextTab">▶</button>
+                    </div>
+                    <div class="remote-grid-row">
+                      <button id="btn-browser-back" type="button" data-i18n-aria-label="main.browserBack" data-i18n-title="main.shortcut.browserBack">⟵</button>
+                      <button id="btn-browser-forward" type="button" data-i18n-aria-label="main.browserForward" data-i18n-title="main.shortcut.browserForward">⟶</button>
+                      <button id="btn-address-bar" type="button" data-i18n-aria-label="main.addressBar" data-i18n-title="main.shortcut.addressBar">⌕</button>
+                      <button id="btn-hard-reload" type="button" data-i18n-aria-label="main.reload" data-i18n-title="main.shortcut.reload">↻</button>
+                    </div>
+                    <div class="remote-grid-row">
+                      <button id="btn-video-play-pause" type="button" data-i18n-aria-label="main.videoPlayPause" data-i18n-title="main.shortcut.videoPlayPause">⏯</button>
+                      <button id="btn-video-mute" type="button" data-i18n-aria-label="main.videoMute" data-i18n-title="main.shortcut.videoMute">🔇︎</button>
+                      <button id="btn-video-fullscreen" type="button" data-i18n-aria-label="main.videoFullscreen" data-i18n-title="main.shortcut.videoFullscreen">⤢</button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </section>
-            <section id="system-controls" class="remote-panel" data-i18n-aria-label="main.systemControlsAria">
-              <p class="remote-panel-title" data-i18n="main.systemSectionLabel">Systeme</p>
-              <div class="tv-actions">
-                <div class="remote-grid-row">
-                  <button id="btn-system-show-desktop" type="button" data-i18n-aria-label="main.systemShowDesktop">Bureau</button>
-                  <button id="btn-system-start-menu" type="button" data-i18n-aria-label="main.systemStartMenu">Start</button>
+            <section id="tv-controls" class="remote-panel remote-panel-collapsible" data-i18n-aria-label="main.tvControlsAria">
+              <button class="remote-panel-toggle" type="button" aria-expanded="false">
+                <span class="remote-panel-title" data-i18n="main.tvSectionLabel">Samsung TV</span>
+                <span class="remote-panel-chevron" aria-hidden="true"></span>
+              </button>
+              <div class="remote-panel-content is-collapsed">
+                <div class="remote-panel-content-inner">
+                  <div class="tv-actions">
+                    <div class="remote-grid-row">
+                      <button id="btn-samsung-on" type="button" data-i18n-aria-label="main.samsungOn">On</button>
+                      <button id="btn-samsung-off" type="button" data-i18n-aria-label="main.samsungOff" data-samsung-requires-on="true">Off</button>
+                    </div>
+                    <div class="remote-grid-row">
+                      <button id="btn-samsung-input" type="button" data-i18n-aria-label="main.samsungInput" data-samsung-requires-on="true">Source</button>
+                      <button id="btn-samsung-enter" type="button" data-i18n-aria-label="main.samsungEnter" data-samsung-requires-on="true">Enter</button>
+                      <button id="btn-samsung-pc-input" type="button" data-i18n-aria-label="main.samsungPcInput" data-samsung-requires-on="true">PC</button>
+                    </div>
+                    <div class="remote-grid-row">
+                      <button id="btn-samsung-volup" type="button" data-i18n-aria-label="main.samsungVolUp" data-samsung-requires-on="true">Vol+</button>
+                      <button id="btn-samsung-voldown" type="button" data-i18n-aria-label="main.samsungVolDown" data-samsung-requires-on="true">Vol-</button>
+                      <button id="btn-samsung-mute" type="button" data-i18n-aria-label="main.samsungMute" data-samsung-requires-on="true">Mute</button>
+                    </div>
+                  </div>
                 </div>
-                <div class="remote-grid-row">
-                  <button id="btn-system-window-left" type="button" data-i18n-aria-label="main.systemWindowLeft">◀</button>
-                  <button id="btn-system-window-right" type="button" data-i18n-aria-label="main.systemWindowRight">▶</button>
+              </div>
+            </section>
+            <section id="system-controls" class="remote-panel remote-panel-collapsible" data-i18n-aria-label="main.systemControlsAria">
+              <button class="remote-panel-toggle" type="button" aria-expanded="false">
+                <span class="remote-panel-title" data-i18n="main.systemSectionLabel">Systeme</span>
+                <span class="remote-panel-chevron" aria-hidden="true"></span>
+              </button>
+              <div class="remote-panel-content is-collapsed">
+                <div class="remote-panel-content-inner">
+                  <div class="tv-actions">
+                    <div class="remote-grid-row">
+                      <button id="btn-system-show-desktop" type="button" data-i18n-aria-label="main.systemShowDesktop">Bureau</button>
+                      <button id="btn-system-start-menu" type="button" data-i18n-aria-label="main.systemStartMenu">Start</button>
+                    </div>
+                    <div class="remote-grid-row">
+                      <button id="btn-system-window-left" type="button" data-i18n-aria-label="main.systemWindowLeft">◀</button>
+                      <button id="btn-system-window-right" type="button" data-i18n-aria-label="main.systemWindowRight">▶</button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </section>

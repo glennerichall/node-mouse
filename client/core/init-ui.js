@@ -9,6 +9,7 @@ import { bindPreviewStream } from '../preview/preview-stream.js';
 import { bindClientNotifications } from '../ui/notifications/bind-client-notifications.js';
 import { bindAdminDrawer } from '../ui/admin-drawer.js';
 import { bindAdminVersion } from '../ui/admin-version.js';
+import { bindRemoteAccordion } from '../ui/bind-remote-accordion.js';
 import {
   getClientBrowserConfig,
   getClientInputConfig,
@@ -29,6 +30,7 @@ import {
 export function initUi(socket) {
   const dom = getDom();
   const canvasUI = createCanvasUI(dom.touchpad);
+  const remoteAccordion = bindRemoteAccordion(dom);
   initClientRemoteAutoHide();
   initClientRemoteVisibilityState();
   let hideRemoteTimer = null;
@@ -70,6 +72,7 @@ export function initUi(socket) {
         dom.cursorPreview.classList.remove('is-visible');
       }
     }
+    remoteAccordion.syncVisiblePanels();
   };
 
   const hideRemotes = (interactionKind = 'move') => {

@@ -352,6 +352,12 @@ html[data-theme="light"] #scroll-zone-label {
   pointer-events: none;
 }
 
+.remote-panel-collapsible {
+  gap: 0;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
 #browser-shortcuts {
   display: grid;
   pointer-events: none;
@@ -379,6 +385,70 @@ html[data-theme="light"] .remote-panel {
   opacity: 0.74;
 }
 
+.remote-panel-toggle {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: inherit;
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) 10px;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 4px 4px 10px;
+  pointer-events: auto;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.remote-panel-toggle:active {
+  transform: none;
+}
+
+.remote-panel-toggle .remote-panel-title {
+  grid-column: 2;
+  text-align: center;
+}
+
+.remote-panel-chevron {
+  grid-column: 3;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid rgba(240, 244, 247, 0.68);
+  border-bottom: 2px solid rgba(240, 244, 247, 0.68);
+  transform: rotate(45deg);
+  transition: transform 220ms ease, opacity 180ms ease;
+  opacity: 0.72;
+}
+
+html[data-theme="light"] .remote-panel-chevron {
+  border-right-color: rgba(24, 35, 44, 0.52);
+  border-bottom-color: rgba(24, 35, 44, 0.52);
+}
+
+.remote-panel-toggle[aria-expanded="true"] .remote-panel-chevron {
+  transform: rotate(-135deg);
+  opacity: 0.88;
+}
+
+.remote-panel-content {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 240ms ease, opacity 180ms ease, padding-top 180ms ease;
+  opacity: 1;
+  padding-top: 2px;
+}
+
+.remote-panel-content.is-collapsed {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  padding-top: 0;
+}
+
+.remote-panel-content-inner {
+  overflow: hidden;
+}
+
 .remote-panel-actions {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -391,7 +461,7 @@ html[data-theme="light"] .remote-panel {
   gap: 6px;
 }
 
-#browser-shortcuts button,
+.browser-actions button,
 .tv-actions button,
 #menu button,
 #keyboard-panel button {
@@ -409,7 +479,7 @@ html[data-theme="light"] .remote-panel {
 }
 
 #left-menu button:disabled,
-#browser-shortcuts button:disabled,
+.browser-actions button:disabled,
 .tv-actions button:disabled,
 #menu button:disabled,
 #keyboard-panel button:disabled {
@@ -418,20 +488,20 @@ html[data-theme="light"] .remote-panel {
   filter: saturate(0.55);
 }
 
-#browser-shortcuts button,
+.browser-actions button,
 .tv-actions button {
   width: 100%;
   min-width: 0;
   height: 30px;
 }
 
-#browser-shortcuts button:active,
+.browser-actions button:active,
 .tv-actions button:active {
   transform: translateY(1px);
   background: rgba(56, 73, 85, 0.96);
 }
 
-html[data-theme="light"] #browser-shortcuts button,
+html[data-theme="light"] .browser-actions button,
 html[data-theme="light"] .tv-actions button,
 html[data-theme="light"] #menu button,
 html[data-theme="light"] #keyboard-panel button {
@@ -439,7 +509,7 @@ html[data-theme="light"] #keyboard-panel button {
   background: rgba(216, 229, 237, 0.96);
 }
 
-html[data-theme="light"] #browser-shortcuts button:active,
+html[data-theme="light"] .browser-actions button:active,
 html[data-theme="light"] .tv-actions button:active,
 html[data-theme="light"] #menu button:active,
 html[data-theme="light"] #keyboard-panel button:active {
@@ -447,14 +517,14 @@ html[data-theme="light"] #keyboard-panel button:active {
 }
 
 #left-menu button:disabled:active,
-#browser-shortcuts button:disabled:active,
+.browser-actions button:disabled:active,
 .tv-actions button:disabled:active,
 #menu button:disabled:active,
 #keyboard-panel button:disabled:active {
   transform: none;
 }
 
-#browser-shortcuts button {
+.browser-actions button {
   pointer-events: auto;
   line-height: 1;
 }
