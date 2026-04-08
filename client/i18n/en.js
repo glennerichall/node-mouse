@@ -122,6 +122,7 @@ export const en = {
   'main.sendText': 'Send',
   'main.menuAria': 'Actions',
   'main.textEntry': 'Text entry',
+  'main.touchEntry': 'Touch entry',
   'main.keyboard': 'Keyboard',
   'main.escape': 'Esc',
   'main.tab': 'Tab',
