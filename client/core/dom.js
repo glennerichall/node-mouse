@@ -72,8 +72,6 @@ function getSystemRemoteDom() {
     btnSystemWindowLeft: getElement('btn-system-window-left'),
     btnSystemWindowRight: getElement('btn-system-window-right'),
     btnSystemStartMenu: getElement('btn-system-start-menu'),
-    btnSystemSettings: getElement('btn-system-settings'),
-    btnSystemNotifications: getElement('btn-system-notifications'),
   };
 }
 

@@ -9,8 +9,6 @@ export function bindSystemRemoteButtons(
     btnSystemWindowLeft,
     btnSystemWindowRight,
     btnSystemStartMenu,
-    btnSystemSettings,
-    btnSystemNotifications,
     touchpad,
   },
 ) {
@@ -19,8 +17,6 @@ export function bindSystemRemoteButtons(
     btnSystemWindowLeft,
     btnSystemWindowRight,
     btnSystemStartMenu,
-    btnSystemSettings,
-    btnSystemNotifications,
   ].filter(Boolean);
 
   bindTouchPassthrough(buttons, touchpad);
@@ -36,11 +32,5 @@ export function bindSystemRemoteButtons(
   );
   btnSystemStartMenu?.addEventListener('click', () =>
     emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'command' }),
-  );
-  btnSystemSettings?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'i', modifiers: ['command'] }),
-  );
-  btnSystemNotifications?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'a', modifiers: ['command'] }),
   );
 }

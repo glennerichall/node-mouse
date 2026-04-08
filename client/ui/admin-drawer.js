@@ -1,7 +1,7 @@
 const EDGE_START_PX = 46;
-const PANEL_CLOSE_EDGE_PX = 46;
 const SWIPE_OPEN_PX = 64;
 const SWIPE_CLOSE_PX = 54;
+const SWIPE_INTENT_PX = 12;
 const MAX_VERTICAL_DRIFT_PX = 44;
 
 export function bindAdminDrawer({ app, touchpad, scrim, adminPanel }) {
@@ -30,30 +30,28 @@ export function bindAdminDrawer({ app, touchpad, scrim, adminPanel }) {
     const localX = t.clientX - rect.left;
     const isOpen = app.classList.contains('admin-drawer-open');
     const fromLeftEdge = localX >= 0 && localX <= EDGE_START_PX;
-    const panelRect = adminPanel?.getBoundingClientRect?.();
-    const fromPanelCloseEdge = isOpen
-      && panelRect
-      && t.clientX >= panelRect.right - PANEL_CLOSE_EDGE_PX
-      && t.clientX <= panelRect.right;
 
     if (!isOpen && !fromLeftEdge) {
       gesture = null;
       return;
     }
 
-    if (isOpen && !fromPanelCloseEdge) {
+    if (isOpen && !adminPanel?.contains(event.target)) {
       gesture = null;
       return;
     }
 
-    event.preventDefault();
-    event.stopImmediatePropagation();
+    if (!isOpen) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
 
     gesture = {
       startX: t.clientX,
       startY: t.clientY,
       mode: isOpen ? 'close' : 'open',
       cancelled: false,
+      engaged: !isOpen,
     };
   }
 
@@ -62,9 +60,6 @@ export function bindAdminDrawer({ app, touchpad, scrim, adminPanel }) {
       return;
     }
 
-    event.preventDefault();
-    event.stopImmediatePropagation();
-
     const t = event.touches[0];
     const dx = t.clientX - gesture.startX;
     const dy = t.clientY - gesture.startY;
@@ -72,6 +67,20 @@ export function bindAdminDrawer({ app, touchpad, scrim, adminPanel }) {
       gesture.cancelled = true;
       return;
     }
+
+    if (!gesture.engaged) {
+      const horizontalIntent = Math.abs(dx) >= SWIPE_INTENT_PX && Math.abs(dx) > Math.abs(dy);
+      const validDirection = gesture.mode === 'open' ? dx > 0 : dx < 0;
+
+      if (!horizontalIntent || !validDirection) {
+        return;
+      }
+
+      gesture.engaged = true;
+    }
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
 
     if (gesture.mode === 'open' && dx >= SWIPE_OPEN_PX) {
       openDrawer();
@@ -86,7 +95,7 @@ export function bindAdminDrawer({ app, touchpad, scrim, adminPanel }) {
   }
 
   function onTouchEnd(event) {
-    if (gesture) {
+    if (gesture?.engaged) {
       event?.preventDefault?.();
       event?.stopImmediatePropagation?.();
     }
