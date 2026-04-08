@@ -46,12 +46,16 @@
         <button id="btn-open-preferences-page" type="button" data-i18n="main.openPreferences" data-i18n-title="main.openPreferencesTitle" data-i18n-aria-label="main.openPreferencesTitle">Preferences</button>
         <div class="admin-drawer-footer">
           <p id="admin-actions-disabled-message" class="admin-drawer-message hidden" data-i18n="main.adminActionsDisabledMessage">Les actions admin sont desactivees sur ce serveur.</p>
-          <p id="admin-app-version" data-i18n-aria-label="common.version" data-i18n="main.adminAppVersion">Version: --</p>
+          <div class="admin-version-row">
+            <img class="admin-version-icon" src="/icon-192.png" alt="" aria-hidden="true" width="18" height="18" />
+            <p id="admin-app-version" data-i18n-aria-label="common.version" data-i18n="main.adminAppVersion">Version: --</p>
+          </div>
         </div>
       </aside>
 
       <section id="touch-area">
         <div id="admin-drawer-scrim" aria-hidden="true"></div>
+        <img id="client-watermark" src="/icon-192.png" alt="" aria-hidden="true" width="34" height="34" />
         <div id="touch-chrome">
           <div id="remote-stack">
             <section id="browser-shortcuts" class="remote-panel" data-i18n-aria-label="main.browserShortcutsAria">

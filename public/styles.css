@@ -161,11 +161,27 @@ html[data-theme="light"] #left-menu button:active {
 
 #admin-app-version {
   margin: 0;
-  padding: 8px 6px 2px;
+  padding: 0;
   opacity: 0.72;
   font-size: 0.78rem;
   line-height: 1.2;
   text-align: center;
+}
+
+.admin-version-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 6px 2px;
+}
+
+.admin-version-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  border-radius: 5px;
+  opacity: 0.88;
 }
 
 .admin-drawer-footer {
@@ -195,6 +211,28 @@ html[data-theme="light"] .admin-drawer-message {
   position: relative;
   min-width: 0;
   flex: 1;
+}
+
+#client-watermark {
+  position: absolute;
+  top: calc(env(safe-area-inset-top));
+  left: calc(env(safe-area-inset-left));
+  z-index: 23;
+  width: 34px;
+  height: 34px;
+  opacity: 0.9;
+  pointer-events: none;
+  user-select: none;
+  filter: saturate(0.54) brightness(0.9);
+}
+
+html[data-handedness="left"] #client-watermark {
+  left: auto;
+  right: calc(env(safe-area-inset-right) + 6px);
+}
+
+html[data-theme="light"] #client-watermark {
+  filter: saturate(0.45) brightness(0.82);
 }
 
 #touch-chrome {
