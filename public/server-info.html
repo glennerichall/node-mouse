@@ -131,18 +131,18 @@
     </section>
 
     <section>
-      <h2>Recent lifecycle events</h2>
+      <h2 data-i18n="serverInfo.section.lifecycle">Recent lifecycle events</h2>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Event</th>
-              <th>Requested</th>
-              <th>Detected</th>
-              <th>Status</th>
-              <th>Cause</th>
-              <th>Source</th>
+              <th data-i18n="serverInfo.table.lifecycle.id">ID</th>
+              <th data-i18n="serverInfo.table.lifecycle.event">Event</th>
+              <th data-i18n="serverInfo.table.lifecycle.requestedAt">Requested</th>
+              <th data-i18n="serverInfo.table.lifecycle.detectedAt">Detected</th>
+              <th data-i18n="serverInfo.table.lifecycle.status">Status</th>
+              <th data-i18n="serverInfo.table.lifecycle.cause">Cause</th>
+              <th data-i18n="serverInfo.table.lifecycle.source">Source</th>
             </tr>
           </thead>
           <tbody id="restarts-table"></tbody>
@@ -170,7 +170,7 @@
     import {applyPageTranslations, getClientI18n, initClientI18n, initClientTheme, onClientI18nChange} from '/client/i18n/index.js';
     await initClientI18n();
     initClientTheme();
-    const {t} = getClientI18n();
+    let {t} = getClientI18n();
     applyPageTranslations(document);
     const versionEl = document.getElementById('version');
     const nowEl = document.getElementById('now');
@@ -207,7 +207,11 @@
       const h = Math.floor(s / 3600);
       const m = Math.floor((s % 3600) / 60);
       const sec = s % 60;
-      return `${h}h ${m}m ${sec}s`;
+      return [
+        t('serverInfo.duration.hours', {value: h}),
+        t('serverInfo.duration.minutes', {value: m}),
+        t('serverInfo.duration.seconds', {value: sec}),
+      ].join(' ');
     }
 
     function formatDateTime(value) {
@@ -295,7 +299,7 @@
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${tokenEntry.isCurrent ? t('serverInfo.token.active') : t('serverInfo.token.archived')}</td>
-          <td>${tokenEntry.token || '[masque]'}</td>
+          <td>${tokenEntry.token || t('serverInfo.token.masked')}</td>
           <td>${formatDateTime(tokenEntry.createdAt)}</td>
           <td>${formatDateTime(tokenEntry.expiresAt)}</td>
         `;
@@ -307,7 +311,7 @@
       restartsTable.innerHTML = '';
       if (!Array.isArray(restarts) || restarts.length === 0) {
         const row = document.createElement('tr');
-        row.innerHTML = '<td colspan="7">No recorded lifecycle event.</td>';
+        row.innerHTML = `<td colspan="7">${t('serverInfo.empty.lifecycle')}</td>`;
         restartsTable.appendChild(row);
         return;
       }
@@ -400,7 +404,10 @@
         onlineSinceEl.textContent = t('serverInfo.onlineSince', {value: formatDateTime(data.onlineSince)});
         uptimeEl.textContent = t('serverInfo.uptime', {value: formatDuration(data.uptimeSec)});
         clientsCountEl.textContent = t('serverInfo.clientsCount', {value: Number(data.clientsConnected) || 0});
-        daemonStateEl.textContent = `Daemon: ${data.daemon?.runningAsDaemon ? 'yes' : 'no'}${data.daemon?.installed ? ' (installed)' : ''}`;
+        daemonStateEl.textContent = t('serverInfo.daemon', {
+          value: t(data.daemon?.runningAsDaemon ? 'serverInfo.daemon.yes' : 'serverInfo.daemon.no'),
+          suffix: data.daemon?.installed ? ` ${t('serverInfo.daemon.installed')}` : '',
+        });
         const adminActionsEnabled = Boolean(data?.sysConfig?.adminActionsEnabled);
         adminActionsStateEl.textContent = t('serverInfo.adminActions', {
           value: t(adminActionsEnabled ? 'serverInfo.adminActions.enabled' : 'serverInfo.adminActions.disabled'),
@@ -473,6 +480,7 @@
     setInterval(refresh, 2000);
     subscribeToConfigEvents().catch(() => {});
     onClientI18nChange(() => {
+      ({t} = getClientI18n());
       applyPageTranslations(document);
       refresh();
     });
