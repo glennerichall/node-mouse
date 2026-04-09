@@ -10,13 +10,14 @@ import {createNotifier} from "./notifier/createNotifier.js";
 import {createTaskRunner} from './task-runner/createTaskRunner.js';
 import {createTaskManager} from './task-manager/createTaskManager.js';
 import {createUpdateManager} from "./update-manager/createUpdateManager.js";
-import {createQrOverlay} from "./overlay/qr-overlay.js";
+import {createQrOverlay} from "./overlay/createQrOverlay.js";
 import {createRemotes} from "./remotes/createRemotes.js";
 import {createPubSub} from './pubsub/createPubSub.js';
 import {createEventStore} from './pubsub/createEventStore.js';
 import {createServiceEvents} from './pubsub/createServiceEvents.js';
 import {createSseService} from './sse/createSseService.js';
 import {createApplicationDaemonService} from './application/createApplicationDaemonService.js';
+import {createOsService} from './os/index.js';
 
 
 export function createServicesRegistry() {
@@ -24,6 +25,7 @@ export function createServicesRegistry() {
     return createServicesContainer({
         createSystemConfig: getSystemConfig,
         createPersistence,
+        createOsService,
         createConfig,
         createSseService,
         createEventStore,

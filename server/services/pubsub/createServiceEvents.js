@@ -1,22 +1,13 @@
+import {PUBSUB_EVENT_STATE_CHANGED} from './serviceEventConstants.js';
+
 export function createServiceEvents(services) {
-  function getBus() {
-    return typeof services.getPubSub === 'function'
-      ? services.getPubSub()
-      : null;
-  }
-
   function publish(service, payload, options = {}) {
-    const bus = getBus();
-    if (!bus || typeof bus.publish !== 'function') {
-      return null;
-    }
-
-    return bus.publish(service, payload, options);
+    return services.getPubSub().publish(service, payload, options);
   }
 
   function publishState(service, state, options = {}) {
     return publish(service, state, {
-      type: String(options.type || 'state.changed').trim() || 'state.changed',
+      type: String(options.type || PUBSUB_EVENT_STATE_CHANGED).trim() || PUBSUB_EVENT_STATE_CHANGED,
       ...options,
       snapshot: options.snapshot ?? true,
     });

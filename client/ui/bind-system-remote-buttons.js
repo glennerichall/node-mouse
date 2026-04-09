@@ -1,6 +1,10 @@
 import { emitWithTimestamp } from '../core/socket-emit.js';
 import { bindTouchPassthrough } from '../touch/bind-touch-passthrough.js';
-import { REMOTE_EVENT_KEYBOARD_KEY } from '../../utils/shared/remoteCommands.js';
+import {
+  REMOTE_EVENT_KEYBOARD_KEY,
+  REMOTE_EVENT_WINDOW_CLOSE,
+  REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE,
+} from '../../utils/shared/remoteCommands.js';
 
 export function bindSystemRemoteButtons(
   socket,
@@ -9,6 +13,8 @@ export function bindSystemRemoteButtons(
     btnSystemWindowLeft,
     btnSystemWindowRight,
     btnSystemStartMenu,
+    btnSystemWindowToggle,
+    btnSystemWindowClose,
     touchpad,
   },
 ) {
@@ -17,6 +23,8 @@ export function bindSystemRemoteButtons(
     btnSystemWindowLeft,
     btnSystemWindowRight,
     btnSystemStartMenu,
+    btnSystemWindowToggle,
+    btnSystemWindowClose,
   ].filter(Boolean);
 
   bindTouchPassthrough(buttons, touchpad);
@@ -32,5 +40,11 @@ export function bindSystemRemoteButtons(
   );
   btnSystemStartMenu?.addEventListener('click', () =>
     emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'command' }),
+  );
+  btnSystemWindowToggle?.addEventListener('click', () =>
+    emitWithTimestamp(socket, REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE),
+  );
+  btnSystemWindowClose?.addEventListener('click', () =>
+    emitWithTimestamp(socket, REMOTE_EVENT_WINDOW_CLOSE),
   );
 }

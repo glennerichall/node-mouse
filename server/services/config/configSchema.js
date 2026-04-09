@@ -64,6 +64,16 @@ export const CONFIG_SCHEMA = {
       },
     },
   },
+  vlc: {
+    title: 'VLC',
+    description: 'Active ou masque la remote VLC pour tous les clients.',
+    fields: {
+      enabled: {
+        label: 'Activer la remote VLC',
+        type: 'boolean',
+      },
+    },
+  },
   preview: {
     title: 'Apercu curseur',
     description: "Qualite et cadence de l'apercu diffuse au client.",

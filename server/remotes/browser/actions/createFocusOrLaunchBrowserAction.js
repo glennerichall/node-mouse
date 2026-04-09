@@ -1,27 +1,20 @@
-import os from 'node:os';
-import { focusOrLaunchBrowserLinux } from '../platforms/linux.js';
-import { focusOrLaunchBrowserDarwin } from '../platforms/darwin.js';
-import { focusOrLaunchBrowserWin32 } from '../platforms/win32.js';
+import { getBrowserCatalogEntry } from '../browserCatalog.js';
+import { createBrowserAppSpec } from '../createBrowserAppSpec.js';
 
-export function createFocusOrLaunchBrowserAction(state) {
+export function createFocusOrLaunchBrowserAction(state, osService) {
   return async function focusOrLaunchBrowser(browserId) {
     if (state.inFlight) {
-      return;
+      return false;
     }
     state.inFlight = true;
 
     try {
-      const platform = os.platform();
-      if (platform === 'linux') {
-        return focusOrLaunchBrowserLinux(browserId);
+      const browser = getBrowserCatalogEntry(browserId);
+      if (!browser) {
+        return false;
       }
-      if (platform === 'darwin') {
-        return focusOrLaunchBrowserDarwin(browserId);
-      }
-      if (platform === 'win32') {
-        return focusOrLaunchBrowserWin32(browserId);
-      }
-      return false;
+
+      return osService.app.openOrFocus(createBrowserAppSpec(browser), { maximize: true });
     } finally {
       state.inFlight = false;
     }

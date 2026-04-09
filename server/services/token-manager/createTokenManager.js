@@ -2,6 +2,7 @@ import {createRandomToken} from '../../utils/createRandomToken.js';
 import {isTokenFormatValid, normalizeToken} from './token-format.js';
 import {computeTokenTtlMs} from './token-store-utils.js';
 import {
+    PUBSUB_EVENT_STATE_CHANGED,
     PUBSUB_EVENT_TOKEN_CHANGED,
     PUBSUB_SERVICE_TOKEN_MANAGER
 } from "../pubsub/serviceEventConstants.js";
@@ -11,7 +12,7 @@ function createTokenPersistence(services) {
         countTokens: () => services.getPersistence().entryTokenDao.countEntryTokens(),
         deleteExpiredTokens: (options) => services.getPersistence().entryTokenDao.deleteExpiredEntryTokens(options),
         getLatestToken: () => services.getPersistence().entryTokenDao.getLatestEntryToken(),
-        getLatestTokenRecord: () => services.getPersistence().entryTokenDao.getLatestEntryTokenRecord(),
+        getLatestTokenRecord: () => services.getPersistence().entryTokenDao.getLatestEntryTokenRecord?.(),
         hasToken: (token) => services.getPersistence().entryTokenDao.hasEntryToken(token),
         createToken: (token, createdAt) => services.getPersistence().entryTokenDao.createEntryToken(token, createdAt),
     };
@@ -20,11 +21,7 @@ function createTokenPersistence(services) {
 export function createTokenManager(services) {
     const persistence = createTokenPersistence(services);
 
-    function publishState(type = 'state.changed') {
-        if (typeof services.getEvents !== 'function') {
-            return;
-        }
-
+    function publishState(type = PUBSUB_EVENT_STATE_CHANGED) {
         const latestToken = getLatestTokenRecord();
         const nextRotationDelayMs = !isPersistenceEnabled()
             ? null
@@ -83,12 +80,19 @@ export function createTokenManager(services) {
     }
 
     function getLatestTokenRecord() {
-        const record = persistence.getLatestTokenRecord?.();
+        const record = persistence.getLatestTokenRecord?.() || (() => {
+            const token = normalizeToken(persistence.getLatestToken?.());
+            return token ? {token, createdAt: Number.NaN} : null;
+        })();
         const token = normalizeToken(record?.token);
         const createdAt = Math.floor(Number(record?.createdAt));
 
-        if (!isTokenFormatValid(token) || !Number.isFinite(createdAt)) {
+        if (!isTokenFormatValid(token)) {
             return null;
+        }
+
+        if (!Number.isFinite(createdAt)) {
+            return {token, createdAt: Number.NaN};
         }
 
         return {
@@ -174,7 +178,7 @@ export function createTokenManager(services) {
             return createToken();
         }
 
-        if (Date.now() < latestToken.createdAt + getRotateTtlMs()) {
+        if (!Number.isFinite(latestToken.createdAt) || Date.now() < latestToken.createdAt + getRotateTtlMs()) {
             return latestToken.token;
         }
 

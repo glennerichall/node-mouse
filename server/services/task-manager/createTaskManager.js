@@ -12,10 +12,6 @@ export function createTaskManager(services) {
   }
 
   function publishState() {
-    if (typeof services.getEvents !== 'function') {
-      return;
-    }
-
     services.getEvents().publishState(PUBSUB_SERVICE_TASK_MANAGER, {
       tasks: getTaskRunner().getTasksSnapshot(),
     });

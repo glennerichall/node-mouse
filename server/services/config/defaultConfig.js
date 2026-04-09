@@ -90,6 +90,9 @@ export const DEFAULT_PERSISTED_CONFIG = {
     keyboard: {
         enabled: true,
     },
+    vlc: {
+        enabled: false,
+    },
     preview: {
         enabled: true,
         width: 128,

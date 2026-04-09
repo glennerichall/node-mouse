@@ -12,6 +12,10 @@ const ALLOWED_KEYS = new Set([
     'd',
     'f',
     'i',
+    'm',
+    'n',
+    'p',
+    's',
     't',
     'w',
     'l',
@@ -46,7 +50,6 @@ export function createKeyboardController(servicesOrRobot) {
     const getRobot = servicesOrRobot?.getRobot
         ? () => servicesOrRobot.getRobot()
         : () => servicesOrRobot;
-    let inputQueue = Promise.resolve();
     let keyboardConfigured = false;
 
     function configureKeyboard(robot) {
@@ -61,22 +64,14 @@ export function createKeyboardController(servicesOrRobot) {
     }
 
     function enqueue(task) {
-        inputQueue = inputQueue
-            .catch(() => {
-                // Keep the queue alive after a failed keyboard task.
-            })
-            .then(() => {
-                const robot = getRobot();
-                configureKeyboard(robot);
-                return task(robot);
-            });
-
-        return inputQueue;
+        const robot = getRobot();
+        configureKeyboard(robot);
+        return task(robot);
     }
 
     function typeText(text) {
         if (!text || typeof text !== 'string') {
-            return Promise.resolve();
+            return;
         }
 
         return enqueue((robot) => {
@@ -120,7 +115,7 @@ export function createKeyboardController(servicesOrRobot) {
 
     function pressSpecialKey(key, modifiers = []) {
         if (!ALLOWED_KEYS.has(key)) {
-            return Promise.resolve();
+            return;
         }
 
         return enqueue((robot) => {

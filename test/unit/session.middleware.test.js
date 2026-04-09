@@ -177,6 +177,9 @@ describe('createSessionRouter', () => {
     const isValid = sandbox.stub().withArgs('token-123').returns(true);
     const getTokenManager = sandbox.stub().returns({isValid});
     const router = createSessionRouter({
+      getEvents: () => ({
+        publishEvent: sandbox.stub(),
+      }),
       getTokenManager,
       getSystemConfig: () => ({
         session: {

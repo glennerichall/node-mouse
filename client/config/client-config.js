@@ -12,6 +12,9 @@ const DEFAULT_CLIENT_CONFIG = {
   keyboard: {
     enabled: true,
   },
+  vlc: {
+    enabled: false,
+  },
   preview: {
     enabled: true,
     hideDelayMs: 10000,
@@ -160,6 +163,10 @@ export function getClientSamsungConfig() {
 
 export function getClientPreviewConfig() {
   return configState.preview || DEFAULT_CLIENT_CONFIG.preview;
+}
+
+export function getClientVlcConfig() {
+  return configState.vlc || DEFAULT_CLIENT_CONFIG.vlc;
 }
 
 export function getClientBrowserConfig() {

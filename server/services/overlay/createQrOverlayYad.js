@@ -5,22 +5,9 @@ import QRCode from 'qrcode';
 import {DEFAULT_PERSISTED_CONFIG} from '../config/defaultConfig.js';
 import { commandExists } from '../../utils/process.js';
 import {createLogger} from '../log/logger.js';
+import {createNoopOverlay} from './createNoopOverlay.js';
 
 const getLogger = () => createLogger('qr-overlay:yad');
-
-function getNoopOverlay() {
-  return {
-    close: () => {},
-    show: async () => false,
-    hide: () => false,
-    update: async () => {},
-    setSuppressed: () => false,
-    toggle: async () => false,
-    isVisible: () => false,
-    isSuppressed: () => false,
-    getBounds: () => null,
-  };
-}
 
 export async function createQrOverlayYad(services) {
   const getUrl = () => services.getUrls().entryUrl;
@@ -45,13 +32,13 @@ export async function createQrOverlayYad(services) {
   }
 
   if (!getOverlayContext().isSupported) {
-    return getNoopOverlay();
+    return createNoopOverlay();
   }
 
   const hasYad = await commandExists('yad');
   if (!hasYad) {
     getLogger().warn('Overlay QR non lancé: "yad" est introuvable.');
-    return getNoopOverlay();
+    return createNoopOverlay();
   }
 
   const qrPath = path.join(os.tmpdir(), 'remote-mouse-qr-overlay.png');

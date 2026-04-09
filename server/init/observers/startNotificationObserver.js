@@ -35,10 +35,6 @@ const NOTIFICATION_HANDLERS = {
 };
 
 export function startNotificationObserver(services) {
-  if (typeof services.getPubSub !== 'function' || typeof services.getNotifier !== 'function') {
-    return () => {};
-  }
-
   const bus = services.getPubSub();
   const notifier = services.getNotifier();
 

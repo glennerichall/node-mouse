@@ -1,7 +1,4 @@
 import {execShell} from '../../utils/process.js';
-import {createLogger} from '../log/logger.js';
-
-const getLogger = () => createLogger('update-check:command-source');
 
 function normalizeCommandResult(rawText, fallbackTitle) {
   const text = String(rawText || '').trim();
@@ -51,9 +48,10 @@ function normalizeCommandResult(rawText, fallbackTitle) {
 }
 
 export class CommandUpdateSource {
-  constructor({ checkCommand, timeoutSec }) {
+  constructor({checkCommand, timeoutSec, logger = null}) {
     this.checkCommand = String(checkCommand || '').trim();
     this.timeoutMs = Math.max(1000, Math.round(Number(timeoutSec || 20) * 1000));
+    this.logger = logger;
   }
 
   async check() {
@@ -63,7 +61,7 @@ export class CommandUpdateSource {
 
     const result = await execShell(this.checkCommand, this.timeoutMs);
     if (!result.ok) {
-      getLogger().warn({ stderr: result.stderr, stdout: result.stdout }, 'Update check command failed');
+      this.logger?.warn({stderr: result.stderr, stdout: result.stdout}, 'Update check command failed');
       return { hasUpdate: false };
     }
 

@@ -3,13 +3,13 @@ import { createFocusOrLaunchBrowserAction } from './actions/createFocusOrLaunchB
 import {openUrlOnHost} from './actions/openUrlOnHost.js';
 import { listBrowsersOnHost } from './listBrowsersOnHost.js';
 
-export function createBrowser() {
+export function createBrowser(osService) {
   const state = createBrowserReceiverState();
-  const focusOrLaunchBrowser = createFocusOrLaunchBrowserAction(state);
+  const focusOrLaunchBrowser = createFocusOrLaunchBrowserAction(state, osService);
 
   return {
     focusOrLaunchBrowser,
-    listBrowsers: listBrowsersOnHost,
-    openUrlOnHost,
+    listBrowsers: () => listBrowsersOnHost(osService),
+    openUrlOnHost: (url) => openUrlOnHost(osService, url),
   };
 }

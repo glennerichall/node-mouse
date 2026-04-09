@@ -17,22 +17,18 @@ function cloneEvent(event) {
 export function createEventStore(services) {
   const latestByService = new Map();
   const history = [];
-  const bus = typeof services.getPubSub === 'function'
-    ? services.getPubSub()
-    : null;
+  const bus = services.getPubSub();
 
-  if (bus && typeof bus.subscribe === 'function') {
-    bus.subscribe((event) => {
-      if (event.snapshot) {
-        latestByService.set(event.service, cloneEvent(event));
-      }
+  bus.subscribe((event) => {
+    if (event.snapshot) {
+      latestByService.set(event.service, cloneEvent(event));
+    }
 
-      history.push(cloneEvent(event));
-      if (history.length > 500) {
-        history.splice(0, history.length - 500);
-      }
-    });
-  }
+    history.push(cloneEvent(event));
+    if (history.length > 500) {
+      history.splice(0, history.length - 500);
+    }
+  });
 
   function getLatestSnapshot() {
     return Array.from(latestByService.values(), (event) => cloneEvent(event));

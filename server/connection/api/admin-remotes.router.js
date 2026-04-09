@@ -18,8 +18,9 @@ export function createAdminRemotesRouter(services) {
     });
   });
 
-  router.get('/', (_req, res) => {
+  router.get('/', async (_req, res) => {
     const config = services.getConfig();
+    const vlcAvailable = await services.getRemotes().vlc.isAvailable();
     const remotes = [
       {
         id: 'browser',
@@ -42,6 +43,14 @@ export function createAdminRemotesRouter(services) {
         enabled: Boolean(config?.samsungTv?.enabled),
       },
     ];
+
+    if (vlcAvailable) {
+      remotes.splice(2, 0, {
+        id: 'vlc',
+        labelKey: 'preferences.remote.vlc',
+        enabled: config?.vlc?.enabled !== false,
+      });
+    }
 
     res.json({
       remotes,

@@ -16,7 +16,7 @@ import {
 import {createBrowser} from '../browser/index.js';
 
 export function createAdminActions(services) {
-    const browser = createBrowser();
+    const browser = createBrowser(services.getOs());
 
     return {
         forceUpdateCheck: createForceUpdateCheckAction(services),

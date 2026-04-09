@@ -11,6 +11,7 @@ export const CONFIG_PATHS = [
     'browser.enabled',
     ...BROWSER_CONFIG_PATHS,
     'keyboard.enabled',
+    'vlc.enabled',
     'preview.enabled',
     'preview.width',
     'preview.height',

@@ -25,10 +25,6 @@ export function createConfigDao({getDatabase, getPubSub} = {}) {
     }
 
     function emitStateChange(changeType, changedKeys = []) {
-        if (typeof getPubSub !== 'function') {
-            return;
-        }
-
         getPubSub().publish(PUBSUB_SERVICE_CONFIG, {
             changeType,
             changedKeys: Array.from(new Set(changedKeys)),

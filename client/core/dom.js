@@ -12,6 +12,7 @@ function getLayoutDom() {
     scrollZoneIndicator: getElement('scroll-zone-indicator'),
     browserShortcuts: getElement('browser-shortcuts'),
     tvControls: getElement('tv-controls'),
+    vlcControls: getElement('vlc-controls'),
     systemControls: getElement('system-controls'),
     menu: getElement('menu'),
     keyboardPanel: getElement('keyboard-panel'),
@@ -72,6 +73,26 @@ function getSystemRemoteDom() {
     btnSystemWindowLeft: getElement('btn-system-window-left'),
     btnSystemWindowRight: getElement('btn-system-window-right'),
     btnSystemStartMenu: getElement('btn-system-start-menu'),
+    btnSystemWindowToggle: getElement('btn-system-window-toggle'),
+    btnSystemWindowClose: getElement('btn-system-window-close'),
+  };
+}
+
+function getVlcRemoteDom() {
+  return {
+    btnVlcOpen: getElement('btn-vlc-open'),
+    btnVlcWindowToggle: getElement('btn-vlc-window-toggle'),
+    btnVlcWindowClose: getElement('btn-vlc-window-close'),
+    btnVlcPrevious: getElement('btn-vlc-previous'),
+    btnVlcPlayPause: getElement('btn-vlc-play-pause'),
+    btnVlcNext: getElement('btn-vlc-next'),
+    btnVlcSeekBackward: getElement('btn-vlc-seek-backward'),
+    btnVlcStop: getElement('btn-vlc-stop'),
+    btnVlcSeekForward: getElement('btn-vlc-seek-forward'),
+    btnVlcVolumeDown: getElement('btn-vlc-volume-down'),
+    btnVlcMute: getElement('btn-vlc-mute'),
+    btnVlcVolumeUp: getElement('btn-vlc-volume-up'),
+    btnVlcFullscreen: getElement('btn-vlc-fullscreen'),
   };
 }
 
@@ -111,6 +132,7 @@ export function getDom() {
     ...getKeyboardRemoteDom(),
     ...getBrowserRemoteDom(),
     ...getSystemRemoteDom(),
+    ...getVlcRemoteDom(),
     ...getSamsungRemoteDom(),
     ...getAdminRemoteDom(),
   };

@@ -1,61 +1,20 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
 import QRCode from 'qrcode';
 import {DEFAULT_PERSISTED_CONFIG} from '../config/defaultConfig.js';
 import {createLogger} from '../log/logger.js';
-
-const getLogger = () => createLogger('qr-overlay:win32');
-
-function getNoopOverlay() {
-  return {
-    close: () => {},
-    show: async () => false,
-    hide: () => false,
-    update: async () => {},
-    setSuppressed: () => false,
-    toggle: async () => false,
-    isVisible: () => false,
-    isSuppressed: () => false,
-    getBounds: () => null,
-  };
-}
-
-function buildPowerShellScript({ qrPath, size, posX, posY }) {
-  const escapedQrPath = String(qrPath).replace(/\\/g, '\\\\');
-  return [
-    'Add-Type -AssemblyName System.Windows.Forms',
-    'Add-Type -AssemblyName System.Drawing',
-    '$form = New-Object Windows.Forms.Form',
-    "$form.StartPosition = 'Manual'",
-    '$form.FormBorderStyle = [System.Windows.Forms.FormBorderStyle]::None',
-    '$form.TopMost = $true',
-    '$form.ShowInTaskbar = $false',
-    `$form.Width = ${size}`,
-    `$form.Height = ${size}`,
-    `$form.Left = ${posX}`,
-    `$form.Top = ${posY}`,
-    '$picture = New-Object Windows.Forms.PictureBox',
-    '$picture.Dock = [System.Windows.Forms.DockStyle]::Fill',
-    '$picture.SizeMode = [System.Windows.Forms.PictureBoxSizeMode]::StretchImage',
-    `$picture.Image = [System.Drawing.Image]::FromFile("${escapedQrPath}")`,
-    '$form.Controls.Add($picture)',
-    '[System.Windows.Forms.Application]::Run($form)',
-  ].join('\n');
-}
-
-function spawnPowerShell(scriptPath) {
-  return spawn(
-    'powershell',
-    ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', scriptPath],
-    { stdio: 'ignore' },
-  );
-}
+import {createNoopOverlay} from './createNoopOverlay.js';
+import {
+  buildQrOverlayPowerShellScript,
+  spawnPowerShellFile,
+} from '../os/platforms/win32/overlay.js';
 
 export async function createQrOverlayWin32(services) {
   const getUrl = () => services.getUrls().entryUrl;
   const getConfig = () => services.getConfig();
+  const getLogger = ()=> services.getLogger('qr-overlay:win32');
+  
   const robot = services.getRobot();
 
   function getOverlayContext() {
@@ -72,7 +31,7 @@ export async function createQrOverlayWin32(services) {
   }
 
   if (!getOverlayContext().isSupported) {
-    return getNoopOverlay();
+    return createNoopOverlay();
   }
 
   const qrPath = path.join(os.tmpdir(), 'remote-mouse-qr-overlay.png');
@@ -112,11 +71,11 @@ export async function createQrOverlayWin32(services) {
 
     fs.writeFileSync(
       scriptPath,
-      buildPowerShellScript({ qrPath, size, posX, posY }),
+      buildQrOverlayPowerShellScript({qrPath, size, posX, posY}),
       'utf8',
     );
 
-    child = spawnPowerShell(scriptPath);
+    child = spawnPowerShellFile(scriptPath);
     child.once('error', (error) => {
       getLogger().warn({ err: error }, 'Impossible de lancer PowerShell pour QR overlay');
     });

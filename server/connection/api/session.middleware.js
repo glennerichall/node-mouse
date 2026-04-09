@@ -76,7 +76,7 @@ export function createSessionRouter(services) {
         }
         const forwarded = getForwardedFor(req);
         const clientIp = forwarded || req.ip || req.socket?.remoteAddress || '';
-        services.getEvents?.().publishEvent(PUBSUB_SERVICE_SESSION, PUBSUB_EVENT_SESSION_CREATED, {
+        services.getEvents().publishEvent(PUBSUB_SERVICE_SESSION, PUBSUB_EVENT_SESSION_CREATED, {
             address: String(clientIp || '').trim(),
             token,
         });

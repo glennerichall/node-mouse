@@ -1,9 +1,16 @@
 import {jest} from '@jest/globals';
 import {createTokenManager} from '../../server/services/token-manager/createTokenManager.js';
 
+function createEventsStub() {
+  return {
+    publishState: jest.fn(),
+  };
+}
+
 describe('createTokenManager', () => {
   it('keeps the fixed entry token when fixedPath is configured', () => {
     const tokenManager = createTokenManager({
+      getEvents: () => createEventsStub(),
       getSystemConfig: () => ({
         entryPath: {
           enabled: false,
@@ -49,6 +56,7 @@ describe('createTokenManager', () => {
     };
 
     const tokenManager = createTokenManager({
+      getEvents: () => createEventsStub(),
       getSystemConfig: () => ({
         entryPath: {
           enabled: true,
@@ -79,6 +87,7 @@ describe('createTokenManager', () => {
   it('does not create an implicit token when none exists yet', () => {
     const createEntryToken = jest.fn();
     const tokenManager = createTokenManager({
+      getEvents: () => createEventsStub(),
       getSystemConfig: () => ({
         entryPath: {
           enabled: true,
@@ -108,6 +117,7 @@ describe('createTokenManager', () => {
       .sort((left, right) => right[1] - left[1])[0]?.[0] || '';
 
     const tokenManager = createTokenManager({
+      getEvents: () => createEventsStub(),
       getSystemConfig: () => ({
         entryPath: {
           enabled: true,
@@ -165,6 +175,7 @@ describe('createTokenManager', () => {
     };
 
     const tokenManager = createTokenManager({
+      getEvents: () => createEventsStub(),
       getSystemConfig: () => ({
         entryPath: {
           enabled: true,
@@ -203,6 +214,7 @@ describe('createTokenManager', () => {
 
     const createEntryToken = jest.fn();
     const tokenManager = createTokenManager({
+      getEvents: () => createEventsStub(),
       getSystemConfig: () => ({
         entryPath: {
           enabled: true,
@@ -250,6 +262,7 @@ describe('createTokenManager', () => {
     };
 
     const tokenManager = createTokenManager({
+      getEvents: () => createEventsStub(),
       getSystemConfig: () => ({
         entryPath: {
           enabled: true,

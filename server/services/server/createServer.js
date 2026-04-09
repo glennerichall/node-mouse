@@ -5,7 +5,7 @@ import {getPublicUrl} from '../../utils/network.js';
 import cookieParser from "cookie-parser";
 import {createHttpsServer} from "./createHttpsServer.js";
 
-export async function createServer(services) {
+export function createServer(services) {
     const {
         getSystemConfig
     } = services;

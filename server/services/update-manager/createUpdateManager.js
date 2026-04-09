@@ -13,10 +13,6 @@ export function createUpdateManager(services) {
     let lastResult = null;
 
     function publishState(type = PUBSUB_EVENT_UPDATE_CHECK) {
-        if (typeof services.getEvents !== 'function') {
-            return;
-        }
-
         services.getEvents().publishState(PUBSUB_SERVICE_UPDATE_MANAGER, {
             enabled: Boolean(services.getConfig().updateCheck?.enabled),
             lastKey,

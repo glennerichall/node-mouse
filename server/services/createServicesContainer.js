@@ -14,11 +14,6 @@ export function createLazy(provider) {
     };
 }
 
-async function resolveNow(asyncProvider) {
-    const instance = await asyncProvider();
-    return createLazy(() => instance);
-}
-
 function urlFactory(services) {
     const {
         getSystemConfig,
@@ -58,6 +53,7 @@ function loggerFactory(services) {
 export async function createServicesContainer({
                                                   createSystemConfig,
                                                   createPersistence,
+                                                  createOsService,
                                                   createConfig,
                                                   createSseService,
                                                   createEventStore,
@@ -75,11 +71,16 @@ export async function createServicesContainer({
                                               createInputController,
                                               createRemotes
                                               }) {
+    let robotReady = false;
+    let robotInstance;
+    let qrOverlayReady = false;
+    let qrOverlayInstance;
 
     let container = {
         // Lazy providers
         getSystemConfig: createLazy(() => createSystemConfig(container)),
         getPersistence: createLazy(() => createPersistence(container)),
+        getOs: createLazy(() => createOsService(container)),
         getConfig: () => createConfig(container),
         getSseService: createLazy(() => createSseService(container)),
         getEventStore: createLazy(() => createEventStore(container)),
@@ -89,20 +90,40 @@ export async function createServicesContainer({
         getPubSub: createLazy(() => createPubSub(container)),
         getTaskRunner: createLazy(() => createTaskRunner(container)),
         getTaskManager: createLazy(() => createTaskManager(container)),
-        getQrOverlay: createLazy(() => createQrOverlay(container)),
+        getServer: createLazy(() => createServer(container)),
+        getQrOverlay: () => {
+            if (!qrOverlayReady) {
+                throw new Error('QR overlay service accessed before initialization');
+            }
+            return qrOverlayInstance;
+        },
         getUpdateManager: createLazy(() => createUpdateManager(container)),
         getApplicationDaemonService: createLazy(() => createApplicationDaemonService(container)),
         getUrls: () => urlFactory(container),
         getLogger: scope => loggerFactory(container)(scope),
         getInputController: createLazy(() => createInputController(container)),
         getRemotes: createLazy(() => createRemotes(container)),
+        getRobot: () => {
+            if (!robotReady) {
+                throw new Error('Robot service accessed before initialization');
+            }
+            return robotInstance;
+        },
+        async initializeCoreServices() {
+            if (!robotReady) {
+                robotInstance = await createRobot(container);
+                robotReady = true;
+            }
+
+            if (!qrOverlayReady) {
+                qrOverlayInstance = await createQrOverlay(container);
+                qrOverlayReady = true;
+            }
+
+            return container;
+        },
 
     };
-
-    container.getRobot = await resolveNow(() => createRobot(container));
-    container.getEventStore = await resolveNow(() => createEventStore(container));
-    container.getServer = await resolveNow(() => createServer(container));
-    container.getQrOverlay = await resolveNow(() => createQrOverlay(container));
 
     return container;
 }

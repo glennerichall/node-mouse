@@ -3,7 +3,8 @@ import {
     NOTIFIER_LEVEL_ERROR,
     NOTIFIER_LEVEL_INFO,
     NOTIFIER_LEVEL_WARNING,
-    NOTIFIER_TARGET_ALL
+    NOTIFIER_TARGET_ALL,
+    NOTIFIER_TARGET_CLIENT
 } from "./createNotifierComposite.js";
 import {
     PUBSUB_EVENT_ADMIN_REJECTED_DISABLED,
@@ -35,7 +36,7 @@ export function handleRotateEntryTokenEvent(notifier, event) {
             ttlMs: 2800,
         }, {clientId: event.payload?.clientId});
     } else if (event.type === PUBSUB_EVENT_ADMIN_ROTATED) {
-        notify(notifier, NOTIFIER_TARGET_ALL, {
+        notify(notifier, NOTIFIER_TARGET_CLIENT, {
             notificationId: NOTIFICATION_ID_ENTRY_TOKEN,
             level: NOTIFIER_LEVEL_INFO,
             title: NOTIFICATION_TITLE_ENTRY_TOKEN,

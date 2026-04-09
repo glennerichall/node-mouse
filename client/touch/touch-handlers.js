@@ -46,7 +46,7 @@ function notifyMovementStartIfNeeded(state, handler, distancePx, kind = 'move') 
   }
 
   state.movementStarted = true;
-  handler.interactionStart(kind);
+  handler.interactionStart?.(kind);
 }
 
 export function handleTouchStart(event, { touchpad, state, handler }) {
@@ -188,6 +188,6 @@ export function handleTouchEnd(event, { state, handler }) {
     state.dragEligible = false;
     state.interactionActive = false;
     handler.flush();
-    handler.interactionEnd();
+    handler.interactionEnd?.();
   }
 }

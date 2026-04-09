@@ -40,7 +40,7 @@ function getDaemonStartupCause() {
 }
 
 export function notifyIfRestarted(services) {
-  const restartLogDao = services.getPersistence?.().restartLogDao;
+  const restartLogDao = services.getPersistence().restartLogDao;
   const marker = readAndClearRestartMarker();
   const startupAt = Date.now();
   const startupCause = isDaemonProcess() ? getDaemonStartupCause() : 'user';

@@ -1,3 +1,5 @@
+import {createExactMatchPredicate} from '../../../utils/shared/predicates.js';
+
 function normalizeServiceName(service) {
   const value = String(service || '').trim();
   return value || 'unknown';
@@ -14,15 +16,6 @@ function cloneEvent(event) {
   };
 }
 
-function createExactMatchPredicate(filters = {}) {
-  const entries = Object.entries(filters);
-  if (!entries.length) {
-    return null;
-  }
-
-  return (event) => entries.every(([key, value]) => event?.[key] === value);
-}
-
 function createListenerEntry(listener, predicateOrObject) {
   if (typeof listener !== 'function') {
     return null;
@@ -36,7 +29,9 @@ function createListenerEntry(listener, predicateOrObject) {
     if (normalizedFilters.service !== undefined) {
       normalizedFilters.service = normalizeServiceName(normalizedFilters.service);
     }
-    predicate = createExactMatchPredicate(normalizedFilters);
+    predicate = Object.keys(normalizedFilters).length
+      ? createExactMatchPredicate(normalizedFilters)
+      : null;
   }
 
   return {

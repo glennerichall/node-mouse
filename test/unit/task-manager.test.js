@@ -15,6 +15,9 @@ describe('task manager', () => {
   it('starts and stops the system tasks through the task runner', async () => {
     const taskRunner = createTaskRunner();
     const taskManager = createTaskManager({
+      getEvents: () => ({
+        publishState: jest.fn(),
+      }),
       getTaskRunner: () => taskRunner,
       getUpdateManager: () => ({
         check: jest.fn(async () => ({})),
@@ -51,6 +54,9 @@ describe('task manager', () => {
   it('uses rotateMin directly for token rotation scheduling', async () => {
     const taskRunner = createTaskRunner();
     const taskManager = createTaskManager({
+      getEvents: () => ({
+        publishState: jest.fn(),
+      }),
       getTaskRunner: () => taskRunner,
       getUpdateManager: () => ({
         check: jest.fn(async () => ({})),

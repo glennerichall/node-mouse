@@ -4,6 +4,8 @@ import {createPreviewEventRegistrar} from '../remotes/preview/registrar.js';
 import {createConnectionRegistrar} from '../connection/socket/createConnectionRegistrar.js';
 import {createBrowserRegistrar} from '../remotes/browser/registrar.js';
 import {createSamsungRegistrar} from '../remotes/samsung/registrar.js';
+import {createVlcRegistrar} from '../remotes/vlc/registrar.js';
+import {createWindowRegistrar} from '../remotes/window/registrar.js';
 
 export function createSocketActionRegistrars(services) {
     return [
@@ -31,6 +33,18 @@ export function createSocketActionRegistrars(services) {
         (socket) => {
             const {samsung} = services.getRemotes();
             return createSamsungRegistrar({samsung})(socket);
+        },
+        (socket) => {
+            const {vlc} = services.getRemotes();
+            return createVlcRegistrar({
+                vlc,
+                keyboard: services.getInputController().keyboard,
+                getConfig: services.getConfig,
+            })(socket);
+        },
+        (socket) => {
+            const {windowActions} = services.getRemotes();
+            return createWindowRegistrar({windowActions})(socket);
         },
         (socket) => createConnectionRegistrar({events: services.getEvents()})(socket)
     ];

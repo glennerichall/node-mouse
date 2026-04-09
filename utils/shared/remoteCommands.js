@@ -11,6 +11,12 @@ export const REMOTE_EVENT_PREVIEW_STOP = 'preview:stop';
 export const REMOTE_EVENT_SYSTEM_RELOAD = 'system:reload';
 
 export const REMOTE_EVENT_BROWSER_OPEN = 'browser:open';
+export const REMOTE_EVENT_VLC_OPEN = 'vlc:open';
+export const REMOTE_EVENT_VLC_COMMAND = 'vlc:command';
+export const REMOTE_EVENT_VLC_WINDOW_TOGGLE = 'vlc:window-toggle';
+export const REMOTE_EVENT_VLC_WINDOW_CLOSE = 'vlc:window-close';
+export const REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE = 'window:toggle-maximize';
+export const REMOTE_EVENT_WINDOW_CLOSE = 'window:close';
 
 export const REMOTE_EVENT_SAMSUNG_ON = 'samsung:on';
 export const REMOTE_EVENT_SAMSUNG_OFF = 'samsung:off';

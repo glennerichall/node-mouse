@@ -18,7 +18,7 @@ export function createApplicationShutdown(services) {
     const io = serverBundle.io;
     const taskManager = services.getTaskManager();
     const qrOverlay = services.getQrOverlay();
-    const sseService = services.getSseService?.();
+    const sseService = services.getSseService();
 
     if (state.shuttingDown) {
       return;
@@ -26,7 +26,7 @@ export function createApplicationShutdown(services) {
 
     state.shuttingDown = true;
     log.info({signal}, 'Arret du serveur');
-    services.getPersistence?.().restartLogDao?.createLifecycleEvent({
+    services.getPersistence().restartLogDao?.createLifecycleEvent({
       eventAt: Date.now(),
       eventType: 'stop',
       cause: 'user',

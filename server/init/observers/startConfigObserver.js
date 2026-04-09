@@ -8,10 +8,6 @@ function getValueAtPath(source, dottedPath) {
 }
 
 export function startConfigObserver(services) {
-  if (typeof services.getPubSub !== 'function' || typeof services.getSseService !== 'function') {
-    return () => {};
-  }
-
   const bus = services.getPubSub();
 
   return bus.subscribe((event) => {

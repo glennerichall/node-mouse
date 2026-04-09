@@ -16,6 +16,7 @@ export function bindRemoteAccordion(dom) {
   const panels = [
     dom.browserShortcuts,
     dom.tvControls,
+    dom.vlcControls,
     dom.systemControls,
   ].filter(Boolean);
 

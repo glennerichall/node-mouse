@@ -15,6 +15,7 @@ import {
   getClientInputConfig,
   getClientKeyboardConfig,
   getClientPreviewConfig,
+  getClientVlcConfig,
   onClientConfigChange,
 } from '../config/client-config.js';
 import {
@@ -43,6 +44,8 @@ export function initUi(socket) {
       && getClientRemoteVisibility('browser', true);
     const keyboardVisible = getClientKeyboardConfig().enabled !== false
       && getClientRemoteVisibility('keyboard', true);
+    const vlcVisible = getClientVlcConfig().enabled !== false
+      && getClientRemoteVisibility('vlc', true);
     const samsungVisible = getClientRemoteVisibility('samsung', true);
     const previewVisible = getClientPreviewConfig().enabled !== false
       && getClientRemoteVisibility('preview', true);
@@ -65,6 +68,9 @@ export function initUi(socket) {
     }
     if (dom.tvControls) {
       dom.tvControls.hidden = !samsungVisible;
+    }
+    if (dom.vlcControls) {
+      dom.vlcControls.hidden = !vlcVisible;
     }
     if (dom.cursorPreview) {
       dom.cursorPreview.hidden = !previewVisible;

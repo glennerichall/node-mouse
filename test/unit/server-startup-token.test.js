@@ -81,10 +81,25 @@ describe('startServer', () => {
     };
 
     createServicesRegistry.mockResolvedValue({
+      initializeCoreServices: jest.fn(async () => {}),
       getTokenManager: () => ({
         createToken,
       }),
+      getNotifier: () => ({
+        target: jest.fn(() => ({notify: jest.fn()})),
+      }),
       getPubSub: () => pubsub,
+      getSseService: () => ({
+        emit: jest.fn(),
+        closeAll: jest.fn(),
+      }),
+      getPersistence: () => ({
+        restartLogDao: {
+          getLastLifecycleEvent: jest.fn(() => null),
+          createLifecycleEvent: jest.fn(),
+          updateRestartStatus: jest.fn(),
+        },
+      }),
       getConfig: () => configState,
       getServer: () => ({
         server: {
@@ -97,6 +112,9 @@ describe('startServer', () => {
         hide,
         close: jest.fn(),
         update,
+      }),
+      getRobot: () => ({
+        getMousePos: jest.fn(() => ({x: 0, y: 0})),
       }),
       getSystemConfig: () => ({
         port: 3000,

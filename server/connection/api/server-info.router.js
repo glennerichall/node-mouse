@@ -105,7 +105,7 @@ export function createServerInfoRouter(services) {
   router.get('/data', async (_req, res) => {
     const clients = getConnectedClients(services.getServer().io);
     const rawConfig = services.getConfig();
-    const rawSystemConfig = services.getSystemConfig?.() || {};
+    const rawSystemConfig = services.getSystemConfig();
     const config = redactSecrets(rawConfig);
     const sysConfig = redactSecrets(rawSystemConfig);
     const logs = getRecentLogs(250);

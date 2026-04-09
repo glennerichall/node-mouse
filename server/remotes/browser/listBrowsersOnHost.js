@@ -1,23 +1,23 @@
-import os from 'node:os';
-import { listBrowsersDarwin } from './platforms/darwin.js';
-import { listBrowsersLinux } from './platforms/linux.js';
-import { listBrowsersWin32 } from './platforms/win32.js';
+import { BROWSER_CATALOG } from './browserCatalog.js';
+import { createBrowserAppSpec } from './createBrowserAppSpec.js';
 
-export async function listBrowsersOnHost() {
-  const platform = os.platform();
+export async function listBrowsersOnHost(osService) {
+  const browsers = [];
 
-  if (platform === 'linux') {
-    return listBrowsersLinux();
+  for (const browser of BROWSER_CATALOG) {
+    const resolved = await osService.app.resolve(createBrowserAppSpec(browser));
+    if (!resolved) {
+      continue;
+    }
+
+    browsers.push({
+      id: browser.id,
+      name: browser.name,
+      shortLabel: browser.shortLabel,
+      command: resolved.launchCommand || resolved.command || '',
+      app: resolved.appName || '',
+    });
   }
 
-  if (platform === 'darwin') {
-    return listBrowsersDarwin();
-  }
-
-  if (platform === 'win32') {
-    return listBrowsersWin32();
-  }
-
-  return [];
+  return browsers;
 }
-
