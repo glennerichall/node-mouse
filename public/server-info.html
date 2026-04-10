@@ -167,11 +167,15 @@
   </main>
 
   <script type="module">
-    import {applyPageTranslations, getClientI18n, initClientI18n, initClientTheme, onClientI18nChange} from '/client/i18n/index.js';
-    await initClientI18n();
-    initClientTheme();
-    let {t} = getClientI18n();
-    applyPageTranslations(document);
+    import {createServicesRegistry} from '/client/services/createServicesRegistry.js';
+
+    const services = createServicesRegistry();
+    const i18n = services.getI18n();
+    await i18n.init();
+    services.getPreferences().init();
+    services.getPreferenceView().init();
+    i18n.translateRoot(document);
+
     const versionEl = document.getElementById('version');
     const nowEl = document.getElementById('now');
     const onlineSinceEl = document.getElementById('online-since');
@@ -197,6 +201,10 @@
     let configSubscriptionId = '';
     let pendingConfigPayload = null;
     let applyingConfigPayload = false;
+
+    function t(key, params) {
+      return i18n.t(key, params);
+    }
 
     function isLogScrollAtBottom() {
       return logsEl.scrollTop + logsEl.clientHeight >= logsEl.scrollHeight - LOG_BOTTOM_THRESHOLD_PX;
@@ -479,9 +487,8 @@
     refresh();
     setInterval(refresh, 2000);
     subscribeToConfigEvents().catch(() => {});
-    onClientI18nChange(() => {
-      ({t} = getClientI18n());
-      applyPageTranslations(document);
+    i18n.onChange(() => {
+      i18n.translateRoot(document);
       refresh();
     });
     window.addEventListener('beforeunload', () => {
