@@ -131,6 +131,37 @@ describe('server cli', () => {
     });
   });
 
+  it('returns the system capabilities for info command', async () => {
+    const info = {
+      platform: 'linux',
+      hostname: 'host-1',
+      browsers: [{id: 'firefox', name: 'Firefox'}],
+      vlc: {available: true},
+      screen: {width: 1920, height: 1080},
+      network: {
+        lanIp: '192.168.1.10',
+        publicBaseUrl: 'http://192.168.1.10:3000',
+        localBaseUrl: 'http://127.0.0.1:3000',
+        interfaces: [],
+      },
+    };
+
+    const result = await executeCliCommand({
+      getSystem: () => ({
+        getInfo: async () => info,
+      }),
+      getRemotes: () => ({
+        adminActions: {},
+      }),
+    }, 'info');
+
+    expect(result).toEqual({
+      ok: true,
+      message: 'Capacites du serveur.',
+      data: info,
+    });
+  });
+
   it('returns the token list for tokens command', async () => {
     const result = await executeCliCommand({
       getPersistence: () => ({

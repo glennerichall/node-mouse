@@ -44,6 +44,7 @@ const createServiceEvents = jest.fn(() => ({
 const createSseService = jest.fn(() => ({}));
 const createApplicationDaemonService = jest.fn(() => ({}));
 const createOsService = jest.fn(() => ({}));
+const createSystemService = jest.fn(() => ({}));
 
 jest.unstable_mockModule('../../server/services/persistence/index.js', () => ({
   createPersistence,
@@ -121,6 +122,10 @@ jest.unstable_mockModule('../../server/services/os/index.js', () => ({
   createOsService,
 }));
 
+jest.unstable_mockModule('../../server/services/system/createSystemService.js', () => ({
+  createSystemService,
+}));
+
 describe('createServicesRegistry', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -156,5 +161,6 @@ describe('createServicesRegistry', () => {
     expect(createSseService).not.toHaveBeenCalled();
     expect(createApplicationDaemonService).not.toHaveBeenCalled();
     expect(createOsService).not.toHaveBeenCalled();
+    expect(createSystemService).not.toHaveBeenCalled();
   });
 });

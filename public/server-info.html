@@ -151,6 +151,11 @@
     </section>
 
     <section>
+      <h2 data-i18n="serverInfo.section.capabilities">Capabilities</h2>
+      <pre id="capabilities"></pre>
+    </section>
+
+    <section>
       <h2 data-i18n="serverInfo.section.config">Configuration</h2>
       <pre id="config"></pre>
     </section>
@@ -188,6 +193,7 @@
     const tasksTable = document.getElementById('tasks-table');
     const tokensTable = document.getElementById('tokens-table');
     const restartsTable = document.getElementById('restarts-table');
+    const capabilitiesEl = document.getElementById('capabilities');
     const configEl = document.getElementById('config');
     const sysConfigEl = document.getElementById('sys-config');
     const logsEl = document.getElementById('logs');
@@ -365,6 +371,37 @@
       }
     }
 
+    function renderCapabilities(system) {
+      if (!system || typeof system !== 'object') {
+        capabilitiesEl.textContent = t('serverInfo.empty.capabilities');
+        return;
+      }
+
+      const browsers = Array.isArray(system.browsers) && system.browsers.length > 0
+        ? system.browsers.map((browser) => browser.name || browser.id || '-').join(', ')
+        : t('serverInfo.capabilities.none');
+      const screen = system.screen && Number.isFinite(system.screen.width) && Number.isFinite(system.screen.height)
+        ? `${system.screen.width}x${system.screen.height}`
+        : t('serverInfo.capabilities.unavailable');
+      const interfaces = Array.isArray(system.network?.interfaces) && system.network.interfaces.length > 0
+        ? system.network.interfaces
+          .map((entry) => `${entry.name} ${entry.family} ${entry.address}${entry.internal ? ' [internal]' : ''}`)
+          .join('\n')
+        : t('serverInfo.capabilities.none');
+
+      capabilitiesEl.textContent = [
+        `${t('serverInfo.capabilities.platform')}: ${system.platform || '-'}`,
+        `${t('serverInfo.capabilities.hostname')}: ${system.hostname || system.network?.hostname || '-'}`,
+        `${t('serverInfo.capabilities.vlc')}: ${t(system.vlc?.available ? 'serverInfo.capabilities.available' : 'serverInfo.capabilities.unavailable')}`,
+        `${t('serverInfo.capabilities.screen')}: ${screen}`,
+        `${t('serverInfo.capabilities.browsers')}: ${browsers}`,
+        `${t('serverInfo.capabilities.lanIp')}: ${system.network?.lanIp || '-'}`,
+        `${t('serverInfo.capabilities.publicUrl')}: ${system.network?.publicBaseUrl || '-'}`,
+        `${t('serverInfo.capabilities.localUrl')}: ${system.network?.localBaseUrl || '-'}`,
+        `${t('serverInfo.capabilities.interfaces')}:\n${interfaces}`,
+      ].join('\n');
+    }
+
     function renderConfigSnapshot(snapshot) {
       configEl.textContent = JSON.stringify(snapshot || {}, null, 2);
     }
@@ -425,6 +462,7 @@
         renderTasks(data.tasks || []);
         renderTokens(data.tokens || []);
         renderRestarts(data.restarts || []);
+        renderCapabilities(data.system || null);
         scheduleConfigPayload({
           config: data.config,
           sysConfig: data.sysConfig,

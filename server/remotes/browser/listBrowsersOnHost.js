@@ -1,5 +1,5 @@
 import { BROWSER_CATALOG } from './browserCatalog.js';
-import { createBrowserAppSpec } from './createBrowserAppSpec.js';
+import { createBrowserAppSpec } from './spec.js';
 
 export async function listBrowsersOnHost(osService) {
   const browsers = [];

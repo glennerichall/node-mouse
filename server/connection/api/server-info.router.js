@@ -116,6 +116,7 @@ export function createServerInfoRouter(services) {
     const currentToken = services.getTokenManager().getToken();
     const entryPathConfig = services.getSystemConfig().entryPath;
     const daemon = await services.getApplicationDaemonService().getInfo();
+    const system = await services.getSystem().getInfo();
     const tokens = buildTokenEntries({
       entries: tokenEntries,
       currentToken,
@@ -132,6 +133,7 @@ export function createServerInfoRouter(services) {
       tasks,
       tokens,
       daemon,
+      system,
       restarts,
       config,
       sysConfig,

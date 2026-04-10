@@ -18,6 +18,8 @@ function buildHelpMessage() {
     '  config get <path> Affiche une valeur de configuration',
     '  config set <path> <value> Met a jour une valeur de configuration',
     '  sys-config Affiche la configuration système',
+    '  info     Affiche les capacites du serveur',
+    '  system-info Alias de info',
     '  service install Installe le daemon/service local',
     '  service disable Desactive le daemon/service local',
     '  service uninstall Desinstalle le daemon/service local',
@@ -157,6 +159,14 @@ export async function executeCliCommand(services, input) {
       ok: true,
       message: 'Configuration système.',
       data: services.getSystemConfig(),
+    };
+  }
+
+  if (command === 'info' || command === 'system-info') {
+    return {
+      ok: true,
+      message: 'Capacites du serveur.',
+      data: await services.getSystem().getInfo(),
     };
   }
 

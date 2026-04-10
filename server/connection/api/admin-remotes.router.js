@@ -9,7 +9,7 @@ export function createAdminRemotesRouter(services) {
 
   router.get('/browsers', async (_req, res) => {
     const config = services.getConfig();
-    const browsers = await services.getRemotes().browser.listBrowsers();
+    const browsers = await services.getSystem().listBrowsers();
     res.json({
       browsers: browsers.map((browser) => ({
         ...browser,
@@ -20,7 +20,7 @@ export function createAdminRemotesRouter(services) {
 
   router.get('/', async (_req, res) => {
     const config = services.getConfig();
-    const vlcAvailable = await services.getRemotes().vlc.isAvailable();
+    const vlcAvailable = await services.getSystem().isVlcAvailable();
     const remotes = [
       {
         id: 'browser',

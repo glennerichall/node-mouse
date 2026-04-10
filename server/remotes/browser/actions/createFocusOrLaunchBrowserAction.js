@@ -1,5 +1,5 @@
 import { getBrowserCatalogEntry } from '../browserCatalog.js';
-import { createBrowserAppSpec } from '../createBrowserAppSpec.js';
+import { createBrowserAppSpec } from '../spec.js';
 
 export function createFocusOrLaunchBrowserAction(state, osService) {
   return async function focusOrLaunchBrowser(browserId) {
