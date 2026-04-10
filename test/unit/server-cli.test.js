@@ -68,10 +68,8 @@ describe('server cli', () => {
 
   it('returns one persisted config value for config get', async () => {
     const result = await executeCliCommand({
-      getConfig: () => ({
-        logging: {
-          level: 'debug',
-        },
+      getConfigService: () => ({
+        getConfig: () => 'debug',
       }),
       getRemotes: () => ({
         adminActions: {},
@@ -88,35 +86,21 @@ describe('server cli', () => {
     });
   });
 
-  it('updates one persisted config value for config set through configDao', async () => {
-    const saveStoredConfig = jest.fn();
-    let currentConfig = {
-      logging: {
-        level: 'info',
-      },
-    };
-
-    saveStoredConfig.mockImplementation((nextConfig) => {
-      currentConfig = nextConfig;
-    });
+  it('updates one persisted config value for config set through config service', async () => {
+    const setConfig = jest.fn();
+    const getConfig = jest.fn(() => 'debug');
 
     const result = await executeCliCommand({
-      getConfig: () => currentConfig,
-      getPersistence: () => ({
-        configDao: {
-          saveStoredConfig,
-        },
+      getConfigService: () => ({
+        setConfig,
+        getConfig,
       }),
       getRemotes: () => ({
         adminActions: {},
       }),
     }, 'config set logging.level debug');
 
-    expect(saveStoredConfig).toHaveBeenCalledWith({
-      logging: {
-        level: 'debug',
-      },
-    }, expect.arrayContaining(['logging.level']));
+    expect(setConfig).toHaveBeenCalledWith('logging.level', 'debug');
     expect(result).toEqual({
       ok: true,
       message: 'Configuration logging.level mise a jour.',

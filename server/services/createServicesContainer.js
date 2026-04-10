@@ -1,18 +1,5 @@
 import {createLogger} from "./log/logger.js";
-
-export function createLazy(provider) {
-    let hasValue = false;
-    let value;
-
-    return () => {
-        if (!hasValue) {
-            value = provider();
-            hasValue = true;
-        }
-
-        return value;
-    };
-}
+import {createLazy} from "../../utils/shared/createLazy.js";
 
 function urlFactory(services) {
     const {
@@ -54,7 +41,7 @@ export async function createServicesContainer({
                                                   createSystemConfig,
                                                   createPersistence,
                                                   createOsService,
-                                                  createConfig,
+                                                  createConfigService,
                                                   createSseService,
                                                   createEventStore,
                                                   createServiceEvents,
@@ -81,7 +68,8 @@ export async function createServicesContainer({
         getSystemConfig: createLazy(() => createSystemConfig(container)),
         getPersistence: createLazy(() => createPersistence(container)),
         getOs: createLazy(() => createOsService(container)),
-        getConfig: () => createConfig(container),
+        getConfigService: createLazy(() => createConfigService(container)),
+        getConfig: () => container.getConfigService().getConfigs(),
         getSseService: createLazy(() => createSseService(container)),
         getEventStore: createLazy(() => createEventStore(container)),
         getEvents: createLazy(() => createServiceEvents(container)),

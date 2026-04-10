@@ -1,6 +1,4 @@
-import {getClientI18n, onClientI18nChange} from '../i18n/index.js';
-
-export function bindConnectionOverlay(socket, overlay) {
+export function bindConnectionOverlay(socket, overlay, i18n) {
   const titleEl = overlay.querySelector('[data-connection-title]');
   const messageEl = overlay.querySelector('[data-connection-message]');
 
@@ -14,7 +12,7 @@ export function bindConnectionOverlay(socket, overlay) {
   }
 
   function update() {
-    const {t} = getClientI18n();
+    const {t} = i18n.getI18n();
     const connected = socket.connected;
     if (!connected) {
       setContent(t('main.connectionUnavailableTitle'), t('main.connectionWaiting'));
@@ -23,7 +21,7 @@ export function bindConnectionOverlay(socket, overlay) {
   }
 
   function handleConnectError(error) {
-    const {t} = getClientI18n();
+    const {t} = i18n.getI18n();
     const isUnauthorized = error?.message === 'unauthorized'
       || error?.data?.code === 'ENTRY_TOKEN_INVALID';
 
@@ -43,7 +41,7 @@ export function bindConnectionOverlay(socket, overlay) {
   socket.on('disconnect', update);
   socket.on('reconnect', update);
   socket.on('connect_error', handleConnectError);
-  onClientI18nChange(() => {
+  i18n.onChange(() => {
     update();
   });
 

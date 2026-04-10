@@ -1,14 +1,14 @@
-import {applyPageTranslations, getClientI18n, initClientHandedness, initClientI18n, initClientTheme, onClientI18nChange} from '../i18n/index.js';
+import {applyPageTranslations} from '../ui/i18n/apply-page-translations.js';
 import {
   NOTIFICATION_EVENT_DEFINITIONS,
   NOTIFICATION_TARGET_CLIENT,
   NOTIFICATION_TARGET_HOST,
   getNotificationTargetPath,
 } from '../../utils/shared/notificationSettings.js';
+import {createServicesRegistry} from '../services/createServicesRegistry.js';
 
-await initClientI18n();
-initClientTheme();
-initClientHandedness();
+const services = createServicesRegistry();
+await services.initializeCoreServices();
 
 const form = document.getElementById('config-form');
 const statusNode = document.getElementById('config-status');
@@ -16,10 +16,10 @@ const reloadButton = document.getElementById('reload-config');
 const restartButton = document.getElementById('restart-service');
 const sectionTemplate = document.getElementById('section-template');
 const fieldTemplate = document.getElementById('field-template');
-applyPageTranslations(document);
+applyPageTranslations(document, t);
 
 function t(key, params) {
-  return getClientI18n().t(key, params);
+  return services.getI18n().t(key, params);
 }
 
 function translateOr(key, fallback = '') {
@@ -630,7 +630,7 @@ function renderConfigForm(config, schema) {
 }
 
 function refreshLocalizedTexts() {
-  applyPageTranslations(document);
+  applyPageTranslations(document, t);
   renderConfigForm(currentConfig, currentSchema);
 }
 
@@ -834,6 +834,6 @@ window.addEventListener('beforeunload', () => {
   unsubscribeFromConfigEvents();
 });
 
-onClientI18nChange(() => {
+services.getI18n().onChange(() => {
   refreshLocalizedTexts();
 });

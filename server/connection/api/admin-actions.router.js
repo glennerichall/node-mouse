@@ -11,7 +11,7 @@ import {
 export {
     buildManagedConfigPayload,
     coerceConfigValue,
-} from './admin-config.shared.js';
+} from './configs.js';
 
 export function createAdminConfigActionsRouter(services) {
     const router = express.Router();

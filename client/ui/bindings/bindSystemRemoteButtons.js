@@ -1,10 +1,10 @@
-import { emitWithTimestamp } from '../core/socket-emit.js';
-import { bindTouchPassthrough } from '../touch/bind-touch-passthrough.js';
+import { emitWithTimestamp } from '../../core/socket-emit.js';
+import { bindTouchPassthrough } from '../../touch/bindTouchPassthrough.js';
 import {
   REMOTE_EVENT_KEYBOARD_KEY,
   REMOTE_EVENT_WINDOW_CLOSE,
   REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE,
-} from '../../utils/shared/remoteCommands.js';
+} from '../../../utils/shared/remoteCommands.js';
 
 export function bindSystemRemoteButtons(
   socket,

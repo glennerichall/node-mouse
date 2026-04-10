@@ -3,52 +3,36 @@ import { createCanvasUI } from '../ui/canvas-ui.js';
 import { bindTouchpad } from '../touch/touchpad.js';
 import { bindKeyboardPanel } from '../ui/keyboard-panel.js';
 import { bindMouseButtons } from '../ui/mouse-buttons.js';
-import { bindActionButtons } from '../ui/action-buttons.js';
+import { bindActionButtons } from '../ui/bindings/bindActionButtons.js';
 import { bindConnectionOverlay } from '../ui/connection-overlay.js';
 import { bindPreviewStream } from '../preview/preview-stream.js';
 import { bindClientNotifications } from '../ui/notifications/bind-client-notifications.js';
-import { bindAdminDrawer } from '../ui/admin-drawer.js';
-import { bindAdminVersion } from '../ui/admin-version.js';
-import { bindRemoteAccordion } from '../ui/bind-remote-accordion.js';
-import {
-  getClientBrowserConfig,
-  getClientInputConfig,
-  getClientKeyboardConfig,
-  getClientPreviewConfig,
-  getClientVlcConfig,
-  onClientConfigChange,
-} from '../config/client-config.js';
-import {
-  getClientHandedness,
-  getClientRemoteAutoHide,
-  getClientRemoteVisibility,
-  initClientRemoteAutoHide,
-  initClientRemoteVisibilityState,
-  onClientRemoteAutoHideChange,
-  onClientRemoteVisibilityChange,
-} from '../i18n/index.js';
-
-export function initUi(socket) {
+import { bindAdminDrawer } from '../ui/bindings/bindAdminDrawer.js';
+import { bindAdminVersion } from '../ui/bindings/bindAdminVersion.js';
+import { bindRemoteAccordion } from '../ui/bindings/bindRemoteAccordion.js';
+export function initUi(services) {
+  const transport = services.getTransport();
+  const preferenceView = services.getPreferenceView();
+  const clientConfig = services.getClientConfig();
   const dom = getDom();
-  const canvasUI = createCanvasUI(dom.touchpad);
+  const canvasUI = createCanvasUI(dom.touchpad, preferenceView);
   const remoteAccordion = bindRemoteAccordion(dom);
-  initClientRemoteAutoHide();
-  initClientRemoteVisibilityState();
   let hideRemoteTimer = null;
   let showRemoteTimer = null;
   const REMOTE_HIDE_DELAY_MS = 300;
   const SHOW_REMOTE_DELAY = 500;
 
   const applyRemoteVisibilityState = () => {
-    const browserVisible = getClientBrowserConfig().enabled !== false
-      && getClientRemoteVisibility('browser', true);
-    const keyboardVisible = getClientKeyboardConfig().enabled !== false
-      && getClientRemoteVisibility('keyboard', true);
-    const vlcVisible = getClientVlcConfig().enabled !== false
-      && getClientRemoteVisibility('vlc', true);
-    const samsungVisible = getClientRemoteVisibility('samsung', true);
-    const previewVisible = getClientPreviewConfig().enabled !== false
-      && getClientRemoteVisibility('preview', true);
+    const configView = services.getConfigView();
+    const browserVisible = configView.getBrowserConfig().enabled !== false
+      && preferenceView.getRemoteVisibility('browser', true);
+    const keyboardVisible = configView.getKeyboardConfig().enabled !== false
+      && preferenceView.getRemoteVisibility('keyboard', true);
+    const vlcVisible = configView.getVlcConfig().enabled !== false
+      && preferenceView.getRemoteVisibility('vlc', true);
+    const samsungVisible = preferenceView.getRemoteVisibility('samsung', true);
+    const previewVisible = configView.getPreviewConfig().enabled !== false
+      && preferenceView.getRemoteVisibility('preview', true);
 
     if (dom.browserShortcuts) {
       dom.browserShortcuts.hidden = !browserVisible;
@@ -88,7 +72,7 @@ export function initUi(socket) {
     if (interactionKind !== 'move') {
       return;
     }
-    if (!getClientRemoteAutoHide()) {
+    if (!preferenceView.getRemoteAutoHide()) {
       dom.remoteStack.classList.remove('is-hidden');
       dom.scrollZoneIndicator?.classList.remove('is-hidden');
       return;
@@ -126,7 +110,7 @@ export function initUi(socket) {
   };
 
   const applyRemoteAutoHideState = () => {
-    if (!getClientRemoteAutoHide()) {
+    if (!preferenceView.getRemoteAutoHide()) {
       if (hideRemoteTimer) {
         clearTimeout(hideRemoteTimer);
         hideRemoteTimer = null;
@@ -140,31 +124,35 @@ export function initUi(socket) {
     }
   };
 
-  const preview = bindPreviewStream(socket, dom);
-  bindTouchpad(socket, dom.touchpad, {
+  const preview = bindPreviewStream(transport, dom, {
+    clientConfig,
+    getConfigView: services.getConfigView,
+    preferenceView,
+  });
+  bindTouchpad(transport, dom.touchpad, {
     onMouseMove: preview.onMouseMoveActivity,
     onMovementStart: hideRemotes,
     onInteractionEnd: showRemotes,
-    getInputConfig: getClientInputConfig,
-    getHandedness: getClientHandedness,
+    getInputConfig: () => services.getConfigView().getInputConfig(),
+    getHandedness: () => preferenceView.getHandedness(),
   });
-  bindKeyboardPanel(socket, dom, {
+  bindKeyboardPanel(transport, dom, {
     setPreviewActive: preview.setKeyboardPreviewActive,
   });
-  bindMouseButtons(socket, dom);
-  bindActionButtons(socket, dom);
-  bindConnectionOverlay(socket, dom.connectionOverlay);
-  bindClientNotifications(socket, dom.notificationsRoot);
+  bindMouseButtons(transport, dom);
+  bindActionButtons(transport, dom, services);
+  bindConnectionOverlay(transport, dom.connectionOverlay, services.getI18n());
+  bindClientNotifications(services, dom.notificationsRoot);
   bindAdminDrawer({
     app: dom.app,
     touchpad: dom.touchpad,
     scrim: dom.adminDrawerScrim,
     adminPanel: dom.leftMenu,
   });
-  bindAdminVersion(dom.adminAppVersion);
-  onClientRemoteAutoHideChange(applyRemoteAutoHideState);
-  onClientRemoteVisibilityChange(applyRemoteVisibilityState);
-  onClientConfigChange(applyRemoteVisibilityState);
+  bindAdminVersion(dom.adminAppVersion, services.getI18n());
+  preferenceView.onRemoteAutoHideChange(applyRemoteAutoHideState);
+  preferenceView.onRemoteVisibilityChange(applyRemoteVisibilityState);
+  services.getClientConfig().onChange(applyRemoteVisibilityState);
   applyRemoteAutoHideState();
   applyRemoteVisibilityState();
 

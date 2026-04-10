@@ -1,10 +1,7 @@
-import {getClientI18n} from '../../i18n/index.js';
-
-export function showToast(root, payload = {}) {
+export function showToast(root, payload = {}, t) {
   if (!root) {
     return;
   }
-  const {t} = getClientI18n();
   const params = payload.params && typeof payload.params === 'object' ? payload.params : {};
 
   const title = String(

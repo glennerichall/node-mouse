@@ -1,12 +1,10 @@
-import {getClientI18n, onClientI18nChange} from '../i18n/index.js';
-
-export async function bindAdminVersion(versionNode) {
+export async function bindAdminVersion(versionNode, i18n) {
   if (!versionNode) {
     return;
   }
 
   async function refreshVersion() {
-    const {t} = getClientI18n();
+    const {t} = i18n.getI18n();
 
     try {
       const response = await fetch('/health', { cache: 'no-store' });
@@ -18,7 +16,7 @@ export async function bindAdminVersion(versionNode) {
     }
   }
 
-  onClientI18nChange(() => {
+  i18n.onChange(() => {
     void refreshVersion();
   });
 

@@ -1,7 +1,7 @@
 import express from "express";
 import {createServerInfoRouter} from "../connection/api/server-info.router.js";
 import {createAdminConfigsRouter} from "../connection/api/admin-configs.router.js";
-import {createAdminConfigActionsRouter} from "../connection/api/admin-config.router.js";
+import {createAdminConfigActionsRouter} from "../connection/api/admin-actions.router.js";
 import {createAdminSubsRouter} from "../connection/api/admin-subs.router.js";
 import {createAdminRemotesRouter} from '../connection/api/admin-remotes.router.js';
 

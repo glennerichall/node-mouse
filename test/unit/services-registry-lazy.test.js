@@ -18,7 +18,12 @@ const getSystemConfig = jest.fn(() => ({
     cookieSecret: 'secret',
   },
 }));
-const createConfig = jest.fn(() => ({}));
+const createConfigService = jest.fn(() => ({
+  getConfigs: jest.fn(() => ({})),
+  getConfig: jest.fn(() => undefined),
+  setConfig: jest.fn(),
+  resetConfig: jest.fn(),
+}));
 const createTokenManager = jest.fn(() => ({}));
 const createNotifier = jest.fn(() => ({}));
 const createTaskRunner = jest.fn(() => ({}));
@@ -61,7 +66,7 @@ jest.unstable_mockModule('../../server/services/config/index.js', () => ({
 }));
 
 jest.unstable_mockModule('../../server/services/config/configService.js', () => ({
-  createConfig,
+  createConfigService,
 }));
 
 jest.unstable_mockModule('../../server/services/token-manager/createTokenManager.js', () => ({
@@ -137,7 +142,7 @@ describe('createServicesRegistry', () => {
     expect(createServer).not.toHaveBeenCalled();
     expect(createInputController).not.toHaveBeenCalled();
     expect(getSystemConfig).not.toHaveBeenCalled();
-    expect(createConfig).not.toHaveBeenCalled();
+    expect(createConfigService).not.toHaveBeenCalled();
     expect(createTokenManager).not.toHaveBeenCalled();
     expect(createNotifier).not.toHaveBeenCalled();
     expect(createTaskRunner).not.toHaveBeenCalled();

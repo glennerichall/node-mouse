@@ -1,7 +1,7 @@
 import {
   buildManagedConfigPayload,
   coerceConfigValue,
-} from '../../server/connection/api/admin-config.shared.js';
+} from '../../server/connection/api/configs.js';
 import {DEFAULT_PERSISTED_CONFIG} from '../../server/services/config/defaultConfig.js';
 
 describe('admin config router helpers', () => {

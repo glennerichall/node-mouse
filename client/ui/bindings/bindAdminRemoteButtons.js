@@ -1,8 +1,4 @@
-import {
-    getClientSystemConfig,
-    onClientConfigChange
-} from "../config/client-config.js";
-import {emitWithTimestamp} from "../core/socket-emit.js";
+import {emitWithTimestamp} from "../../core/socket-emit.js";
 import {
     REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT,
     REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER,
@@ -13,7 +9,7 @@ import {
     REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY,
     REMOTE_EVENT_ADMIN_UPDATE_CHECK,
     REMOTE_EVENT_ADMIN_UPDATE_INSTALL
-} from "../../utils/shared/remoteCommands.js";
+} from "../../../utils/shared/remoteCommands.js";
 
 export function bindAdminRemoteButtons(
     socket,
@@ -31,7 +27,10 @@ export function bindAdminRemoteButtons(
         btnRotateEntryToken,
         adminActionsDisabledMessage,
     },
+    services,
 ) {
+    const clientConfig = services.getClientConfig();
+    const getConfigView = services.getConfigView;
     const adminButtons = [
         btnForceUpdateCheck,
         btnInstallUpdate,
@@ -46,7 +45,7 @@ export function bindAdminRemoteButtons(
     ];
 
     const syncAdminButtonsState = () => {
-        const {adminActionsEnabled = true} = getClientSystemConfig();
+        const {adminActionsEnabled = true} = getConfigView().getSystemConfig();
         for (const button of adminButtons) {
             if (!button) {
                 continue;
@@ -75,5 +74,5 @@ export function bindAdminRemoteButtons(
     btnRotateEntryToken.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN));
 
     syncAdminButtonsState();
-    onClientConfigChange(syncAdminButtonsState);
+    clientConfig.onChange(syncAdminButtonsState);
 }

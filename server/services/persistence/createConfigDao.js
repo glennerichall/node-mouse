@@ -1,16 +1,6 @@
-import {
-    setNestedValue,
-    toFlatMap
-} from "../../../utils/shared/objet.utils.js";
-import {
-    PUBSUB_EVENT_CONFIG_DELETED,
-    PUBSUB_EVENT_CONFIG_UPDATED,
-    PUBSUB_SERVICE_CONFIG
-} from "../pubsub/serviceEventConstants.js";
-
 const CONFIG_TABLE = 'config_entries';
 
-export function createConfigDao({getDatabase, getPubSub} = {}) {
+export function createConfigDao({getDatabase} = {}) {
     let bootstrapped = false;
 
     function bootstrapConfigDatabase() {
@@ -24,113 +14,93 @@ export function createConfigDao({getDatabase, getPubSub} = {}) {
         `);
     }
 
-    function emitStateChange(changeType, changedKeys = []) {
-        getPubSub().publish(PUBSUB_SERVICE_CONFIG, {
-            changeType,
-            changedKeys: Array.from(new Set(changedKeys)),
-            storedConfig: getStoredConfig(),
-        }, {
-            type: changeType === 'deleted' ? PUBSUB_EVENT_CONFIG_DELETED : PUBSUB_EVENT_CONFIG_UPDATED,
-            snapshot: false,
-        });
-    }
-
-    function saveStoredConfig(value, managedPaths = []) {
+    function saveOne(key, value) {
         const db = getDatabase();
         if (!bootstrapped) {
             bootstrapConfigDatabase();
             bootstrapped = true;
         }
 
-        const flattened = toFlatMap(value);
-        const allowedKeys = new Set(managedPaths);
-        const insertStatement = db.prepare(`
+        const normalizedKey = String(key || '').trim();
+        if (!normalizedKey) {
+            return 0;
+        }
+
+        const statement = db.prepare(`
             INSERT INTO ${CONFIG_TABLE} (key, value_json)
             VALUES (?, ?)
             ON CONFLICT(key) DO UPDATE SET value_json = excluded.value_json
         `);
-
-        const persist = db.transaction(() => {
-            for (const [key, entryValue] of flattened.entries()) {
-                if (allowedKeys.size > 0 && !allowedKeys.has(key)) {
-                    continue;
-                }
-                insertStatement.run(key, JSON.stringify(entryValue));
-            }
-        });
-
-        persist();
-        emitStateChange(
-            'updated',
-            Array.from(flattened.keys()).filter((key) => !allowedKeys.size || allowedKeys.has(key)),
-        );
+        return statement.run(normalizedKey, JSON.stringify(value)).changes;
     }
 
-    function getStoredConfig(managedPaths = []) {
+    function getOne(key) {
         const db = getDatabase();
         if (!bootstrapped) {
             bootstrapConfigDatabase();
             bootstrapped = true;
         }
-        const selectStatement = db.prepare(`SELECT key, value_json FROM ${CONFIG_TABLE}`);
-        const rows = selectStatement.all();
-        const allowedKeys = new Set(managedPaths);
-        const config = {};
 
-        for (const row of rows) {
-            if (allowedKeys.size > 0 && !allowedKeys.has(row.key)) {
-                continue;
-            }
+        const normalizedKey = String(key || '').trim();
+        if (!normalizedKey) {
+            return undefined;
+        }
 
+        const row = db.prepare(`SELECT value_json FROM ${CONFIG_TABLE} WHERE key = ?`).get(normalizedKey);
+        if (!row) {
+            return undefined;
+        }
+
+        try {
+            return JSON.parse(row.value_json);
+        } catch (_error) {
+            return row.value_json;
+        }
+    }
+
+    function getAll() {
+        const db = getDatabase();
+        if (!bootstrapped) {
+            bootstrapConfigDatabase();
+            bootstrapped = true;
+        }
+
+        const rows = db.prepare(`SELECT key, value_json FROM ${CONFIG_TABLE}`).all();
+        return rows.map((row) => {
             let value;
             try {
                 value = JSON.parse(row.value_json);
             } catch (_error) {
                 value = row.value_json;
             }
-            setNestedValue(config, row.key, value);
-        }
 
-        return config;
+            return {
+                key: row.key,
+                value,
+            };
+        });
     }
 
-    function deleteStoredConfig(paths = [], managedPaths = []) {
+    function deleteOne(key) {
         const db = getDatabase();
         if (!bootstrapped) {
             bootstrapConfigDatabase();
             bootstrapped = true;
         }
 
-        const allowedKeys = new Set(managedPaths);
-        const filteredPaths = Array.from(new Set(paths))
-            .filter((pathKey) => !allowedKeys.size || allowedKeys.has(pathKey));
-
-        if (!filteredPaths.length) {
+        const normalizedKey = String(key || '').trim();
+        if (!normalizedKey) {
             return 0;
         }
 
-        const remove = db.transaction(() => {
-            const statement = db.prepare(`DELETE FROM ${CONFIG_TABLE} WHERE key = ?`);
-            let changes = 0;
-
-            for (const pathKey of filteredPaths) {
-                changes += statement.run(pathKey).changes;
-            }
-
-            return changes;
-        });
-
-        const changes = remove();
-        if (changes > 0) {
-            emitStateChange('deleted', filteredPaths);
-        }
-        return changes;
+        return db.prepare(`DELETE FROM ${CONFIG_TABLE} WHERE key = ?`).run(normalizedKey).changes;
     }
 
     return {
         bootstrapConfigDatabase,
-        saveStoredConfig,
-        getStoredConfig,
-        deleteStoredConfig,
+        saveOne,
+        getOne,
+        getAll,
+        deleteOne,
     };
 }

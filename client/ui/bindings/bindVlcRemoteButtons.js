@@ -1,11 +1,11 @@
-import { emitWithTimestamp } from '../core/socket-emit.js';
-import { bindTouchPassthrough } from '../touch/bind-touch-passthrough.js';
+import { emitWithTimestamp } from '../../core/socket-emit.js';
+import { bindTouchPassthrough } from '../../touch/bindTouchPassthrough.js';
 import {
   REMOTE_EVENT_VLC_COMMAND,
   REMOTE_EVENT_VLC_OPEN,
   REMOTE_EVENT_VLC_WINDOW_CLOSE,
   REMOTE_EVENT_VLC_WINDOW_TOGGLE,
-} from '../../utils/shared/remoteCommands.js';
+} from '../../../utils/shared/remoteCommands.js';
 
 export function bindVlcRemoteButtons(
   socket,

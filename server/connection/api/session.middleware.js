@@ -60,12 +60,6 @@ export function createSessionGuard(services, {
 
 export function createSessionRouter(services) {
     const router = express.Router();
-  // const postSessionGuard = createSessionGuard({
-  //   services,
-  //   onUnauthorized: (_req, res) => {
-  //     res.status(401).json({ok: false, message: 'Invalid token'});
-  //   },
-  // });
 
     router.get('/:token', (req, res) => {
         const tokenManager = services.getTokenManager();

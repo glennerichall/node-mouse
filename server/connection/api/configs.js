@@ -76,7 +76,6 @@ export function getManagedConfigSnapshot(config, managedPaths = CONFIG_PATHS) {
   for (const pathKey of managedPaths) {
     setNestedValue(snapshot, pathKey, getValueAtPath(config, pathKey));
   }
-
   return snapshot;
 }
 

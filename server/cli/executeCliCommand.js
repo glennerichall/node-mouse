@@ -4,8 +4,7 @@ import {
   coerceConfigValue,
   getFieldDefinition,
   getValueAtPath,
-} from '../connection/api/admin-config.shared.js';
-import {setNestedValue} from '../../utils/shared/objet.utils.js';
+} from '../connection/api/configs.js';
 import {
   getSamsungDeviceMac,
   pickSamsungDevice,
@@ -98,14 +97,14 @@ export async function executeCliCommand(services, input) {
       };
     }
 
-    return {
-      ok: true,
-      message: `Configuration ${pathKey}.`,
-      data: {
-        path: pathKey,
-        value: getValueAtPath(services.getConfig(), pathKey),
-      },
-    };
+      return {
+        ok: true,
+        message: `Configuration ${pathKey}.`,
+        data: {
+          path: pathKey,
+          value: services.getConfigService().getConfig(pathKey),
+        },
+      };
   }
 
   if (primaryCommand === 'config' && normalizeSubcommand(tokens[1]) === 'set') {
@@ -135,16 +134,14 @@ export async function executeCliCommand(services, input) {
     try {
       const rawValue = tokens.slice(3).join(' ');
       const nextValue = coerceConfigValue(rawValue, field);
-      const nextConfig = {};
-      setNestedValue(nextConfig, pathKey, nextValue);
-      services.getPersistence().configDao.saveStoredConfig(nextConfig, CONFIG_PATHS);
+      services.getConfigService().setConfig(pathKey, nextValue);
 
       return {
         ok: true,
         message: `Configuration ${pathKey} mise a jour.`,
         data: {
           path: pathKey,
-          value: getValueAtPath(services.getConfig(), pathKey),
+          value: services.getConfigService().getConfig(pathKey),
         },
       };
     } catch (error) {

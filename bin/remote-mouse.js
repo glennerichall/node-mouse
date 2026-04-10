@@ -4,20 +4,7 @@ import {sendCliCommand} from '../server/cli/sendCliCommand.js';
 import {getSystemConfig} from '../server/services/config/index.js';
 import {createPersistence} from '../server/services/persistence/index.js';
 import {createApplicationDaemonService} from '../server/services/application/createApplicationDaemonService.js';
-
-function createLazy(provider) {
-  let hasValue = false;
-  let value;
-
-  return () => {
-    if (!hasValue) {
-      value = provider();
-      hasValue = true;
-    }
-
-    return value;
-  };
-}
+import {createLazy} from '../utils/shared/createLazy.js';
 
 function createLocalDaemonServices() {
   const services = {};

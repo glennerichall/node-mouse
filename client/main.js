@@ -1,23 +1,12 @@
-import { initSocketIo } from './core/init-socket-io.js';
 import { initUi } from './core/init-ui.js';
-import {
-  applyPageTranslations,
-  initClientBrowserVisibilityState,
-  initClientHandedness,
-  initClientI18n,
-  initClientTheme,
-} from './i18n/index.js';
-import { initClientConfig } from './config/client-config.js';
+import {createServicesRegistry} from './services/createServicesRegistry.js';
 
 async function initClient() {
-  await initClientI18n();
-  initClientTheme();
-  initClientHandedness();
-  initClientBrowserVisibilityState();
-  applyPageTranslations(document);
-  await initClientConfig();
-  const socket = initSocketIo();
-  initUi(socket);
+  const services = createServicesRegistry();
+  await services.initializeCoreServices();
+  services.initializeRealtimeServices();
+  services.getI18n().translateRoot(document);
+  initUi(services);
 }
 
 void initClient();

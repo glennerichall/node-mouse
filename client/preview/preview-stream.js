@@ -1,16 +1,11 @@
 import {createPreviewFrameReceiver} from "./create-preview-frame-receiver.js";
 import {emitWithTimestamp} from "../core/socket-emit.js";
-import { getClientPreviewConfig, onClientConfigChange } from '../config/client-config.js';
-import {
-  getClientRemoteVisibility,
-  onClientRemoteVisibilityChange,
-} from '../i18n/index.js';
 import {
   REMOTE_EVENT_PREVIEW_START,
   REMOTE_EVENT_PREVIEW_STOP,
 } from '../../utils/shared/remoteCommands.js';
 
-export function bindPreviewStream(socket, { previewCanvas, previewLabel }) {
+export function bindPreviewStream(socket, { previewCanvas, previewLabel }, {clientConfig, getConfigView, preferenceView}) {
   if (!previewCanvas) {
     return {
       onMouseMoveActivity: () => {},
@@ -26,10 +21,10 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }) {
   let keyboardPreviewActive = false;
 
   const isPreviewEnabled = () =>
-    getClientPreviewConfig().enabled !== false && getClientRemoteVisibility('preview', true);
+    getConfigView().getPreviewConfig().enabled !== false && preferenceView.getRemoteVisibility('preview', true);
 
   const getInactivityDelayMs = () => {
-    const configuredDelay = Number(getClientPreviewConfig()?.hideDelayMs);
+    const configuredDelay = Number(getConfigView().getPreviewConfig()?.hideDelayMs);
     if (Number.isFinite(configuredDelay) && configuredDelay >= 200) {
       return configuredDelay;
     }
@@ -115,7 +110,7 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }) {
   socket.on('preview:frame', onPreviewFrame);
   socket.on('disconnect', stopPreview);
   window.addEventListener('beforeunload', stopPreview);
-  onClientConfigChange(() => {
+  clientConfig.onChange(() => {
     if (!isPreviewEnabled()) {
       stopPreview();
       return;
@@ -125,7 +120,7 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }) {
       armInactivityStop();
     }
   });
-  onClientRemoteVisibilityChange(() => {
+  preferenceView.onRemoteVisibilityChange(() => {
     if (!isPreviewEnabled()) {
       stopPreview();
       return;

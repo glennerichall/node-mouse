@@ -1,7 +1,6 @@
 import express from 'express';
 
 import {CONFIG_PATHS} from '../../services/config/configPaths.js';
-import {setNestedValue} from '../../../utils/shared/objet.utils.js';
 import {
   adminConfigDefaults,
   adminConfigSchema,
@@ -9,7 +8,7 @@ import {
   coerceConfigValue,
   getFieldDefinition,
   getManagedConfigSnapshot,
-} from './admin-config.shared.js';
+} from './configs.js';
 
 export function createAdminConfigsRouter(services) {
   const getConfig = services.getConfig;
@@ -117,12 +116,10 @@ export function createAdminConfigsRouter(services) {
 
     try {
       if (req.body.value === null) {
-        services.getPersistence().configDao.deleteStoredConfig([pathKey], managedPaths);
+        services.getConfigService().resetConfig(pathKey);
       } else {
         const nextValue = coerceConfigValue(req.body.value, field);
-        const nextConfig = {};
-        setNestedValue(nextConfig, pathKey, nextValue);
-        services.getPersistence().configDao.saveStoredConfig(nextConfig, managedPaths);
+        services.getConfigService().setConfig(pathKey, nextValue);
       }
 
       const nextContext = await getManagedContext();
@@ -155,7 +152,7 @@ export function createAdminConfigsRouter(services) {
       return;
     }
 
-    services.getPersistence().configDao.deleteStoredConfig([pathKey], managedPaths);
+    services.getConfigService().resetConfig(pathKey);
     const nextContext = await getManagedContext();
     res.json({
       ok: true,

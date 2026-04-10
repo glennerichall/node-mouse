@@ -1,7 +1,6 @@
 import { getScrollZoneLayout } from '../touch/gesture-zone.js';
-import {getClientHandedness, onClientHandednessChange} from '../i18n/index.js';
 
-export function createCanvasUI(touchpad) {
+export function createCanvasUI(touchpad, preferenceView) {
   const ctx = touchpad.getContext('2d');
 
   function drawHint() {
@@ -18,14 +17,14 @@ export function createCanvasUI(touchpad) {
     touchpad.height = Math.round(rect.height * ratio);
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
-    const layout = getScrollZoneLayout(touchpad.clientWidth, touchpad.clientHeight, getClientHandedness());
+    const layout = getScrollZoneLayout(touchpad.clientWidth, touchpad.clientHeight, preferenceView.getHandedness());
     document.documentElement.style.setProperty('--scroll-zone-width', `${layout.width}px`);
     document.documentElement.style.setProperty('--scroll-zone-edge-gap', `${layout.edgeGap}px`);
 
     drawHint();
   }
 
-  onClientHandednessChange(() => {
+  preferenceView.onHandednessChange(() => {
     resize();
   });
 

@@ -1,42 +1,6 @@
+import {dispatchSyntheticTouch} from "./dispatchSyntheticTouch.js";
+
 const MOVE_THRESHOLD_PX = 10;
-
-function createTouchList(touchpad, touch) {
-  return [
-    new Touch({
-      identifier: touch.identifier,
-      target: touchpad,
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-      screenX: touch.screenX ?? touch.clientX,
-      screenY: touch.screenY ?? touch.clientY,
-      pageX: touch.pageX ?? touch.clientX,
-      pageY: touch.pageY ?? touch.clientY,
-      radiusX: touch.radiusX ?? 1,
-      radiusY: touch.radiusY ?? 1,
-      rotationAngle: touch.rotationAngle ?? 0,
-      force: touch.force ?? 0.5,
-    }),
-  ];
-}
-
-function dispatchSyntheticTouch(touchpad, type, sourceTouch) {
-  if (!touchpad || typeof Touch !== 'function' || typeof TouchEvent !== 'function') {
-    return;
-  }
-
-  const touches = type === 'touchend' || type === 'touchcancel'
-    ? []
-    : createTouchList(touchpad, sourceTouch);
-  const changedTouches = createTouchList(touchpad, sourceTouch);
-
-  touchpad.dispatchEvent(new TouchEvent(type, {
-    bubbles: true,
-    cancelable: true,
-    touches,
-    targetTouches: touches,
-    changedTouches,
-  }));
-}
 
 function distanceFrom(startTouch, nextTouch) {
   const dx = nextTouch.clientX - startTouch.clientX;

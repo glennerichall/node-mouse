@@ -1,12 +1,4 @@
-import {
-    getClientSamsungConfig,
-    onClientConfigChange
-} from "../config/client-config.js";
-import {
-    getClientRemoteVisibility,
-    onClientRemoteVisibilityChange
-} from "../i18n/index.js";
-import {emitWithTimestamp} from "../core/socket-emit.js";
+import {emitWithTimestamp} from "../../core/socket-emit.js";
 import {
     REMOTE_EVENT_SAMSUNG_ENTER,
     REMOTE_EVENT_SAMSUNG_INPUT,
@@ -16,8 +8,8 @@ import {
     REMOTE_EVENT_SAMSUNG_PC_INPUT,
     REMOTE_EVENT_SAMSUNG_VOL_DOWN,
     REMOTE_EVENT_SAMSUNG_VOL_UP
-} from "../../utils/shared/remoteCommands.js";
-import { bindTouchPassthrough } from '../touch/bind-touch-passthrough.js';
+} from "../../../utils/shared/remoteCommands.js";
+import { bindTouchPassthrough } from '../../touch/bindTouchPassthrough.js';
 
 export function bindSamsungRemoteButtons(
     socket,
@@ -33,7 +25,12 @@ export function bindSamsungRemoteButtons(
         btnSamsungPcInput,
         touchpad,
     },
+    services,
 ) {
+    const clientConfig = services.getClientConfig();
+    const getConfigView = services.getConfigView;
+    const preferenceView = services.getPreferenceView();
+    const backend = services.getBackend();
     bindTouchPassthrough([
         btnSamsungOn,
         btnSamsungOff,
@@ -69,8 +66,8 @@ export function bindSamsungRemoteButtons(
     };
 
     const refreshSamsungPowerState = async () => {
-        const samsungConfig = getClientSamsungConfig();
-        const locallyVisible = getClientRemoteVisibility('samsung', true);
+        const samsungConfig = getConfigView().getSamsungConfig();
+        const locallyVisible = preferenceView.getRemoteVisibility('samsung', true);
         if (!tvControls || !samsungConfig.enabled || !locallyVisible) {
             applySamsungPowerState('off');
             return;
@@ -78,13 +75,7 @@ export function bindSamsungRemoteButtons(
 
         try {
             console.debug('[samsung-remote] refresh power state');
-            const response = await fetch('/api/remotes/samsung/status', {cache: 'no-store'});
-            if (!response.ok) {
-                console.debug('[samsung-remote] status http error', {status: response.status});
-                applySamsungPowerState('unknown');
-                return;
-            }
-            const payload = await response.json();
+            const payload = await backend.getSamsungStatus();
             console.debug('[samsung-remote] status payload', payload);
             applySamsungPowerState(payload?.power || 'unknown');
         } catch (_error) {
@@ -119,8 +110,8 @@ export function bindSamsungRemoteButtons(
         if (!tvControls) {
             return;
         }
-        const samsungConfig = getClientSamsungConfig();
-        const locallyVisible = getClientRemoteVisibility('samsung', true);
+        const samsungConfig = getConfigView().getSamsungConfig();
+        const locallyVisible = preferenceView.getRemoteVisibility('samsung', true);
         tvControls.hidden = !samsungConfig.enabled || !locallyVisible;
         if (tvControls.hidden) {
             clearExpeditedSamsungPolling();
@@ -148,6 +139,6 @@ export function bindSamsungRemoteButtons(
     btnSamsungPcInput.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_PC_INPUT));
     syncSamsungVisibility();
     ensureSamsungStatusPolling();
-    onClientConfigChange(syncSamsungVisibility);
-    onClientRemoteVisibilityChange(syncSamsungVisibility);
+    clientConfig.onChange(syncSamsungVisibility);
+    preferenceView.onRemoteVisibilityChange(syncSamsungVisibility);
 }

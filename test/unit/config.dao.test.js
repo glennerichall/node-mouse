@@ -1,16 +1,11 @@
-import {jest} from '@jest/globals';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+
 import {createConfigDao} from '../../server/services/persistence/createConfigDao.js';
 import {createDatabaseProvider} from '../../server/services/persistence/createDatabaseProvider.js';
-import {
-  PUBSUB_EVENT_CONFIG_DELETED,
-  PUBSUB_EVENT_CONFIG_UPDATED,
-  PUBSUB_SERVICE_CONFIG,
-} from '../../server/services/pubsub/serviceEventConstants.js';
 
-describe('config dao pubsub', () => {
+describe('config dao', () => {
   let tempDir;
   let getDatabase;
 
@@ -31,67 +26,27 @@ describe('config dao pubsub', () => {
     fs.rmSync(tempDir, {recursive: true, force: true});
   });
 
-  it('publishes config updates from the dao', () => {
-    const publish = jest.fn();
-    const dao = createConfigDao({
-      getDatabase,
-      getPubSub: () => ({publish}),
-    });
+  it('persists and loads individual entries', () => {
+    const dao = createConfigDao({getDatabase});
 
-    dao.saveStoredConfig({
-      logging: {
-        level: 'debug',
-      },
-      notifications: {
-        clientConnected: {
-          client: false,
-        },
-      },
-    }, ['logging.level', 'notifications.clientConnected.client']);
+    dao.saveOne('logging.level', 'debug');
+    dao.saveOne('notifications.clientConnected.client', false);
 
-    expect(publish).toHaveBeenCalledWith(PUBSUB_SERVICE_CONFIG, {
-      changeType: 'updated',
-      changedKeys: ['logging.level', 'notifications.clientConnected.client'],
-      storedConfig: {
-        logging: {
-          level: 'debug',
-        },
-        notifications: {
-          clientConnected: {
-            client: false,
-          },
-        },
-      },
-    }, {
-      type: PUBSUB_EVENT_CONFIG_UPDATED,
-      snapshot: false,
-    });
+    expect(dao.getOne('logging.level')).toBe('debug');
+    expect(dao.getOne('notifications.clientConnected.client')).toBe(false);
+    expect(dao.getAll()).toEqual(expect.arrayContaining([
+      {key: 'logging.level', value: 'debug'},
+      {key: 'notifications.clientConnected.client', value: false},
+    ]));
   });
 
-  it('publishes config deletions from the dao', () => {
-    const publish = jest.fn();
-    const dao = createConfigDao({
-      getDatabase,
-      getPubSub: () => ({publish}),
-    });
+  it('deletes one persisted entry', () => {
+    const dao = createConfigDao({getDatabase});
 
-    dao.saveStoredConfig({
-      logging: {
-        level: 'debug',
-      },
-    }, ['logging.level']);
-    publish.mockClear();
+    dao.saveOne('logging.level', 'debug');
 
-    const changes = dao.deleteStoredConfig(['logging.level'], ['logging.level']);
-
-    expect(changes).toBe(1);
-    expect(publish).toHaveBeenCalledWith(PUBSUB_SERVICE_CONFIG, {
-      changeType: 'deleted',
-      changedKeys: ['logging.level'],
-      storedConfig: {},
-    }, {
-      type: PUBSUB_EVENT_CONFIG_DELETED,
-      snapshot: false,
-    });
+    expect(dao.deleteOne('logging.level')).toBe(1);
+    expect(dao.getOne('logging.level')).toBeUndefined();
+    expect(dao.getAll()).toEqual([]);
   });
 });

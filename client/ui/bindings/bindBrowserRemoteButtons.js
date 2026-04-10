@@ -1,11 +1,9 @@
-import {emitWithTimestamp} from "../core/socket-emit.js";
-import { bindTouchPassthrough } from '../touch/bind-touch-passthrough.js';
-import { getClientBrowserConfig, onClientConfigChange } from '../config/client-config.js';
-import { getClientBrowserVisibility, onClientBrowserVisibilityChange } from '../i18n/index.js';
+import {emitWithTimestamp} from "../../core/socket-emit.js";
+import { bindTouchPassthrough } from '../../touch/bindTouchPassthrough.js';
 import {
     REMOTE_EVENT_BROWSER_OPEN,
     REMOTE_EVENT_KEYBOARD_KEY
-} from "../../utils/shared/remoteCommands.js";
+} from "../../../utils/shared/remoteCommands.js";
 
 export function bindBrowserRemoteButtons(
     socket,
@@ -25,7 +23,12 @@ export function bindBrowserRemoteButtons(
         btnVideoFullscreen,
         touchpad,
     },
+    services,
 ) {
+    const clientConfig = services.getClientConfig();
+    const getConfigView = services.getConfigView;
+    const preferenceView = services.getPreferenceView();
+    const backend = services.getBackend();
     let launcherButtons = [];
     const staticButtons = [
         btnBrowserBack,
@@ -45,13 +48,14 @@ export function bindBrowserRemoteButtons(
     bindTouchPassthrough(staticButtons, touchpad);
 
     function isBrowserRemoteEnabled() {
-        return getClientBrowserConfig().enabled !== false;
+        return getConfigView().getBrowserConfig().enabled !== false;
     }
 
     function isBrowserLauncherEnabled(browserId) {
-        return getClientBrowserConfig().enabled !== false
-            && getClientBrowserConfig()?.[browserId] !== false
-            && getClientBrowserVisibility(browserId, true);
+        const browserConfig = getConfigView().getBrowserConfig();
+        return browserConfig.enabled !== false
+            && browserConfig?.[browserId] !== false
+            && preferenceView.getBrowserVisibility(browserId, true);
     }
 
     async function loadBrowserLaunchers() {
@@ -67,14 +71,7 @@ export function bindBrowserRemoteButtons(
         }
 
         try {
-            const response = await fetch('/api/admin/remotes/browsers', {
-                credentials: 'same-origin',
-            });
-            if (!response.ok) {
-                return;
-            }
-
-            const payload = await response.json();
+            const payload = await backend.getAvailableBrowsers();
             const browsers = Array.isArray(payload?.browsers) ? payload.browsers : [];
 
             for (const browser of browsers) {
@@ -105,10 +102,10 @@ export function bindBrowserRemoteButtons(
     }
 
     void loadBrowserLaunchers();
-    onClientConfigChange(() => {
+    clientConfig.onChange(() => {
         void loadBrowserLaunchers();
     });
-    onClientBrowserVisibilityChange(() => {
+    preferenceView.onBrowserVisibilityChange(() => {
         void loadBrowserLaunchers();
     });
     

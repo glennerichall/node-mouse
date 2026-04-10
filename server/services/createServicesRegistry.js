@@ -4,7 +4,7 @@ import {loadRobot} from '../utils/robot.js';
 import {createServer} from "./server/createServer.js";
 import {createInputController} from "./input/createInputController.js";
 import {getSystemConfig} from "./config/index.js";
-import {createConfig} from "./config/configService.js";
+import {createConfigService} from "./config/configService.js";
 import {createTokenManager} from "./token-manager/createTokenManager.js";
 import {createNotifier} from "./notifier/createNotifier.js";
 import {createTaskRunner} from './task-runner/createTaskRunner.js';
@@ -26,7 +26,7 @@ export function createServicesRegistry() {
         createSystemConfig: getSystemConfig,
         createPersistence,
         createOsService,
-        createConfig,
+        createConfigService,
         createSseService,
         createEventStore,
         createServiceEvents,
