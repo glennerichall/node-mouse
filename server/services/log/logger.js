@@ -7,6 +7,7 @@ const maxStoredDataLength = 8_000;
 const recentLogs = [];
 let rootLogger = null;
 let defaultConfigProvider = getSystemConfig;
+let temporaryLogLevel = '';
 
 const levelNamesByValue = {
   10: 'trace',
@@ -72,7 +73,7 @@ function createDestination(logFormat) {
 }
 
 function syncLoggerConfig(logger, nextConfig) {
-  const nextLevel = nextConfig?.logging?.level;
+  const nextLevel = temporaryLogLevel || nextConfig?.logging?.level;
   if (nextLevel && logger.level !== nextLevel) {
     logger.level = nextLevel;
   }
@@ -138,4 +139,30 @@ export function createLogger(scope, configProvider = defaultConfigProvider) {
 export function getRecentLogs(limit = 200) {
   const safeLimit = Math.max(1, Math.min(1000, Math.round(Number(limit) || 200)));
   return recentLogs.slice(-safeLimit);
+}
+
+export function getRecentLogCursor() {
+  return recentLogs.length;
+}
+
+export function getRecentLogsSince(cursor = 0) {
+  const safeCursor = Math.max(0, Math.round(Number(cursor) || 0));
+  return recentLogs.slice(safeCursor);
+}
+
+export async function withTemporaryLoggerLevel(level, callback) {
+  const logger = bootstrapLogger();
+  const previousTemporaryLogLevel = temporaryLogLevel;
+  const previousLevel = logger.level;
+  temporaryLogLevel = String(level || '').trim();
+  if (temporaryLogLevel) {
+    logger.level = temporaryLogLevel;
+  }
+
+  try {
+    return await callback();
+  } finally {
+    temporaryLogLevel = previousTemporaryLogLevel;
+    logger.level = previousTemporaryLogLevel || previousLevel;
+  }
 }

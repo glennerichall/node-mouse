@@ -23,7 +23,7 @@ function cleanupStaleSocket(socketPath, error) {
   }
 }
 
-export async function sendCliCommand(command) {
+export async function sendCliCommand(command, options = {}) {
   const socketPath = getCliSocketPath();
 
   return new Promise((resolve, reject) => {
@@ -33,7 +33,10 @@ export async function sendCliCommand(command) {
     socket.setEncoding('utf8');
 
     socket.on('connect', () => {
-      socket.end(String(command || '').trim());
+      socket.end(JSON.stringify({
+        command,
+        options,
+      }));
     });
 
     socket.on('data', (chunk) => {

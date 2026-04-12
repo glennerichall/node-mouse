@@ -2,8 +2,16 @@ import {jest} from '@jest/globals';
 import {createSystemService} from '../../server/services/system/createSystemService.js';
 
 describe('system service', () => {
+  function createLogger() {
+    return {
+      debug: jest.fn(),
+      trace: jest.fn(),
+    };
+  }
+
   it('aggregates browsers, vlc, screen and network information', async () => {
     const service = createSystemService({
+      getLogger: () => createLogger(),
       getOs: () => ({
         platform: 'linux',
       }),
@@ -58,6 +66,7 @@ describe('system service', () => {
 
   it('returns null screen info when robot is unavailable', () => {
     const service = createSystemService({
+      getLogger: () => createLogger(),
       getOs: () => ({
         platform: 'linux',
       }),

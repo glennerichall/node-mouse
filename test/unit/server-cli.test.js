@@ -23,7 +23,7 @@ describe('server cli', () => {
           openQrBrowserServer,
         },
       }),
-    }, 'open-qr');
+    }, {name: 'open-qr', args: {}});
 
     expect(openQrBrowserServer).toHaveBeenCalledTimes(1);
     expect(result).toEqual({
@@ -37,12 +37,10 @@ describe('server cli', () => {
       getRemotes: () => ({
         adminActions: {},
       }),
-    }, 'help');
+    }, {name: 'help', args: {}});
 
     expect(result.ok).toBe(true);
-    expect(result.message).toContain('open-qr');
-    expect(result.message).toContain('tokens');
-    expect(result.message).toContain('tasks');
+    expect(result.message).toContain('remote-mouse --help');
   });
 
   it('returns the effective persisted config for config command', async () => {
@@ -57,7 +55,7 @@ describe('server cli', () => {
       getRemotes: () => ({
         adminActions: {},
       }),
-    }, 'config');
+    }, {name: 'config', args: {}});
 
     expect(result).toEqual({
       ok: true,
@@ -74,7 +72,7 @@ describe('server cli', () => {
       getRemotes: () => ({
         adminActions: {},
       }),
-    }, 'config get logging.level');
+    }, {name: 'config', args: {action: 'get', path: 'logging.level', value: ''}});
 
     expect(result).toEqual({
       ok: true,
@@ -98,7 +96,7 @@ describe('server cli', () => {
       getRemotes: () => ({
         adminActions: {},
       }),
-    }, 'config set logging.level debug');
+    }, {name: 'config', args: {action: 'set', path: 'logging.level', value: 'debug'}});
 
     expect(setConfig).toHaveBeenCalledWith('logging.level', 'debug');
     expect(result).toEqual({
@@ -122,7 +120,7 @@ describe('server cli', () => {
       getRemotes: () => ({
         adminActions: {},
       }),
-    }, 'sys-config');
+    }, {name: 'sys-config', args: {}});
 
     expect(result).toEqual({
       ok: true,
@@ -132,6 +130,19 @@ describe('server cli', () => {
   });
 
   it('returns the system capabilities for info command', async () => {
+    const getInfo = jest.fn(async () => ({
+      platform: 'linux',
+      hostname: 'host-1',
+      browsers: [{id: 'firefox', name: 'Firefox'}],
+      vlc: {available: true},
+      screen: {width: 1920, height: 1080},
+      network: {
+        lanIp: '192.168.1.10',
+        publicBaseUrl: 'http://192.168.1.10:3000',
+        localBaseUrl: 'http://127.0.0.1:3000',
+        interfaces: [],
+      },
+    }));
     const info = {
       platform: 'linux',
       hostname: 'host-1',
@@ -148,17 +159,43 @@ describe('server cli', () => {
 
     const result = await executeCliCommand({
       getSystem: () => ({
-        getInfo: async () => info,
+        getInfo,
       }),
       getRemotes: () => ({
         adminActions: {},
       }),
-    }, 'info');
+    }, {name: 'info', args: {}});
 
+    expect(getInfo).toHaveBeenCalledWith();
     expect(result).toEqual({
       ok: true,
       message: 'Capacites du serveur.',
       data: info,
+    });
+  });
+
+  it('executes service actions through the grouped service command handler', async () => {
+    const restart = jest.fn(async () => ({
+      ok: true,
+      message: 'Service redemarre.',
+    }));
+
+    const result = await executeCliCommand({
+      getApplicationDaemonService: () => ({
+        restart,
+      }),
+      getRemotes: () => ({
+        adminActions: {},
+      }),
+    }, {name: 'service', args: {action: 'restart'}});
+
+    expect(restart).toHaveBeenCalledWith({
+      cause: 'user',
+      source: 'cli',
+    });
+    expect(result).toEqual({
+      ok: true,
+      message: 'Service redemarre.',
     });
   });
 
@@ -175,7 +212,7 @@ describe('server cli', () => {
       getRemotes: () => ({
         adminActions: {},
       }),
-    }, 'tokens');
+    }, {name: 'tokens', args: {}});
 
     expect(result).toEqual({
       ok: true,
@@ -216,7 +253,7 @@ describe('server cli', () => {
           ]),
         },
       }),
-    }, 'samsung-detect');
+    }, {name: 'samsung-detect', args: {}});
 
     expect(result).toEqual({
       ok: true,
@@ -259,7 +296,7 @@ describe('server cli', () => {
           ]),
         },
       }),
-    }, 'samsung-detect');
+    }, {name: 'samsung-detect', args: {}});
 
     expect(result).toEqual({
       ok: false,
@@ -304,7 +341,7 @@ describe('server cli', () => {
       getRemotes: () => ({
         adminActions: {},
       }),
-    }, 'tasks');
+    }, {name: 'tasks', args: {}});
 
     expect(result).toEqual({
       ok: true,

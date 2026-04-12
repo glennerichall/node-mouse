@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import net from 'node:net';
 import {getCliSocketPath} from './getCliSocketPath.js';
-import {executeCliCommand} from './executeCliCommand.js';
+import {executeCliRequest} from './executeCliRequest.js';
 
 function removeSocketIfNeeded(socketPath) {
   if (process.platform === 'win32') {
@@ -17,6 +17,21 @@ function removeSocketIfNeeded(socketPath) {
 
 function writeResponse(socket, payload) {
   socket.end(`${JSON.stringify(payload)}\n`);
+}
+
+function parseRequest(input) {
+  try {
+    const payload = JSON.parse(String(input || '').trim() || '{}');
+    return {
+      command: payload.command && typeof payload.command === 'object' ? payload.command : {name: String(payload.command || '').trim(), args: {}},
+      options: payload.options && typeof payload.options === 'object' ? payload.options : {},
+    };
+  } catch (_error) {
+    return {
+      command: {name: String(input || '').trim(), args: {}},
+      options: {},
+    };
+  }
 }
 
 export async function startCliServer(services) {
@@ -49,7 +64,8 @@ export async function startCliServer(services) {
       handled = true;
 
       try {
-        const result = await executeCliCommand(services, input);
+        const request = parseRequest(input);
+        const result = await executeCliRequest(services, request.command, request.options);
         writeResponse(socket, result);
       } catch (error) {
         log.error({err: error}, 'Erreur execution commande CLI');
