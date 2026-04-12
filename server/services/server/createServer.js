@@ -4,8 +4,10 @@ import {Server} from 'socket.io';
 import {getPublicUrl} from '../../utils/network.js';
 import cookieParser from "cookie-parser";
 import {createHttpsServer} from "./createHttpsServer.js";
+import {createLogger} from '../../application/logger.js';
 
 export function createServer(services) {
+    const log = createLogger('server:create');
     const {
         getSystemConfig
     } = services;
@@ -21,11 +23,18 @@ export function createServer(services) {
     const sockets = new Set();
 
     const io = new Server(server, {});
+    log.debug({
+        protocol: config.protocol,
+        port: config.port,
+        httpsEnabled: Boolean(config.https.enabled),
+    }, 'Serveur HTTP initialise');
 
     server.on('connection', (socket) => {
         sockets.add(socket);
+        log.trace({socketCount: sockets.size}, 'Connexion HTTP ouverte');
         socket.on('close', () => {
             sockets.delete(socket);
+            log.trace({socketCount: sockets.size}, 'Connexion HTTP fermee');
         });
     });
 
@@ -42,9 +51,11 @@ export function createServer(services) {
         serverStartedAt,
         cookieParser: cookies,
         closeIdleConnections: () => {
+            log.debug('Fermeture connexions HTTP inactives');
             server.closeIdleConnections?.();
         },
         destroyConnections: () => {
+            log.debug({socketCount: sockets.size}, 'Destruction connexions HTTP restantes');
             for (const socket of sockets) {
                 socket.destroy();
             }

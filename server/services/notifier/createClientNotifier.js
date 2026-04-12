@@ -1,9 +1,8 @@
 import {NOTIFIER_TARGET_ALL_CLIENTS, NOTIFIER_TARGET_CLIENT} from './createNotifierComposite.js';
 import {createLogger} from '../../application/logger.js';
 
-const log = createLogger('notifier:client');
-
 export function createClientNotifier(services) {
+  const log = createLogger('notifier:client');
   return {
     notify(payload, options = {}) {
       const scope = String(options.scope || NOTIFIER_TARGET_ALL_CLIENTS);

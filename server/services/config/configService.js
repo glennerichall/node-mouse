@@ -34,13 +34,15 @@ function mapStoredRowsToObject(rows) {
 
 export function createConfigService(services) {
   function getStoredConfigObject() {
-    return mapStoredRowsToObject(services.getPersistence().configDao.getAll());
+    const rows = services.getPersistence().configDao.getAll();
+    return mapStoredRowsToObject(rows);
   }
 
   function publishChange(changeType, changedKeys) {
+    const uniqueChangedKeys = Array.from(new Set(changedKeys));
     services.getPubSub().publish(PUBSUB_SERVICE_CONFIG, {
       changeType,
-      changedKeys: Array.from(new Set(changedKeys)),
+      changedKeys: uniqueChangedKeys,
       storedConfig: getStoredConfigObject(),
     }, {
       type: changeType === 'deleted' ? PUBSUB_EVENT_CONFIG_DELETED : PUBSUB_EVENT_CONFIG_UPDATED,

@@ -35,6 +35,12 @@ export function bootstrapApi(services) {
     const systemConfig = getSystemConfig();
     const log = createLogger('createApp');
 
+    log.debug({
+        httpsEnabled: Boolean(systemConfig.https.enabled),
+        cookieName: systemConfig.session.cookieName,
+        entryPathEnabled: Boolean(systemConfig.entryPath.enabled),
+    }, 'Initialisation API Express');
+
     if (!systemConfig.https.enabled) {
         log.warn('HTTPS=false: cookie session envoyé sans attribut Secure (moins sécuritaire).');
     }
@@ -70,6 +76,7 @@ export function bootstrapApi(services) {
     app.use('/api/remotes', createRemotesRouter(services));
     app.use('/api/admin', createAdminApiRouter(services));
     app.use('/ui/admin', createAdminUiRouter(services));
+    log.trace('Routes API enregistrees');
 
     app.get('/health', (_req, res) => {
         res.json({

@@ -10,8 +10,13 @@ const withCliLogStream = jest.fn(async (_level, onLog, callback) => {
   onLog?.(logEntry);
   return callback();
 });
+const createLogger = jest.fn(() => ({
+  debug: jest.fn(),
+  trace: jest.fn(),
+}));
 
 jest.unstable_mockModule('../../server/application/logger.js', () => ({
+  createLogger,
   withCliLogStream,
 }));
 
@@ -20,6 +25,7 @@ const {executeCliRequest, withCliVerbosity} = await import('../../server/cli/exe
 describe('cli request execution', () => {
   beforeEach(() => {
     withCliLogStream.mockClear();
+    createLogger.mockClear();
   });
 
   it('applies verbosity logging around any cli command', async () => {

@@ -60,16 +60,20 @@ function createActionHandlers(services) {
 
 export function bootstrapSocket(services) {
     const {getServer} = services;
+    const log = createLogger('socket:bootstrap');
 
     const {io, cookieParser} = getServer();
+    log.debug('Initialisation Socket.IO');
 
     io.engine.use((...args) => cookieParser(...args));
     
     io.use(createSocketSessionAuthMiddleware(services));
     io.use(createSocketGuardMiddleware(services));
+    log.trace('Middlewares Socket.IO enregistres');
 
     io.on('connection', broadcast(
         createNotificationHandler(services),
         createActionHandlers(services)
     ));
+    log.debug('Handlers Socket.IO enregistres');
 }

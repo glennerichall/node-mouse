@@ -44,9 +44,11 @@ function writeResult(socket, result, options = {}) {
 function parseRequest(input) {
   try {
     const payload = JSON.parse(String(input || '').trim() || '{}');
+    const command = payload.command && typeof payload.command === 'object' ? payload.command : {name: String(payload.command || '').trim(), args: {}};
+    const options = payload.options && typeof payload.options === 'object' ? payload.options : {};
     return {
-      command: payload.command && typeof payload.command === 'object' ? payload.command : {name: String(payload.command || '').trim(), args: {}},
-      options: payload.options && typeof payload.options === 'object' ? payload.options : {},
+      command,
+      options,
     };
   } catch (_error) {
     return {
@@ -77,6 +79,7 @@ export async function startCliServer(services) {
     let input = '';
     let handled = false;
     socket.setEncoding('utf8');
+    log.trace('Connexion CLI ouverte');
 
     async function handleCommand() {
       if (handled) {
@@ -87,12 +90,20 @@ export async function startCliServer(services) {
 
       try {
         const request = parseRequest(input);
+        log.debug({
+          command: request.command?.name || '',
+          verbosity: normalizeVerbosity(request.options),
+        }, 'Commande CLI recue');
         const result = await executeCliRequest(services, request.command, request.options, (entry) => {
           writeFrame(socket, {
             type: 'log',
             entry,
           });
         });
+        log.debug({
+          command: request.command?.name || '',
+          ok: Boolean(result?.ok),
+        }, 'Commande CLI terminee');
         writeResult(socket, result, request.options);
       } catch (error) {
         log.error({err: error}, 'Erreur execution commande CLI');
@@ -109,6 +120,9 @@ export async function startCliServer(services) {
 
     socket.on('end', () => {
       void handleCommand();
+    });
+    socket.on('close', () => {
+      log.trace('Connexion CLI fermee');
     });
   });
 

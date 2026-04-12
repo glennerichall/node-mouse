@@ -1,4 +1,5 @@
 import {createLazy} from "../../utils/shared/createLazy.js";
+import {createLogger} from '../application/logger.js';
 
 function urlFactory(services) {
     const {
@@ -54,6 +55,7 @@ export async function createServicesContainer({
                                               createInputController,
                                               createRemotes
                                               }) {
+    const getLog = () => createLogger('services:container');
     let robotReady = false;
     let robotInstance;
     let qrOverlayReady = false;
@@ -95,13 +97,17 @@ export async function createServicesContainer({
         },
         async initializeCoreServices() {
             if (!robotReady) {
+                getLog().debug('Initialisation service robot');
                 robotInstance = await createRobot(container);
                 robotReady = true;
+                getLog().debug('Service robot initialise');
             }
 
             if (!qrOverlayReady) {
+                getLog().debug('Initialisation service QR overlay');
                 qrOverlayInstance = await createQrOverlay(container);
                 qrOverlayReady = true;
+                getLog().debug('Service QR overlay initialise');
             }
 
             return container;

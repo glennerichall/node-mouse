@@ -14,29 +14,25 @@ import {createLogger} from './logger.js';
 export function createApplicationStart(services) {
   function logStartupUrls(urls) {
     const entries = [
-      ['Entree mobile', urls.entryUrl],
+      ['Entry', urls.entryUrl],
       ['QR', urls.qrUrl],
       ['Admin config', urls.adminConfigUrl],
       ['Server info', urls.serverInfoUrl],
-      ['Health', urls.healthUrl],
-      ['Entree locale', urls.localEntryUrl],
-      ['QR local', urls.localQrUrl],
-      ['Admin config local', urls.localAdminConfigUrl],
-      ['Server info local', urls.localServerInfoUrl],
-      ['Health local', urls.localHealthUrl],
+      ['Health', urls.healthUrl]
     ].filter(([, value]) => Boolean(value));
 
-    console.log('URLs disponibles au demarrage:');
+    console.log('URLs:');
     for (const [label, value] of entries) {
       console.log(`  ${label}: ${value}`);
     }
   }
 
   return async function start() {
+    const log = createLogger('server');
     const state = ensureApplicationLifecycleState(services);
     const config = services.getConfig();
     const systemConfig = services.getSystemConfig();
-    const log = createLogger('server');
+
     const httpServer = services.getServer().server;
     const qrOverlay = services.getQrOverlay();
     const taskManager = services.getTaskManager();
