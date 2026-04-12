@@ -1,11 +1,10 @@
-import {projectRoot} from "../../utils/paths.js";
 import {
     getEntrypoint,
     getPlatformKind,
     getSystemdUnitPath,
     isDaemonProcess,
     shellQuote,
-} from "./utils.js";
+} from "../../services/application/utils.js";
 import fs from "node:fs";
 import path from "node:path";
 import {

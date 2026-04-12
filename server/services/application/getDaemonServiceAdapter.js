@@ -5,16 +5,16 @@ import {
     installLinuxDaemon,
     uninstallLinuxDaemon,
     restartLinuxDaemon
-} from "./systemd.js";
+} from "../../os/linux/systemd.js";
 import {
     disableWindowsDaemon,
     getWindowsDaemonInfo,
     installWindowsDaemon,
     uninstallWindowsDaemon,
     restartWindowsDaemon
-} from "./windows.js";
+} from "../../os/win32/service.js";
 
-export function getPlatformAdapter() {
+export function getDaemonServiceAdapter() {
     const platformKind = getPlatformKind();
 
     if (platformKind === 'systemd-user') {

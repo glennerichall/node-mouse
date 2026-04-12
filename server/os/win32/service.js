@@ -2,7 +2,7 @@ import {
     getEntrypoint,
     getPlatformKind,
     isDaemonProcess
-} from "./utils.js";
+} from "../../services/application/utils.js";
 import {
     execFileAsync,
     spawnDetached

@@ -1,4 +1,5 @@
-import {commandExists, execFileAsync} from '../../utils/process.js';
+import {execFileAsync} from '../../utils/process.js';
+import {commandExists} from './process.js';
 
 export function parseWindowIdsFromWmctrl(output, {classes = [], names = []} = {}) {
   const patterns = [...classes, ...names].map((value) => String(value).toLowerCase());

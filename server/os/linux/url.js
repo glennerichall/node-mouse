@@ -1,4 +1,5 @@
-import {commandExists, spawnDetached} from '../../utils/process.js';
+import {spawnDetached} from '../../utils/process.js';
+import {commandExists} from './process.js';
 
 export async function openLinuxUrl(url) {
   const safeUrl = String(url || '').trim();

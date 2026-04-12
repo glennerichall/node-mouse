@@ -3,9 +3,9 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import QRCode from 'qrcode';
 import {DEFAULT_PERSISTED_CONFIG} from '../config/defaultConfig.js';
-import { commandExists } from '../../utils/process.js';
 import {createLogger} from '../../application/logger.js';
 import {createNoopOverlay} from './createNoopOverlay.js';
+import {commandExists} from '../../os/linux/process.js';
 
 const getLogger = () => createLogger('qr-overlay:yad');
 

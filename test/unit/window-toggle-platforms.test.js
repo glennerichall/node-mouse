@@ -25,8 +25,10 @@ describe('window toggle platform helpers', () => {
     });
 
     jest.unstable_mockModule('../../server/utils/process.js', () => ({
-      commandExists,
       execFileAsync,
+    }));
+    jest.unstable_mockModule('../../server/os/linux/process.js', () => ({
+      commandExists,
     }));
 
     const {toggleWindow} = await import('../../server/os/linux/windows.js');

@@ -1,5 +1,5 @@
 import {writeRestartMarker} from '../../remotes/admin/notifyIfRestarted.js';
-import {getPlatformAdapter} from "./getPlatformAdapter.js";
+import {getDaemonServiceAdapter} from "./getDaemonServiceAdapter.js";
 import {spawnDetached} from '../../utils/process.js';
 
 async function spawnCustomRestartCommand(command) {
@@ -31,7 +31,7 @@ export function createApplicationDaemonService(services) {
     async install() {
       const systemConfig = services.getSystemConfig();
       const serviceName = String(systemConfig.serviceName || '').trim();
-      const adapter = getPlatformAdapter();
+      const adapter = getDaemonServiceAdapter();
 
       if (!serviceName) {
         return {ok: false, message: 'serviceName non configure.'};
@@ -47,7 +47,7 @@ export function createApplicationDaemonService(services) {
     async disable() {
       const systemConfig = services.getSystemConfig();
       const serviceName = String(systemConfig.serviceName || '').trim();
-      const adapter = getPlatformAdapter();
+      const adapter = getDaemonServiceAdapter();
 
       if (!serviceName) {
         return {ok: false, message: 'serviceName non configure.'};
@@ -63,7 +63,7 @@ export function createApplicationDaemonService(services) {
     async uninstall() {
       const systemConfig = services.getSystemConfig();
       const serviceName = String(systemConfig.serviceName || '').trim();
-      const adapter = getPlatformAdapter();
+      const adapter = getDaemonServiceAdapter();
 
       if (!serviceName) {
         return {ok: false, message: 'serviceName non configure.'};
@@ -80,7 +80,7 @@ export function createApplicationDaemonService(services) {
       const systemConfig = services.getSystemConfig();
       const serviceName = String(systemConfig.serviceName || '').trim();
       const restartCommand = String(systemConfig.serviceRestartCommand || '').trim();
-      const adapter = getPlatformAdapter();
+      const adapter = getDaemonServiceAdapter();
       const restartLogDao = services.getPersistence().restartLogDao;
       const restartId = restartLogDao.createRestartRequest({
         cause,
@@ -138,7 +138,7 @@ export function createApplicationDaemonService(services) {
     },
 
     getInfo() {
-      return getPlatformAdapter().getInfo(String(services.getSystemConfig().serviceName || '').trim());
+      return getDaemonServiceAdapter().getInfo(String(services.getSystemConfig().serviceName || '').trim());
     },
   };
 }

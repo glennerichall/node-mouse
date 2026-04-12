@@ -1,6 +1,7 @@
-import {commandExists, execFileAsync, spawnDetached} from '../../utils/process.js';
-import {findFirstAvailable, sleep} from '../shared.js';
+import {execFileAsync, spawnDetached} from '../../utils/process.js';
+import {sleep} from '../shared.js';
 import {activateWindow, closeWindow, findWindows, toggleWindow} from './windows.js';
+import {resolveLinuxCommand} from './process.js';
 
 export async function isAnyProcessRunning(processNames = []) {
   const checks = [];
@@ -15,7 +16,14 @@ export async function isAnyProcessRunning(processNames = []) {
 
 export async function resolveLinuxApp(spec = {}) {
   const linux = spec.linux || {};
-  const launchCommand = await findFirstAvailable(linux.commands, commandExists);
+  let launchCommand = '';
+
+  for (const command of linux.commands || []) {
+    launchCommand = await resolveLinuxCommand(command);
+    if (launchCommand) {
+      break;
+    }
+  }
 
   if (launchCommand) {
     return {
@@ -29,9 +37,10 @@ export async function resolveLinuxApp(spec = {}) {
     };
   }
 
-  if (linux.flatpakAppId && await commandExists('flatpak')) {
+  const flatpakCommand = linux.flatpakAppId ? await resolveLinuxCommand('flatpak') : '';
+  if (linux.flatpakAppId && flatpakCommand) {
     return {
-      launchCommand: 'flatpak',
+      launchCommand: flatpakCommand,
       launchArgs: ['run', linux.flatpakAppId],
       processNames: linux.processNames ?? [],
       windowQuery: {

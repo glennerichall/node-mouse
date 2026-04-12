@@ -3,7 +3,11 @@ import { exec, execFile, spawn } from 'node:child_process';
 export function execFileAsync(command, args = [], options = {}) {
   const timeout = options.timeout ?? 3000;
   return new Promise((resolve) => {
-    execFile(command, args, { timeout }, (error, stdout = '', stderr = '') => {
+    execFile(command, args, {
+      timeout,
+      env: options.env,
+      maxBuffer: options.maxBuffer,
+    }, (error, stdout = '', stderr = '') => {
       resolve({
         ok: !error,
         stdout: String(stdout),
@@ -11,11 +15,6 @@ export function execFileAsync(command, args = [], options = {}) {
       });
     });
   });
-}
-
-export async function commandExists(command) {
-  const result = await execFileAsync('which', [command], { timeout: 2000 });
-  return result.ok;
 }
 
 export function execShell(command, timeoutMs) {
