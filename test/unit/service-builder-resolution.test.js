@@ -146,9 +146,6 @@ describe('service builders resolve providers only in methods', () => {
   });
 
   it('createRotateEntryTokenAction does not read services during builder creation', async () => {
-    const getLogger = jest.fn(() => ({
-      info: jest.fn(),
-    }));
     const getEvents = jest.fn(() => ({
       publishEvent: jest.fn(),
     }));
@@ -158,17 +155,14 @@ describe('service builders resolve providers only in methods', () => {
     }));
 
     const action = createRotateEntryTokenAction({
-      getLogger,
       getEvents,
       getTokenManager,
     });
 
-    expect(getLogger).not.toHaveBeenCalled();
     expect(getEvents).not.toHaveBeenCalled();
     expect(getTokenManager).not.toHaveBeenCalled();
 
     await action({clientId: 'client-a'});
-    expect(getLogger).toHaveBeenCalled();
     expect(getEvents).toHaveBeenCalled();
     expect(getTokenManager).toHaveBeenCalled();
   });

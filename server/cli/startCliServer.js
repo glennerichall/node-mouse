@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import net from 'node:net';
 import {getCliSocketPath} from './getCliSocketPath.js';
 import {executeCliRequest} from './executeCliRequest.js';
+import {createLogger} from '../application/logger.js';
 
 function removeSocketIfNeeded(socketPath) {
   if (process.platform === 'win32') {
@@ -17,6 +18,27 @@ function removeSocketIfNeeded(socketPath) {
 
 function writeResponse(socket, payload) {
   socket.end(`${JSON.stringify(payload)}\n`);
+}
+
+function normalizeVerbosity(options = {}) {
+  return Math.max(0, Number.parseInt(options.verbosity || 0, 10) || 0);
+}
+
+function writeFrame(socket, payload) {
+  socket.write(`${JSON.stringify(payload)}\n`);
+}
+
+function writeResult(socket, result, options = {}) {
+  if (normalizeVerbosity(options) <= 0) {
+    writeResponse(socket, result);
+    return;
+  }
+
+  writeFrame(socket, {
+    type: 'result',
+    result,
+  });
+  socket.end();
 }
 
 function parseRequest(input) {
@@ -35,7 +57,7 @@ function parseRequest(input) {
 }
 
 export async function startCliServer(services) {
-  const log = services.getLogger('cli');
+  const log = createLogger('cli');
   const socketPath = getCliSocketPath();
   let isClosed = false;
 
@@ -65,8 +87,13 @@ export async function startCliServer(services) {
 
       try {
         const request = parseRequest(input);
-        const result = await executeCliRequest(services, request.command, request.options);
-        writeResponse(socket, result);
+        const result = await executeCliRequest(services, request.command, request.options, (entry) => {
+          writeFrame(socket, {
+            type: 'log',
+            entry,
+          });
+        });
+        writeResult(socket, result, request.options);
       } catch (error) {
         log.error({err: error}, 'Erreur execution commande CLI');
         writeResponse(socket, {

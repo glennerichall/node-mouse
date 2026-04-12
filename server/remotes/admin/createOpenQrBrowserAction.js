@@ -1,4 +1,4 @@
-import {createLogger} from '../../services/log/logger.js';
+import {createLogger} from '../../application/logger.js';
 import {
   NOTIFIER_TARGET_CLIENT,
   NOTIFIER_TARGET_SERVER,

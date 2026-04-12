@@ -1,4 +1,4 @@
-import {createLogger} from "../../services/log/logger.js";
+import {createLogger} from "../../application/logger.js";
 import {
     REMOTE_EVENT_SAMSUNG_ENTER,
     REMOTE_EVENT_SAMSUNG_INPUT,

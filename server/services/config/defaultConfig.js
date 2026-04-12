@@ -74,6 +74,10 @@ export const DEFAULT_SYSTEM_CONFIG = {
     persistence: {
         dbPath: './data/remote-mouse.db',
     },
+    logging: {
+        level: 'info',
+        format: 'json',
+    },
 };
 
 export const DEFAULT_PERSISTED_CONFIG = {

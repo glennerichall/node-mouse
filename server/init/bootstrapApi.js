@@ -16,6 +16,7 @@ import {createAdminUiRouter} from "./createAdminUiRouter.js";
 import {createAdminApiRouter} from "./createAdminApiRouter.js";
 import { createRemotesRouter } from '../connection/api/remotes.router.js';
 import {readPackageVersion} from '../utils/env.js';
+import {createLogger} from '../application/logger.js';
 
 const packageJsonPath = path.join(projectRoot, 'package.json');
 
@@ -23,7 +24,6 @@ export function bootstrapApi(services) {
     const {
         getTokenManager,
         getSystemConfig,
-        getLogger,
         getServer,
     } = services;
 
@@ -33,7 +33,7 @@ export function bootstrapApi(services) {
     } = getServer();
 
     const systemConfig = getSystemConfig();
-    const log = getLogger('createApp');
+    const log = createLogger('createApp');
 
     if (!systemConfig.https.enabled) {
         log.warn('HTTPS=false: cookie session envoyé sans attribut Secure (moins sécuritaire).');

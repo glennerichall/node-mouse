@@ -1,5 +1,5 @@
 import { startServer } from './server/index.js';
-import { createLogger } from './server/services/log/logger.js';
+import { createLogger } from './server/application/logger.js';
 
 const log = createLogger('bootstrap');
 

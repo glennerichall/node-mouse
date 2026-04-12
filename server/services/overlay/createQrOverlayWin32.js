@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import QRCode from 'qrcode';
 import {DEFAULT_PERSISTED_CONFIG} from '../config/defaultConfig.js';
-import {createLogger} from '../log/logger.js';
+import {createLogger} from '../../application/logger.js';
 import {createNoopOverlay} from './createNoopOverlay.js';
 import {
   buildQrOverlayPowerShellScript,
@@ -13,7 +13,7 @@ import {
 export async function createQrOverlayWin32(services) {
   const getUrl = () => services.getUrls().entryUrl;
   const getConfig = () => services.getConfig();
-  const getLogger = ()=> services.getLogger('qr-overlay:win32');
+  const getLogger = ()=> createLogger('qr-overlay:win32');
   
   const robot = services.getRobot();
 

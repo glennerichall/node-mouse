@@ -21,7 +21,6 @@ describe('createRotateEntryTokenAction', () => {
   it('returns error when token is empty after rotate', async () => {
     const publishEvent = sandbox.stub();
     const action = createRotateEntryTokenAction({
-      getLogger: sandbox.stub().returns({info: sandbox.stub()}),
       getEvents: sandbox.stub().returns({publishEvent}),
       getTokenManager: sandbox.stub().returns({
         getToken: sandbox.stub().returns('old-token'),
@@ -44,7 +43,6 @@ describe('createRotateEntryTokenAction', () => {
   it('returns warning when token does not change', async () => {
     const publishEvent = sandbox.stub();
     const action = createRotateEntryTokenAction({
-      getLogger: sandbox.stub().returns({info: sandbox.stub()}),
       getEvents: sandbox.stub().returns({publishEvent}),
       getTokenManager: sandbox.stub().returns({
         getToken: sandbox.stub().returns('same-token'),
@@ -66,9 +64,7 @@ describe('createRotateEntryTokenAction', () => {
 
   it('succeeds when token changes', async () => {
     const publishEvent = sandbox.stub();
-    const info = sandbox.stub();
     const action = createRotateEntryTokenAction({
-      getLogger: sandbox.stub().returns({info}),
       getEvents: sandbox.stub().returns({publishEvent}),
       getTokenManager: sandbox.stub().returns({
         getToken: sandbox.stub().returns('old-token'),
@@ -85,6 +81,5 @@ describe('createRotateEntryTokenAction', () => {
       PUBSUB_EVENT_ADMIN_ROTATED,
       {clientId: 'client-c'},
     ]);
-    expect(info.calledOnce).toBe(true);
   });
 });

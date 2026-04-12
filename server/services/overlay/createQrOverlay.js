@@ -1,5 +1,5 @@
 import os from 'node:os';
-import {createLogger} from '../log/logger.js';
+import {createLogger} from '../../application/logger.js';
 import {createNoopOverlay} from './createNoopOverlay.js';
 import {createQrOverlayYad} from './createQrOverlayYad.js';
 import {createQrOverlayWin32} from './createQrOverlayWin32.js';

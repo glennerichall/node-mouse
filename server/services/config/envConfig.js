@@ -40,6 +40,10 @@ export function getEnvConfig() {
         },
         persistence: {
             dbPath: readOptionalString('PERSISTENCE_DB_PATH'),
-        }
+        },
+        logging: {
+            level: readOptionalString('LOG_LEVEL'),
+            format: readOptionalString('LOG_FORMAT'),
+        },
     };
 }

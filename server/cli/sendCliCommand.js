@@ -23,12 +23,32 @@ function cleanupStaleSocket(socketPath, error) {
   }
 }
 
-export async function sendCliCommand(command, options = {}) {
+function parseResponseLine(line, state, onLog) {
+  const payload = JSON.parse(line);
+  if (payload?.type === 'log') {
+    if (typeof onLog === 'function') {
+      onLog(payload.entry);
+    }
+    return;
+  }
+
+  if (payload?.type === 'result') {
+    state.result = payload.result;
+    return;
+  }
+
+  state.result = payload;
+}
+
+export async function sendCliCommand(command, options = {}, {onLog = null} = {}) {
   const socketPath = getCliSocketPath();
 
   return new Promise((resolve, reject) => {
     const socket = net.createConnection(socketPath);
-    let response = '';
+    const state = {
+      buffer: '',
+      result: undefined,
+    };
 
     socket.setEncoding('utf8');
 
@@ -40,12 +60,24 @@ export async function sendCliCommand(command, options = {}) {
     });
 
     socket.on('data', (chunk) => {
-      response += chunk;
+      state.buffer += chunk;
+      const lines = state.buffer.split('\n');
+      state.buffer = lines.pop() || '';
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed) {
+          parseResponseLine(trimmed, state, onLog);
+        }
+      }
     });
 
     socket.on('end', () => {
       try {
-        resolve(JSON.parse(response.trim() || '{}'));
+        const remaining = state.buffer.trim();
+        if (remaining) {
+          parseResponseLine(remaining, state, onLog);
+        }
+        resolve(state.result || {});
       } catch (error) {
         reject(error);
       }

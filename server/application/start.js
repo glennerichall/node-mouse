@@ -9,6 +9,7 @@ import {startQrOverlayRefreshObserver} from '../init/observers/startQrOverlayRef
 import {startQrOverlayHoverObserver} from '../init/observers/startQrOverlayHoverObserver.js';
 import {notifyIfRestarted} from '../remotes/admin/notifyIfRestarted.js';
 import {ensureApplicationLifecycleState} from './state.js';
+import {createLogger} from './logger.js';
 
 export function createApplicationStart(services) {
   function logStartupUrls(urls) {
@@ -35,7 +36,7 @@ export function createApplicationStart(services) {
     const state = ensureApplicationLifecycleState(services);
     const config = services.getConfig();
     const systemConfig = services.getSystemConfig();
-    const log = services.getLogger('server');
+    const log = createLogger('server');
     const httpServer = services.getServer().server;
     const qrOverlay = services.getQrOverlay();
     const taskManager = services.getTaskManager();

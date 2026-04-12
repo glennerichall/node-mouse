@@ -1,9 +1,10 @@
 import os from 'node:os';
 import {getScreenInfo} from "./getScreenInfo.js";
 import {getNetworkInfo} from "./getNetworkInfo.js";
+import {createLogger} from '../../application/logger.js';
 
 export function createSystemService(services) {
-  const getLogger = () => services.getLogger('system');
+  const getLogger = () => createLogger('system');
 
   return {
     listBrowsers() {

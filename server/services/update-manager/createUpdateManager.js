@@ -6,8 +6,10 @@ import {
     PUBSUB_EVENT_UPDATE_ERROR,
     PUBSUB_SERVICE_UPDATE_MANAGER
 } from "../pubsub/serviceEventConstants.js";
+import {createLogger} from '../../application/logger.js';
 
 export function createUpdateManager(services) {
+    const log = createLogger('update-check');
     let lastKey = '';
     let lastInstallCommand = '';
     let lastResult = null;
@@ -40,7 +42,7 @@ export function createUpdateManager(services) {
             const result = await chooseUpdateCheckSource(services)();
 
             if (!result?.hasUpdate || !result.key || result.key === lastKey) {
-                services.getLogger('update-check').debug('Update check: no update');
+                log.debug('Update check: no update');
                 lastResult = {
                     checked: true,
                     hasUpdate: false,
@@ -70,7 +72,7 @@ export function createUpdateManager(services) {
                 key: result.key,
             };
         } catch (_error) {
-            services.getLogger('update-check').error({err: _error}, 'Update check: error');
+            log.error({err: _error}, 'Update check: error');
             lastResult = {
                 checked: false,
                 hasUpdate: false,
@@ -88,14 +90,14 @@ export function createUpdateManager(services) {
     async function update() {
         const install = chooseUpdateInstallSource(services);
         lastInstallCommand = String(install.command || '');
-        services.getLogger('update-check').info({installCommand: lastInstallCommand}, 'Exécution commande install update');
+        log.info({installCommand: lastInstallCommand}, 'Exécution commande install update');
         const result = await install();
         if (result.ok) {
-            services.getLogger('update-check').info('Install update terminée avec succès');
+            log.info('Install update terminée avec succès');
             return result;
         }
         if (result?.status === 'failed') {
-            services.getLogger('update-check').error({details: result.details}, 'Install update en échec');
+            log.error({details: result.details}, 'Install update en échec');
         }
         return result;
     }

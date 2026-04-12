@@ -3,7 +3,7 @@ import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {computeTokenTtlMs} from '../../services/token-manager/token-store-utils.js';
 import {publicDir, projectRoot} from '../../utils/paths.js';
-import {getRecentLogs} from '../../services/log/logger.js';
+import {getRecentLogs} from '../../application/logger.js';
 import {readPackageVersion} from '../../utils/env.js';
 
 const packageJsonPath = path.join(projectRoot, 'package.json');

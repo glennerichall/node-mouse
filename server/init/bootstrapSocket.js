@@ -7,6 +7,7 @@ import {
     PUBSUB_SERVICE_SOCKET
 } from "../services/pubsub/serviceEventConstants.js";
 import { REMOTE_EVENT_SYSTEM_RELOAD } from '../../utils/shared/remoteCommands.js';
+import {createLogger} from '../application/logger.js';
 
 function broadcast(...functions) {
     return (...args) => functions.flatMap(f => f).map(f => f(...args));
@@ -14,7 +15,7 @@ function broadcast(...functions) {
 
 function createNotificationHandler(services) {
     const events = services.getEvents();
-    const log = services.getLogger('socket:timestamp');
+    const log = createLogger('socket:timestamp');
 
     return socket => {
         log.info({socketId: socket.id}, 'Client connecté');

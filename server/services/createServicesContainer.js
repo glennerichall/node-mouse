@@ -1,4 +1,3 @@
-import {createLogger} from "./log/logger.js";
 import {createLazy} from "../../utils/shared/createLazy.js";
 
 function urlFactory(services) {
@@ -31,10 +30,6 @@ function urlFactory(services) {
         healthUrl: `${publicBaseUrl}/health`,
         localHealthUrl: `${localBaseUrl}/health`,
     }
-}
-
-function loggerFactory(services) {
-    return scope => createLogger(scope, services.getConfig);
 }
 
 export async function createServicesContainer({
@@ -90,7 +85,6 @@ export async function createServicesContainer({
         getUpdateManager: createLazy(() => createUpdateManager(container)),
         getApplicationDaemonService: createLazy(() => createApplicationDaemonService(container)),
         getUrls: () => urlFactory(container),
-        getLogger: scope => loggerFactory(container)(scope),
         getInputController: createLazy(() => createInputController(container)),
         getRemotes: createLazy(() => createRemotes(container)),
         getRobot: () => {

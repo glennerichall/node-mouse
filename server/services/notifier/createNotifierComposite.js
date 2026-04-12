@@ -1,5 +1,5 @@
 import {DEFAULT_PERSISTED_CONFIG} from '../config/defaultConfig.js';
-import {createLogger} from '../log/logger.js';
+import {createLogger} from '../../application/logger.js';
 import {
     isNotificationTargetEnabled,
     NOTIFICATION_TARGET_CLIENT as CONFIG_NOTIFICATION_TARGET_CLIENT,

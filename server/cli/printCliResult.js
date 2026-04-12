@@ -1,8 +1,12 @@
+export function printCliLog(entry) {
+    const data = entry.data === undefined ? '' : ` ${JSON.stringify(entry.data)}`;
+    console.error(`[${entry.at}] ${entry.level} ${entry.scope}: ${entry.message}${data}`);
+}
+
 export function printCliResult(result) {
     if (Array.isArray(result?.logs)) {
         for (const entry of result.logs) {
-            const data = entry.data === undefined ? '' : ` ${JSON.stringify(entry.data)}`;
-            console.error(`[${entry.at}] ${entry.level} ${entry.scope}: ${entry.message}${data}`);
+            printCliLog(entry);
         }
     }
     if (result?.data !== undefined) {

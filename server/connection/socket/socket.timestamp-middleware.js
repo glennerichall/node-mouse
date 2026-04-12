@@ -1,4 +1,4 @@
-import {createLogger} from '../../services/log/logger.js';
+import {createLogger} from '../../application/logger.js';
 
 const getLogger = () => createLogger('socket:timestamp');
 

@@ -1,4 +1,4 @@
-import {createLogger} from "../../services/log/logger.js";
+import {createLogger} from "../../application/logger.js";
 import { REMOTE_EVENT_BROWSER_OPEN } from '../../../utils/shared/remoteCommands.js';
 
 const getLogger = () => createLogger('browser:remote');

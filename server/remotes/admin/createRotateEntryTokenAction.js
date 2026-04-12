@@ -4,12 +4,13 @@ import {
   PUBSUB_EVENT_ADMIN_UNCHANGED,
   PUBSUB_SERVICE_ADMIN_ROTATE_ENTRY_TOKEN,
 } from '../../services/pubsub/serviceEventConstants.js';
+import {createLogger} from '../../application/logger.js';
 
 export function createRotateEntryTokenAction(services) {
   return async function rotateEntryToken({ clientId } = {}) {
     const events = services.getEvents();
     const tokenManager = services.getTokenManager();
-    const log = services.getLogger('admin:rotate-entry-token');
+    const log = createLogger('admin:rotate-entry-token');
     const before = String(tokenManager.getToken());
     const after = String(tokenManager.createToken());
 

@@ -1,6 +1,6 @@
 import {parseCliArgs} from "./parseCliArgs.js";
 import {executeLocalServiceCommand} from "./executeLocalServiceCommand.js";
-import {printCliResult} from "./printCliResult.js";
+import {printCliLog, printCliResult} from "./printCliResult.js";
 import {sendCliCommand} from "./sendCliCommand.js";
 import {withCliVerbosity} from "./executeCliRequest.js";
 
@@ -35,12 +35,12 @@ export async function runCliCmd(args) {
 
     try {
         if (isLocalServiceCommand(command)) {
-            const result = await withCliVerbosity(options, () => executeLocalServiceCommand(command));
+            const result = await withCliVerbosity(options, () => executeLocalServiceCommand(command), printCliLog);
             printCliResult(result);
             process.exit(result?.ok ? 0 : 1);
         }
 
-        const result = await sendCliCommand(command, options);
+        const result = await sendCliCommand(command, options, {onLog: printCliLog});
         printCliResult(result);
         process.exit(result?.ok ? 0 : 1);
     } catch (error) {

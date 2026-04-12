@@ -1,8 +1,10 @@
 import {ensureApplicationLifecycleState} from './state.js';
+import {createLogger} from './logger.js';
 
 export function createApplicationShutdown(services) {
+  const log = createLogger('server');
+
   async function runShutdownStep(label, action) {
-    const log = services.getLogger('server');
     try {
       await action();
     } catch (error) {
@@ -12,7 +14,6 @@ export function createApplicationShutdown(services) {
 
   return async function shutdown(signal) {
     const state = ensureApplicationLifecycleState(services);
-    const log = services.getLogger('server');
     const serverBundle = services.getServer();
     const httpServer = serverBundle.server;
     const io = serverBundle.io;

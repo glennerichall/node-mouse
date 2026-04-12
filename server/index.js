@@ -1,7 +1,7 @@
 import {createServicesRegistry} from './services/createServicesRegistry.js';
 import {
     bootstrapLogger,
-} from './services/log/logger.js';
+} from './application/logger.js';
 import {createApplicationLifecycle} from './application/createApplicationLifecycle.js';
 
 export async function startServer() {

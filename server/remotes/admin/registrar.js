@@ -1,4 +1,4 @@
-import {createLogger} from '../../services/log/logger.js';
+import {createLogger} from '../../application/logger.js';
 import {createSocketActionResponder} from '../../connection/socket/socket-action-responder.js';
 import {createAdminEventGuardMiddleware} from './createAdminEventGuardMiddleware.js';
 import {

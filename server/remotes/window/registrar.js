@@ -1,4 +1,4 @@
-import { createLogger } from '../../services/log/logger.js';
+import { createLogger } from '../../application/logger.js';
 import {
   REMOTE_EVENT_WINDOW_CLOSE,
   REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE,

@@ -1,4 +1,4 @@
-import {createLogger} from '../../services/log/logger.js';
+import {createLogger} from '../../application/logger.js';
 import {
     PUBSUB_EVENT_ADMIN_COMPLETED,
     PUBSUB_SERVICE_ADMIN_FORCE_UPDATE_CHECK

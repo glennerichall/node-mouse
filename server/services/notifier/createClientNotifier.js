@@ -1,4 +1,7 @@
 import {NOTIFIER_TARGET_ALL_CLIENTS, NOTIFIER_TARGET_CLIENT} from './createNotifierComposite.js';
+import {createLogger} from '../../application/logger.js';
+
+const log = createLogger('notifier:client');
 
 export function createClientNotifier(services) {
   return {
@@ -8,7 +11,7 @@ export function createClientNotifier(services) {
 
       if (scope === NOTIFIER_TARGET_CLIENT) {
         if (!clientId) {
-          services.getLogger('notifier:client').warn('Notification ciblée client ignorée: clientId manquant');
+          log.warn('Notification ciblée client ignorée: clientId manquant');
           return;
         }
         services.getServer().io.to(clientId).emit('notification', payload);
