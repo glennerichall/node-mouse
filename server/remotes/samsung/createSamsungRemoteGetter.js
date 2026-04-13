@@ -21,8 +21,10 @@ export function createSamsungRemoteGetter({
 
         if (!remotePromise || remoteKey !== nextKey) {
             remoteKey = nextKey;
-            remotePromise = resolveDeviceConfig()
-                .then((device) => new SamsungTvRemoteClass({
+            remotePromise = (async () => {
+                try {
+                    const device = await resolveDeviceConfig();
+                    return new SamsungTvRemoteClass({
                     device: {
                         ip: device.ip,
                         mac: device.mac,
@@ -30,12 +32,13 @@ export function createSamsungRemoteGetter({
                     port: config.port,
                     name: config.appName,
                     timeout: config.timeoutMs,
-                }))
-                .catch((error) => {
+                    });
+                } catch (error) {
                     remotePromise = null;
                     remoteKey = '';
                     throw error;
-                });
+                }
+            })();
         }
 
         return remotePromise;

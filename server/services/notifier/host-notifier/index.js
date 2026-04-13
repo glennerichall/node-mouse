@@ -1,6 +1,6 @@
 import os from 'os';
-import { createLinuxHostNotifier } from './linux-host-notifier.js';
-import { createNodeNotifierHostNotifier } from './node-notifier-host.js';
+import { createLinuxHostNotifier } from './createLinuxHostNotifier.js';
+import { createNodeNotifierHostNotifier } from './createNodeNotifierHostNotifier.js';
 
 export function createHostNotifierByPlatform(platform = os.platform()) {
   const fallbackNotifier = createNodeNotifierHostNotifier();

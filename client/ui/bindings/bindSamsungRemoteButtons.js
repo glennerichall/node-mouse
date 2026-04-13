@@ -8,7 +8,7 @@ import {
     REMOTE_EVENT_SAMSUNG_PC_INPUT,
     REMOTE_EVENT_SAMSUNG_VOL_DOWN,
     REMOTE_EVENT_SAMSUNG_VOL_UP
-} from "../../../utils/shared/remoteCommands.js";
+} from "../../../utils/remoteCommands.js";
 import { bindTouchPassthrough } from '../../touch/bindTouchPassthrough.js';
 
 export function bindSamsungRemoteButtons(

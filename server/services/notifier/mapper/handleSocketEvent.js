@@ -8,13 +8,9 @@ import {
     PUBSUB_EVENT_SOCKET_CLIENT_DISCONNECTED
 } from "../../pubsub/serviceEventConstants.js";
 import {
-    NOTIFICATION_TITLE_CLIENT_CONNECTED,
-    NOTIFICATION_TITLE_CLIENT_DISCONNECTED
-} from "../notificationTitles.js";
-import {
     NOTIFICATION_ID_CLIENT_CONNECTED,
     NOTIFICATION_ID_CLIENT_DISCONNECTED
-} from "../../../../utils/shared/notificationSettings.js";
+} from "../../../../utils/notificationSettings.js";
 
 export function handleSocketEvent(notifier, event) {
     const clientId = event.payload?.clientId;
@@ -24,8 +20,6 @@ export function handleSocketEvent(notifier, event) {
         notify(notifier, NOTIFIER_TARGET_ALL, {
             notificationId: NOTIFICATION_ID_CLIENT_CONNECTED,
             level: NOTIFIER_LEVEL_INFO,
-            title: NOTIFICATION_TITLE_CLIENT_CONNECTED,
-            message: `Client ${shortClientId} connecte.`,
             titleKey: 'notification.clientConnected.title',
             messageKey: 'notification.clientConnected.message',
             params: {
@@ -36,8 +30,6 @@ export function handleSocketEvent(notifier, event) {
         notify(notifier, NOTIFIER_TARGET_ALL, {
             notificationId: NOTIFICATION_ID_CLIENT_DISCONNECTED,
             level: NOTIFIER_LEVEL_INFO,
-            title: NOTIFICATION_TITLE_CLIENT_DISCONNECTED,
-            message: `Client ${shortClientId} deconnecte.`,
             titleKey: 'notification.clientDisconnected.title',
             messageKey: 'notification.clientDisconnected.message',
             params: {

@@ -2,7 +2,7 @@ import { createLogger } from '../../application/logger.js';
 import {
   REMOTE_EVENT_WINDOW_CLOSE,
   REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE,
-} from '../../../utils/shared/remoteCommands.js';
+} from '../../../utils/remoteCommands.js';
 
 let log;
 function getModuleLog() {

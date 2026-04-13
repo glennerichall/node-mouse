@@ -1,4 +1,4 @@
-import {deepMerge, setNestedValue} from '../../../utils/shared/objet.utils.js';
+import {deepMerge, setNestedValue} from '../../../utils/object.utils.js';
 import {CONFIG_PATHS} from './configPaths.js';
 import {DEFAULT_PERSISTED_CONFIG} from './defaultConfig.js';
 import {

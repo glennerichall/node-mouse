@@ -1,4 +1,4 @@
-import {clamp} from "../../../utils/shared/math.js";
+import {clamp} from "../../../utils/math.js";
 
 export function captureAroundCursor(robot, width, height) {
     const screen = robot.getScreenSize();

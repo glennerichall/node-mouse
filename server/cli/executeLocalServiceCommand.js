@@ -1,4 +1,4 @@
-import {createLazy} from "../../utils/shared/createLazy.js";
+import {createLazy} from "../../utils/createLazy.js";
 import {getSystemConfig} from "../services/config/index.js";
 import {createPersistence} from "../services/persistence/index.js";
 import {createApplicationDaemonService} from "../services/application/createApplicationDaemonService.js";

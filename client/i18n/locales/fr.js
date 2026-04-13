@@ -23,6 +23,7 @@ export const fr = {
   'notification.sessionCreated.title': 'Nouvelle connexion',
   'notification.sessionCreated.message': 'Nouvelle connexion via jeton depuis {address}.',
   'notification.update.title': 'Update',
+  'notification.update.available': 'Mise a jour disponible.',
   'notification.updateCheck.title': 'Check update',
   'notification.updateCheck.available': 'Mise a jour detectee.',
   'notification.updateCheck.none': 'Aucune nouvelle mise a jour detectee.',

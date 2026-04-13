@@ -4,7 +4,7 @@ import {
     isNotificationTargetEnabled,
     NOTIFICATION_TARGET_CLIENT as CONFIG_NOTIFICATION_TARGET_CLIENT,
     NOTIFICATION_TARGET_HOST as CONFIG_NOTIFICATION_TARGET_HOST,
-} from '../../../utils/shared/notificationSettings.js';
+} from '../../../utils/notificationSettings.js';
 
 let log;
 function getModuleLog() {

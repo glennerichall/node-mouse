@@ -5,7 +5,7 @@ import {
     REMOTE_EVENT_MOUSE_CLICK,
     REMOTE_EVENT_MOUSE_MOVE,
     REMOTE_EVENT_MOUSE_SCROLL,
-} from '../../utils/shared/remoteCommands.js';
+} from '../../utils/remoteCommands.js';
 import {
     handleTouchEnd,
     handleTouchMove,

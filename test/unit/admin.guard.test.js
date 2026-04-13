@@ -4,7 +4,7 @@ import {
   REMOTE_EVENT_ADMIN_SERVICE_RESTART,
   REMOTE_EVENT_ADMIN_UPDATE_CHECK,
   REMOTE_EVENT_MOUSE_MOVE,
-} from '../../utils/shared/remoteCommands.js';
+} from '../../utils/remoteCommands.js';
 
 describe('createAdminEventGuardMiddleware', () => {
   let sandbox;

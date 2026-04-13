@@ -1,4 +1,4 @@
-import {createExactMatchPredicate} from '../../../utils/shared/predicates.js';
+import {createExactMatchPredicate} from '../../../utils/predicates.js';
 
 function normalizeServiceName(service) {
   const value = String(service || '').trim();

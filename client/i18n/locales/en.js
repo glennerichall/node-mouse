@@ -23,6 +23,7 @@ export const en = {
   'notification.sessionCreated.title': 'New connection',
   'notification.sessionCreated.message': 'New token connection from {address}.',
   'notification.update.title': 'Update',
+  'notification.update.available': 'Update available.',
   'notification.updateCheck.title': 'Check update',
   'notification.updateCheck.available': 'Update detected.',
   'notification.updateCheck.none': 'No new update detected.',

@@ -51,17 +51,18 @@ export function createSamsungCommandService({getConfig, discoverDevices, getSams
         }
 
         if (!powerStatePromise) {
-            powerStatePromise = computePowerState()
-                .then((value) => {
+            powerStatePromise = (async () => {
+                try {
+                    const value = await computePowerState();
                     powerStateCache = {
                         value,
                         checkedAt: Date.now(),
                     };
                     return value;
-                })
-                .finally(() => {
+                } finally {
                     powerStatePromise = null;
-                });
+                }
+            })();
         }
 
         return powerStatePromise;

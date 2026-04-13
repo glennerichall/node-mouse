@@ -266,8 +266,8 @@ describe('state pubsub', () => {
 
     expect(target).toHaveBeenCalledWith(NOTIFIER_TARGET_CLIENT);
     expect(notify).toHaveBeenCalledWith(expect.objectContaining({
-      title: 'Entry token',
-      message: 'Token d entree rotation forcee.',
+      titleKey: 'notification.entryToken.title',
+      messageKey: 'notification.entryToken.rotated',
     }), {
       clientId: 'client-1',
     });

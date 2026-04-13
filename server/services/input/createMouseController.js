@@ -1,4 +1,4 @@
-import {clamp} from '../../../utils/shared/math.js';
+import {clamp} from '../../../utils/math.js';
 import {DEFAULT_PERSISTED_CONFIG} from '../config/defaultConfig.js';
 
 export function createMouseController(services) {

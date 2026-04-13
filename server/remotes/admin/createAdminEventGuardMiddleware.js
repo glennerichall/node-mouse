@@ -1,4 +1,4 @@
-import { REMOTE_EVENT_ADMIN_PREFIX } from '../../../utils/shared/remoteCommands.js';
+import { REMOTE_EVENT_ADMIN_PREFIX } from '../../../utils/remoteCommands.js';
 
 export function createAdminEventGuardMiddleware({
   isAdminActionsEnabled,

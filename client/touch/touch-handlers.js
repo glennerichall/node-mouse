@@ -3,7 +3,7 @@ import {
   applyNonLinearAcceleration,
   distance2D,
   scaleSigned,
-} from '../../utils/shared/math.js';
+} from '../../utils/math.js';
 
 const SCROLL_GAIN = 1.1;
 const REMOTE_HIDE_MOVEMENT_THRESHOLD_PX = 10;

@@ -6,7 +6,7 @@ import {
     PUBSUB_EVENT_SOCKET_CLIENT_CONNECTED,
     PUBSUB_SERVICE_SOCKET
 } from "../services/pubsub/serviceEventConstants.js";
-import { REMOTE_EVENT_SYSTEM_RELOAD } from '../../utils/shared/remoteCommands.js';
+import { REMOTE_EVENT_SYSTEM_RELOAD } from '../../utils/remoteCommands.js';
 import {createLogger} from '../application/logger.js';
 
 function broadcast(...functions) {

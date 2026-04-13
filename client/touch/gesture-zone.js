@@ -1,4 +1,4 @@
-import { clamp } from '../../utils/shared/math.js';
+import { clamp } from '../../utils/math.js';
 
 export function getScrollZoneWidth(width) {
   return clamp(Math.round(width * 0.11), 36, 64);

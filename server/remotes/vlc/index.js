@@ -8,9 +8,14 @@ export function createVlc(services) {
 
   function getAvailability() {
     if (!availabilityPromise) {
-      availabilityPromise = getOsService().app.resolve(VLC_APP_SPEC)
-        .then((resolved) => Boolean(resolved))
-        .catch(() => false);
+      availabilityPromise = (async () => {
+        try {
+          const resolved = await getOsService().app.resolve(VLC_APP_SPEC);
+          return Boolean(resolved);
+        } catch (_error) {
+          return false;
+        }
+      })();
     }
     return availabilityPromise;
   }

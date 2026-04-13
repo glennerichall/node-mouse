@@ -1,5 +1,5 @@
 import {createLogger} from "../../application/logger.js";
-import { REMOTE_EVENT_BROWSER_OPEN } from '../../../utils/shared/remoteCommands.js';
+import { REMOTE_EVENT_BROWSER_OPEN } from '../../../utils/remoteCommands.js';
 
 let log;
 function getModuleLog() {

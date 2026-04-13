@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import {clamp} from "../../utils/shared/math.js";
+import {clamp} from "../../utils/math.js";
 
 export function createRandomToken(length) {
     const safeLength = clamp(Math.floor(length), 8, 128);

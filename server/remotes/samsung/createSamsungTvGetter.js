@@ -31,8 +31,9 @@ export function createSamsungTvGetter({
 
     if (!tvPromise || tvKey !== nextKey) {
       tvKey = nextKey;
-      tvPromise = resolveDeviceConfig()
-        .then((device) => {
+      tvPromise = (async () => {
+        try {
+          const device = await resolveDeviceConfig();
           const remote = new SamsungTvRemoteClass({
             device: {
               ip: device.ip,
@@ -66,8 +67,7 @@ export function createSamsungTvGetter({
               await remote.wakeTV();
             },
           };
-        })
-        .catch((error) => {
+        } catch (error) {
           tvPromise = null;
           tvKey = '';
 
@@ -93,7 +93,8 @@ export function createSamsungTvGetter({
               throw error;
             },
           };
-        });
+        }
+      })();
     }
 
     return tvPromise;

@@ -4,7 +4,7 @@ import {
   REMOTE_EVENT_KEYBOARD_KEY,
   REMOTE_EVENT_WINDOW_CLOSE,
   REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE,
-} from '../../../utils/shared/remoteCommands.js';
+} from '../../../utils/remoteCommands.js';
 
 export function bindSystemRemoteButtons(
   socket,

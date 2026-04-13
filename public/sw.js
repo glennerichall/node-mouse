@@ -12,18 +12,26 @@ const SHELL_ASSETS = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL_ASSETS)).catch(() => {}),
+    (async () => {
+      try {
+        const cache = await caches.open(CACHE_NAME);
+        await cache.addAll(SHELL_ASSETS);
+      } catch (_error) {}
+    })(),
   );
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(
-      keys
-        .filter((key) => key !== CACHE_NAME)
-        .map((key) => caches.delete(key)),
-    )),
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(
+        keys
+          .filter((key) => key !== CACHE_NAME)
+          .map((key) => caches.delete(key)),
+      );
+    })(),
   );
   self.clients.claim();
 });
@@ -55,24 +63,41 @@ self.addEventListener('fetch', (event) => {
     || url.pathname.startsWith('/client/')
   ) {
     event.respondWith(
-      fetch(request).then((response) => {
-        const responseClone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(request, responseClone).catch(() => {});
-        });
-        return response;
-      }).catch(() => caches.match(request)),
+      (async () => {
+        try {
+          const response = await fetch(request);
+          const responseClone = response.clone();
+          void (async () => {
+            try {
+              const cache = await caches.open(CACHE_NAME);
+              await cache.put(request, responseClone);
+            } catch (_error) {}
+          })();
+          return response;
+        } catch (_error) {
+          return caches.match(request);
+        }
+      })(),
     );
     return;
   }
 
   event.respondWith(
-    caches.match(request).then((cached) => cached || fetch(request).then((response) => {
+    (async () => {
+      const cached = await caches.match(request);
+      if (cached) {
+        return cached;
+      }
+
+      const response = await fetch(request);
       const responseClone = response.clone();
-      caches.open(CACHE_NAME).then((cache) => {
-        cache.put(request, responseClone).catch(() => {});
-      });
+      void (async () => {
+        try {
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(request, responseClone);
+        } catch (_error) {}
+      })();
       return response;
-    })),
+    })(),
   );
 });

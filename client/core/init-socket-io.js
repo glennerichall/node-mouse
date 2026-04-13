@@ -1,4 +1,4 @@
-import { REMOTE_EVENT_SYSTEM_RELOAD } from '../../utils/shared/remoteCommands.js';
+import { REMOTE_EVENT_SYSTEM_RELOAD } from '../../utils/remoteCommands.js';
 
 const SYSTEM_RELOAD_GUARD_KEY = 'remote-mouse.system-reload-at';
 const SYSTEM_RELOAD_GUARD_MS = 15_000;

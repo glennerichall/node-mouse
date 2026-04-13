@@ -8,16 +8,11 @@ import {
     REMOTE_EVENT_SAMSUNG_PC_INPUT,
     REMOTE_EVENT_SAMSUNG_VOL_DOWN,
     REMOTE_EVENT_SAMSUNG_VOL_UP,
-} from '../../../utils/shared/remoteCommands.js';
+} from '../../../utils/remoteCommands.js';
 
-let log;
-function getModuleLog() {
-    log ??= createLogger('samsung:remote');
-    return log;
-}
+let log = createLogger('samsung:remote');
 
 export function createSamsungRegistrar({samsung}) {
-    const log = getModuleLog();
     return socket => {
         const client = socket.id.slice(0, 8);
 

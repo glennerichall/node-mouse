@@ -5,7 +5,7 @@ import {
   REMOTE_EVENT_BROWSER_OPEN,
   REMOTE_EVENT_SAMSUNG_ON,
   REMOTE_EVENT_SAMSUNG_VOL_DOWN,
-} from '../../utils/shared/remoteCommands.js';
+} from '../../utils/remoteCommands.js';
 
 describe('remote command registrars', () => {
   let sandbox;

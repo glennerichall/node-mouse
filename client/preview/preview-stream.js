@@ -3,7 +3,7 @@ import {emitWithTimestamp} from "../core/socket-emit.js";
 import {
   REMOTE_EVENT_PREVIEW_START,
   REMOTE_EVENT_PREVIEW_STOP,
-} from '../../utils/shared/remoteCommands.js';
+} from '../../utils/remoteCommands.js';
 
 export function bindPreviewStream(socket, { previewCanvas, previewLabel }, {clientConfig, getConfigView, preferenceView}) {
   if (!previewCanvas) {

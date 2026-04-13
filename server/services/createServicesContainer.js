@@ -1,4 +1,4 @@
-import {createLazy} from "../../utils/shared/createLazy.js";
+import {createLazy} from "../../utils/createLazy.js";
 import {createLogger} from '../application/logger.js';
 
 let log;

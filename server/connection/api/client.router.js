@@ -9,7 +9,7 @@ export function createStaticShareRouter({
 
     router.use(express.static(publicDir));
     router.use('/client', express.static(clientDir));
-    router.use('/utils/shared', express.static(sharedUtilsDir));
+    router.use('/utils', express.static(sharedUtilsDir));
     return router;
 }
 

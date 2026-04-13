@@ -2,7 +2,7 @@ import {
   readString,
   resolvePathFromConfigDir,
 } from '../../utils/env.js';
-import {deepMerge} from '../../../utils/shared/objet.utils.js';
+import {deepMerge} from '../../../utils/object.utils.js';
 import {CONFIG_DIR} from './bootstrapConfig.js';
 import {DEFAULT_SYSTEM_CONFIG} from './defaultConfig.js';
 import {getEnvConfig as readEnvConfig} from './envConfig.js';

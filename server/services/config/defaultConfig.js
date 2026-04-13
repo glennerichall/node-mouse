@@ -9,7 +9,7 @@ import {
     NOTIFICATION_ID_SERVICE_RESTARTED,
     NOTIFICATION_ID_SERVICE_RESTARTING,
     NOTIFICATION_ID_SESSION_CREATED,
-} from '../../../utils/shared/notificationSettings.js';
+} from '../../../utils/notificationSettings.js';
 
 const DEFAULT_NOTIFICATION_SETTINGS = createDefaultNotificationSettings(false);
 

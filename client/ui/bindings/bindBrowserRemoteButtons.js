@@ -3,7 +3,7 @@ import { bindTouchPassthrough } from '../../touch/bindTouchPassthrough.js';
 import {
     REMOTE_EVENT_BROWSER_OPEN,
     REMOTE_EVENT_KEYBOARD_KEY
-} from "../../../utils/shared/remoteCommands.js";
+} from "../../../utils/remoteCommands.js";
 
 export function bindBrowserRemoteButtons(
     socket,

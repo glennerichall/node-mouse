@@ -4,7 +4,7 @@ import {
   NOTIFICATION_TARGET_CLIENT,
   NOTIFICATION_TARGET_HOST,
   getNotificationTargetPath,
-} from '../../utils/shared/notificationSettings.js';
+} from '../../utils/notificationSettings.js';
 import {createServicesRegistry} from '../services/createServicesRegistry.js';
 
 const services = createServicesRegistry();

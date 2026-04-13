@@ -1,4 +1,4 @@
-import {setNestedValue} from '../../../utils/shared/objet.utils.js';
+import {setNestedValue} from '../../../utils/object.utils.js';
 import {DEFAULT_CLIENT_CONFIG} from './defaultClientConfig.js';
 
 function getConfigObjectFromEntries(entries) {

@@ -5,7 +5,7 @@ import {
   REMOTE_EVENT_VLC_OPEN,
   REMOTE_EVENT_VLC_WINDOW_CLOSE,
   REMOTE_EVENT_VLC_WINDOW_TOGGLE,
-} from '../../../utils/shared/remoteCommands.js';
+} from '../../../utils/remoteCommands.js';
 
 export function bindVlcRemoteButtons(
   socket,

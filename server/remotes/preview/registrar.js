@@ -1,7 +1,7 @@
 import {
   REMOTE_EVENT_PREVIEW_START,
   REMOTE_EVENT_PREVIEW_STOP,
-} from '../../../utils/shared/remoteCommands.js';
+} from '../../../utils/remoteCommands.js';
 
 export function createPreviewEventRegistrar({ preview, getConfig = () => ({}) }) {
   return function registerPreviewEvents(socket) {

@@ -106,12 +106,14 @@ export async function createQrOverlayYad(services) {
       return;
     }
 
-    refreshChain = refreshChain
-      .then(async () => {
+    const previousRefresh = refreshChain;
+    refreshChain = (async () => {
+      try {
+        await previousRefresh;
         close();
         await spawnOverlay();
-      })
-      .catch((_error) => {});
+      } catch (_error) {}
+    })();
 
     await refreshChain;
   };

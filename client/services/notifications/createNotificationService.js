@@ -1,4 +1,4 @@
-import {REMOTE_EVENT_ADMIN_RESULT} from '../../../utils/shared/remoteCommands.js';
+import {REMOTE_EVENT_ADMIN_RESULT} from '../../../utils/remoteCommands.js';
 import {showToast} from '../../ui/notifications/show-toast.js';
 
 export function createNotificationService(services) {

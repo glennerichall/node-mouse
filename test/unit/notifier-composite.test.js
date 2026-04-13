@@ -5,7 +5,7 @@ import {
   NOTIFIER_TARGET_CLIENT,
   NOTIFIER_TARGET_SERVER,
 } from '../../server/services/notifier/createNotifierComposite.js';
-import { NOTIFICATION_ID_CLIENT_CONNECTED } from '../../utils/shared/notificationSettings.js';
+import { NOTIFICATION_ID_CLIENT_CONNECTED } from '../../utils/notificationSettings.js';
 
 describe('createNotifierComposite', () => {
   let sandbox;

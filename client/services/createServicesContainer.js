@@ -1,4 +1,4 @@
-import {createLazy} from '../../utils/shared/createLazy.js';
+import {createLazy} from '../../utils/createLazy.js';
 import {ConfigView} from './config/ConfigView.js';
 import {PreferenceView} from './preferences/PreferenceView.js';
 

@@ -11,14 +11,14 @@ async function loadJson(url) {
 
 export async function loadAvailableRemotes(services = null) {
   const payload = services
-    ? await services.getRemotes().loadAvailableRemotes().then((remotes) => ({remotes}))
+    ? {remotes: await services.getRemotes().loadAvailableRemotes()}
     : await loadJson('/api/admin/remotes');
   return mergeAvailableRemotes(Array.isArray(payload?.remotes) ? payload.remotes : []);
 }
 
 export async function loadAvailableBrowsers(services = null) {
   const payload = services
-    ? await services.getRemotes().loadAvailableBrowsers().then((browsers) => ({browsers}))
+    ? {browsers: await services.getRemotes().loadAvailableBrowsers()}
     : await loadJson('/api/admin/remotes/browsers');
   return Array.isArray(payload?.browsers) ? payload.browsers : [];
 }

@@ -1,6 +1,6 @@
 import sinon from 'sinon';
 import {createSocketActionResponder} from '../../server/connection/socket/socket-action-responder.js';
-import { REMOTE_EVENT_ADMIN_RESULT } from '../../utils/shared/remoteCommands.js';
+import { REMOTE_EVENT_ADMIN_RESULT } from '../../utils/remoteCommands.js';
 
 describe('createSocketActionResponder', () => {
   let sandbox;

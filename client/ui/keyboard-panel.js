@@ -2,7 +2,7 @@ import { emitWithTimestamp } from '../core/socket-emit.js';
 import {
   REMOTE_EVENT_KEYBOARD_KEY,
   REMOTE_EVENT_KEYBOARD_TEXT,
-} from '../../utils/shared/remoteCommands.js';
+} from '../../utils/remoteCommands.js';
 
 export function bindKeyboardPanel(socket, {
   keyboardPanel,

@@ -1,4 +1,4 @@
-import { getNotificationPaths } from '../../../utils/shared/notificationSettings.js';
+import { getNotificationPaths } from '../../../utils/notificationSettings.js';
 import { BROWSER_CATALOG } from '../../remotes/browser/browserCatalog.js';
 
 const BROWSER_CONFIG_PATHS = BROWSER_CATALOG.map((browser) => `browser.${browser.id}`);

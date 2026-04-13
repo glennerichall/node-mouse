@@ -12,7 +12,7 @@ import {
   REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY,
   REMOTE_EVENT_ADMIN_UPDATE_CHECK,
   REMOTE_EVENT_ADMIN_UPDATE_INSTALL,
-} from '../../../utils/shared/remoteCommands.js';
+} from '../../../utils/remoteCommands.js';
 
 let log;
 function getModuleLog() {
