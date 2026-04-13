@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import {startServer} from '../server/index.js';
-import {runCliCmd} from "../server/cli/runCliCmd.js";
+import {runCliCmd} from "../server/term/cli/runCliCmd.js";
 
 async function main() {
     const args = process.argv.slice(2);

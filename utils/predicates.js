@@ -6,3 +6,12 @@ export function createExactMatchPredicate(filters = {}) {
 
   return (value) => entries.every(([key, expected]) => value?.[key] === expected);
 }
+
+export async function findFirstAvailable(items = [], tester = async () => false) {
+    for (const item of items) {
+        if (await tester(item)) {
+            return item;
+        }
+    }
+    return '';
+}

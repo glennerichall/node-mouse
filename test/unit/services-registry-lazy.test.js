@@ -131,19 +131,22 @@ describe('createServicesRegistry', () => {
     jest.clearAllMocks();
   });
 
-  it('does not eagerly resolve any service during registry creation', async () => {
+  it('eagerly resolves core services and keeps other services lazy during registry creation', async () => {
     const {createServicesRegistry} = await import('../../server/services/createServicesRegistry.js');
 
+    jest.clearAllMocks();
     const services = await createServicesRegistry();
 
     expect(services).toBeTruthy();
     expect(typeof services.getServer).toBe('function');
     expect(typeof services.getRobot).toBe('function');
     expect(typeof services.getQrOverlay).toBe('function');
-    expect(typeof services.initializeCoreServices).toBe('function');
+    expect(typeof services.initializeCoreServices).toBe('undefined');
+    expect(services.getRobot()).toEqual({});
+    expect(services.getQrOverlay()).toEqual({});
 
     expect(createPersistence).not.toHaveBeenCalled();
-    expect(loadRobot).not.toHaveBeenCalled();
+    expect(loadRobot).toHaveBeenCalledTimes(1);
     expect(createServer).not.toHaveBeenCalled();
     expect(createInputController).not.toHaveBeenCalled();
     expect(getSystemConfig).not.toHaveBeenCalled();
@@ -153,7 +156,7 @@ describe('createServicesRegistry', () => {
     expect(createTaskRunner).not.toHaveBeenCalled();
     expect(createTaskManager).not.toHaveBeenCalled();
     expect(createUpdateManager).not.toHaveBeenCalled();
-    expect(createQrOverlay).not.toHaveBeenCalled();
+    expect(createQrOverlay).toHaveBeenCalledTimes(1);
     expect(createRemotes).not.toHaveBeenCalled();
     expect(createPubSub).not.toHaveBeenCalled();
     expect(createEventStore).not.toHaveBeenCalled();

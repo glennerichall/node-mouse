@@ -7,7 +7,7 @@ import {executeServiceCommand} from './commands/serviceCommand.js';
 import {executeSystemConfigCommand} from './commands/systemConfigCommand.js';
 import {executeTasksCommand} from './commands/tasksCommand.js';
 import {executeTokensCommand} from './commands/tokensCommand.js';
-import {formatCliCommand} from './parseCliArgs.js';
+import {formatCliCommand} from '../cli/parseCliArgs.js';
 
 const commandHandlers = {
   help: executeHelpCommand,

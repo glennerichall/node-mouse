@@ -1,5 +1,5 @@
 import {jest} from '@jest/globals';
-import {executeCliCommand} from '../../server/cli/executeCliCommand.js';
+import {executeCliCommand} from '../../server/term/srv/executeCliCommand.js';
 
 describe('server cli', () => {
   beforeEach(() => {

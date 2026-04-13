@@ -8,10 +8,11 @@ import {
 } from '../preferences/render.js';
 import {createPreferencesState} from '../preferences/state.js';
 import {createServicesRegistry} from '../services/createServicesRegistry.js';
+import {initializeCoreServices} from '../services/createServicesContainer.js';
 import {bindPreferenceSwitchers} from './preferences/bind-preference-switchers.js';
 
 const services = createServicesRegistry();
-await services.initializeCoreServices();
+await initializeCoreServices(services);
 services.getI18n().translateRoot(document);
 bindPreferenceSwitchers(services);
 

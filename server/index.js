@@ -6,7 +6,6 @@ import {createApplicationLifecycle} from './application/createApplicationLifecyc
 
 export async function startServer() {
     const services = await createServicesRegistry();
-    await services.initializeCoreServices();
     bootstrapLogger();
     const lifecycle = createApplicationLifecycle(services);
     return lifecycle.start();

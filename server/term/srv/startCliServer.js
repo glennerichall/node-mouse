@@ -1,20 +1,7 @@
-import fs from 'node:fs';
 import net from 'node:net';
-import {getCliSocketPath} from './getCliSocketPath.js';
+import {getCliSocketAdapter} from '../cliSocket.js';
 import {executeCliRequest} from './executeCliRequest.js';
-import {createLogger} from '../application/logger.js';
-
-function removeSocketIfNeeded(socketPath) {
-  if (process.platform === 'win32') {
-    return;
-  }
-
-  try {
-    fs.unlinkSync(socketPath);
-  } catch (_error) {
-    // Ignore missing or stale socket cleanup issues.
-  }
-}
+import {createLogger} from '../../application/logger.js';
 
 function writeResponse(socket, payload) {
   socket.end(`${JSON.stringify(payload)}\n`);
@@ -58,9 +45,12 @@ function parseRequest(input) {
   }
 }
 
+const log = createLogger('cli');
+
 export async function startCliServer(services) {
-  const log = createLogger('cli');
-  const socketPath = getCliSocketPath();
+
+  const cliSocket = getCliSocketAdapter();
+  const socketPath = cliSocket.getCliSocketPath();
   let isClosed = false;
 
   function closeServer() {
@@ -70,10 +60,10 @@ export async function startCliServer(services) {
 
     isClosed = true;
     server.close();
-    removeSocketIfNeeded(socketPath);
+    cliSocket.cleanupCliServerSocket(socketPath);
   }
 
-  removeSocketIfNeeded(socketPath);
+  cliSocket.prepareCliServerSocket(socketPath);
 
   const server = net.createServer({allowHalfOpen: true}, (socket) => {
     let input = '';
@@ -127,7 +117,7 @@ export async function startCliServer(services) {
   });
 
   server.once('close', () => {
-    removeSocketIfNeeded(socketPath);
+    cliSocket.cleanupCliServerSocket(socketPath);
   });
 
   await new Promise((resolve, reject) => {
@@ -138,13 +128,7 @@ export async function startCliServer(services) {
     });
   });
 
-  if (process.platform !== 'win32') {
-    try {
-      fs.chmodSync(socketPath, 0o600);
-    } catch (_error) {
-      // Best effort.
-    }
-  }
+  cliSocket.secureCliServerSocket(socketPath);
 
   log.info({socketPath}, 'Interface CLI locale prête');
 

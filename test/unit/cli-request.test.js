@@ -20,7 +20,7 @@ jest.unstable_mockModule('../../server/application/logger.js', () => ({
   withCliLogStream,
 }));
 
-const {executeCliRequest, withCliVerbosity} = await import('../../server/cli/executeCliRequest.js');
+const {executeCliRequest, withCliVerbosity} = await import('../../server/term/srv/executeCliRequest.js');
 
 describe('cli request execution', () => {
   beforeEach(() => {

@@ -1,27 +1,5 @@
-import fs from 'node:fs';
 import net from 'node:net';
-import {getCliSocketPath} from './getCliSocketPath.js';
-
-function cleanupStaleSocket(socketPath, error) {
-  if (process.platform === 'win32') {
-    return false;
-  }
-
-  if (error?.code !== 'ECONNREFUSED') {
-    return false;
-  }
-
-  try {
-    if (!fs.existsSync(socketPath)) {
-      return false;
-    }
-
-    fs.unlinkSync(socketPath);
-    return true;
-  } catch (_cleanupError) {
-    return false;
-  }
-}
+import {getCliSocketAdapter} from '../cliSocket.js';
 
 function parseResponseLine(line, state, onLog) {
   const payload = JSON.parse(line);
@@ -41,7 +19,8 @@ function parseResponseLine(line, state, onLog) {
 }
 
 export async function sendCliCommand(command, options = {}, {onLog = null} = {}) {
-  const socketPath = getCliSocketPath();
+  const cliSocket = getCliSocketAdapter();
+  const socketPath = cliSocket.getCliSocketPath();
 
   return new Promise((resolve, reject) => {
     const socket = net.createConnection(socketPath);
@@ -84,7 +63,7 @@ export async function sendCliCommand(command, options = {}, {onLog = null} = {})
     });
 
     socket.on('error', (error) => {
-      const staleSocketRemoved = cleanupStaleSocket(socketPath, error);
+      const staleSocketRemoved = cliSocket.cleanupCliClientConnectionError(socketPath, error);
 
       if (staleSocketRemoved) {
         reject(new Error(`Service indisponible. Le socket stale a été supprimé: ${socketPath}`));

@@ -2,7 +2,7 @@ import {parseCliArgs} from "./parseCliArgs.js";
 import {executeLocalServiceCommand} from "./executeLocalServiceCommand.js";
 import {printCliLog, printCliResult} from "./printCliResult.js";
 import {sendCliCommand} from "./sendCliCommand.js";
-import {withCliVerbosity} from "./executeCliRequest.js";
+import {withCliVerbosity} from "../srv/executeCliRequest.js";
 
 function isLocalServiceCommand(command) {
     return command?.name === 'service'

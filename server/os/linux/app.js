@@ -1,7 +1,7 @@
 import {execFileAsync, spawnDetached} from '../../utils/process.js';
-import {sleep} from '../shared.js';
 import {activateWindow, closeWindow, findWindows, toggleWindow} from './windows.js';
 import {resolveLinuxCommand} from './process.js';
+import {sleep} from "../../../utils/sync.js";
 
 export async function isAnyProcessRunning(processNames = []) {
   const checks = [];

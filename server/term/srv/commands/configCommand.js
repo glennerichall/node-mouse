@@ -1,9 +1,9 @@
-import {CONFIG_PATHS} from '../../services/config/configPaths.js';
+import {CONFIG_PATHS} from '../../../services/config/configPaths.js';
 import {
   adminConfigSchema,
   coerceConfigValue,
   getFieldDefinition,
-} from '../../connection/api/configs.js';
+} from '../../../connection/api/configs.js';
 
 export async function executeConfigCommand(services, args = {}) {
   if (!args.action) {

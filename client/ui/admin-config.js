@@ -6,9 +6,10 @@ import {
   getNotificationTargetPath,
 } from '../../utils/notificationSettings.js';
 import {createServicesRegistry} from '../services/createServicesRegistry.js';
+import {initializeCoreServices} from '../services/createServicesContainer.js';
 
 const services = createServicesRegistry();
-await services.initializeCoreServices();
+await initializeCoreServices(services);
 
 const form = document.getElementById('config-form');
 const statusNode = document.getElementById('config-status');

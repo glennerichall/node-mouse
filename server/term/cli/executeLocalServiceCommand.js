@@ -1,7 +1,7 @@
-import {createLazy} from "../../utils/createLazy.js";
-import {getSystemConfig} from "../services/config/index.js";
-import {createPersistence} from "../services/persistence/index.js";
-import {createApplicationDaemonService} from "../services/application/createApplicationDaemonService.js";
+import {createLazy} from "../../../utils/createLazy.js";
+import {getSystemConfig} from "../../services/config/index.js";
+import {createPersistence} from "../../services/persistence/index.js";
+import {createApplicationDaemonService} from "../../services/application/createApplicationDaemonService.js";
 import {formatCliCommand} from "./parseCliArgs.js";
 
 function createLocalDaemonServices() {

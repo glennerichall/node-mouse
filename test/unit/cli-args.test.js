@@ -1,4 +1,4 @@
-import {parseCliArgs} from '../../server/cli/parseCliArgs.js';
+import {parseCliArgs} from '../../server/term/cli/parseCliArgs.js';
 
 describe('cli args parser', () => {
   it.each([

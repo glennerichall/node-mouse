@@ -2,7 +2,7 @@ import qrcodeTerminal from 'qrcode-terminal';
 import {bootstrapApi} from '../init/bootstrapApi.js';
 import {logStartupConfig} from '../services/config/logConfig.js';
 import {bootstrapSocket} from '../init/bootstrapSocket.js';
-import {startCliServer} from '../cli/startCliServer.js';
+import {startCliServer} from '../term/srv/startCliServer.js';
 import {startConfigObserver} from '../init/observers/startConfigObserver.js';
 import {startNotificationObserver} from '../init/observers/startNotificationObserver.js';
 import {startQrOverlayRefreshObserver} from '../init/observers/startQrOverlayRefreshObserver.js';

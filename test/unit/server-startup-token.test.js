@@ -41,7 +41,7 @@ jest.unstable_mockModule('../../server/services/config/logConfig.js', () => ({
   logStartupConfig,
 }));
 
-jest.unstable_mockModule('../../server/cli/startCliServer.js', () => ({
+jest.unstable_mockModule('../../server/term/srv/startCliServer.js', () => ({
   startCliServer,
 }));
 
@@ -81,7 +81,6 @@ describe('startServer', () => {
     };
 
     createServicesRegistry.mockResolvedValue({
-      initializeCoreServices: jest.fn(async () => {}),
       getTokenManager: () => ({
         createToken,
       }),

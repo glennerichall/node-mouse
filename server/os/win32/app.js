@@ -1,7 +1,7 @@
 import {execFileAsync} from '../../utils/process.js';
-import {findFirstAvailable} from '../shared.js';
 import {buildForegroundWindowPowerShell, buildTitleActivationPowerShell} from './powershell.js';
 import {commandExistsWin32} from './process.js';
+import {findFirstAvailable} from "../../../utils/predicates.js";
 
 export async function activateWin32Titles(titles = []) {
   if (!titles.length) {

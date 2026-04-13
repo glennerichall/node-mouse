@@ -1,11 +1,7 @@
 import {createLazy} from "../../utils/createLazy.js";
 import {createLogger} from '../application/logger.js';
 
-let log;
-function getModuleLog() {
-    log ??= createLogger('services:container');
-    return log;
-}
+const log = createLogger('services:container');
 
 function urlFactory(services) {
     const {
@@ -27,15 +23,10 @@ function urlFactory(services) {
         publicBaseUrl,
         localBaseUrl,
         entryUrl: `${publicBaseUrl}${entryPath}`,
-        localEntryUrl: `${localBaseUrl}${entryPath}`,
         qrUrl: `${publicBaseUrl}/qr`,
-        localQrUrl: `${localBaseUrl}/qr`,
         adminConfigUrl: `${publicBaseUrl}/ui/admin/config`,
-        localAdminConfigUrl: `${localBaseUrl}/ui/admin/config`,
         serverInfoUrl: `${publicBaseUrl}/ui/admin/server-info`,
-        localServerInfoUrl: `${localBaseUrl}/ui/admin/server-info`,
         healthUrl: `${publicBaseUrl}/health`,
-        localHealthUrl: `${localBaseUrl}/health`,
     }
 }
 
@@ -58,12 +49,10 @@ export async function createServicesContainer({
                                                   createUpdateManager,
                                                   createApplicationDaemonService,
                                                   createServer,
-                                              createInputController,
-                                              createRemotes
+                                                  createInputController,
+                                                  createRemotes
                                               }) {
-    let robotReady = false;
     let robotInstance;
-    let qrOverlayReady = false;
     let qrOverlayInstance;
 
     let container = {
@@ -83,43 +72,23 @@ export async function createServicesContainer({
         getTaskRunner: createLazy(() => createTaskRunner(container)),
         getTaskManager: createLazy(() => createTaskManager(container)),
         getServer: createLazy(() => createServer(container)),
-        getQrOverlay: () => {
-            if (!qrOverlayReady) {
-                throw new Error('QR overlay service accessed before initialization');
-            }
-            return qrOverlayInstance;
-        },
+        getQrOverlay: () => qrOverlayInstance,
         getUpdateManager: createLazy(() => createUpdateManager(container)),
         getApplicationDaemonService: createLazy(() => createApplicationDaemonService(container)),
         getUrls: () => urlFactory(container),
         getInputController: createLazy(() => createInputController(container)),
         getRemotes: createLazy(() => createRemotes(container)),
-        getRobot: () => {
-            if (!robotReady) {
-                throw new Error('Robot service accessed before initialization');
-            }
-            return robotInstance;
-        },
-        async initializeCoreServices() {
-            const log = getModuleLog();
-            if (!robotReady) {
-                log.debug('Initialisation service robot');
-                robotInstance = await createRobot(container);
-                robotReady = true;
-                log.debug('Service robot initialise');
-            }
-
-            if (!qrOverlayReady) {
-                log.debug('Initialisation service QR overlay');
-                qrOverlayInstance = await createQrOverlay(container);
-                qrOverlayReady = true;
-                log.debug('Service QR overlay initialise');
-            }
-
-            return container;
-        },
+        getRobot: () => robotInstance,
 
     };
+
+    log.debug('Initialisation service robot');
+    robotInstance = await createRobot(container);
+    log.debug('Service robot initialise');
+
+    log.debug('Initialisation service QR overlay');
+    qrOverlayInstance = await createQrOverlay(container);
+    log.debug('Service QR overlay initialise');
 
     return container;
 }

@@ -2,7 +2,7 @@ import {executeCliCommand} from './executeCliCommand.js';
 import {
   createLogger,
   withCliLogStream,
-} from '../application/logger.js';
+} from '../../application/logger.js';
 
 let log;
 function getModuleLog() {

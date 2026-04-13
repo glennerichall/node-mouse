@@ -1,7 +1,7 @@
 import {
   getSamsungDeviceMac,
   pickSamsungDevice,
-} from '../../remotes/samsung/device-config.js';
+} from '../../../remotes/samsung/device-config.js';
 
 function mapDevice(device) {
   return {

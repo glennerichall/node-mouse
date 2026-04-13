@@ -2,6 +2,20 @@ import {createLazy} from '../../utils/createLazy.js';
 import {ConfigView} from './config/ConfigView.js';
 import {PreferenceView} from './preferences/PreferenceView.js';
 
+export async function initializeCoreServices(container) {
+  await container.getI18n().init();
+  container.getPreferences().init();
+  container.getPreferenceView().init();
+  await container.getClientConfig().init();
+  return container;
+}
+
+export function initializeRealtimeServices(container) {
+  container.getTransport().connect();
+  container.getNotifications().bindTransport();
+  return container;
+}
+
 export function createServicesContainer({
   createI18nService,
   createPreferencesService,
@@ -23,18 +37,6 @@ export function createServicesContainer({
     getRemotes: createLazy(() => createRemotesService(container)),
     getPubSub: createLazy(() => createPubSubService(container)),
     getNotifications: createLazy(() => createNotificationService(container)),
-    async initializeCoreServices() {
-      await container.getI18n().init();
-      container.getPreferences().init();
-      container.getPreferenceView().init();
-      await container.getClientConfig().init();
-      return container;
-    },
-    initializeRealtimeServices() {
-      container.getTransport().connect();
-      container.getNotifications().bindTransport();
-      return container;
-    },
   };
 
   return container;
