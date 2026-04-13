@@ -2,18 +2,18 @@ import {createLazy} from '../../utils/createLazy.js';
 import {ConfigView} from './config/ConfigView.js';
 import {PreferenceView} from './preferences/PreferenceView.js';
 
-export async function initializeCoreServices(container) {
-  await container.getI18n().init();
-  container.getPreferences().init();
-  container.getPreferenceView().init();
-  await container.getClientConfig().init();
-  return container;
+export async function initializeCoreServices(services) {
+  await services.getI18n().init();
+  services.getPreferences().init();
+  services.getPreferenceView().init();
+  await services.getClientConfig().init();
+  return services;
 }
 
-export function initializeRealtimeServices(container) {
-  container.getTransport().connect();
-  container.getNotifications().bindTransport();
-  return container;
+export function initializeRealtimeServices(services) {
+  services.getTransport().connect();
+  services.getNotifications().bindTransport();
+  return services;
 }
 
 export function createServicesContainer({

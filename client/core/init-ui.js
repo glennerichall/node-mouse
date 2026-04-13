@@ -10,60 +10,30 @@ import { bindClientNotifications } from '../ui/notifications/bind-client-notific
 import { bindAdminDrawer } from '../ui/bindings/bindAdminDrawer.js';
 import { bindAdminVersion } from '../ui/bindings/bindAdminVersion.js';
 import { bindRemoteAccordion } from '../ui/bindings/bindRemoteAccordion.js';
+import {applyRemoteVisibilityState} from '../ui/applyRemoteVisibilityState.js';
+
 export function initUi(services) {
+
+  services.getI18n().translateRoot(document);
+
   const transport = services.getTransport();
   const preferenceView = services.getPreferenceView();
   const clientConfig = services.getClientConfig();
   const dom = getDom();
-  const canvasUI = createCanvasUI(dom.touchpad, preferenceView);
-  const remoteAccordion = bindRemoteAccordion(dom);
+  const {remotes} = dom;
+  const canvasUI = createCanvasUI(remotes.mouse.touchpad, preferenceView);
+  const remoteAccordion = bindRemoteAccordion(remotes);
+
   let hideRemoteTimer = null;
   let showRemoteTimer = null;
   const REMOTE_HIDE_DELAY_MS = 300;
   const SHOW_REMOTE_DELAY = 500;
 
-  const applyRemoteVisibilityState = () => {
-    const configView = services.getConfigView();
-    const browserVisible = configView.getBrowserConfig().enabled !== false
-      && preferenceView.getRemoteVisibility('browser', true);
-    const keyboardVisible = configView.getKeyboardConfig().enabled !== false
-      && preferenceView.getRemoteVisibility('keyboard', true);
-    const vlcVisible = configView.getVlcConfig().enabled !== false
-      && preferenceView.getRemoteVisibility('vlc', true);
-    const samsungVisible = preferenceView.getRemoteVisibility('samsung', true);
-    const previewVisible = configView.getPreviewConfig().enabled !== false
-      && preferenceView.getRemoteVisibility('preview', true);
-
-    if (dom.browserShortcuts) {
-      dom.browserShortcuts.hidden = !browserVisible;
-    }
-    dom.app?.classList.toggle('keyboard-remote-hidden', !keyboardVisible);
-    if (dom.menu) {
-      dom.menu.style.display = keyboardVisible ? '' : 'none';
-    }
-    if (dom.keyboardShortcutsBar) {
-      dom.keyboardShortcutsBar.style.display = keyboardVisible ? '' : 'none';
-    }
-    if (dom.keyboardPanel) {
-      if (!keyboardVisible) {
-        dom.keyboardPanel.classList.add('hidden');
-      }
-      dom.keyboardPanel.style.display = keyboardVisible ? '' : 'none';
-    }
-    if (dom.tvControls) {
-      dom.tvControls.hidden = !samsungVisible;
-    }
-    if (dom.vlcControls) {
-      dom.vlcControls.hidden = !vlcVisible;
-    }
-    if (dom.cursorPreview) {
-      dom.cursorPreview.hidden = !previewVisible;
-      if (!previewVisible) {
-        dom.cursorPreview.classList.remove('is-visible');
-      }
-    }
-    remoteAccordion.syncVisiblePanels();
-  };
+  const syncRemoteVisibilityState = () => applyRemoteVisibilityState({
+    services,
+    accordion: remoteAccordion,
+    dom,
+  });
 
   const hideRemotes = (interactionKind = 'move') => {
     if (!dom.remoteStack) {
@@ -124,38 +94,52 @@ export function initUi(services) {
     }
   };
 
-  const preview = bindPreviewStream(transport, dom, {
+  const preview = bindPreviewStream(transport, remotes.preview, {
     clientConfig,
     getConfigView: services.getConfigView,
     preferenceView,
   });
-  bindTouchpad(transport, dom.touchpad, {
+
+  bindTouchpad(transport, remotes.mouse.touchpad, {
     onMouseMove: preview.onMouseMoveActivity,
     onMovementStart: hideRemotes,
     onInteractionEnd: showRemotes,
     getInputConfig: () => services.getConfigView().getInputConfig(),
     getHandedness: () => preferenceView.getHandedness(),
   });
-  bindKeyboardPanel(transport, dom, {
+
+  bindKeyboardPanel(transport, remotes.keyboard, {
     setPreviewActive: preview.setKeyboardPreviewActive,
   });
-  bindMouseButtons(transport, dom);
-  bindActionButtons(transport, dom, services);
+
+  bindMouseButtons(transport, remotes.mouse);
+
+  bindActionButtons(transport, remotes, services);
+
   bindConnectionOverlay(transport, dom.connectionOverlay, services.getI18n());
+
   bindClientNotifications(services, dom.notificationsRoot);
+
   bindAdminDrawer({
     app: dom.app,
-    touchpad: dom.touchpad,
+    touchpad: remotes.mouse.touchpad,
     scrim: dom.adminDrawerScrim,
     adminPanel: dom.leftMenu,
   });
-  bindAdminVersion(dom.adminAppVersion, services.getI18n());
+
+  bindAdminVersion(remotes.admin.adminAppVersion, services.getI18n());
+
   preferenceView.onRemoteAutoHideChange(applyRemoteAutoHideState);
-  preferenceView.onRemoteVisibilityChange(applyRemoteVisibilityState);
-  services.getClientConfig().onChange(applyRemoteVisibilityState);
+
+  preferenceView.onRemoteVisibilityChange(syncRemoteVisibilityState);
+
+  services.getClientConfig().onChange(syncRemoteVisibilityState);
+
   applyRemoteAutoHideState();
-  applyRemoteVisibilityState();
+
+  syncRemoteVisibilityState();
 
   window.addEventListener('resize', canvasUI.resize);
+
   canvasUI.resize();
 }

@@ -5,15 +5,23 @@ function getElement(id) {
 function getLayoutDom() {
   return {
     app: getElement('app'),
-    touchpad: getElement('touchpad'),
     adminDrawerScrim: getElement('admin-drawer-scrim'),
     leftMenu: getElement('left-menu'),
     remoteStack: getElement('remote-stack'),
     scrollZoneIndicator: getElement('scroll-zone-indicator'),
-    browserShortcuts: getElement('browser-shortcuts'),
-    tvControls: getElement('tv-controls'),
-    vlcControls: getElement('vlc-controls'),
-    systemControls: getElement('system-controls'),
+    connectionOverlay: getElement('connection-overlay'),
+    notificationsRoot: getElement('client-notifications'),
+  };
+}
+
+function getMouseRemoteDom() {
+  return {
+    touchpad: getElement('touchpad'),
+  };
+}
+
+function getKeyboardRemoteDom() {
+  return {
     menu: getElement('menu'),
     keyboardPanel: getElement('keyboard-panel'),
     keyboardShortcutsBar: getElement('keyboard-shortcuts-bar'),
@@ -28,29 +36,15 @@ function getLayoutDom() {
     keyboardShift: getElement('keyboard-shift'),
     keyboardAlt: getElement('keyboard-alt'),
     keyboardCtrl: getElement('keyboard-ctrl'),
-    connectionOverlay: getElement('connection-overlay'),
-    notificationsRoot: getElement('client-notifications'),
-    previewCanvas: getElement('preview-canvas'),
-    cursorPreview: getElement('cursor-preview'),
-    adminActionsDisabledMessage: getElement('admin-actions-disabled-message'),
-    adminAppVersion: getElement('admin-app-version'),
-  };
-}
-
-function getMouseControlsDom() {
-  return {
     btnTextEntry: getElement('btn-text-entry'),
     btnLiveKeyboard: getElement('btn-live-keyboard'),
     btnSendText: getElement('send-text'),
   };
 }
 
-function getKeyboardRemoteDom() {
-  return {};
-}
-
 function getBrowserRemoteDom() {
   return {
+    root: getElement('browser-shortcuts'),
     browserLaunchers: getElement('browser-launchers'),
     btnBrowserBack: getElement('btn-browser-back'),
     btnBrowserForward: getElement('btn-browser-forward'),
@@ -69,6 +63,7 @@ function getBrowserRemoteDom() {
 
 function getSystemRemoteDom() {
   return {
+    root: getElement('system-controls'),
     btnSystemShowDesktop: getElement('btn-system-show-desktop'),
     btnSystemWindowLeft: getElement('btn-system-window-left'),
     btnSystemWindowRight: getElement('btn-system-window-right'),
@@ -80,6 +75,7 @@ function getSystemRemoteDom() {
 
 function getVlcRemoteDom() {
   return {
+    root: getElement('vlc-controls'),
     btnVlcOpen: getElement('btn-vlc-open'),
     btnVlcWindowToggle: getElement('btn-vlc-window-toggle'),
     btnVlcWindowClose: getElement('btn-vlc-window-close'),
@@ -98,6 +94,7 @@ function getVlcRemoteDom() {
 
 function getSamsungRemoteDom() {
   return {
+    root: getElement('tv-controls'),
     btnSamsungOn: getElement('btn-samsung-on'),
     btnSamsungOff: getElement('btn-samsung-off'),
     btnSamsungVolUp: getElement('btn-samsung-volup'),
@@ -122,18 +119,30 @@ function getAdminRemoteDom() {
     btnOpenConfigPage: getElement('btn-open-config-page'),
     btnOpenPreferencesPage: getElement('btn-open-preferences-page'),
     btnRotateEntryToken: getElement('btn-rotate-entry-token'),
+    adminActionsDisabledMessage: getElement('admin-actions-disabled-message'),
+    adminAppVersion: getElement('admin-app-version'),
+  };
+}
+
+function getPreviewRemoteDom() {
+  return {
+    root: getElement('cursor-preview'),
+    previewCanvas: getElement('preview-canvas'),
   };
 }
 
 export function getDom() {
   return {
     ...getLayoutDom(),
-    ...getMouseControlsDom(),
-    ...getKeyboardRemoteDom(),
-    ...getBrowserRemoteDom(),
-    ...getSystemRemoteDom(),
-    ...getVlcRemoteDom(),
-    ...getSamsungRemoteDom(),
-    ...getAdminRemoteDom(),
+    remotes: {
+      mouse: getMouseRemoteDom(),
+      keyboard: getKeyboardRemoteDom(),
+      browser: getBrowserRemoteDom(),
+      system: getSystemRemoteDom(),
+      vlc: getVlcRemoteDom(),
+      samsung: getSamsungRemoteDom(),
+      admin: getAdminRemoteDom(),
+      preview: getPreviewRemoteDom(),
+    },
   };
 }

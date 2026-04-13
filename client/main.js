@@ -9,7 +9,6 @@ async function initClient() {
   const services = createServicesRegistry();
   await initializeCoreServices(services);
   initializeRealtimeServices(services);
-  services.getI18n().translateRoot(document);
   initUi(services);
 }
 

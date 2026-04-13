@@ -42,45 +42,24 @@ export function bindVlcRemoteButtons(
     btnVlcFullscreen,
   ].filter(Boolean);
 
+  const emitCommand = (action) => () => emitWithTimestamp(socket, REMOTE_EVENT_VLC_COMMAND, { action });
+  const emitOpen = () => emitWithTimestamp(socket, REMOTE_EVENT_VLC_OPEN);
+  const emitWindowToggle = () => emitWithTimestamp(socket, REMOTE_EVENT_VLC_WINDOW_TOGGLE);
+  const emitWindowClose = () => emitWithTimestamp(socket, REMOTE_EVENT_VLC_WINDOW_CLOSE);
+
   bindTouchPassthrough(buttons, touchpad);
 
-  btnVlcOpen?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_VLC_OPEN),
-  );
-  btnVlcWindowToggle?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_VLC_WINDOW_TOGGLE),
-  );
-  btnVlcWindowClose?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_VLC_WINDOW_CLOSE),
-  );
-  btnVlcPrevious?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_VLC_COMMAND, { action: 'previous' }),
-  );
-  btnVlcPlayPause?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_VLC_COMMAND, { action: 'play-pause' }),
-  );
-  btnVlcNext?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_VLC_COMMAND, { action: 'next' }),
-  );
-  btnVlcSeekBackward?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_VLC_COMMAND, { action: 'seek-backward' }),
-  );
-  btnVlcStop?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_VLC_COMMAND, { action: 'stop' }),
-  );
-  btnVlcSeekForward?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_VLC_COMMAND, { action: 'seek-forward' }),
-  );
-  btnVlcVolumeDown?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_VLC_COMMAND, { action: 'volume-down' }),
-  );
-  btnVlcMute?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_VLC_COMMAND, { action: 'mute' }),
-  );
-  btnVlcVolumeUp?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_VLC_COMMAND, { action: 'volume-up' }),
-  );
-  btnVlcFullscreen?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_VLC_COMMAND, { action: 'fullscreen' }),
-  );
+  btnVlcOpen?.addEventListener('click', emitOpen);
+  btnVlcWindowToggle?.addEventListener('click', emitWindowToggle);
+  btnVlcWindowClose?.addEventListener('click', emitWindowClose);
+  btnVlcPrevious?.addEventListener('click', emitCommand('previous'));
+  btnVlcPlayPause?.addEventListener('click', emitCommand('play-pause'));
+  btnVlcNext?.addEventListener('click', emitCommand('next'));
+  btnVlcSeekBackward?.addEventListener('click', emitCommand('seek-backward'));
+  btnVlcStop?.addEventListener('click', emitCommand('stop'));
+  btnVlcSeekForward?.addEventListener('click', emitCommand('seek-forward'));
+  btnVlcVolumeDown?.addEventListener('click', emitCommand('volume-down'));
+  btnVlcMute?.addEventListener('click', emitCommand('mute'));
+  btnVlcVolumeUp?.addEventListener('click', emitCommand('volume-up'));
+  btnVlcFullscreen?.addEventListener('click', emitCommand('fullscreen'));
 }

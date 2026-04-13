@@ -27,24 +27,16 @@ export function bindSystemRemoteButtons(
     btnSystemWindowClose,
   ].filter(Boolean);
 
+  const emitKey = (payload = {}) => () => emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, payload);
+  const emitWindowToggle = () => emitWithTimestamp(socket, REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE);
+  const emitWindowClose = () => emitWithTimestamp(socket, REMOTE_EVENT_WINDOW_CLOSE);
+
   bindTouchPassthrough(buttons, touchpad);
 
-  btnSystemShowDesktop?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'd', modifiers: ['command'] }),
-  );
-  btnSystemWindowLeft?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'tab', modifiers: ['alt', 'shift'] }),
-  );
-  btnSystemWindowRight?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'tab', modifiers: ['alt'] }),
-  );
-  btnSystemStartMenu?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key: 'command' }),
-  );
-  btnSystemWindowToggle?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE),
-  );
-  btnSystemWindowClose?.addEventListener('click', () =>
-    emitWithTimestamp(socket, REMOTE_EVENT_WINDOW_CLOSE),
-  );
+  btnSystemShowDesktop?.addEventListener('click', emitKey({ key: 'd', modifiers: ['command'] }));
+  btnSystemWindowLeft?.addEventListener('click', emitKey({ key: 'tab', modifiers: ['alt', 'shift'] }));
+  btnSystemWindowRight?.addEventListener('click', emitKey({ key: 'tab', modifiers: ['alt'] }));
+  btnSystemStartMenu?.addEventListener('click', emitKey({ key: 'command' }));
+  btnSystemWindowToggle?.addEventListener('click', emitWindowToggle);
+  btnSystemWindowClose?.addEventListener('click', emitWindowClose);
 }

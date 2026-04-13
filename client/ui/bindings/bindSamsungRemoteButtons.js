@@ -1,4 +1,4 @@
-import {emitWithTimestamp} from "../../core/socket-emit.js";
+import {emitWithTimestamp} from '../../core/socket-emit.js';
 import {
     REMOTE_EVENT_SAMSUNG_ENTER,
     REMOTE_EVENT_SAMSUNG_INPUT,
@@ -8,13 +8,13 @@ import {
     REMOTE_EVENT_SAMSUNG_PC_INPUT,
     REMOTE_EVENT_SAMSUNG_VOL_DOWN,
     REMOTE_EVENT_SAMSUNG_VOL_UP
-} from "../../../utils/remoteCommands.js";
+} from '../../../utils/remoteCommands.js';
 import { bindTouchPassthrough } from '../../touch/bindTouchPassthrough.js';
 
 export function bindSamsungRemoteButtons(
     socket,
     {
-        tvControls,
+        root,
         btnSamsungOn,
         btnSamsungOff,
         btnSamsungVolUp,
@@ -42,10 +42,13 @@ export function bindSamsungRemoteButtons(
         btnSamsungPcInput,
     ], touchpad);
 
-    const requiresOnButtons = Array.from(tvControls?.querySelectorAll('[data-samsung-requires-on="true"]') || []);
+    const requiresOnButtons = Array.from(root?.querySelectorAll('[data-samsung-requires-on="true"]') || []);
     let samsungStatusInterval = null;
     let currentSamsungPowerState = 'unknown';
     let expeditedPollTimers = [];
+    const emit = (eventName) => () => emitWithTimestamp(socket, eventName);
+    const emitSamsungOn = emit(REMOTE_EVENT_SAMSUNG_ON);
+    const emitSamsungOff = emit(REMOTE_EVENT_SAMSUNG_OFF);
 
     const clearExpeditedSamsungPolling = () => {
         for (const timer of expeditedPollTimers) {
@@ -68,7 +71,7 @@ export function bindSamsungRemoteButtons(
     const refreshSamsungPowerState = async () => {
         const samsungConfig = getConfigView().getSamsungConfig();
         const locallyVisible = preferenceView.getRemoteVisibility('samsung', true);
-        if (!tvControls || !samsungConfig.enabled || !locallyVisible) {
+        if (!root || !samsungConfig.enabled || !locallyVisible) {
             applySamsungPowerState('off');
             return;
         }
@@ -107,13 +110,13 @@ export function bindSamsungRemoteButtons(
     };
 
     const syncSamsungVisibility = () => {
-        if (!tvControls) {
+        if (!root) {
             return;
         }
         const samsungConfig = getConfigView().getSamsungConfig();
         const locallyVisible = preferenceView.getRemoteVisibility('samsung', true);
-        tvControls.hidden = !samsungConfig.enabled || !locallyVisible;
-        if (tvControls.hidden) {
+        root.hidden = !samsungConfig.enabled || !locallyVisible;
+        if (root.hidden) {
             clearExpeditedSamsungPolling();
             applySamsungPowerState('off');
         } else {
@@ -123,20 +126,20 @@ export function bindSamsungRemoteButtons(
 
     btnSamsungOn.addEventListener('click', () => {
         console.debug('[samsung-remote] click on');
-        emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_ON);
+        emitSamsungOn();
         startExpeditedSamsungPolling('on');
     });
     btnSamsungOff.addEventListener('click', () => {
         console.debug('[samsung-remote] click off');
-        emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_OFF);
+        emitSamsungOff();
         startExpeditedSamsungPolling('off');
     });
-    btnSamsungVolUp.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_VOL_UP));
-    btnSamsungVolDown.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_VOL_DOWN));
-    btnSamsungMute.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_MUTE));
-    btnSamsungInput.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_INPUT));
-    btnSamsungEnter.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_ENTER));
-    btnSamsungPcInput.addEventListener('click', () => emitWithTimestamp(socket, REMOTE_EVENT_SAMSUNG_PC_INPUT));
+    btnSamsungVolUp.addEventListener('click', emit(REMOTE_EVENT_SAMSUNG_VOL_UP));
+    btnSamsungVolDown.addEventListener('click', emit(REMOTE_EVENT_SAMSUNG_VOL_DOWN));
+    btnSamsungMute.addEventListener('click', emit(REMOTE_EVENT_SAMSUNG_MUTE));
+    btnSamsungInput.addEventListener('click', emit(REMOTE_EVENT_SAMSUNG_INPUT));
+    btnSamsungEnter.addEventListener('click', emit(REMOTE_EVENT_SAMSUNG_ENTER));
+    btnSamsungPcInput.addEventListener('click', emit(REMOTE_EVENT_SAMSUNG_PC_INPUT));
     syncSamsungVisibility();
     ensureSamsungStatusPolling();
     clientConfig.onChange(syncSamsungVisibility);
