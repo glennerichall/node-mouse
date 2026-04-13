@@ -4,19 +4,24 @@ import {
   REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE,
 } from '../../../utils/shared/remoteCommands.js';
 
-const getLogger = () => createLogger('window:remote');
+let log;
+function getModuleLog() {
+  log ??= createLogger('window:remote');
+  return log;
+}
 
 export function createWindowRegistrar({ windowActions }) {
+  const log = getModuleLog();
   return (socket) => {
     const client = socket.id.slice(0, 8);
 
     socket.on(REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE, async () => {
-      getLogger().info({ client }, `Demande ${REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE}`);
+      log.info({ client }, `Demande ${REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE}`);
       await windowActions.toggleMaximizeMinimize();
     });
 
     socket.on(REMOTE_EVENT_WINDOW_CLOSE, async () => {
-      getLogger().info({ client }, `Demande ${REMOTE_EVENT_WINDOW_CLOSE}`);
+      log.info({ client }, `Demande ${REMOTE_EVENT_WINDOW_CLOSE}`);
       await windowActions.closeActiveWindow();
     });
   };

@@ -25,16 +25,16 @@ describe('admin config router helpers', () => {
     const payload = buildManagedConfigPayload({
       'input.mouseSpeed': '1.5',
       'notifications.clientConnected.client': true,
-      'logging.level': 'debug',
+      'preview.fps': '12',
     }, {
       input: {
         fields: {
           mouseSpeed: {type: 'number'},
         },
       },
-      logging: {
+      preview: {
         fields: {
-          level: {type: 'string'},
+          fps: {type: 'integer'},
         },
       },
     });
@@ -48,17 +48,14 @@ describe('admin config router helpers', () => {
           client: true,
         },
       },
-      logging: {
-        level: 'debug',
+      preview: {
+        fps: 12,
       },
     });
   });
 
-  it('exposes the default logging values in the shared defaults source', () => {
-    expect(DEFAULT_PERSISTED_CONFIG.logging).toEqual({
-      level: 'info',
-      format: 'json',
-    });
+  it('does not expose logging values in the persisted defaults source', () => {
+    expect(DEFAULT_PERSISTED_CONFIG.logging).toBeUndefined();
   });
 
   it('treats null as a delete signal at the API contract level', () => {

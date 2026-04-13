@@ -4,9 +4,14 @@ import {createNoopOverlay} from './createNoopOverlay.js';
 import {createQrOverlayYad} from './createQrOverlayYad.js';
 import {createQrOverlayWin32} from './createQrOverlayWin32.js';
 
-const getLogger = () => createLogger('qr-overlay');
+let log;
+function getModuleLog() {
+  log ??= createLogger('qr-overlay');
+  return log;
+}
 
 export async function createQrOverlay(services) {
+  const log = getModuleLog();
   const platform = os.platform();
 
   if (platform === 'linux') {
@@ -17,6 +22,6 @@ export async function createQrOverlay(services) {
     return createQrOverlayWin32(services);
   }
 
-  getLogger().info({ platform }, 'QR overlay non supporté sur cette plateforme');
+  log.info({ platform }, 'QR overlay non supporté sur cette plateforme');
   return createNoopOverlay();
 }

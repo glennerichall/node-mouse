@@ -4,12 +4,17 @@ import {
     PUBSUB_SERVICE_SOCKET
 } from "../../services/pubsub/serviceEventConstants.js";
 
-const getLogger = () => createLogger('socket');
+let log;
+function getModuleLog() {
+    log ??= createLogger('socket');
+    return log;
+}
 
 export function createConnectionRegistrar({events}) {
+    const log = getModuleLog();
     return (socket) => {
         socket.on('disconnect', () => {
-            getLogger().info({socketId: socket.id}, 'Client déconnecté');
+            log.info({socketId: socket.id}, 'Client déconnecté');
             events.publishEvent(PUBSUB_SERVICE_SOCKET, PUBSUB_EVENT_SOCKET_CLIENT_DISCONNECTED, {
                 clientId: socket.id,
             });

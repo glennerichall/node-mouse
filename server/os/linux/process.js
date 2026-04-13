@@ -9,7 +9,11 @@ const LINUX_COMMAND_EXTRA_PATHS = [
   '/bin',
 ];
 
-const getLog = () => createLogger('os:linux:process');
+let log;
+function getModuleLog() {
+  log ??= createLogger('os:linux:process');
+  return log;
+}
 
 export function getLinuxCommandLookupPath(basePath = process.env.PATH || '') {
   const entries = String(basePath || '')
@@ -27,6 +31,7 @@ export function getLinuxCommandLookupPath(basePath = process.env.PATH || '') {
 }
 
 export async function resolveLinuxCommand(command) {
+  const log = getModuleLog();
   const normalizedCommand = String(command || '').trim();
   if (!normalizedCommand) {
     return '';
@@ -42,7 +47,7 @@ export async function resolveLinuxCommand(command) {
   });
 
   if (!result.ok) {
-    getLog().trace({command: normalizedCommand, lookupPath}, 'Commande Linux introuvable');
+    log.trace({command: normalizedCommand, lookupPath}, 'Commande Linux introuvable');
     return '';
   }
 
@@ -51,7 +56,7 @@ export async function resolveLinuxCommand(command) {
     .map((line) => line.trim())
     .find(Boolean) || normalizedCommand;
 
-  getLog().debug({
+  log.debug({
     command: normalizedCommand,
     resolvedCommand,
     lookupPath,

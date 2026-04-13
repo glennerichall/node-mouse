@@ -7,9 +7,14 @@ import {createLogger} from '../../application/logger.js';
 import {createNoopOverlay} from './createNoopOverlay.js';
 import {commandExists} from '../../os/linux/process.js';
 
-const getLogger = () => createLogger('qr-overlay:yad');
+let log;
+function getModuleLog() {
+  log ??= createLogger('qr-overlay:yad');
+  return log;
+}
 
 export async function createQrOverlayYad(services) {
+  const log = getModuleLog();
   const getUrl = () => services.getUrls().entryUrl;
   const getConfig = () => services.getConfig();
   const getSystemConfig = () => services.getSystemConfig();
@@ -37,7 +42,7 @@ export async function createQrOverlayYad(services) {
 
   const hasYad = await commandExists('yad');
   if (!hasYad) {
-    getLogger().warn('Overlay QR non lancé: "yad" est introuvable.');
+    log.warn('Overlay QR non lancé: "yad" est introuvable.');
     return createNoopOverlay();
   }
 
@@ -93,7 +98,7 @@ export async function createQrOverlayYad(services) {
     ];
 
     child = spawn('yad', args, { stdio: 'ignore' });
-    getLogger().debug({ url: getUrl() }, 'QR overlay rafraîchi');
+    log.debug({ url: getUrl() }, 'QR overlay rafraîchi');
   }
 
   const update = async () => {

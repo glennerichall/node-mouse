@@ -29,13 +29,13 @@ describe('config dao', () => {
   it('persists and loads individual entries', () => {
     const dao = createConfigDao({getDatabase});
 
-    dao.saveOne('logging.level', 'debug');
+    dao.saveOne('preview.fps', 12);
     dao.saveOne('notifications.clientConnected.client', false);
 
-    expect(dao.getOne('logging.level')).toBe('debug');
+    expect(dao.getOne('preview.fps')).toBe(12);
     expect(dao.getOne('notifications.clientConnected.client')).toBe(false);
     expect(dao.getAll()).toEqual(expect.arrayContaining([
-      {key: 'logging.level', value: 'debug'},
+      {key: 'preview.fps', value: 12},
       {key: 'notifications.clientConnected.client', value: false},
     ]));
   });
@@ -43,10 +43,10 @@ describe('config dao', () => {
   it('deletes one persisted entry', () => {
     const dao = createConfigDao({getDatabase});
 
-    dao.saveOne('logging.level', 'debug');
+    dao.saveOne('preview.fps', 12);
 
-    expect(dao.deleteOne('logging.level')).toBe(1);
-    expect(dao.getOne('logging.level')).toBeUndefined();
+    expect(dao.deleteOne('preview.fps')).toBe(1);
+    expect(dao.getOne('preview.fps')).toBeUndefined();
     expect(dao.getAll()).toEqual([]);
   });
 });

@@ -8,7 +8,6 @@ const maxStoredDataLength = 8_000;
 const recentLogs = [];
 const cliLogSubscribers = new Set();
 let rootLogger = null;
-let defaultConfigProvider = getSystemConfig;
 let temporaryLogLevel = '';
 
 const levels = {
@@ -141,22 +140,20 @@ function createDestination(logFormat) {
   return undefined;
 }
 
-function syncLoggerConfig(logger, nextConfig) {
-  const nextLevel = temporaryLogLevel || nextConfig?.logging?.level;
+function syncLoggerConfig(logger) {
+  const nextLevel = temporaryLogLevel || getSystemConfig()?.logging?.level;
   if (nextLevel && logger.level !== nextLevel) {
     logger.level = nextLevel;
   }
 }
 
-function buildRootLogger(configProvider) {
-  const initialConfig = configProvider();
+function buildRootLogger() {
   const systemConfig = getSystemConfig();
-  const logLevel = initialConfig?.logging?.level || 'info';
   const systemLogLevel = systemConfig?.logging?.level || 'info';
   const systemLogFormat = systemConfig?.logging?.format || 'json';
   const systemDestination = createDestination(systemLogFormat) || process.stdout;
   const logger = pino({
-    level: logLevel,
+    level: systemLogLevel,
     timestamp: pino.stdTimeFunctions.isoTime,
   }, pino.multistream([
     {level: systemLogLevel, stream: systemDestination},
@@ -167,30 +164,18 @@ function buildRootLogger(configProvider) {
   return logger;
 }
 
-export function setDefaultLoggerConfigProvider(configProvider) {
-  if (typeof configProvider !== 'function') {
-    return;
-  }
-
-  defaultConfigProvider = configProvider;
-
-  if (rootLogger) {
-    syncLoggerConfig(rootLogger, defaultConfigProvider());
-  }
-}
-
-export function bootstrapLogger(configProvider = defaultConfigProvider) {
-  setDefaultLoggerConfigProvider(configProvider);
-
+export function bootstrapLogger() {
   if (!rootLogger) {
-    rootLogger = buildRootLogger(defaultConfigProvider);
+    rootLogger = buildRootLogger();
+  } else {
+    syncLoggerConfig(rootLogger);
   }
   return rootLogger;
 }
 
-export function createLogger(scope, configProvider = defaultConfigProvider) {
-  const logger = bootstrapLogger(configProvider);
-  syncLoggerConfig(logger, configProvider());
+export function createLogger(scope) {
+  const logger = bootstrapLogger();
+  syncLoggerConfig(logger);
   return logger.child({ scope });
 }
 

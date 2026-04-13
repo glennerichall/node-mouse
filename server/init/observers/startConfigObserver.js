@@ -1,5 +1,11 @@
 import {PUBSUB_SERVICE_CONFIG} from '../../services/pubsub/serviceEventConstants.js';
-import {createLogger, setDefaultLoggerConfigProvider} from '../../application/logger.js';
+import {createLogger} from '../../application/logger.js';
+
+let log;
+function getModuleLog() {
+  log ??= createLogger('config:observer');
+  return log;
+}
 
 function getValueAtPath(source, dottedPath) {
   return String(dottedPath || '')
@@ -9,15 +15,14 @@ function getValueAtPath(source, dottedPath) {
 }
 
 export function startConfigObserver(services) {
+  const log = getModuleLog();
   const bus = services.getPubSub();
-  const getLog = () => createLogger('config:observer');
 
   return bus.subscribe((event) => {
     const sse = services.getSseService();
     const config = services.getConfig();
-    setDefaultLoggerConfigProvider(services.getConfig);
     const changedKeys = Array.isArray(event.payload?.changedKeys) ? event.payload.changedKeys : [];
-    getLog().debug({
+    log.debug({
       type: event.type,
       changeType: event.payload?.changeType || '',
       changedKeys,

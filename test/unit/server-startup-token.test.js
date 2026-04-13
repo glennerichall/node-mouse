@@ -10,7 +10,6 @@ const createServicesRegistry = jest.fn();
 const bootstrapApi = jest.fn();
 const bootstrapSocket = jest.fn();
 const bootstrapLogger = jest.fn();
-const setDefaultLoggerConfigProvider = jest.fn();
 const createLogger = jest.fn(() => ({
   info: jest.fn(),
   warn: jest.fn(),
@@ -36,7 +35,6 @@ jest.unstable_mockModule('../../server/init/bootstrapSocket.js', () => ({
 jest.unstable_mockModule('../../server/application/logger.js', () => ({
   bootstrapLogger,
   createLogger,
-  setDefaultLoggerConfigProvider,
 }));
 
 jest.unstable_mockModule('../../server/services/config/logConfig.js', () => ({

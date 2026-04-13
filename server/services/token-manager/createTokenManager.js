@@ -8,7 +8,11 @@ import {
 } from "../pubsub/serviceEventConstants.js";
 import {createLogger} from '../../application/logger.js';
 
-const getLog = () => createLogger('token-manager');
+let log;
+function getModuleLog() {
+    log ??= createLogger('token-manager');
+    return log;
+}
 
 function createTokenPersistence(services) {
     return {
@@ -22,6 +26,7 @@ function createTokenPersistence(services) {
 }
 
 export function createTokenManager(services) {
+    const log = getModuleLog();
     const persistence = createTokenPersistence(services);
 
     function publishState(type = PUBSUB_EVENT_STATE_CHANGED) {
@@ -32,7 +37,7 @@ export function createTokenManager(services) {
                 ? 0
                 : Math.max(0, latestToken.createdAt + getRotateTtlMs() - Date.now());
 
-        getLog().trace({
+        log.trace({
             type,
             enabled: isEffectivelyEnabled(),
             gateEnabled: isGateEnabled(),
@@ -124,7 +129,7 @@ export function createTokenManager(services) {
     function cleanupExpired({persist = false} = {}) {
         const normalizedFixedPath = getNormalizedFixedPath();
         if (!isGateEnabled() || normalizedFixedPath) {
-            getLog().trace({
+            log.trace({
                 persist,
                 gateEnabled: isGateEnabled(),
                 fixedPathEnabled: Boolean(normalizedFixedPath),
@@ -133,7 +138,7 @@ export function createTokenManager(services) {
         }
         if (persist) {
             const graceTtlMs = computeTokenTtlMs(getEntryPathConfig().graceMin);
-            getLog().debug({graceTtlMs}, 'Nettoyage tokens expires');
+            log.debug({graceTtlMs}, 'Nettoyage tokens expires');
             persistence.deleteExpiredTokens({
                 olderThan: Date.now() - graceTtlMs,
                 keepToken: getCurrentToken(),
@@ -145,7 +150,7 @@ export function createTokenManager(services) {
         const normalizedFixedPath = getNormalizedFixedPath();
         const currentToken = getCurrentToken();
         if (!isEffectivelyEnabled() || normalizedFixedPath) {
-            getLog().trace({
+            log.trace({
                 enabled: isEffectivelyEnabled(),
                 fixedPathEnabled: Boolean(normalizedFixedPath),
                 hasCurrentToken: Boolean(currentToken),
@@ -155,7 +160,7 @@ export function createTokenManager(services) {
         const createdAt = Date.now();
         const token = createRandomToken(getEntryPathConfig().tokenLength);
 
-        getLog().debug({tokenLength: token.length}, 'Creation nouveau token entree');
+        log.debug({tokenLength: token.length}, 'Creation nouveau token entree');
         persistence.createToken(token, createdAt);
         cleanupExpired({persist: true});
         if (token !== currentToken) {
@@ -169,7 +174,7 @@ export function createTokenManager(services) {
         const currentToken = getCurrentToken();
         const normalized = normalizeToken(token);
         if (normalizedFixedPath) {
-            getLog().trace({
+            log.trace({
                 mode: 'fixed',
                 hasInputToken: Boolean(normalized),
             }, 'Validation token entree');
@@ -179,7 +184,7 @@ export function createTokenManager(services) {
             return normalized === currentToken;
         }
         if (!isGateEnabled()) {
-            getLog().trace({
+            log.trace({
                 mode: 'disabled',
                 hasCurrentToken: Boolean(currentToken),
                 hasInputToken: Boolean(normalized),
@@ -193,38 +198,38 @@ export function createTokenManager(services) {
             return normalized === currentToken;
         }
         if (!normalized) {
-            getLog().trace('Validation token entree rejetee: token vide');
+            log.trace('Validation token entree rejetee: token vide');
             return false;
         }
         cleanupExpired({persist: true});
         if (!isPersistenceEnabled()) {
-            getLog().trace('Validation token entree rejetee: persistence inactive');
+            log.trace('Validation token entree rejetee: persistence inactive');
             return false;
         }
-        getLog().trace('Validation token entree via persistence');
+        log.trace('Validation token entree via persistence');
         return Boolean(persistence.hasToken(normalized));
     }
 
     function rotateIfNeeded() {
         if (!isPersistenceEnabled()) {
-            getLog().trace('Rotation token ignoree: persistence inactive');
+            log.trace('Rotation token ignoree: persistence inactive');
             return getCurrentToken();
         }
 
         const latestToken = getLatestTokenRecord();
         if (!latestToken) {
-            getLog().debug('Rotation token: aucun token existant');
+            log.debug('Rotation token: aucun token existant');
             return createToken();
         }
 
         if (!Number.isFinite(latestToken.createdAt) || Date.now() < latestToken.createdAt + getRotateTtlMs()) {
-            getLog().trace({
+            log.trace({
                 hasCreatedAt: Number.isFinite(latestToken.createdAt),
             }, 'Rotation token non requise');
             return latestToken.token;
         }
 
-        getLog().debug('Rotation token requise');
+        log.debug('Rotation token requise');
         return createToken();
     }
     

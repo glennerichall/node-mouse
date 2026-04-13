@@ -4,8 +4,14 @@ import {createSamsungTvGetter} from './createSamsungTvGetter.js';
 import {createDisabledSamsungRemote} from './utils.js';
 import {createLogger} from '../../application/logger.js';
 
+let log;
+function getModuleLog() {
+    log ??= createLogger('samsung:remote');
+    return log;
+}
+
 export function createSamsungRemote(services) {
-    const getLogger = ()=> createLogger('samsung:remote');
+    const getLogger = () => getModuleLog();
     const getConfig = ()=> services.getConfig().samsungTv;
     const resolveDeviceConfig = createSamsungDeviceConfigResolver({getConfig, getLogger});
     const discoverDevices = discoverSamsungDevices({getConfig});

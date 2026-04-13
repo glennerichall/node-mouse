@@ -14,8 +14,8 @@ describe('config observer', () => {
       getPubSub: () => bus,
       getSseService: () => ({emit}),
       getConfig: () => ({
-        logging: {
-          level: 'debug',
+        preview: {
+          fps: 12,
         },
       }),
       getSystemConfig: () => ({
@@ -27,7 +27,7 @@ describe('config observer', () => {
 
     bus.publish(PUBSUB_SERVICE_CONFIG, {
       changeType: 'updated',
-      changedKeys: ['logging.level'],
+      changedKeys: ['preview.fps'],
     }, {
       type: PUBSUB_EVENT_CONFIG_UPDATED,
       snapshot: false,
@@ -42,16 +42,16 @@ describe('config observer', () => {
         at: expect.any(String),
         type: PUBSUB_EVENT_CONFIG_UPDATED,
         changeType: 'updated',
-        changedKeys: ['logging.level'],
+        changedKeys: ['preview.fps'],
         entries: [
           {
-            path: 'logging.level',
-            value: 'debug',
+            path: 'preview.fps',
+            value: 12,
           },
         ],
         config: {
-          logging: {
-            level: 'debug',
+          preview: {
+            fps: 12,
           },
         },
         sysConfig: {

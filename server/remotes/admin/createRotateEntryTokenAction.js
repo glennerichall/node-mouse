@@ -6,11 +6,17 @@ import {
 } from '../../services/pubsub/serviceEventConstants.js';
 import {createLogger} from '../../application/logger.js';
 
+let log;
+function getModuleLog() {
+  log ??= createLogger('admin:rotate-entry-token');
+  return log;
+}
+
 export function createRotateEntryTokenAction(services) {
+  const log = getModuleLog();
   return async function rotateEntryToken({ clientId } = {}) {
     const events = services.getEvents();
     const tokenManager = services.getTokenManager();
-    const log = createLogger('admin:rotate-entry-token');
     const before = String(tokenManager.getToken());
     const after = String(tokenManager.createToken());
 

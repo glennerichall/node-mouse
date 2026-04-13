@@ -67,26 +67,26 @@ describe('server cli', () => {
   it('returns one persisted config value for config get', async () => {
     const result = await executeCliCommand({
       getConfigService: () => ({
-        getConfig: () => 'debug',
+        getConfig: () => 12,
       }),
       getRemotes: () => ({
         adminActions: {},
       }),
-    }, {name: 'config', args: {action: 'get', path: 'logging.level', value: ''}});
+    }, {name: 'config', args: {action: 'get', path: 'preview.fps', value: ''}});
 
     expect(result).toEqual({
       ok: true,
-      message: 'Configuration logging.level.',
+      message: 'Configuration preview.fps.',
       data: {
-        path: 'logging.level',
-        value: 'debug',
+        path: 'preview.fps',
+        value: 12,
       },
     });
   });
 
   it('updates one persisted config value for config set through config service', async () => {
     const setConfig = jest.fn();
-    const getConfig = jest.fn(() => 'debug');
+    const getConfig = jest.fn(() => 12);
 
     const result = await executeCliCommand({
       getConfigService: () => ({
@@ -96,15 +96,15 @@ describe('server cli', () => {
       getRemotes: () => ({
         adminActions: {},
       }),
-    }, {name: 'config', args: {action: 'set', path: 'logging.level', value: 'debug'}});
+    }, {name: 'config', args: {action: 'set', path: 'preview.fps', value: '12'}});
 
-    expect(setConfig).toHaveBeenCalledWith('logging.level', 'debug');
+    expect(setConfig).toHaveBeenCalledWith('preview.fps', 12);
     expect(result).toEqual({
       ok: true,
-      message: 'Configuration logging.level mise a jour.',
+      message: 'Configuration preview.fps mise a jour.',
       data: {
-        path: 'logging.level',
-        value: 'debug',
+        path: 'preview.fps',
+        value: 12,
       },
     });
   });

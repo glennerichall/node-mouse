@@ -10,9 +10,14 @@ import {
   PUBSUB_SERVICE_ADMIN_OPEN_SERVER_INFO_BROWSER,
 } from '../../services/pubsub/serviceEventConstants.js';
 
-const getLogger = () => createLogger('admin:open-server-info-browser');
+let log;
+function getModuleLog() {
+  log ??= createLogger('admin:open-server-info-browser');
+  return log;
+}
 
 export function createOpenServerInfoBrowserAction(services, options = {}) {
+  const log = getModuleLog();
   const browser = options.browser;
   const target = options.target || NOTIFIER_TARGET_SERVER;
 
@@ -22,7 +27,7 @@ export function createOpenServerInfoBrowserAction(services, options = {}) {
     const clientInfoUrl = '/ui/admin/server-info';
 
     if (isClientTarget) {
-      getLogger().info({ clientId, clientInfoUrl }, 'Ouverture de la page server info sur le client');
+      log.info({ clientId, clientInfoUrl }, 'Ouverture de la page server info sur le client');
       events.publishEvent(PUBSUB_SERVICE_ADMIN_OPEN_SERVER_INFO_BROWSER, PUBSUB_EVENT_ADMIN_CLIENT_OPENED, {
         clientId,
       });
@@ -35,7 +40,7 @@ export function createOpenServerInfoBrowserAction(services, options = {}) {
 
     const config = services.getSystemConfig();
     const localInfoUrl = `${config.protocol}://127.0.0.1:${config.port}/ui/admin/server-info`;
-    getLogger().info({ localInfoUrl }, 'Ouverture de la page server info sur le serveur');
+    log.info({ localInfoUrl }, 'Ouverture de la page server info sur le serveur');
 
     const ok = await browser.openUrlOnHost(localInfoUrl);
     if (!ok) {

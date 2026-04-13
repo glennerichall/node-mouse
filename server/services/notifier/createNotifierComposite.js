@@ -6,7 +6,11 @@ import {
     NOTIFICATION_TARGET_HOST as CONFIG_NOTIFICATION_TARGET_HOST,
 } from '../../../utils/shared/notificationSettings.js';
 
-const getLogger = () => createLogger('notifier:composite');
+let log;
+function getModuleLog() {
+    log ??= createLogger('notifier:composite');
+    return log;
+}
 
 export const NOTIFIER_TARGET_ALL = 'all';
 export const NOTIFIER_TARGET_ALL_CLIENTS = 'all-clients';
@@ -30,6 +34,7 @@ export const NOTIFIER_LEVELS = [
 ];
 
 export function createNotifierComposite({clientNotifier, serverNotifier, getNotificationsConfig}) {
+    const log = getModuleLog();
     function getDefaultTtlMs() {
         return getNotificationsConfig?.()?.ttlMs
             ?? DEFAULT_PERSISTED_CONFIG.notifications.ttlMs;
@@ -100,7 +105,7 @@ export function createNotifierComposite({clientNotifier, serverNotifier, getNoti
                 }
 
                 if (!NOTIFIER_TARGETS.includes(resolvedTarget)) {
-                    getLogger().warn({target: resolvedTarget}, 'Target de notification inconnu');
+                    log.warn({target: resolvedTarget}, 'Target de notification inconnu');
                 }
             },
         };

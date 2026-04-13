@@ -3,26 +3,31 @@ import {getScreenInfo} from "./getScreenInfo.js";
 import {getNetworkInfo} from "./getNetworkInfo.js";
 import {createLogger} from '../../application/logger.js';
 
-export function createSystemService(services) {
-  const getLogger = () => createLogger('system');
+let log;
+function getModuleLog() {
+  log ??= createLogger('system');
+  return log;
+}
 
+export function createSystemService(services) {
+  const log = getModuleLog();
   return {
     listBrowsers() {
-      getLogger().debug('Detection des navigateurs disponibles');
+      log.debug('Detection des navigateurs disponibles');
       return services.getRemotes().browser.listBrowsers();
     },
     isVlcAvailable() {
-      getLogger().debug('Detection disponibilite VLC');
+      log.debug('Detection disponibilite VLC');
       return services.getRemotes().vlc.isAvailable();
     },
     getScreenInfo() {
       const screen = getScreenInfo(services);
-      getLogger().debug({screen}, 'Detection resolution ecran');
+      log.debug({screen}, 'Detection resolution ecran');
       return screen;
     },
     getNetworkInfo() {
       const network = getNetworkInfo(services);
-      getLogger().debug({
+      log.debug({
         lanIp: network.lanIp,
         publicBaseUrl: network.publicBaseUrl,
         interfaceCount: network.interfaces.length,
@@ -30,7 +35,6 @@ export function createSystemService(services) {
       return network;
     },
     async getInfo() {
-      const log = getLogger();
       log.debug('Collecte des capacites serveur');
       const browsers = await this.listBrowsers();
       const vlcAvailable = await this.isVlcAvailable();

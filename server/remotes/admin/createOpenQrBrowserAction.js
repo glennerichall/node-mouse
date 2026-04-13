@@ -10,7 +10,11 @@ import {
   PUBSUB_SERVICE_ADMIN_OPEN_QR_BROWSER,
 } from '../../services/pubsub/serviceEventConstants.js';
 
-const getLogger = () => createLogger('admin:open-qr-browser');
+let log;
+function getModuleLog() {
+  log ??= createLogger('admin:open-qr-browser');
+  return log;
+}
 
 function publishClientEvent(events, type, clientId) {
   if (!clientId) {
@@ -22,6 +26,7 @@ function publishClientEvent(events, type, clientId) {
 }
 
 export function createOpenQrBrowserAction(services, options = {}) {
+  const log = getModuleLog();
   const browser = options.browser;
   const target = options.target || NOTIFIER_TARGET_SERVER;
 
@@ -31,7 +36,7 @@ export function createOpenQrBrowserAction(services, options = {}) {
     const clientQrUrl = '/qr';
 
     if (isClientTarget) {
-      getLogger().info({ clientId, clientQrUrl }, 'Ouverture de la page QR sur le client');
+      log.info({ clientId, clientQrUrl }, 'Ouverture de la page QR sur le client');
       events.publishEvent(PUBSUB_SERVICE_ADMIN_OPEN_QR_BROWSER, PUBSUB_EVENT_ADMIN_CLIENT_OPENED, {
         clientId,
       });
@@ -44,7 +49,7 @@ export function createOpenQrBrowserAction(services, options = {}) {
 
     const config = services.getSystemConfig();
     const localQrUrl = `${config.protocol}://127.0.0.1:${config.port}/qr`;
-    getLogger().info({ localQrUrl }, 'Ouverture de la page QR sur le serveur');
+    log.info({ localQrUrl }, 'Ouverture de la page QR sur le serveur');
 
     const ok = await browser.openUrlOnHost(localQrUrl);
     if (!ok) {

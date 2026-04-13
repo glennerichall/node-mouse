@@ -134,8 +134,4 @@ export const DEFAULT_PERSISTED_CONFIG = {
         hoverExitMarginPx: 18,
         hoverShowDelayMs: 5000
     },
-    logging: {
-        level: 'info',
-        format: 'json',
-    },
 };

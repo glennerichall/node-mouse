@@ -32,18 +32,18 @@ describe('cli request execution', () => {
     const onLog = jest.fn();
     const result = await executeCliRequest({
       getConfigService: () => ({
-        getConfig: () => 'debug',
+        getConfig: () => 12,
       }),
       getRemotes: () => ({
         adminActions: {},
       }),
-    }, {name: 'config', args: {action: 'get', path: 'logging.level', value: ''}}, {verbosity: 1}, onLog);
+    }, {name: 'config', args: {action: 'get', path: 'preview.fps', value: ''}}, {verbosity: 1}, onLog);
 
     expect(withCliLogStream).toHaveBeenCalledWith('debug', onLog, expect.any(Function));
     expect(onLog).toHaveBeenCalledWith(logEntry);
     expect(result).toEqual(expect.objectContaining({
       ok: true,
-      message: 'Configuration logging.level.',
+      message: 'Configuration preview.fps.',
     }));
   });
 

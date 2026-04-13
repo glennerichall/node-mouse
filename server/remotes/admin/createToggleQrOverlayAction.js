@@ -4,9 +4,14 @@ import {
   PUBSUB_SERVICE_ADMIN_TOGGLE_QR_OVERLAY,
 } from '../../services/pubsub/serviceEventConstants.js';
 
-const getLogger = () => createLogger('admin:toggle-qr-overlay');
+let log;
+function getModuleLog() {
+  log ??= createLogger('admin:toggle-qr-overlay');
+  return log;
+}
 
 export function createToggleQrOverlayAction(services) {
+  const log = getModuleLog();
   const getEvents = services.getEvents;
   const getQrOverlay = services.getQrOverlay;
 
@@ -22,7 +27,7 @@ export function createToggleQrOverlayAction(services) {
       ? 'QR overlay affiche.'
       : 'QR overlay masque.';
 
-    getLogger().info({ visible }, 'Toggle QR overlay');
+    log.info({ visible }, 'Toggle QR overlay');
     events.publishEvent(PUBSUB_SERVICE_ADMIN_TOGGLE_QR_OVERLAY, PUBSUB_EVENT_ADMIN_TOGGLED, {
       clientId,
       visible,

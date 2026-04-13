@@ -6,7 +6,11 @@ import {
   REMOTE_EVENT_VLC_WINDOW_TOGGLE,
 } from '../../../utils/shared/remoteCommands.js';
 
-const getLogger = () => createLogger('vlc:remote');
+let log;
+function getModuleLog() {
+  log ??= createLogger('vlc:remote');
+  return log;
+}
 const VLC_ACTIONS = {
   previous: { key: 'p' },
   'play-pause': { key: 'space' },
@@ -25,16 +29,17 @@ function isVlcEnabled(config) {
 }
 
 export function createVlcRegistrar({ vlc, keyboard, getConfig = () => ({}) }) {
+  const log = getModuleLog();
   return (socket) => {
     const client = socket.id.slice(0, 8);
 
     async function ensureUsable() {
       if (!(await vlc.isAvailable())) {
-        getLogger().info({ client }, 'VLC ignore: non disponible sur le host.');
+        log.info({ client }, 'VLC ignore: non disponible sur le host.');
         return false;
       }
       if (!isVlcEnabled(getConfig())) {
-        getLogger().info({ client }, 'VLC ignore: desactive par configuration.');
+        log.info({ client }, 'VLC ignore: desactive par configuration.');
         return false;
       }
       return true;
@@ -45,7 +50,7 @@ export function createVlcRegistrar({ vlc, keyboard, getConfig = () => ({}) }) {
         return;
       }
 
-      getLogger().info({ client }, `Demande ${REMOTE_EVENT_VLC_OPEN}`);
+      log.info({ client }, `Demande ${REMOTE_EVENT_VLC_OPEN}`);
       await vlc.focusOrLaunch();
     });
 
@@ -60,7 +65,7 @@ export function createVlcRegistrar({ vlc, keyboard, getConfig = () => ({}) }) {
         return;
       }
 
-      getLogger().info({ client, action }, `Demande ${REMOTE_EVENT_VLC_COMMAND}`);
+      log.info({ client, action }, `Demande ${REMOTE_EVENT_VLC_COMMAND}`);
       const focused = await vlc.focusOrLaunch();
       if (!focused) {
         return;
@@ -73,7 +78,7 @@ export function createVlcRegistrar({ vlc, keyboard, getConfig = () => ({}) }) {
         return;
       }
 
-      getLogger().info({ client }, `Demande ${REMOTE_EVENT_VLC_WINDOW_TOGGLE}`);
+      log.info({ client }, `Demande ${REMOTE_EVENT_VLC_WINDOW_TOGGLE}`);
       await vlc.toggleWindow();
     });
 
@@ -82,7 +87,7 @@ export function createVlcRegistrar({ vlc, keyboard, getConfig = () => ({}) }) {
         return;
       }
 
-      getLogger().info({ client }, `Demande ${REMOTE_EVENT_VLC_WINDOW_CLOSE}`);
+      log.info({ client }, `Demande ${REMOTE_EVENT_VLC_WINDOW_CLOSE}`);
       await vlc.closeWindow();
     });
   };

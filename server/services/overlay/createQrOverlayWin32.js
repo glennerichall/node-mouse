@@ -10,10 +10,16 @@ import {
   spawnPowerShellFile,
 } from '../os/platforms/win32/overlay.js';
 
+let log;
+function getModuleLog() {
+  log ??= createLogger('qr-overlay:win32');
+  return log;
+}
+
 export async function createQrOverlayWin32(services) {
+  const log = getModuleLog();
   const getUrl = () => services.getUrls().entryUrl;
   const getConfig = () => services.getConfig();
-  const getLogger = ()=> createLogger('qr-overlay:win32');
   
   const robot = services.getRobot();
 
@@ -77,9 +83,9 @@ export async function createQrOverlayWin32(services) {
 
     child = spawnPowerShellFile(scriptPath);
     child.once('error', (error) => {
-      getLogger().warn({ err: error }, 'Impossible de lancer PowerShell pour QR overlay');
+      log.warn({ err: error }, 'Impossible de lancer PowerShell pour QR overlay');
     });
-    getLogger().debug({ url: getUrl() }, 'QR overlay Windows rafraîchi');
+    log.debug({ url: getUrl() }, 'QR overlay Windows rafraîchi');
   }
 
   const update = async () => {

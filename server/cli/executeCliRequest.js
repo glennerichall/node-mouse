@@ -4,7 +4,11 @@ import {
   withCliLogStream,
 } from '../application/logger.js';
 
-const getLog = () => createLogger('cli:request');
+let log;
+function getModuleLog() {
+  log ??= createLogger('cli:request');
+  return log;
+}
 
 function normalizeVerbosity(options = {}) {
   return Math.max(0, Number.parseInt(options.verbosity || 0, 10) || 0);
@@ -15,8 +19,9 @@ function getVerbosityLogLevel(verbosity) {
 }
 
 export async function withCliVerbosity(options = {}, callback, onLog = null) {
+  const log = getModuleLog();
   const verbosity = normalizeVerbosity(options);
-  getLog().trace({verbosity}, 'Application verbosite CLI');
+  log.trace({verbosity}, 'Application verbosite CLI');
 
   return verbosity > 0
     ? withCliLogStream(getVerbosityLogLevel(verbosity), onLog, callback)
@@ -24,7 +29,8 @@ export async function withCliVerbosity(options = {}, callback, onLog = null) {
 }
 
 export async function executeCliRequest(services, command, options = {}, onLog = null) {
-  getLog().debug({
+  const log = getModuleLog();
+  log.debug({
     command: command?.name || '',
     verbosity: normalizeVerbosity(options),
   }, 'Execution requete CLI');

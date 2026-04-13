@@ -256,22 +256,6 @@ export const CONFIG_SCHEMA = {
       },
     },
   },
-  logging: {
-    title: 'Logs',
-    description: 'Format et niveau de verbosite.',
-    fields: {
-      level: {
-        label: 'Niveau',
-        type: 'string',
-        options: ['trace', 'debug', 'info', 'warn', 'error', 'fatal'],
-      },
-      format: {
-        label: 'Format',
-        type: 'string',
-        options: ['json', 'pretty'],
-      },
-    },
-  },
 };
 
 export function getManagedConfigSchema(managedPaths = []) {

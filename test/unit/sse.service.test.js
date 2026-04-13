@@ -14,7 +14,7 @@ describe('sse service', () => {
       service: 'config',
       type: 'config.updated',
       payload: {
-        changedKeys: ['logging.level'],
+        changedKeys: ['preview.fps'],
       },
     });
 
@@ -32,7 +32,7 @@ describe('sse service', () => {
     expect(service.connect(id, req, res)).toBe(true);
     expect(writes).toEqual([
       'retry: 3000\n\n',
-      'event: config.changed\ndata: {"changedKeys":["logging.level"]}\n\n',
+      'event: config.changed\ndata: {"changedKeys":["preview.fps"]}\n\n',
     ]);
   });
 });

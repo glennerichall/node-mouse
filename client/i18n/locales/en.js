@@ -238,8 +238,6 @@ export const en = {
   'adminConfig.section.updateCheck.description': 'Enable automatic update checks.',
   'adminConfig.section.qrOverlay.title': 'QR Overlay',
   'adminConfig.section.qrOverlay.description': 'Size and position settings for the QR overlay.',
-  'adminConfig.section.logging.title': 'Logs',
-  'adminConfig.section.logging.description': 'Verbosity level and format.',
   'adminConfig.field.input.mouseSpeed': 'Mouse speed',
   'adminConfig.field.input.scrollSpeed': 'Scroll speed',
   'adminConfig.field.input.touchDragHoldMs': 'Touch drag hold delay (ms)',
@@ -287,9 +285,6 @@ export const en = {
   'adminConfig.field.qrOverlay.hoverEntryMarginPx': 'Hover entry margin (px)',
   'adminConfig.field.qrOverlay.hoverExitMarginPx': 'Hover exit margin (px)',
   'adminConfig.field.qrOverlay.hoverShowDelayMs': 'Hover show delay (ms)',
-  'adminConfig.field.logging.level': 'Level',
-  'adminConfig.field.logging.format': 'Format',
-
   'preferences.pageTitle': 'Remote Mouse Preferences',
   'preferences.eyebrow': 'Preferences',
   'preferences.title': 'Local preferences',
