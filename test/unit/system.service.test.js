@@ -25,6 +25,13 @@ describe('system service', () => {
           isAvailable: jest.fn(async () => true),
         },
       }),
+      getConfig: () => ({
+        browser: {enabled: true},
+        keyboard: {enabled: true},
+        vlc: {enabled: false},
+        preview: {enabled: true},
+        samsungTv: {enabled: false},
+      }),
       getRobot: () => ({
         getScreenSize: () => ({
           width: 1920,
@@ -51,6 +58,43 @@ describe('system service', () => {
         {id: 'firefox', name: 'Firefox'},
       ],
       vlc: {available: true},
+      applications: expect.arrayContaining([
+        expect.objectContaining({
+          id: 'browser:firefox',
+          name: 'Firefox',
+          kind: 'browser',
+          available: true,
+          remotes: ['browser'],
+        }),
+        expect.objectContaining({
+          id: 'vlc',
+          name: 'VLC media player',
+          kind: 'media-player',
+          available: true,
+          remotes: ['vlc'],
+        }),
+      ]),
+      remotes: expect.arrayContaining([
+        expect.objectContaining({
+          id: 'browser',
+          available: true,
+          enabled: true,
+        }),
+        expect.objectContaining({
+          id: 'vlc',
+          available: true,
+          enabled: false,
+          inactiveReasons: ['config-disabled'],
+        }),
+      ]),
+      allRemotes: expect.arrayContaining([
+        expect.objectContaining({
+          id: 'samsung',
+          available: true,
+          enabled: false,
+          inactiveReasons: ['config-disabled'],
+        }),
+      ]),
       screen: {width: 1920, height: 1080},
       network: expect.objectContaining({
         hostname: expect.any(String),

@@ -173,12 +173,11 @@
 
   <script type="module">
     import {createServicesRegistry} from '/client/services/createServicesRegistry.js';
+    import {initializeCoreServices} from '/client/services/createServicesContainer.js';
 
     const services = createServicesRegistry();
+    await initializeCoreServices(services);
     const i18n = services.getI18n();
-    await i18n.init();
-    services.getPreferences().init();
-    services.getPreferenceView().init();
     i18n.translateRoot(document);
 
     const versionEl = document.getElementById('version');
@@ -210,6 +209,11 @@
 
     function t(key, params) {
       return i18n.t(key, params);
+    }
+
+    function translateOr(key, fallback = '') {
+      const value = t(key);
+      return value === key ? fallback : value;
     }
 
     function isLogScrollAtBottom() {
@@ -377,8 +381,39 @@
         return;
       }
 
-      const browsers = Array.isArray(system.browsers) && system.browsers.length > 0
-        ? system.browsers.map((browser) => browser.name || browser.id || '-').join(', ')
+      const applications = Array.isArray(system.applications) && system.applications.length > 0
+        ? system.applications
+          .map((application) => {
+            const status = application.available
+              ? translateOr('serverInfo.capabilities.available', 'available')
+              : translateOr('serverInfo.capabilities.unavailable', 'unavailable');
+            const details = [application.command, application.app].filter(Boolean).join(' / ');
+            return `- ${application.name || application.id || '-'} [${status}]${details ? ` (${details})` : ''}`;
+          })
+          .join('\n')
+        : t('serverInfo.capabilities.none');
+      const applicationNameById = new Map(
+        (Array.isArray(system.applications) ? system.applications : [])
+          .map((application) => [application.id, application.name || application.id]),
+      );
+      const formatRemote = (remote) => {
+        const label = translateOr(remote.labelKey, remote.id || '-');
+        const status = remote.enabled
+          ? translateOr('serverInfo.capabilities.enabled', 'enabled')
+          : translateOr('serverInfo.capabilities.disabled', 'disabled');
+        const inactiveReasons = Array.isArray(remote.inactiveReasons) && remote.inactiveReasons.length > 0
+          ? `: ${remote.inactiveReasons.map((reason) => translateOr(`serverInfo.capabilities.reason.${reason}`, reason)).join(', ')}`
+          : '';
+        const applications = Array.isArray(remote.applicationIds) && remote.applicationIds.length > 0
+          ? ` -> ${remote.applicationIds.map((id) => applicationNameById.get(id) || id).join(', ')}`
+          : '';
+        return `- ${label} [${status}]${applications}${inactiveReasons}`;
+      };
+      const remotes = Array.isArray(system.remotes) && system.remotes.length > 0
+        ? system.remotes.map(formatRemote).join('\n')
+        : t('serverInfo.capabilities.none');
+      const allRemotes = Array.isArray(system.allRemotes) && system.allRemotes.length > 0
+        ? system.allRemotes.map(formatRemote).join('\n')
         : t('serverInfo.capabilities.none');
       const screen = system.screen && Number.isFinite(system.screen.width) && Number.isFinite(system.screen.height)
         ? `${system.screen.width}x${system.screen.height}`
@@ -392,9 +427,10 @@
       capabilitiesEl.textContent = [
         `${t('serverInfo.capabilities.platform')}: ${system.platform || '-'}`,
         `${t('serverInfo.capabilities.hostname')}: ${system.hostname || system.network?.hostname || '-'}`,
-        `${t('serverInfo.capabilities.vlc')}: ${t(system.vlc?.available ? 'serverInfo.capabilities.available' : 'serverInfo.capabilities.unavailable')}`,
         `${t('serverInfo.capabilities.screen')}: ${screen}`,
-        `${t('serverInfo.capabilities.browsers')}: ${browsers}`,
+        `${translateOr('serverInfo.capabilities.applications', 'Applications')}:\n${applications}`,
+        `${translateOr('serverInfo.capabilities.remotes', 'Remotes')}:\n${remotes}`,
+        `${translateOr('serverInfo.capabilities.allRemotes', 'All remotes')}:\n${allRemotes}`,
         `${t('serverInfo.capabilities.lanIp')}: ${system.network?.lanIp || '-'}`,
         `${t('serverInfo.capabilities.publicUrl')}: ${system.network?.publicBaseUrl || '-'}`,
         `${t('serverInfo.capabilities.localUrl')}: ${system.network?.localBaseUrl || '-'}`,
