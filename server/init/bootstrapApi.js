@@ -56,16 +56,9 @@ export function bootstrapApi(services) {
 
     app.use('/api/sessions', createSessionRouter(services));
 
-    app.use(createStaticShareRouter({
-        publicDir,
-        clientDir,
-        sharedUtilsDir
-    }));
 
     app.use(createSessionGuard(services));
-
-    app.get('/qr', createQrPageHandler(services));
-
+    
     app.get('/', (req, res, next) => {
         if (req.sessionToken) {
             res.createSession(getTokenManager().getToken());
@@ -73,6 +66,13 @@ export function bootstrapApi(services) {
         next();
     });
 
+    app.use(createStaticShareRouter({
+        publicDir,
+        clientDir,
+        sharedUtilsDir
+    }));
+    
+    app.get('/qr', createQrPageHandler(services));
     app.use('/api/remotes', createRemotesRouter(services));
     app.use('/api/admin', createAdminApiRouter(services));
     app.use('/ui/admin', createAdminUiRouter(services));
