@@ -15,7 +15,7 @@ export function bindSamsungRemoteButtons(services, dom) {
     const socket = services.getTransport();
     const clientConfig = services.getClientConfig();
     const getConfigView = services.getConfigView;
-    const preferenceView = services.getPreferenceView();
+    const appState = services.getAppState();
     const backend = services.getBackend();
     const touchpad = dom.remotes.mouse.touchpad;
     const {
@@ -68,7 +68,7 @@ export function bindSamsungRemoteButtons(services, dom) {
 
     const refreshSamsungPowerState = async () => {
         const samsungConfig = getConfigView().getSamsungConfig();
-        const locallyVisible = preferenceView.getRemoteVisibility('samsung', true);
+        const locallyVisible = appState.get('effective.remote.samsung.visible');
         if (!root || !samsungConfig.enabled || !locallyVisible) {
             applySamsungPowerState('off');
             return;
@@ -112,7 +112,7 @@ export function bindSamsungRemoteButtons(services, dom) {
             return;
         }
         const samsungConfig = getConfigView().getSamsungConfig();
-        const locallyVisible = preferenceView.getRemoteVisibility('samsung', true);
+        const locallyVisible = appState.get('effective.remote.samsung.visible');
         root.hidden = !samsungConfig.enabled || !locallyVisible;
         if (root.hidden) {
             clearExpeditedSamsungPolling();
@@ -141,5 +141,5 @@ export function bindSamsungRemoteButtons(services, dom) {
     syncSamsungVisibility();
     ensureSamsungStatusPolling();
     clientConfig.onChange(syncSamsungVisibility);
-    preferenceView.onRemoteVisibilityChange(syncSamsungVisibility);
+    appState.subscribeProperty('effective.remote.samsung.visible', syncSamsungVisibility);
 }

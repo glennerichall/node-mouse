@@ -9,7 +9,7 @@ export function bindBrowserRemoteButtons(services, dom) {
     const socket = services.getTransport();
     const clientConfig = services.getClientConfig();
     const getConfigView = services.getConfigView;
-    const preferenceView = services.getPreferenceView();
+    const appState = services.getAppState();
     const backend = services.getBackend();
     const touchpad = dom.remotes.mouse.touchpad;
     const {
@@ -52,10 +52,7 @@ export function bindBrowserRemoteButtons(services, dom) {
     }
 
     function isBrowserLauncherEnabled(browserId) {
-        const browserConfig = getConfigView().getBrowserConfig();
-        return browserConfig.enabled !== false
-            && browserConfig?.[browserId] !== false
-            && preferenceView.getBrowserVisibility(browserId, true);
+        return appState.get(`effective.browser.${browserId}.visible`);
     }
 
     async function loadBrowserLaunchers() {
@@ -103,7 +100,7 @@ export function bindBrowserRemoteButtons(services, dom) {
     clientConfig.onChange(() => {
         void loadBrowserLaunchers();
     });
-    preferenceView.onBrowserVisibilityChange(() => {
+    appState.subscribeProperty('preferences.browserVisibility', () => {
         void loadBrowserLaunchers();
     });
 

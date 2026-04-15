@@ -5,6 +5,7 @@ import {
   REMOTE_EVENT_PREVIEW_STOP,
 } from '../../utils/remoteCommands.js';
 import {
+  APP_STATE_EFFECTIVE_PREVIEW_REMOTE_VISIBLE,
   APP_STATE_KEYBOARD_PREVIEW_ACTIVE,
   APP_STATE_PREVIEW_ACTIVITY_AT,
   getAppStatePropertyChangedEventName,
@@ -13,7 +14,7 @@ import {
 export function bindPreviewStream(services, dom) {
   const socket = services.getTransport();
   const clientConfig = services.getClientConfig();
-  const preferenceView = services.getPreferenceView();
+  const appState = services.getAppState();
   const pubsub = services.getPubSub();
   const {previewCanvas, previewLabel} = dom.remotes.preview;
 
@@ -29,7 +30,7 @@ export function bindPreviewStream(services, dom) {
   let keyboardPreviewActive = false;
 
   const isPreviewEnabled = () =>
-    services.getConfigView().getPreviewConfig().enabled !== false && preferenceView.getRemoteVisibility('preview', true);
+    appState.get(APP_STATE_EFFECTIVE_PREVIEW_REMOTE_VISIBLE);
 
   const getInactivityDelayMs = () => {
     const configuredDelay = Number(services.getConfigView().getPreviewConfig()?.hideDelayMs);
@@ -133,7 +134,7 @@ export function bindPreviewStream(services, dom) {
       armInactivityStop();
     }
   });
-  preferenceView.onRemoteVisibilityChange(() => {
+  appState.subscribeProperty(APP_STATE_EFFECTIVE_PREVIEW_REMOTE_VISIBLE, () => {
     if (!isPreviewEnabled()) {
       stopPreview();
       return;
@@ -147,5 +148,5 @@ export function bindPreviewStream(services, dom) {
 
   hidePreview();
 
-  setKeyboardPreviewActive(Boolean(services.getAppState().get(APP_STATE_KEYBOARD_PREVIEW_ACTIVE)));
+  setKeyboardPreviewActive(Boolean(appState.get(APP_STATE_KEYBOARD_PREVIEW_ACTIVE)));
 }

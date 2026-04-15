@@ -11,7 +11,11 @@ import {
     handleTouchMove,
     handleTouchStart,
 } from './touch-handlers.js';
-import {APP_STATE_PREVIEW_ACTIVITY_AT} from '../services/app-state/createAppStateService.js';
+import {
+    APP_STATE_HANDEDNESS,
+    APP_STATE_PREVIEW_ACTIVITY_AT,
+    APP_STATE_REMOTE_AUTO_HIDE,
+} from '../services/app-state/createAppStateService.js';
 
 const REMOTE_HIDE_DELAY_MS = 300;
 const SHOW_REMOTE_DELAY_MS = 500;
@@ -144,7 +148,6 @@ export function bindSocketTouchpad(socket, touchpad, options = {}) {
 export function bindTouchpad(services, dom) {
     const socket = services.getTransport();
     const appState = services.getAppState();
-    const preferenceView = services.getPreferenceView();
     const touchpad = dom.remotes.mouse.touchpad;
     let hideRemoteTimer = null;
     let showRemoteTimer = null;
@@ -172,7 +175,7 @@ export function bindTouchpad(services, dom) {
         if (!dom.remoteStack || interactionKind !== 'move') {
             return;
         }
-        if (!preferenceView.getRemoteAutoHide()) {
+        if (!appState.get(APP_STATE_REMOTE_AUTO_HIDE)) {
             showRemotesImmediately();
             return;
         }
@@ -200,7 +203,7 @@ export function bindTouchpad(services, dom) {
     };
 
     const applyRemoteAutoHideState = () => {
-        if (preferenceView.getRemoteAutoHide()) {
+        if (appState.get(APP_STATE_REMOTE_AUTO_HIDE)) {
             return;
         }
         clearHideTimer();
@@ -220,9 +223,9 @@ export function bindTouchpad(services, dom) {
         onMovementStart: hideRemotes,
         onInteractionEnd: showRemotes,
         getInputConfig: () => services.getConfigView().getInputConfig(),
-        getHandedness: () => preferenceView.getHandedness(),
+        getHandedness: () => appState.get(APP_STATE_HANDEDNESS),
     });
 
-    preferenceView.onRemoteAutoHideChange(applyRemoteAutoHideState);
+    appState.subscribeProperty(APP_STATE_REMOTE_AUTO_HIDE, applyRemoteAutoHideState);
     applyRemoteAutoHideState();
 }

@@ -1,24 +1,27 @@
+import {
+  APP_STATE_EFFECTIVE_BROWSER_REMOTE_VISIBLE,
+  APP_STATE_EFFECTIVE_KEYBOARD_REMOTE_VISIBLE,
+  APP_STATE_EFFECTIVE_PREVIEW_REMOTE_VISIBLE,
+  APP_STATE_EFFECTIVE_SAMSUNG_REMOTE_VISIBLE,
+  APP_STATE_EFFECTIVE_VLC_REMOTE_VISIBLE,
+} from '../../services/app-state/createAppStateService.js';
+
 export function applyRemoteVisibilityState({
   services,
   dom,
 }) {
   const {remotes} = dom;
-  const configView = services.getConfigView();
-  const preferenceView = services.getPreferenceView();
+  const appState = services.getAppState();
   
-  const browserVisible = configView.getBrowserConfig().enabled !== false
-    && preferenceView.getRemoteVisibility('browser', true);
+  const browserVisible = appState.get(APP_STATE_EFFECTIVE_BROWSER_REMOTE_VISIBLE);
   
-  const keyboardVisible = configView.getKeyboardConfig().enabled !== false
-    && preferenceView.getRemoteVisibility('keyboard', true);
+  const keyboardVisible = appState.get(APP_STATE_EFFECTIVE_KEYBOARD_REMOTE_VISIBLE);
   
-  const vlcVisible = configView.getVlcConfig().enabled !== false
-    && preferenceView.getRemoteVisibility('vlc', true);
+  const vlcVisible = appState.get(APP_STATE_EFFECTIVE_VLC_REMOTE_VISIBLE);
   
-  const samsungVisible = preferenceView.getRemoteVisibility('samsung', true);
+  const samsungVisible = appState.get(APP_STATE_EFFECTIVE_SAMSUNG_REMOTE_VISIBLE);
   
-  const previewVisible = configView.getPreviewConfig().enabled !== false
-    && preferenceView.getRemoteVisibility('preview', true);
+  const previewVisible = appState.get(APP_STATE_EFFECTIVE_PREVIEW_REMOTE_VISIBLE);
 
   if (remotes.browser.root) {
     remotes.browser.root.hidden = !browserVisible;

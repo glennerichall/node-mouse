@@ -1,18 +1,22 @@
-import {LOCALE_STORAGE_KEY, I18N_CHANGED_EVENT} from '../../i18n/constants.js';
+import {I18N_CHANGED_EVENT} from '../../i18n/constants.js';
 import {interpolate, loadDictionary, resolveLocale} from '../../i18n/core.js';
-import {createStorageBinding} from '../../i18n/storage.js';
 import {applyPageTranslations} from '../../i18n/apply-page-translations.js';
 import {createWindowEventListener, emitWindowEvent} from '../../core/window-events.js';
-import {mountLanguageSwitcher as mountLanguageSwitcherView} from '../../ui/preferences/switchers.js';
 
 export function createI18nService(services) {
-  const localeStorage = createStorageBinding(LOCALE_STORAGE_KEY);
   const onChange = createWindowEventListener(I18N_CHANGED_EVENT);
   let currentLocale = '';
   let currentDictionary = null;
 
-  function getResolvedLocale(value = localeStorage.read() || navigator.language) {
+  function getResolvedLocale(value = typeof navigator !== 'undefined' ? navigator.language : '') {
     return resolveLocale(value);
+  }
+
+  function applyLocaleToDom(locale) {
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = locale;
+    }
+    return locale;
   }
 
   function ensureInitialized() {
@@ -44,11 +48,11 @@ export function createI18nService(services) {
 
       currentDictionary = await loadDictionary(normalizedLocale);
       currentLocale = normalizedLocale;
-      document.documentElement.lang = currentLocale;
+      applyLocaleToDom(currentLocale);
       return getI18nView();
     },
     getLocale() {
-      return getResolvedLocale(currentLocale || localeStorage.read() || navigator.language);
+      return getResolvedLocale(currentLocale);
     },
     getI18n() {
       return getI18nView();
@@ -61,7 +65,6 @@ export function createI18nService(services) {
     },
     async setLocale(locale) {
       const normalizedLocale = getResolvedLocale(locale);
-      localeStorage.write(normalizedLocale);
       const previousLocale = currentLocale || '';
       await this.init(normalizedLocale);
 
@@ -73,12 +76,8 @@ export function createI18nService(services) {
 
       return getI18nView();
     },
-    mountLanguageSwitcher() {
-      mountLanguageSwitcherView({
-        locale: this.getLocale(),
-        t,
-        onChange: this.setLocale.bind(this),
-      });
+    applyLocaleToDom(locale = currentLocale) {
+      return applyLocaleToDom(getResolvedLocale(locale));
     },
     onChange(listener) {
       return onChange(listener);

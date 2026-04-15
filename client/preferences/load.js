@@ -1,24 +1,19 @@
 import {mergeAvailableRemotes} from './state.js';
 
-async function loadJson(url) {
-  const response = await fetch(url, {cache: 'no-store'});
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
+function getBackend(services) {
+  if (!services || typeof services.getBackend !== 'function') {
+    throw new Error('Preferences loaders require a services container.');
   }
 
-  return response.json();
+  return services.getBackend();
 }
 
-export async function loadAvailableRemotes(services = null) {
-  const payload = services
-    ? {remotes: await services.getRemotes().loadAvailableRemotes()}
-    : await loadJson('/api/admin/remotes');
+export async function loadAvailableRemotes(services) {
+  const payload = await getBackend(services).getAvailableRemotes();
   return mergeAvailableRemotes(Array.isArray(payload?.remotes) ? payload.remotes : []);
 }
 
-export async function loadAvailableBrowsers(services = null) {
-  const payload = services
-    ? {browsers: await services.getRemotes().loadAvailableBrowsers()}
-    : await loadJson('/api/admin/remotes/browsers');
+export async function loadAvailableBrowsers(services) {
+  const payload = await getBackend(services).getAvailableBrowsers();
   return Array.isArray(payload?.browsers) ? payload.browsers : [];
 }

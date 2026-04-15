@@ -16,10 +16,9 @@ export function initUi(services) {
 
   services.getI18n().translateRoot(document);
 
-  const preferenceView = services.getPreferenceView();
   const dom = getDom();
   const {remotes} = dom;
-  const canvasUI = createCanvasUI(remotes.mouse.touchpad, preferenceView);
+  const canvasUI = createCanvasUI(remotes.mouse.touchpad, services.getAppState());
   bindRemoteAccordion(services, dom);
 
   const syncRemoteVisibilityState = () => applyRemoteVisibilityState({
@@ -37,9 +36,15 @@ export function initUi(services) {
   bindAdminDrawer(services, dom);
   bindAdminVersion(services, dom);
 
-  preferenceView.onRemoteVisibilityChange(syncRemoteVisibilityState);
-
-  services.getClientConfig().onChange(syncRemoteVisibilityState);
+  for (const key of [
+    'effective.remote.browser.visible',
+    'effective.remote.keyboard.visible',
+    'effective.remote.vlc.visible',
+    'effective.remote.samsung.visible',
+    'effective.remote.preview.visible',
+  ]) {
+    services.getAppState().subscribeProperty(key, syncRemoteVisibilityState);
+  }
 
   syncRemoteVisibilityState();
 

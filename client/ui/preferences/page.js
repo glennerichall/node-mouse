@@ -25,11 +25,11 @@ function t(key, params) {
 }
 
 function renderRemotes() {
-  renderRemoteVisibilityListView(remotesRoot, state.availableRemotes, t);
+  renderRemoteVisibilityListView(remotesRoot, state.availableRemotes, t, services);
 }
 
 function renderBrowsers() {
-  renderBrowserVisibilityListView(browsersRoot, state.availableBrowsers, t);
+  renderBrowserVisibilityListView(browsersRoot, state.availableBrowsers, t, services);
 }
 
 async function refreshAvailableRemotes() {
@@ -49,11 +49,11 @@ services.getI18n().onChange(() => {
   renderBrowsers();
 });
 
-services.getPreferenceView().onRemoteVisibilityChange(() => {
+services.getAppState().subscribeProperty('preferences.remoteVisibility', () => {
   renderRemotes();
 });
 
-services.getPreferenceView().onBrowserVisibilityChange(() => {
+services.getAppState().subscribeProperty('preferences.browserVisibility', () => {
   renderBrowsers();
 });
 

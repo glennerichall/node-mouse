@@ -24,4 +24,3 @@ export function createStorageBinding(key) {
     },
   };
 }
-
