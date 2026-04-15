@@ -1,15 +1,15 @@
 import {
   loadAvailableBrowsers,
   loadAvailableRemotes,
-} from '../preferences/load.js';
+} from '../../preferences/load.js';
 import {
   renderBrowserVisibilityList as renderBrowserVisibilityListView,
   renderRemoteVisibilityList as renderRemoteVisibilityListView,
-} from '../preferences/render.js';
-import {createPreferencesState} from '../preferences/state.js';
-import {createServicesRegistry} from '../services/createServicesRegistry.js';
-import {initializeCoreServices} from '../services/createServicesContainer.js';
-import {bindPreferenceSwitchers} from './preferences/bind-preference-switchers.js';
+} from '../../preferences/render.js';
+import {createPreferencesState} from '../../preferences/state.js';
+import {createServicesRegistry} from '../../services/createServicesRegistry.js';
+import {initializeCoreServices} from '../../services/createServicesContainer.js';
+import {bindPreferenceSwitchers} from './bindPreferenceSwitchers.js';
 
 const services = createServicesRegistry();
 await initializeCoreServices(services);

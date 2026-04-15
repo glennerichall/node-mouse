@@ -1,7 +1,7 @@
 import {LOCALE_STORAGE_KEY, I18N_CHANGED_EVENT} from '../../i18n/constants.js';
 import {interpolate, loadDictionary, resolveLocale} from '../../i18n/core.js';
 import {createStorageBinding} from '../../i18n/storage.js';
-import {applyPageTranslations} from '../../ui/i18n/apply-page-translations.js';
+import {applyPageTranslations} from '../../i18n/apply-page-translations.js';
 import {createWindowEventListener, emitWindowEvent} from '../../core/window-events.js';
 import {mountLanguageSwitcher as mountLanguageSwitcherView} from '../../ui/preferences/switchers.js';
 

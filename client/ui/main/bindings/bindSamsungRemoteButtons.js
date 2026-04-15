@@ -1,4 +1,4 @@
-import {emitWithTimestamp} from '../../core/socket-emit.js';
+import {emitWithTimestamp} from '../../../core/socket-emit.js';
 import {
     REMOTE_EVENT_SAMSUNG_ENTER,
     REMOTE_EVENT_SAMSUNG_INPUT,
@@ -8,12 +8,17 @@ import {
     REMOTE_EVENT_SAMSUNG_PC_INPUT,
     REMOTE_EVENT_SAMSUNG_VOL_DOWN,
     REMOTE_EVENT_SAMSUNG_VOL_UP
-} from '../../../utils/remoteCommands.js';
-import { bindTouchPassthrough } from '../../touch/bindTouchPassthrough.js';
+} from '../../../../utils/remoteCommands.js';
+import { bindTouchPassthrough } from '../../../touch/bindTouchPassthrough.js';
 
-export function bindSamsungRemoteButtons(
-    socket,
-    {
+export function bindSamsungRemoteButtons(services, dom) {
+    const socket = services.getTransport();
+    const clientConfig = services.getClientConfig();
+    const getConfigView = services.getConfigView;
+    const preferenceView = services.getPreferenceView();
+    const backend = services.getBackend();
+    const touchpad = dom.remotes.mouse.touchpad;
+    const {
         root,
         btnSamsungOn,
         btnSamsungOff,
@@ -23,14 +28,7 @@ export function bindSamsungRemoteButtons(
         btnSamsungInput,
         btnSamsungEnter,
         btnSamsungPcInput,
-        touchpad,
-    },
-    services,
-) {
-    const clientConfig = services.getClientConfig();
-    const getConfigView = services.getConfigView;
-    const preferenceView = services.getPreferenceView();
-    const backend = services.getBackend();
+    } = dom.remotes.samsung;
     bindTouchPassthrough([
         btnSamsungOn,
         btnSamsungOff,

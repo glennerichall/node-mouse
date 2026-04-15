@@ -1,13 +1,18 @@
-import {emitWithTimestamp} from '../../core/socket-emit.js';
-import {bindTouchPassthrough} from '../../touch/bindTouchPassthrough.js';
+import {emitWithTimestamp} from '../../../core/socket-emit.js';
+import {bindTouchPassthrough} from '../../../touch/bindTouchPassthrough.js';
 import {
     REMOTE_EVENT_BROWSER_OPEN,
     REMOTE_EVENT_KEYBOARD_KEY
-} from '../../../utils/remoteCommands.js';
+} from '../../../../utils/remoteCommands.js';
 
-export function bindBrowserRemoteButtons(
-    socket,
-    {
+export function bindBrowserRemoteButtons(services, dom) {
+    const socket = services.getTransport();
+    const clientConfig = services.getClientConfig();
+    const getConfigView = services.getConfigView;
+    const preferenceView = services.getPreferenceView();
+    const backend = services.getBackend();
+    const touchpad = dom.remotes.mouse.touchpad;
+    const {
         browserLaunchers,
         btnBrowserBack,
         btnBrowserForward,
@@ -21,14 +26,7 @@ export function bindBrowserRemoteButtons(
         btnVideoPlayPause,
         btnVideoMute,
         btnVideoFullscreen,
-        touchpad,
-    },
-    services,
-) {
-    const clientConfig = services.getClientConfig();
-    const getConfigView = services.getConfigView;
-    const preferenceView = services.getPreferenceView();
-    const backend = services.getBackend();
+    } = dom.remotes.browser;
     let launcherButtons = [];
     const staticButtons = [
         btnBrowserBack,

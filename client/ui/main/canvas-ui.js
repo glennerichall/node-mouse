@@ -1,4 +1,4 @@
-import { getScrollZoneLayout } from '../touch/gesture-zone.js';
+import { getScrollZoneLayout } from '../../touch/gesture-zone.js';
 
 export function createCanvasUI(touchpad, preferenceView) {
   const ctx = touchpad.getContext('2d');

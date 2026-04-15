@@ -4,7 +4,12 @@ const SWIPE_CLOSE_PX = 54;
 const SWIPE_INTENT_PX = 12;
 const MAX_VERTICAL_DRIFT_PX = 44;
 
-export function bindAdminDrawer({ app, touchpad, scrim, adminPanel }) {
+export function bindAdminDrawer(_services, dom) {
+  const app = dom.app;
+  const touchpad = dom.remotes.mouse.touchpad;
+  const scrim = dom.adminDrawerScrim;
+  const adminPanel = dom.leftMenu;
+
   if (!app || !touchpad) {
     return;
   }

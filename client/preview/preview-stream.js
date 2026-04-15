@@ -4,13 +4,21 @@ import {
   REMOTE_EVENT_PREVIEW_START,
   REMOTE_EVENT_PREVIEW_STOP,
 } from '../../utils/remoteCommands.js';
+import {
+  APP_STATE_KEYBOARD_PREVIEW_ACTIVE,
+  APP_STATE_PREVIEW_ACTIVITY_AT,
+  getAppStatePropertyChangedEventName,
+} from '../services/app-state/createAppStateService.js';
 
-export function bindPreviewStream(socket, { previewCanvas, previewLabel }, {clientConfig, getConfigView, preferenceView}) {
+export function bindPreviewStream(services, dom) {
+  const socket = services.getTransport();
+  const clientConfig = services.getClientConfig();
+  const preferenceView = services.getPreferenceView();
+  const pubsub = services.getPubSub();
+  const {previewCanvas, previewLabel} = dom.remotes.preview;
+
   if (!previewCanvas) {
-    return {
-      onMouseMoveActivity: () => {},
-      setKeyboardPreviewActive: () => {},
-    };
+    return;
   }
 
   const ctx = previewCanvas.getContext('2d');
@@ -21,10 +29,10 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }, {clie
   let keyboardPreviewActive = false;
 
   const isPreviewEnabled = () =>
-    getConfigView().getPreviewConfig().enabled !== false && preferenceView.getRemoteVisibility('preview', true);
+    services.getConfigView().getPreviewConfig().enabled !== false && preferenceView.getRemoteVisibility('preview', true);
 
   const getInactivityDelayMs = () => {
-    const configuredDelay = Number(getConfigView().getPreviewConfig()?.hideDelayMs);
+    const configuredDelay = Number(services.getConfigView().getPreviewConfig()?.hideDelayMs);
     if (Number.isFinite(configuredDelay) && configuredDelay >= 200) {
       return configuredDelay;
     }
@@ -107,6 +115,11 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }, {clie
     armInactivityStop();
   };
 
+  pubsub.subscribe(getAppStatePropertyChangedEventName(APP_STATE_PREVIEW_ACTIVITY_AT), onMouseMoveActivity);
+  pubsub.subscribe(getAppStatePropertyChangedEventName(APP_STATE_KEYBOARD_PREVIEW_ACTIVE), ({value}) => {
+    setKeyboardPreviewActive(Boolean(value));
+  });
+
   socket.on('preview:frame', onPreviewFrame);
   socket.on('disconnect', stopPreview);
   window.addEventListener('beforeunload', stopPreview);
@@ -134,8 +147,5 @@ export function bindPreviewStream(socket, { previewCanvas, previewLabel }, {clie
 
   hidePreview();
 
-  return {
-    onMouseMoveActivity,
-    setKeyboardPreviewActive,
-  };
+  setKeyboardPreviewActive(Boolean(services.getAppState().get(APP_STATE_KEYBOARD_PREVIEW_ACTIVE)));
 }

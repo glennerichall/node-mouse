@@ -1,15 +1,16 @@
-import { emitWithTimestamp } from '../../core/socket-emit.js';
-import { bindTouchPassthrough } from '../../touch/bindTouchPassthrough.js';
+import { emitWithTimestamp } from '../../../core/socket-emit.js';
+import { bindTouchPassthrough } from '../../../touch/bindTouchPassthrough.js';
 import {
   REMOTE_EVENT_VLC_COMMAND,
   REMOTE_EVENT_VLC_OPEN,
   REMOTE_EVENT_VLC_WINDOW_CLOSE,
   REMOTE_EVENT_VLC_WINDOW_TOGGLE,
-} from '../../../utils/remoteCommands.js';
+} from '../../../../utils/remoteCommands.js';
 
-export function bindVlcRemoteButtons(
-  socket,
-  {
+export function bindVlcRemoteButtons(services, dom) {
+  const socket = services.getTransport();
+  const touchpad = dom.remotes.mouse.touchpad;
+  const {
     btnVlcOpen,
     btnVlcWindowToggle,
     btnVlcWindowClose,
@@ -23,9 +24,7 @@ export function bindVlcRemoteButtons(
     btnVlcMute,
     btnVlcVolumeUp,
     btnVlcFullscreen,
-    touchpad,
-  },
-) {
+  } = dom.remotes.vlc;
   const buttons = [
     btnVlcOpen,
     btnVlcWindowToggle,

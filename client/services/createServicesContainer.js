@@ -25,6 +25,7 @@ export function createServicesContainer({
   createRemotesService,
   createPubSubService,
   createNotificationService,
+  createAppStateService,
 }) {
   const container = {
     getI18n: createLazy(() => createI18nService(container)),
@@ -37,6 +38,7 @@ export function createServicesContainer({
     getRemotes: createLazy(() => createRemotesService(container)),
     getPubSub: createLazy(() => createPubSubService(container)),
     getNotifications: createLazy(() => createNotificationService(container)),
+    getAppState: createLazy(() => createAppStateService(container)),
   };
 
   return container;

@@ -11,6 +11,10 @@ import {
     handleTouchMove,
     handleTouchStart,
 } from './touch-handlers.js';
+import {APP_STATE_PREVIEW_ACTIVITY_AT} from '../services/app-state/createAppStateService.js';
+
+const REMOTE_HIDE_DELAY_MS = 300;
+const SHOW_REMOTE_DELAY_MS = 500;
 
 function createNoopTouchHandler() {
     return {
@@ -132,7 +136,93 @@ export function bindTouchpadEvents(touchpad, touchHandler) {
     touchpad.addEventListener('touchcancel', onTouchEnd, {passive: false});
 }
 
-export function bindTouchpad(socket, touchpad, options = {}) {
+export function bindSocketTouchpad(socket, touchpad, options = {}) {
     const touchHandler = createSocketTouchHandler(socket, options);
     bindTouchpadEvents(touchpad, touchHandler);
+}
+
+export function bindTouchpad(services, dom) {
+    const socket = services.getTransport();
+    const appState = services.getAppState();
+    const preferenceView = services.getPreferenceView();
+    const touchpad = dom.remotes.mouse.touchpad;
+    let hideRemoteTimer = null;
+    let showRemoteTimer = null;
+
+    const clearHideTimer = () => {
+        if (hideRemoteTimer) {
+            clearTimeout(hideRemoteTimer);
+            hideRemoteTimer = null;
+        }
+    };
+
+    const clearShowTimer = () => {
+        if (showRemoteTimer) {
+            clearTimeout(showRemoteTimer);
+            showRemoteTimer = null;
+        }
+    };
+
+    const showRemotesImmediately = () => {
+        dom.remoteStack?.classList.remove('is-hidden');
+        dom.scrollZoneIndicator?.classList.remove('is-hidden');
+    };
+
+    const hideRemotes = (interactionKind = 'move') => {
+        if (!dom.remoteStack || interactionKind !== 'move') {
+            return;
+        }
+        if (!preferenceView.getRemoteAutoHide()) {
+            showRemotesImmediately();
+            return;
+        }
+        if (hideRemoteTimer) {
+            return;
+        }
+        clearShowTimer();
+        hideRemoteTimer = window.setTimeout(() => {
+            dom.remoteStack.classList.add('is-hidden');
+            dom.scrollZoneIndicator?.classList.add('is-hidden');
+            hideRemoteTimer = null;
+        }, REMOTE_HIDE_DELAY_MS);
+    };
+
+    const showRemotes = () => {
+        if (!dom.remoteStack) {
+            return;
+        }
+        clearHideTimer();
+        clearShowTimer();
+        showRemoteTimer = window.setTimeout(() => {
+            showRemotesImmediately();
+            showRemoteTimer = null;
+        }, SHOW_REMOTE_DELAY_MS);
+    };
+
+    const applyRemoteAutoHideState = () => {
+        if (preferenceView.getRemoteAutoHide()) {
+            return;
+        }
+        clearHideTimer();
+        clearShowTimer();
+        showRemotesImmediately();
+    };
+
+    bindSocketTouchpad(socket, touchpad, {
+        onMouseMove: () => {
+            appState.set(
+                APP_STATE_PREVIEW_ACTIVITY_AT,
+                typeof performance !== 'undefined' && typeof performance.now === 'function'
+                    ? performance.now()
+                    : Date.now(),
+            );
+        },
+        onMovementStart: hideRemotes,
+        onInteractionEnd: showRemotes,
+        getInputConfig: () => services.getConfigView().getInputConfig(),
+        getHandedness: () => preferenceView.getHandedness(),
+    });
+
+    preferenceView.onRemoteAutoHideChange(applyRemoteAutoHideState);
+    applyRemoteAutoHideState();
 }

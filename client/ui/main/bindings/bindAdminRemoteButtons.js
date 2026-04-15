@@ -1,4 +1,4 @@
-import {emitWithTimestamp} from '../../core/socket-emit.js';
+import {emitWithTimestamp} from '../../../core/socket-emit.js';
 import {
     REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT,
     REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER,
@@ -9,11 +9,13 @@ import {
     REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY,
     REMOTE_EVENT_ADMIN_UPDATE_CHECK,
     REMOTE_EVENT_ADMIN_UPDATE_INSTALL
-} from '../../../utils/remoteCommands.js';
+} from '../../../../utils/remoteCommands.js';
 
-export function bindAdminRemoteButtons(
-    socket,
-    {
+export function bindAdminRemoteButtons(services, dom) {
+    const socket = services.getTransport();
+    const clientConfig = services.getClientConfig();
+    const getConfigView = services.getConfigView;
+    const {
         btnForceUpdateCheck,
         btnInstallUpdate,
         btnRestartService,
@@ -26,11 +28,7 @@ export function bindAdminRemoteButtons(
         btnOpenPreferencesPage,
         btnRotateEntryToken,
         adminActionsDisabledMessage,
-    },
-    services,
-) {
-    const clientConfig = services.getClientConfig();
-    const getConfigView = services.getConfigView;
+    } = dom.remotes.admin;
     const adminButtons = [
         btnForceUpdateCheck,
         btnInstallUpdate,

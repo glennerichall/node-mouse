@@ -1,7 +1,10 @@
-import { emitWithTimestamp } from '../core/socket-emit.js';
-import { REMOTE_EVENT_MOUSE_BUTTON } from '../../utils/remoteCommands.js';
+import { emitWithTimestamp } from '../../core/socket-emit.js';
+import { REMOTE_EVENT_MOUSE_BUTTON } from '../../../utils/remoteCommands.js';
 
-export function bindMouseButtons(socket, { btnLeft, btnRight }) {
+export function bindMouseButtons(services, dom) {
+  const socket = services.getTransport();
+  const {btnLeft, btnRight} = dom.remotes.mouse;
+
   function bindHoldButton(buttonNode, button) {
     if (!buttonNode) {
       return;

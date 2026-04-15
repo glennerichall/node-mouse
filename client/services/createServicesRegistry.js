@@ -7,6 +7,7 @@ import {createBackendService} from './backend/createBackendService.js';
 import {createRemotesService} from './remotes/createRemotesService.js';
 import {createPubSubService} from './pubsub/createPubSubService.js';
 import {createNotificationService} from './notifications/createNotificationService.js';
+import {createAppStateService} from './app-state/createAppStateService.js';
 
 export function createServicesRegistry() {
   return createServicesContainer({
@@ -18,5 +19,6 @@ export function createServicesRegistry() {
     createRemotesService,
     createPubSubService,
     createNotificationService,
+    createAppStateService,
   });
 }

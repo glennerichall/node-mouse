@@ -1,23 +1,22 @@
-import { emitWithTimestamp } from '../../core/socket-emit.js';
-import { bindTouchPassthrough } from '../../touch/bindTouchPassthrough.js';
+import { emitWithTimestamp } from '../../../core/socket-emit.js';
+import { bindTouchPassthrough } from '../../../touch/bindTouchPassthrough.js';
 import {
   REMOTE_EVENT_KEYBOARD_KEY,
   REMOTE_EVENT_WINDOW_CLOSE,
   REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE,
-} from '../../../utils/remoteCommands.js';
+} from '../../../../utils/remoteCommands.js';
 
-export function bindSystemRemoteButtons(
-  socket,
-  {
+export function bindSystemRemoteButtons(services, dom) {
+  const socket = services.getTransport();
+  const touchpad = dom.remotes.mouse.touchpad;
+  const {
     btnSystemShowDesktop,
     btnSystemWindowLeft,
     btnSystemWindowRight,
     btnSystemStartMenu,
     btnSystemWindowToggle,
     btnSystemWindowClose,
-    touchpad,
-  },
-) {
+  } = dom.remotes.system;
   const buttons = [
     btnSystemShowDesktop,
     btnSystemWindowLeft,

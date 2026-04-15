@@ -1,35 +1,40 @@
-import { emitWithTimestamp } from '../core/socket-emit.js';
+import { emitWithTimestamp } from '../../core/socket-emit.js';
 import {
   REMOTE_EVENT_KEYBOARD_KEY,
   REMOTE_EVENT_KEYBOARD_TEXT,
-} from '../../utils/remoteCommands.js';
+} from '../../../utils/remoteCommands.js';
+import {APP_STATE_KEYBOARD_PREVIEW_ACTIVE} from '../../services/app-state/createAppStateService.js';
 
-export function bindKeyboardPanel(socket, {
-  keyboardPanel,
-  keyboardShortcutsBar,
-  keyboardPanelPreview,
-  keyboardTextMode,
-  keyboardLiveMode,
-  textInput,
-  liveTextInput,
-  keyboardEsc,
-  keyboardTab,
-  keyboardEnter,
-  keyboardShift,
-  keyboardAlt,
-  keyboardCtrl,
-  btnTextEntry,
-  btnLiveKeyboard,
-  btnSendText,
-}, {
-  setPreviewActive = () => {},
-} = {}) {
+export function bindKeyboardPanel(services, dom) {
+  const socket = services.getTransport();
+  const appState = services.getAppState();
+  const {
+    keyboardPanel,
+    keyboardPanelPreview,
+    keyboardTextMode,
+    keyboardLiveMode,
+    textInput,
+    liveTextInput,
+    keyboardEsc,
+    keyboardTab,
+    keyboardEnter,
+    keyboardShift,
+    keyboardAlt,
+    keyboardCtrl,
+    btnTextEntry,
+    btnLiveKeyboard,
+    btnSendText,
+  } = dom.remotes.keyboard;
   const modifierState = {
     control: false,
     alt: false,
     shift: false,
   };
   let activeMode = '';
+
+  function setPreviewActive(active) {
+    appState.set(APP_STATE_KEYBOARD_PREVIEW_ACTIVE, Boolean(active));
+  }
 
   function forceViewportLayout(input) {
     if (!input) {

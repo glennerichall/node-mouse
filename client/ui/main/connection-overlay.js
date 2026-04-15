@@ -1,4 +1,12 @@
-export function bindConnectionOverlay(socket, overlay, i18n) {
+export function bindConnectionOverlay(services, dom) {
+  const socket = services.getTransport();
+  const i18n = services.getI18n();
+  const overlay = dom.connectionOverlay;
+
+  if (!overlay) {
+    return;
+  }
+
   const titleEl = overlay.querySelector('[data-connection-title]');
   const messageEl = overlay.querySelector('[data-connection-message]');
 

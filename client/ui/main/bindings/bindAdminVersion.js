@@ -1,4 +1,7 @@
-export async function bindAdminVersion(versionNode, i18n) {
+export async function bindAdminVersion(services, dom) {
+  const versionNode = dom.remotes.admin.adminAppVersion;
+  const i18n = services.getI18n();
+
   if (!versionNode) {
     return;
   }

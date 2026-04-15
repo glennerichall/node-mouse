@@ -1,12 +1,12 @@
-import {applyPageTranslations} from '../ui/i18n/apply-page-translations.js';
+import {applyPageTranslations} from '../../i18n/apply-page-translations.js';
 import {
   NOTIFICATION_EVENT_DEFINITIONS,
   NOTIFICATION_TARGET_CLIENT,
   NOTIFICATION_TARGET_HOST,
   getNotificationTargetPath,
-} from '../../utils/notificationSettings.js';
-import {createServicesRegistry} from '../services/createServicesRegistry.js';
-import {initializeCoreServices} from '../services/createServicesContainer.js';
+} from '../../../utils/notificationSettings.js';
+import {createServicesRegistry} from '../../services/createServicesRegistry.js';
+import {initializeCoreServices} from '../../services/createServicesContainer.js';
 
 const services = createServicesRegistry();
 await initializeCoreServices(services);
