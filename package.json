@@ -1,6 +1,6 @@
 {
   "name": "remote-mouse",
-  "version": "6.4.1",
+  "version": "6.4.2",
   "type": "module",
   "description": "Remote mouse and keyboard with mobile client",
   "main": "index.js",
@@ -11,6 +11,8 @@
     "start": "node index.js",
     "dev": "node index.js",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand --coverage",
+    "test:all": "npm test && npm run test:e2e",
+    "test:e2e": "playwright test",
     "commit:codex": "bash ./bin/codex-commit.sh"
   },
   "dependencies": {
@@ -29,6 +31,7 @@
     "yargs": "^15.4.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "jest": "^30.3.0",
     "sinon": "^21.0.3"
   }

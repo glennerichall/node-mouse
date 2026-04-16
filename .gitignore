@@ -5,3 +5,6 @@ npm-debug.log*
 .env
 coverage/
 .data/
+playwright-report/
+test-results/
+test/.tmp/
