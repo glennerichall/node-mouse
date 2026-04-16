@@ -1,5 +1,5 @@
 {
-  "name": "remote-mouse",
+  "name": "@velor/remote-mouse",
   "version": "6.4.2",
   "type": "module",
   "description": "Remote mouse and keyboard with mobile client",
@@ -13,7 +13,8 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand --coverage",
     "test:all": "npm test && npm run test:e2e",
     "test:e2e": "playwright test",
-    "commit:codex": "bash ./bin/codex-commit.sh"
+    "screenshots:mobile": "node scripts/generate-mobile-screenshots.mjs",
+    "commit:codex": "bash scripts/codex-commit.sh"
   },
   "dependencies": {
     "@hurdlegroup/robotjs": "^0.12.3",

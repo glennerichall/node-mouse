@@ -1,0 +1,30 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Dependency and package-manager state
+node_modules/
+npm-debug.log*
+
+# Version-control and editor metadata
+.git/
+.gitignore
+.idea/
+.DS_Store
+
+# Codex/local automation metadata
+.codex/
+
+# Tests, coverage, and reports
+coverage/
+playwright-report/
+test-results/
+test/
+jest.config.js
+playwright.config.js
+
+# Generated documentation assets
+.artifacts/*
+!.artifacts/screenshots/
+!.artifacts/screenshots/*.png
