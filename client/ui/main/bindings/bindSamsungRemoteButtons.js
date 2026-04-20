@@ -11,6 +11,181 @@ import {
 } from '../../../../utils/remoteCommands.js';
 import { bindTouchPassthrough } from '../../../touch/bindTouchPassthrough.js';
 
+const VOLUME_REPEAT_HOLD_DELAY_MS = 1000;
+const VOLUME_REPEAT_INTERVAL_MS = 170;
+const VOLUME_REPEAT_MOVE_CANCEL_THRESHOLD_PX = 10;
+
+function getPointerDistance(startPoint, event) {
+    if (!startPoint) {
+        return 0;
+    }
+
+    const dx = Number(event.clientX || 0) - startPoint.clientX;
+    const dy = Number(event.clientY || 0) - startPoint.clientY;
+    return Math.hypot(dx, dy);
+}
+
+function getTouchDistance(startPoint, touch) {
+    if (!startPoint || !touch) {
+        return 0;
+    }
+
+    const dx = Number(touch.clientX || 0) - startPoint.clientX;
+    const dy = Number(touch.clientY || 0) - startPoint.clientY;
+    return Math.hypot(dx, dy);
+}
+
+export function bindRepeatingButton(button, emitAction, {
+    holdDelayMs = VOLUME_REPEAT_HOLD_DELAY_MS,
+    repeatIntervalMs = VOLUME_REPEAT_INTERVAL_MS,
+    moveCancelThresholdPx = VOLUME_REPEAT_MOVE_CANCEL_THRESHOLD_PX,
+} = {}) {
+    if (!button || typeof emitAction !== 'function') {
+        return;
+    }
+
+    let isPressed = false;
+    let pointerPressHandled = false;
+    let activePointerId = null;
+    let activeTouchId = null;
+    let startPoint = null;
+    let holdTimer = null;
+    let repeatTimer = null;
+    let suppressClickTimer = null;
+
+    const clearTimers = () => {
+        if (holdTimer) {
+            window.clearTimeout(holdTimer);
+            holdTimer = null;
+        }
+        if (repeatTimer) {
+            window.clearInterval(repeatTimer);
+            repeatTimer = null;
+        }
+        if (suppressClickTimer) {
+            window.clearTimeout(suppressClickTimer);
+            suppressClickTimer = null;
+        }
+    };
+
+    const startPress = () => {
+        if (isPressed || button.disabled || button.hidden) {
+            return;
+        }
+
+        isPressed = true;
+        emitAction();
+        holdTimer = window.setTimeout(() => {
+            emitAction();
+            repeatTimer = window.setInterval(emitAction, repeatIntervalMs);
+        }, holdDelayMs);
+    };
+
+    const stopPress = () => {
+        if (!isPressed) {
+            return;
+        }
+
+        isPressed = false;
+        activePointerId = null;
+        activeTouchId = null;
+        startPoint = null;
+        if (holdTimer) {
+            window.clearTimeout(holdTimer);
+            holdTimer = null;
+        }
+        if (repeatTimer) {
+            window.clearInterval(repeatTimer);
+            repeatTimer = null;
+        }
+        suppressClickTimer = window.setTimeout(() => {
+            pointerPressHandled = false;
+            suppressClickTimer = null;
+        }, 500);
+    };
+
+    button.addEventListener('pointerdown', (event) => {
+        if (event.button !== undefined && event.button !== 0) {
+            return;
+        }
+
+        pointerPressHandled = true;
+        activePointerId = event.pointerId;
+        startPoint = {
+            clientX: Number(event.clientX || 0),
+            clientY: Number(event.clientY || 0),
+        };
+        event.preventDefault();
+        button.setPointerCapture?.(event.pointerId);
+        startPress();
+    });
+
+    button.addEventListener('touchstart', (event) => {
+        if (event.changedTouches?.length !== 1) {
+            return;
+        }
+
+        const touch = event.changedTouches[0];
+        activeTouchId = touch.identifier;
+        startPoint = {
+            clientX: Number(touch.clientX || 0),
+            clientY: Number(touch.clientY || 0),
+        };
+    }, {passive: true});
+
+    button.addEventListener('pointermove', (event) => {
+        if (!isPressed || event.pointerId !== activePointerId) {
+            return;
+        }
+
+        if (getPointerDistance(startPoint, event) >= moveCancelThresholdPx) {
+            stopPress();
+        }
+    });
+
+    button.addEventListener('touchmove', (event) => {
+        if (!isPressed || activeTouchId === null) {
+            return;
+        }
+
+        const touch = Array.from(event.changedTouches || [])
+            .find((entry) => entry.identifier === activeTouchId);
+        if (getTouchDistance(startPoint, touch) >= moveCancelThresholdPx) {
+            stopPress();
+        }
+    }, {passive: true});
+
+    button.addEventListener('pointerup', (event) => {
+        event.preventDefault();
+        button.releasePointerCapture?.(event.pointerId);
+        stopPress();
+    });
+
+    button.addEventListener('pointercancel', stopPress);
+    button.addEventListener('lostpointercapture', stopPress);
+    button.addEventListener('mouseleave', stopPress);
+    window.addEventListener('blur', stopPress);
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            stopPress();
+        }
+    });
+
+    button.addEventListener('click', (event) => {
+        if (pointerPressHandled) {
+            pointerPressHandled = false;
+            if (suppressClickTimer) {
+                window.clearTimeout(suppressClickTimer);
+                suppressClickTimer = null;
+            }
+            event.preventDefault();
+            return;
+        }
+
+        emitAction();
+    });
+}
+
 export function bindSamsungRemoteButtons(services, dom) {
     const socket = services.getTransport();
     const clientConfig = services.getClientConfig();
@@ -132,8 +307,8 @@ export function bindSamsungRemoteButtons(services, dom) {
         emitSamsungOff();
         startExpeditedSamsungPolling('off');
     });
-    btnSamsungVolUp.addEventListener('click', emit(REMOTE_EVENT_SAMSUNG_VOL_UP));
-    btnSamsungVolDown.addEventListener('click', emit(REMOTE_EVENT_SAMSUNG_VOL_DOWN));
+    bindRepeatingButton(btnSamsungVolUp, emit(REMOTE_EVENT_SAMSUNG_VOL_UP));
+    bindRepeatingButton(btnSamsungVolDown, emit(REMOTE_EVENT_SAMSUNG_VOL_DOWN));
     btnSamsungMute.addEventListener('click', emit(REMOTE_EVENT_SAMSUNG_MUTE));
     btnSamsungInput.addEventListener('click', emit(REMOTE_EVENT_SAMSUNG_INPUT));
     btnSamsungEnter.addEventListener('click', emit(REMOTE_EVENT_SAMSUNG_ENTER));
