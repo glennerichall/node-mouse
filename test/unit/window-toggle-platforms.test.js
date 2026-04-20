@@ -47,6 +47,43 @@ describe('window toggle platform helpers', () => {
     expect(script).not.toContain('ShowWindow($hwnd, 6)');
   });
 
+  it('windows QR overlay uses a square client area without padding', async () => {
+    const {buildQrOverlayPowerShellScript} = await import('../../server/os/win32/powershell.js');
+
+    const script = buildQrOverlayPowerShellScript({
+      qrPath: 'C:\\Temp\\qr.png',
+      size: 75,
+      posX: 100,
+      posY: 20,
+    });
+
+    expect(script).toContain('$form.ClientSize = New-Object System.Drawing.Size(75, 75)');
+    expect(script).toContain('$form.Padding = New-Object Windows.Forms.Padding(0)');
+    expect(script).toContain('$picture.Margin = New-Object Windows.Forms.Padding(0)');
+    expect(script).toContain('$picture.Padding = New-Object Windows.Forms.Padding(0)');
+    expect(script).not.toContain('$form.Width = 75');
+  });
+
+  it('linux QR overlay uses picture mode without dialog text padding', async () => {
+    const {buildQrOverlayYadArgs} = await import('../../server/services/overlay/createQrOverlayYad.js');
+
+    const args = buildQrOverlayYadArgs({
+      qrPath: '/tmp/remote-mouse-qr-overlay.png',
+      size: 75,
+      posX: 100,
+      posY: 20,
+    });
+
+    expect(args).toEqual(expect.arrayContaining([
+      '--picture',
+      '--borders=0',
+      '--size=orig',
+      '--filename=/tmp/remote-mouse-qr-overlay.png',
+    ]));
+    expect(args).not.toContain('--text=');
+    expect(args.some((arg) => arg.startsWith('--image='))).toBe(false);
+  });
+
   it('darwin toggle scripts use the zoom button and do not minimize', async () => {
     const {buildActiveWindowScript, buildAppWindowScript} = await import('../../server/os/darwin/applescript.js');
 

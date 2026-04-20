@@ -1,6 +1,6 @@
 {
   "name": "@velor/remote-mouse",
-  "version": "6.4.5",
+  "version": "6.4.6",
   "type": "module",
   "description": "Remote mouse and keyboard with mobile client",
   "main": "index.js",

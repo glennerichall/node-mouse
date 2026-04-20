@@ -13,6 +13,26 @@ function getModuleLog() {
   return log;
 }
 
+export function buildQrOverlayYadArgs({qrPath, size, posX, posY}) {
+  return [
+    '--picture',
+    '--class=remote-mouse-qr-overlay',
+    '--undecorated',
+    '--skip-taskbar',
+    '--sticky',
+    '--on-top',
+    '--no-buttons',
+    '--fixed',
+    '--borders=0',
+    `--width=${size}`,
+    `--height=${size}`,
+    `--posx=${posX}`,
+    `--posy=${posY}`,
+    '--size=orig',
+    `--filename=${qrPath}`,
+  ];
+}
+
 export async function createQrOverlayYad(services) {
   const log = getModuleLog();
   const getUrl = () => services.getUrls().entryUrl;
@@ -80,21 +100,7 @@ export async function createQrOverlayYad(services) {
       height: size,
     };
 
-    const args = [
-      '--class=remote-mouse-qr-overlay',
-      '--undecorated',
-      '--skip-taskbar',
-      '--sticky',
-      '--on-top',
-      '--no-buttons',
-      '--fixed',
-      `--width=${size}`,
-      `--height=${size}`,
-      `--posx=${posX}`,
-      `--posy=${posY}`,
-      `--image=${qrPath}`,
-      '--text=',
-    ];
+    const args = buildQrOverlayYadArgs({qrPath, size, posX, posY});
 
     child = spawn('yad', args, { stdio: 'ignore' });
     log.debug({ url: getUrl() }, 'QR overlay rafraîchi');
