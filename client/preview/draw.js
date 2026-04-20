@@ -1,6 +1,6 @@
-function drawCursorOverlay(ctx, width, height) {
-    const cx = Math.round(width / 2);
-    const cy = Math.round(height / 2);
+function drawCursorOverlay(ctx, width, height, cursorFrameX, cursorFrameY) {
+    const cx = Math.round(Number.isFinite(cursorFrameX) ? cursorFrameX : width / 2);
+    const cy = Math.round(Number.isFinite(cursorFrameY) ? cursorFrameY : height / 2);
 
     ctx.save();
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
@@ -44,7 +44,7 @@ function getPreviewViewportSize(width, height) {
 }
 
 export function drawPreviewFrame({ctx, previewCanvas, previewLabel, frame}) {
-    const {width, height, rgba, x, y} = frame;
+    const {width, height, rgba, x, y, cursorX, cursorY, cursorFrameX, cursorFrameY} = frame;
     if (previewCanvas.width !== width || previewCanvas.height !== height) {
         previewCanvas.width = width;
         previewCanvas.height = height;
@@ -67,9 +67,11 @@ export function drawPreviewFrame({ctx, previewCanvas, previewLabel, frame}) {
 
     const imageData = new ImageData(rgba, width, height);
     ctx.putImageData(imageData, 0, 0);
-    drawCursorOverlay(ctx, width, height);
+    drawCursorOverlay(ctx, width, height, cursorFrameX, cursorFrameY);
 
     if (previewLabel) {
-        previewLabel.textContent = `(${x}, ${y})`;
+        const labelX = Number.isFinite(cursorX) ? cursorX : x;
+        const labelY = Number.isFinite(cursorY) ? cursorY : y;
+        previewLabel.textContent = `(${labelX}, ${labelY})`;
     }
 }

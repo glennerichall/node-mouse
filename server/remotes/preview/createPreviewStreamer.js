@@ -29,7 +29,15 @@ export function createPreviewStreamer(services) {
           const currentPreviewConfig = getPreviewConfig();
           const frameWidth = Number(currentPreviewConfig.width) || DEFAULT_PERSISTED_CONFIG.preview.width;
           const frameHeight = Number(currentPreviewConfig.height) || DEFAULT_PERSISTED_CONFIG.preview.height;
-          const { capture, x, y } = captureAroundCursor(robot, frameWidth, frameHeight);
+          const {
+            capture,
+            x,
+            y,
+            cursorX,
+            cursorY,
+            cursorFrameX,
+            cursorFrameY,
+          } = captureAroundCursor(robot, frameWidth, frameHeight);
           const frame = bgraToRgbaBuffer(capture, frameWidth, frameHeight);
           socket.emit(
             'preview:frame',
@@ -38,6 +46,10 @@ export function createPreviewStreamer(services) {
               height: frameHeight,
               x,
               y,
+              cursorX,
+              cursorY,
+              cursorFrameX,
+              cursorFrameY,
             },
             frame,
           );

@@ -9,7 +9,9 @@ export function parsePreviewFrame(meta, payload) {
         return null;
     }
 
-    const arrayBuffer = payload instanceof ArrayBuffer ? payload : payload.buffer;
+    const arrayBuffer = typeof payload.byteLength === 'number' && !payload.buffer
+        ? payload
+        : payload.buffer;
     if (!arrayBuffer) {
         return null;
     }
@@ -25,5 +27,13 @@ export function parsePreviewFrame(meta, payload) {
         rgba,
         x: Number(meta.x) || 0,
         y: Number(meta.y) || 0,
+        cursorX: Number(meta.cursorX) || 0,
+        cursorY: Number(meta.cursorY) || 0,
+        cursorFrameX: Number.isFinite(Number(meta.cursorFrameX))
+            ? Number(meta.cursorFrameX)
+            : Math.round(width / 2),
+        cursorFrameY: Number.isFinite(Number(meta.cursorFrameY))
+            ? Number(meta.cursorFrameY)
+            : Math.round(height / 2),
     };
 }
