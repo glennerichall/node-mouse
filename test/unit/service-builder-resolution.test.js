@@ -227,7 +227,7 @@ describe('service builders resolve providers only in methods', () => {
     expect(getRobot).toHaveBeenCalled();
   });
 
-  it('mouse controller uses drag when left button is held', () => {
+  it('mouse controller uses drag when left button is held', async () => {
     const robot = {
       getScreenSize: jest.fn(() => ({width: 100, height: 100})),
       getMousePos: jest.fn(() => ({x: 10, y: 10})),
@@ -245,16 +245,101 @@ describe('service builders resolve providers only in methods', () => {
           scrollSpeed: 1,
         },
       }),
+      getSystem: () => ({
+        getScreenInfo: jest.fn(async () => ({width: 100, height: 100})),
+      }),
     });
 
     mouse.setButtonState('left', 'down');
-    mouse.move(5, 4);
+    await mouse.move(5, 4);
     mouse.setButtonState('left', 'up');
 
     expect(robot.mouseToggle).toHaveBeenNthCalledWith(1, 'down', 'left');
     expect(robot.dragMouse).toHaveBeenCalledWith(15, 14);
     expect(robot.mouseToggle).toHaveBeenNthCalledWith(2, 'up', 'left');
     expect(robot.moveMouse).not.toHaveBeenCalled();
+  });
+
+  it('mouse controller clamps stale coordinates after display size changes', async () => {
+    const robot = {
+      getScreenSize: jest.fn(() => ({width: 1280, height: 720})),
+      getMousePos: jest.fn(() => ({x: 1919, y: 1079})),
+      moveMouse: jest.fn(),
+      dragMouse: jest.fn(),
+      mouseToggle: jest.fn(),
+      scrollMouse: jest.fn(),
+      mouseClick: jest.fn(),
+    };
+    const mouse = createMouseController({
+      getRobot: () => robot,
+      getConfig: () => ({
+        input: {
+          mouseSpeed: 1,
+          scrollSpeed: 1,
+        },
+      }),
+      getSystem: () => ({
+        getScreenInfo: jest.fn(async () => ({width: 1280, height: 720})),
+      }),
+    });
+
+    await mouse.move(-10, -8);
+
+    expect(robot.moveMouse).toHaveBeenCalledWith(1269, 711);
+  });
+
+  it('mouse controller remaps coordinates when display size grows', () => {
+    const robot = {
+      getScreenSize: jest.fn(() => ({width: 1920, height: 1080})),
+      getMousePos: jest.fn(() => ({x: 1279, y: 719})),
+      moveMouse: jest.fn(),
+      dragMouse: jest.fn(),
+      mouseToggle: jest.fn(),
+      scrollMouse: jest.fn(),
+      mouseClick: jest.fn(),
+    };
+    const mouse = createMouseController({
+      getRobot: () => robot,
+      getConfig: () => ({
+        input: {
+          mouseSpeed: 1,
+          scrollSpeed: 1,
+        },
+      }),
+    });
+
+    mouse.remapToScreenSize({width: 1280, height: 720}, {width: 1920, height: 1080});
+
+    expect(robot.moveMouse).toHaveBeenCalledWith(1919, 1079);
+  });
+
+  it('mouse controller uses fresh display size override instead of stale robot size', async () => {
+    const robot = {
+      getScreenSize: jest.fn(() => ({width: 1280, height: 720})),
+      getMousePos: jest.fn(() => ({x: 1910, y: 1070})),
+      moveMouse: jest.fn(),
+      dragMouse: jest.fn(),
+      mouseToggle: jest.fn(),
+      scrollMouse: jest.fn(),
+      mouseClick: jest.fn(),
+    };
+    const mouse = createMouseController({
+      getRobot: () => robot,
+      getConfig: () => ({
+        input: {
+          mouseSpeed: 1,
+          scrollSpeed: 1,
+        },
+      }),
+      getSystem: () => ({
+        getScreenInfo: jest.fn(async () => ({width: 1920, height: 1080})),
+      }),
+    });
+
+    mouse.setScreenSizeOverride({width: 1920, height: 1080});
+    await mouse.move(5, 5);
+
+    expect(robot.moveMouse).toHaveBeenCalledWith(1915, 1075);
   });
 
   it('keyboard controller serializes text and special key input', async () => {

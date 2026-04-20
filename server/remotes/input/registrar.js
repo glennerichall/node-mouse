@@ -8,11 +8,11 @@ import {
 } from '../../../utils/remoteCommands.js';
 
 export function createControlEventRegistrar({ mouse, keyboard }) {
-  return function registerControlEvents(socket) {
-    socket.on(REMOTE_EVENT_MOUSE_MOVE, (payload = {}) => {
+    return function registerControlEvents(socket) {
+    socket.on(REMOTE_EVENT_MOUSE_MOVE, async (payload = {}) => {
       const dx = Number(payload.dx) || 0;
       const dy = Number(payload.dy) || 0;
-      mouse.move(dx, dy);
+      await mouse.move(dx, dy);
     });
 
     socket.on(REMOTE_EVENT_MOUSE_CLICK, (payload = {}) => {

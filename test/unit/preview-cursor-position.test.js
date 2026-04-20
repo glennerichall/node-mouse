@@ -5,7 +5,7 @@ import {parsePreviewFrame} from '../../client/preview/parse-preview-frame.js';
 
 function createRobot({screenSize, mousePos}) {
   return {
-    getScreenSize: () => screenSize,
+    screenSize,
     getMousePos: () => mousePos,
     screen: {
       capture: jest.fn(() => ({image: 'capture'})),
@@ -20,7 +20,7 @@ describe('preview cursor position', () => {
       mousePos: {x: 960, y: 540},
     });
 
-    const result = captureAroundCursor(robot, 128, 84);
+    const result = captureAroundCursor(robot, 128, 84, robot.screenSize);
 
     expect(result).toEqual(expect.objectContaining({
       x: 896,
@@ -38,7 +38,7 @@ describe('preview cursor position', () => {
       mousePos: {x: 3, y: 4},
     });
 
-    const result = captureAroundCursor(robot, 128, 84);
+    const result = captureAroundCursor(robot, 128, 84, robot.screenSize);
 
     expect(result).toEqual(expect.objectContaining({
       x: 0,
@@ -56,7 +56,7 @@ describe('preview cursor position', () => {
       mousePos: {x: 1919, y: 1079},
     });
 
-    const result = captureAroundCursor(robot, 128, 84);
+    const result = captureAroundCursor(robot, 128, 84, robot.screenSize);
 
     expect(result).toEqual(expect.objectContaining({
       x: 1792,

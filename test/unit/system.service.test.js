@@ -108,7 +108,7 @@ describe('system service', () => {
     }));
   });
 
-  it('returns null screen info when robot is unavailable', () => {
+  it('returns null screen info when robot is unavailable', async () => {
     const service = createSystemService({
       getLogger: () => createLogger(),
       getOs: () => ({
@@ -136,6 +136,6 @@ describe('system service', () => {
       }),
     });
 
-    expect(service.getScreenInfo()).toBeNull();
+    await expect(service.getScreenInfo()).resolves.toBeNull();
   });
 });

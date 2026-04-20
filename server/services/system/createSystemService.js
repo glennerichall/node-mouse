@@ -117,8 +117,8 @@ export function createSystemService(services) {
       log.debug('Detection disponibilite VLC');
       return services.getRemotes().vlc.isAvailable();
     },
-    getScreenInfo() {
-      const screen = getScreenInfo(services);
+    async getScreenInfo() {
+      const screen = await getScreenInfo(services);
       log.debug({screen}, 'Detection resolution ecran');
       return screen;
     },
@@ -140,7 +140,7 @@ export function createSystemService(services) {
         applications,
         config: services.getConfig(),
       });
-      const screen = this.getScreenInfo();
+      const screen = await this.getScreenInfo();
       const network = this.getNetworkInfo();
 
       log.debug({

@@ -44,6 +44,7 @@ export function createApplicationShutdown(services) {
       runShutdownStep('Erreur a l arret du task manager', () => taskManager.stop()),
       runShutdownStep('Erreur a l arret de l observateur de configuration', () => state.stopConfigObserver()),
       runShutdownStep('Erreur a l arret de l observateur de notifications', () => state.stopNotificationObserver()),
+      runShutdownStep('Erreur a l arret de l observateur de resolution ecran', () => state.stopDisplaySizeObserver()),
       runShutdownStep('Erreur a l arret de l observateur du QR overlay', () => state.stopQrOverlayRefreshObserver()),
       runShutdownStep('Erreur a l arret de l observateur du survol QR overlay', () => state.stopQrOverlayHoverObserver()),
       runShutdownStep('Erreur a la fermeture du socket CLI', () => state.cliServer?.close()),

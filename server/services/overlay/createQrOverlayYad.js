@@ -18,7 +18,6 @@ export async function createQrOverlayYad(services) {
   const getUrl = () => services.getUrls().entryUrl;
   const getConfig = () => services.getConfig();
   const getSystemConfig = () => services.getSystemConfig();
-  const robot = services.getRobot();
 
   function getOverlayContext() {
     const config = getConfig?.() || {};
@@ -71,7 +70,7 @@ export async function createQrOverlayYad(services) {
     const topBarOffset = qrOverlayConfig.topOffsetPx;
     await QRCode.toFile(qrPath, getUrl(), { width: size, margin: 1 });
 
-    const screen = robot.getScreenSize();
+    const screen = await services.getSystem().getScreenInfo() || {width: size + margin, height: size + margin};
     const posX = Math.max(0, screen.width - size - margin);
     const posY = Math.max(0, margin + topBarOffset);
     overlayBounds = {

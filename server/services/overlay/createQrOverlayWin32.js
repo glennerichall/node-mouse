@@ -21,8 +21,6 @@ export async function createQrOverlayWin32(services) {
   const getUrl = () => services.getUrls().entryUrl;
   const getConfig = () => services.getConfig();
   
-  const robot = services.getRobot();
-
   function getOverlayContext() {
     const config = getConfig?.() || {};
     const qrOverlayConfig = {
@@ -65,7 +63,7 @@ export async function createQrOverlayWin32(services) {
     const margin = qrOverlayConfig.margin;
     await QRCode.toFile(qrPath, getUrl(), { width: size, margin: 1 });
 
-    const screen = robot.getScreenSize();
+    const screen = await services.getSystem().getScreenInfo() || {width: size + margin, height: size + margin};
     const posX = Math.max(0, screen.width - size - margin);
     const posY = Math.max(0, margin);
     overlayBounds = {

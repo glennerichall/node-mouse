@@ -1,7 +1,6 @@
 import {clamp} from "../../../utils/math.js";
 
-export function captureAroundCursor(robot, width, height) {
-    const screen = robot.getScreenSize();
+export function captureAroundCursor(robot, width, height, screen) {
     const cursor = robot.getMousePos();
 
     const x = clamp(Math.round(cursor.x - width / 2), 0, Math.max(0, screen.width - width));

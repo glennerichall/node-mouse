@@ -19,7 +19,7 @@ export function createPreviewStreamer(services) {
       const fps = Number(previewConfig.fps) || DEFAULT_PERSISTED_CONFIG.preview.fps;
       const intervalMs = Math.max(50, Math.round(1000 / fps));
 
-      timer = setTimeout(() => {
+      timer = setTimeout(async () => {
         if (!active) {
           return;
         }
@@ -29,6 +29,10 @@ export function createPreviewStreamer(services) {
           const currentPreviewConfig = getPreviewConfig();
           const frameWidth = Number(currentPreviewConfig.width) || DEFAULT_PERSISTED_CONFIG.preview.width;
           const frameHeight = Number(currentPreviewConfig.height) || DEFAULT_PERSISTED_CONFIG.preview.height;
+          const screen = await services.getSystem().getScreenInfo();
+          if (!screen) {
+            throw new Error('Screen size unavailable');
+          }
           const {
             capture,
             x,
@@ -37,7 +41,7 @@ export function createPreviewStreamer(services) {
             cursorY,
             cursorFrameX,
             cursorFrameY,
-          } = captureAroundCursor(robot, frameWidth, frameHeight);
+          } = captureAroundCursor(robot, frameWidth, frameHeight, screen);
           const frame = bgraToRgbaBuffer(capture, frameWidth, frameHeight);
           socket.emit(
             'preview:frame',
