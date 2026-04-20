@@ -5,6 +5,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 DEFAULT_NPM_PACKAGE="@velor/remote-mouse"
+MIN_NODE_MAJOR=20
+NODESOURCE_MAJOR=22
 
 if [[ -f "$PROJECT_ROOT/package.json" ]]; then
   PACKAGE_JSON_NAME="$(sed -n 's/^[[:space:]]*"name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$PROJECT_ROOT/package.json" | head -n 1)"
@@ -18,9 +20,12 @@ NPM_PACKAGE="${REMOTE_MOUSE_NPM_PACKAGE:-$DEFAULT_NPM_PACKAGE}"
 CONFIG_DIR="${REMOTE_MOUSE_CONFIG_DIR:-$HOME/.config/remote-mouse}"
 PORT="${REMOTE_MOUSE_PORT:-3000}"
 HTTPS="false"
-SSL_KEY_PATH=""
-SSL_CERT_PATH=""
+SSL_KEY_PATH="${REMOTE_MOUSE_SSL_KEY_PATH:-}"
+SSL_CERT_PATH="${REMOTE_MOUSE_SSL_CERT_PATH:-}"
 INSTALL_SERVICE="false"
+HTTPS_CHOICE=""
+GENERATE_CERT_CHOICE=""
+INSTALL_SERVICE_CHOICE=""
 
 usage() {
   cat <<'EOF'
@@ -31,12 +36,22 @@ Options:
   --package <name>       npm package to install globally.
   --config-dir <path>    Remote Mouse config directory.
   --port <port>          Server port written to the generated .env.
+  --https                Configure HTTPS without prompting.
+  --no-https             Disable HTTPS without prompting.
+  --generate-cert        Generate a self-signed certificate without prompting.
+  --no-generate-cert     Use existing certificate paths without prompting.
+  --ssl-key-path <path>  Existing PEM private key path.
+  --ssl-cert-path <path> Existing PEM certificate path.
+  --install-service      Install and restart the service without prompting.
+  --no-service           Do not install the service.
   -h, --help             Show this help.
 
 Environment:
   REMOTE_MOUSE_NPM_PACKAGE   npm package name override.
   REMOTE_MOUSE_CONFIG_DIR    config directory override.
   REMOTE_MOUSE_PORT          server port override.
+  REMOTE_MOUSE_SSL_KEY_PATH  existing PEM private key path.
+  REMOTE_MOUSE_SSL_CERT_PATH existing PEM certificate path.
 EOF
 }
 
@@ -57,6 +72,38 @@ while [[ $# -gt 0 ]]; do
     --port)
       PORT="${2:-}"
       shift 2
+      ;;
+    --https)
+      HTTPS_CHOICE="true"
+      shift
+      ;;
+    --no-https)
+      HTTPS_CHOICE="false"
+      shift
+      ;;
+    --generate-cert)
+      GENERATE_CERT_CHOICE="true"
+      shift
+      ;;
+    --no-generate-cert)
+      GENERATE_CERT_CHOICE="false"
+      shift
+      ;;
+    --ssl-key-path)
+      SSL_KEY_PATH="${2:-}"
+      shift 2
+      ;;
+    --ssl-cert-path)
+      SSL_CERT_PATH="${2:-}"
+      shift 2
+      ;;
+    --install-service)
+      INSTALL_SERVICE_CHOICE="true"
+      shift
+      ;;
+    --no-service)
+      INSTALL_SERVICE_CHOICE="false"
+      shift
       ;;
     -h|--help)
       usage
@@ -232,6 +279,47 @@ package_for_dependency() {
   esac
 }
 
+node_major_version() {
+  local version
+  version="$(node --version 2>/dev/null || true)"
+  version="${version#v}"
+  version="${version%%.*}"
+  if [[ "$version" =~ ^[0-9]+$ ]]; then
+    printf '%s\n' "$version"
+  else
+    printf '0\n'
+  fi
+}
+
+has_supported_node() {
+  command -v node >/dev/null 2>&1 || return 1
+  [[ "$(node_major_version)" -ge "$MIN_NODE_MAJOR" ]]
+}
+
+contains_word() {
+  local needle="$1"
+  shift
+  local value
+  for value in "$@"; do
+    if [[ "$value" == "$needle" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+install_nodesource_node_apt() {
+  log "Installing Node.js $NODESOURCE_MAJOR.x from NodeSource for npm package compatibility."
+  sudo_cmd apt-get update
+  sudo_cmd apt-get install -y ca-certificates curl gnupg
+  if [[ "$(id -u)" -eq 0 ]]; then
+    curl -fsSL "https://deb.nodesource.com/setup_${NODESOURCE_MAJOR}.x" | bash -
+  else
+    curl -fsSL "https://deb.nodesource.com/setup_${NODESOURCE_MAJOR}.x" | sudo bash -
+  fi
+  sudo_cmd apt-get install -y nodejs
+}
+
 append_packages_for_dependency() {
   local manager="$1"
   local dependency="$2"
@@ -268,7 +356,7 @@ can_compile_header() {
 check_functional_dependencies() {
   MISSING_DEPS=()
 
-  command -v node >/dev/null 2>&1 || MISSING_DEPS+=("node")
+  has_supported_node || MISSING_DEPS+=("node")
   command -v npm >/dev/null 2>&1 || MISSING_DEPS+=("npm")
 
   if ! command -v gcc >/dev/null 2>&1 && ! command -v cc >/dev/null 2>&1; then
@@ -346,7 +434,19 @@ EOF
   log "Missing dependency checks: ${MISSING_DEPS[*]}"
   log "Suggested $manager packages: ${MISSING_PACKAGES[*]}"
   if confirm "Install missing system dependencies with $manager?"; then
-    install_packages "$manager" "${MISSING_PACKAGES[@]}"
+    if [[ "$manager" == "apt" ]] && contains_word "node" "${MISSING_DEPS[@]}"; then
+      install_nodesource_node_apt
+      MISSING_PACKAGES=()
+      for dependency in $(dedupe_words "${MISSING_DEPS[@]}"); do
+        if [[ "$dependency" != "node" && "$dependency" != "npm" ]]; then
+          append_packages_for_dependency "$manager" "$dependency"
+        fi
+      done
+      mapfile -t MISSING_PACKAGES < <(dedupe_words "${MISSING_PACKAGES[@]}")
+    fi
+    if [[ "${#MISSING_PACKAGES[@]}" -gt 0 ]]; then
+      install_packages "$manager" "${MISSING_PACKAGES[@]}"
+    fi
     check_functional_dependencies
     if [[ "${#MISSING_DEPS[@]}" -ne 0 ]]; then
       echo "Some dependency checks still fail after package installation: ${MISSING_DEPS[*]}" >&2
@@ -363,6 +463,9 @@ install_npm_package() {
   local prefix
   prefix="$(npm config get prefix)"
   local npm_install=(npm install -g "$NPM_PACKAGE")
+  if [[ -d "$NPM_PACKAGE" ]]; then
+    npm_install=(npm install -g --install-links "$NPM_PACKAGE")
+  fi
 
   log "Installing npm package: $NPM_PACKAGE"
   if [[ -w "$prefix" ]]; then
@@ -391,7 +494,12 @@ generate_cookie_secret() {
 }
 
 configure_https() {
-  if ! confirm "Serve Remote Mouse over HTTPS?"; then
+  if [[ "$HTTPS_CHOICE" == "false" ]]; then
+    HTTPS="false"
+    return
+  fi
+
+  if [[ "$HTTPS_CHOICE" != "true" ]] && ! confirm "Serve Remote Mouse over HTTPS?"; then
     HTTPS="false"
     return
   fi
@@ -399,7 +507,7 @@ configure_https() {
   HTTPS="true"
   local cert_dir="$CONFIG_DIR/certs"
 
-  if confirm "Generate a local self-signed certificate?"; then
+  if [[ "$GENERATE_CERT_CHOICE" == "true" ]] || { [[ "$GENERATE_CERT_CHOICE" != "false" ]] && confirm "Generate a local self-signed certificate?"; }; then
     require_command openssl
     mkdir -p "$cert_dir"
     SSL_KEY_PATH="$cert_dir/remote-mouse.key"
@@ -410,8 +518,12 @@ configure_https() {
       -subj "/CN=remote-mouse.local" \
       -addext "subjectAltName=DNS:localhost,DNS:remote-mouse.local,IP:127.0.0.1"
   else
-    SSL_KEY_PATH="$(prompt_value "Path to the existing PEM private key")"
-    SSL_CERT_PATH="$(prompt_value "Path to the existing PEM certificate")"
+    if [[ -z "$SSL_KEY_PATH" ]]; then
+      SSL_KEY_PATH="$(prompt_value "Path to the existing PEM private key")"
+    fi
+    if [[ -z "$SSL_CERT_PATH" ]]; then
+      SSL_CERT_PATH="$(prompt_value "Path to the existing PEM certificate")"
+    fi
     if [[ ! -f "$SSL_KEY_PATH" ]]; then
       echo "Private key not found: $SSL_KEY_PATH" >&2
       exit 1
@@ -472,7 +584,12 @@ EOF
 }
 
 install_service() {
-  if ! confirm "Install the user service?"; then
+  if [[ "$INSTALL_SERVICE_CHOICE" == "false" ]]; then
+    INSTALL_SERVICE="false"
+    return
+  fi
+
+  if [[ "$INSTALL_SERVICE_CHOICE" != "true" ]] && ! confirm "Install the user service?"; then
     INSTALL_SERVICE="false"
     return
   fi

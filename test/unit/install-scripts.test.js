@@ -180,6 +180,113 @@ exit 9
     expect(commandLog).not.toContain('apt-get install');
   });
 
+  it('linux installer upgrades old apt Node.js with NodeSource', async () => {
+    const root = await mkdtemp(path.join(tmpdir(), 'remote-mouse-install-linux-'));
+    const mockBin = path.join(root, 'bin');
+    const configDir = path.join(root, 'config');
+    const prefix = path.join(root, 'npm-prefix');
+    const logPath = path.join(root, 'commands.log');
+    const nodeReadyPath = path.join(root, 'node-ready');
+    await import('node:fs/promises').then((fs) => Promise.all([
+      fs.mkdir(mockBin, {recursive: true}),
+      fs.mkdir(prefix, {recursive: true}),
+    ]));
+
+    await writeExecutable(path.join(mockBin, 'node'), `#!/usr/bin/env bash
+echo "node $*" >> "$REMOTE_MOUSE_TEST_LOG"
+if [[ -f "$REMOTE_MOUSE_NODE_READY" ]]; then
+  echo "v22.0.0"
+else
+  echo "v18.19.1"
+fi
+`);
+    await writeExecutable(path.join(mockBin, 'npm'), `#!/usr/bin/env bash
+echo "npm $*" >> "$REMOTE_MOUSE_TEST_LOG"
+if [[ "$1 $2 $3" == "config get prefix" ]]; then echo "$REMOTE_MOUSE_NPM_PREFIX"; fi
+if [[ "$1" == "--version" ]]; then echo "10.0.0"; fi
+exit 0
+`);
+    await writeExecutable(path.join(mockBin, 'apt-get'), `#!/usr/bin/env bash
+echo "apt-get $*" >> "$REMOTE_MOUSE_TEST_LOG"
+if [[ "$*" == *"install -y nodejs"* ]]; then touch "$REMOTE_MOUSE_NODE_READY"; fi
+exit 0
+`);
+    await writeExecutable(path.join(mockBin, 'curl'), `#!/usr/bin/env bash
+echo "curl $*" >> "$REMOTE_MOUSE_TEST_LOG"
+printf "exit 0\\n"
+`);
+    await writeExecutable(path.join(mockBin, 'sudo'), `#!/usr/bin/env bash
+echo "sudo $*" >> "$REMOTE_MOUSE_TEST_LOG"
+exec "$@"
+`);
+    await writeExecutable(path.join(mockBin, 'gcc'), `#!/usr/bin/env bash
+echo "gcc $*" >> "$REMOTE_MOUSE_TEST_LOG"
+exit 0
+`);
+    await writeExecutable(path.join(mockBin, 'make'), `#!/usr/bin/env bash
+echo "make $*" >> "$REMOTE_MOUSE_TEST_LOG"
+exit 0
+`);
+    await writeExecutable(path.join(mockBin, 'wmctrl'), `#!/usr/bin/env bash
+echo "wmctrl $*" >> "$REMOTE_MOUSE_TEST_LOG"
+exit 0
+`);
+    await writeExecutable(path.join(mockBin, 'yad'), `#!/usr/bin/env bash
+echo "yad $*" >> "$REMOTE_MOUSE_TEST_LOG"
+exit 0
+`);
+    await writeExecutable(path.join(mockBin, 'openssl'), `#!/usr/bin/env bash
+echo "openssl $*" >> "$REMOTE_MOUSE_TEST_LOG"
+if [[ "$1" == "rand" ]]; then echo "secret"; fi
+exit 0
+`);
+    await writeExecutable(path.join(mockBin, 'remote-mouse'), `#!/usr/bin/env bash
+echo "remote-mouse $*" >> "$REMOTE_MOUSE_TEST_LOG"
+exit 0
+`);
+
+    const result = await run('bash', [
+      'scripts/install-linux.sh',
+      '-y',
+      '--package',
+      root,
+      '--config-dir',
+      configDir,
+      '--no-https',
+      '--no-service',
+    ], {
+      cwd: process.cwd(),
+      env: {
+        ...process.env,
+        PATH: `${mockBin}:${process.env.PATH}`,
+        REMOTE_MOUSE_TEST_LOG: logPath,
+        REMOTE_MOUSE_NPM_PREFIX: prefix,
+        REMOTE_MOUSE_NODE_READY: nodeReadyPath,
+      },
+    });
+
+    expect(result.code).toBe(0);
+    const commandLog = await readFile(logPath, 'utf8');
+    expect(commandLog).toContain('curl -fsSL https://deb.nodesource.com/setup_22.x');
+    expect(commandLog).toContain('apt-get install -y nodejs');
+    expect(commandLog).toContain(`npm install -g --install-links ${root}`);
+  });
+
+  it('linux installer supports explicit non-interactive HTTPS and service choices', async () => {
+    const result = await run('bash', ['scripts/install-linux.sh', '--help'], {
+      cwd: process.cwd(),
+      env: process.env,
+    });
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('--https');
+    expect(result.stdout).toContain('--no-https');
+    expect(result.stdout).toContain('--generate-cert');
+    expect(result.stdout).toContain('--no-generate-cert');
+    expect(result.stdout).toContain('--install-service');
+    expect(result.stdout).toContain('--no-service');
+  });
+
   it('windows installer keeps dependency, npm, HTTPS and service steps separated', async () => {
     const script = await readFile(path.join(process.cwd(), 'scripts/install-windows.ps1'), 'utf8');
 
@@ -190,6 +297,10 @@ exit 9
     expect(script).toContain('function Configure-Https');
     expect(script).toContain('function Write-EnvFile');
     expect(script).toContain('function Install-Service');
+    expect(script).toContain('[switch]$Https');
+    expect(script).toContain('[switch]$NoHttps');
+    expect(script).toContain('[switch]$InstallService');
+    expect(script).toContain('[switch]$NoService');
     expect(script).toContain('Install-NpmPackage');
     expect(script).toContain('remote-mouse service install');
     expect(script).toContain('remote-mouse service restart');

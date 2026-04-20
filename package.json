@@ -1,6 +1,6 @@
 {
   "name": "@velor/remote-mouse",
-  "version": "6.4.7",
+  "version": "6.4.8",
   "type": "module",
   "description": "Remote mouse and keyboard with mobile client",
   "main": "index.js",
@@ -12,6 +12,7 @@
     "dev": "node index.js",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand --coverage",
     "test:install": "NODE_OPTIONS=--experimental-vm-modules jest test/unit/install-scripts.test.js --runInBand",
+    "test:install:integration": "node test/integration/install/run-linux-install.mjs",
     "test:all": "npm test && npm run test:e2e",
     "test:e2e": "playwright test",
     "screenshots:mobile": "node scripts/generate-mobile-screenshots.mjs",

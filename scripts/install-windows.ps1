@@ -7,7 +7,23 @@ param(
 
   [string]$ConfigDir = $env:REMOTE_MOUSE_CONFIG_DIR,
 
-  [int]$Port = $(if ($env:REMOTE_MOUSE_PORT) { [int]$env:REMOTE_MOUSE_PORT } else { 3000 })
+  [int]$Port = $(if ($env:REMOTE_MOUSE_PORT) { [int]$env:REMOTE_MOUSE_PORT } else { 3000 }),
+
+  [switch]$Https,
+
+  [switch]$NoHttps,
+
+  [switch]$GenerateCert,
+
+  [switch]$NoGenerateCert,
+
+  [string]$SslKeyPath = $env:REMOTE_MOUSE_SSL_KEY_PATH,
+
+  [string]$SslCertPath = $env:REMOTE_MOUSE_SSL_CERT_PATH,
+
+  [switch]$InstallService,
+
+  [switch]$NoService
 )
 
 $ErrorActionPreference = 'Stop'
@@ -199,14 +215,18 @@ function Configure-Https {
     CertPath = ''
   }
 
-  if (-not (Confirm-Step 'Serve Remote Mouse over HTTPS?')) {
+  if ($NoHttps) {
+    return $config
+  }
+
+  if (-not $Https -and -not (Confirm-Step 'Serve Remote Mouse over HTTPS?')) {
     return $config
   }
 
   $config.Https = 'true'
   $certDir = Join-Path $ConfigDir 'certs'
 
-  if (Confirm-Step 'Generate a local self-signed certificate?') {
+  if ($GenerateCert -or (-not $NoGenerateCert -and (Confirm-Step 'Generate a local self-signed certificate?'))) {
     New-Item -ItemType Directory -Force -Path $certDir | Out-Null
     $cert = New-SelfSignedCertificate `
       -DnsName @('localhost', 'remote-mouse.local') `
@@ -235,8 +255,15 @@ function Configure-Https {
     return $config
   }
 
-  $keyPathInput = Read-Value 'Path to the existing PEM private key'
-  $certPathInput = Read-Value 'Path to the existing PEM certificate'
+  $keyPathInput = $SslKeyPath
+  if ([string]::IsNullOrWhiteSpace($keyPathInput)) {
+    $keyPathInput = Read-Value 'Path to the existing PEM private key'
+  }
+
+  $certPathInput = $SslCertPath
+  if ([string]::IsNullOrWhiteSpace($certPathInput)) {
+    $certPathInput = Read-Value 'Path to the existing PEM certificate'
+  }
 
   if (-not (Test-Path -LiteralPath $keyPathInput)) {
     throw "Private key not found: $keyPathInput"
@@ -299,7 +326,11 @@ SERVICE_RESTART_COMMAND=
 }
 
 function Install-Service {
-  if (-not (Confirm-Step 'Install the user service?')) {
+  if ($NoService) {
+    return $false
+  }
+
+  if (-not $InstallService -and -not (Confirm-Step 'Install the user service?')) {
     return $false
   }
 
