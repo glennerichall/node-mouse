@@ -1,9 +1,17 @@
 {
   "name": "@velor/remote-mouse",
-  "version": "6.4.8",
+  "version": "6.4.9",
   "type": "module",
   "description": "Remote mouse and keyboard with mobile client",
+  "homepage": "https://github.com/glennerichall/node-mouse#readme",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/glennerichall/node-mouse.git"
+  },
+  "bugs": {
+    "url": "https://github.com/glennerichall/node-mouse/issues"
+  },
   "bin": {
     "remote-mouse": "./bin/remote-mouse.js"
   },

@@ -21,15 +21,15 @@ Regenerate these assets with `npm run screenshots:mobile`.
 
 | Remote control | Local preferences |
 | --- | --- |
-| <img src=".artifacts/screenshots/remote-mobile-home.png" alt="Mobile remote control screen" width="260"> | <img src=".artifacts/screenshots/remote-mobile-preferences.png" alt="Mobile local preferences screen" width="260"> |
+| <img src="https://raw.githubusercontent.com/glennerichall/node-mouse/main/.artifacts/screenshots/remote-mobile-home.png" alt="Mobile remote control screen" width="260"> | <img src="https://raw.githubusercontent.com/glennerichall/node-mouse/main/.artifacts/screenshots/remote-mobile-preferences.png" alt="Mobile local preferences screen" width="260"> |
 
 | VLC remote | Admin configuration |
 | --- | --- |
-| <img src=".artifacts/screenshots/remote-mobile-vlc.png" alt="Mobile VLC remote screen" width="260"> | <img src=".artifacts/screenshots/remote-mobile-config.png" alt="Mobile admin configuration screen" width="260"> |
+| <img src="https://raw.githubusercontent.com/glennerichall/node-mouse/main/.artifacts/screenshots/remote-mobile-vlc.png" alt="Mobile VLC remote screen" width="260"> | <img src="https://raw.githubusercontent.com/glennerichall/node-mouse/main/.artifacts/screenshots/remote-mobile-config.png" alt="Mobile admin configuration screen" width="260"> |
 
 | Server info |
 | --- |
-| <img src=".artifacts/screenshots/remote-mobile-server-info.png" alt="Mobile server info screen" width="260"> |
+| <img src="https://raw.githubusercontent.com/glennerichall/node-mouse/main/.artifacts/screenshots/remote-mobile-server-info.png" alt="Mobile server info screen" width="260"> |
 
 ## Install
 
