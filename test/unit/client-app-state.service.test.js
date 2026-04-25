@@ -1,5 +1,6 @@
 import {
   APP_STATE_EFFECTIVE_BROWSER_REMOTE_VISIBLE,
+  APP_STATE_EFFECTIVE_SAMSUNG_REMOTE_VISIBLE,
   APP_STATE_KEYBOARD_PREVIEW_ACTIVE,
   APP_STATE_PREVIEW_ACTIVITY_AT,
   APP_STATE_REMOTE_ACCORDION_EXPANDED_PANEL,
@@ -134,6 +135,23 @@ describe('client app state service', () => {
       value: false,
       previousValue: true,
     }));
+  });
+
+  it('keeps the samsung remote hidden when the server config disables it', () => {
+    const {appState, clientConfig} = createAppStateTestHarness({
+      persistState: {
+        [APP_STATE_REMOTE_VISIBILITY]: {samsung: true},
+      },
+      config: {
+        samsungTv: {enabled: false},
+      },
+    });
+
+    expect(appState.get(APP_STATE_EFFECTIVE_SAMSUNG_REMOTE_VISIBLE)).toBe(false);
+
+    clientConfig.setConfig({samsungTv: {enabled: true}});
+
+    expect(appState.get(APP_STATE_EFFECTIVE_SAMSUNG_REMOTE_VISIBLE)).toBe(true);
   });
 
   it('builds stable pubsub event names for state properties', () => {

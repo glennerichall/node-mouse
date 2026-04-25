@@ -39,7 +39,8 @@ export function resolveEffectiveStateValue(key, {stateStore, persistStore, clien
         && getRecordFlag(remoteVisibility, 'vlc', true);
 
     case APP_STATE_EFFECTIVE_SAMSUNG_REMOTE_VISIBLE:
-      return getRecordFlag(remoteVisibility, 'samsung', true);
+      return getConfigSection(config, 'samsungTv').enabled === true
+        && getRecordFlag(remoteVisibility, 'samsung', true);
 
     case APP_STATE_EFFECTIVE_PREVIEW_REMOTE_VISIBLE:
       return getConfigSection(config, 'preview').enabled !== false

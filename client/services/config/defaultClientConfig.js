@@ -19,4 +19,7 @@ export const DEFAULT_CLIENT_CONFIG = {
     enabled: true,
     hideDelayMs: 10000,
   },
+  samsungTv: {
+    enabled: false,
+  },
 };
