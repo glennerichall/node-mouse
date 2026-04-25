@@ -29,6 +29,22 @@ function redactSecrets(value, key = '') {
   return value;
 }
 
+function buildConfigSnapshots(rawConfig, rawSystemConfig) {
+  const config = redactSecrets(rawConfig);
+  const sysConfig = redactSecrets(rawSystemConfig);
+
+  return {
+    config: {
+      ...config,
+      updateCheck: {
+        ...sysConfig?.updateCheck,
+        ...config?.updateCheck,
+      },
+    },
+    sysConfig,
+  };
+}
+
 function getConnectedClients(io) {
   return Array.from(io.of('/').sockets.values()).map((socket) => ({
     id: socket.id,
@@ -106,8 +122,7 @@ export function createServerInfoRouter(services) {
     const clients = getConnectedClients(services.getServer().io);
     const rawConfig = services.getConfig();
     const rawSystemConfig = services.getSystemConfig();
-    const config = redactSecrets(rawConfig);
-    const sysConfig = redactSecrets(rawSystemConfig);
+    const {config, sysConfig} = buildConfigSnapshots(rawConfig, rawSystemConfig);
     const logs = getRecentLogs(250);
     const version = readPackageVersion(packageJsonPath);
     const tasks = services.getTaskManager().getTasksSnapshot();
@@ -145,5 +160,6 @@ export function createServerInfoRouter(services) {
 
 export const __testables = {
   buildTokenEntries,
+  buildConfigSnapshots,
   redactSecrets,
 };

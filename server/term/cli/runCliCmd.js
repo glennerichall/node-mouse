@@ -18,7 +18,12 @@ export async function runCliCmd(args) {
     if (!command?.name || command.name === 'help') {
         console.log('Usage:');
         console.log('  remote-mouse              Demarre le serveur');
+        console.log('  remote-mouse help         Affiche cette aide');
         console.log('  remote-mouse config       Affiche la configuration persistée effective');
+        console.log('  remote-mouse config get <path> Affiche une valeur de configuration persistée');
+        console.log('  remote-mouse config set <path> <value> Met a jour une valeur de configuration persistée');
+        console.log('  remote-mouse sys-config   Affiche la configuration systeme');
+        console.log('  remote-mouse system-config Alias de sys-config');
         console.log('  remote-mouse service install Installe le daemon/service local');
         console.log('  remote-mouse service disable Desactive le daemon/service local');
         console.log('  remote-mouse service uninstall Desinstalle le daemon/service local');
@@ -28,6 +33,7 @@ export async function runCliCmd(args) {
         console.log('  remote-mouse info --verbosity 2 Affiche les capacites serveur avec logs detailles');
         console.log('  remote-mouse system-info  Alias de info');
         console.log('  remote-mouse tokens       Liste les tokens en base');
+        console.log('  remote-mouse samsung-detect Detecte les TV Samsung sur le reseau');
         console.log('  remote-mouse open-qr      Envoie une commande au service deja demarre');
         console.log('  remote-mouse qr           Alias de open-qr');
         process.exit(0);

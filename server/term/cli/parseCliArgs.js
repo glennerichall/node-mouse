@@ -51,6 +51,9 @@ export function parseCliArgs(args) {
     .command('sys-config', false, () => {}, () => {
       command = {name: 'sys-config', args: {}};
     })
+    .command('system-config', false, () => {}, () => {
+      command = {name: 'system-config', args: {}};
+    })
     .command('info', false, () => {}, () => {
       command = {name: 'info', args: {}};
     })

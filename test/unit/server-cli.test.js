@@ -40,7 +40,8 @@ describe('server cli', () => {
     }, {name: 'help', args: {}});
 
     expect(result.ok).toBe(true);
-    expect(result.message).toContain('remote-mouse --help');
+    expect(result.message).toContain('remote-mouse system-config');
+    expect(result.message).toContain('remote-mouse sys-config');
   });
 
   it('returns the effective persisted config for config command', async () => {
@@ -121,6 +122,29 @@ describe('server cli', () => {
         adminActions: {},
       }),
     }, {name: 'sys-config', args: {}});
+
+    expect(result).toEqual({
+      ok: true,
+      message: 'Configuration système.',
+      data: systemConfig,
+    });
+  });
+
+  it('returns the system config for system-config command', async () => {
+    const systemConfig = {
+      port: 3000,
+      protocol: 'http',
+      updateCheck: {
+        packageName: '@velor/remote-mouse',
+      },
+    };
+
+    const result = await executeCliCommand({
+      getSystemConfig: () => systemConfig,
+      getRemotes: () => ({
+        adminActions: {},
+      }),
+    }, {name: 'system-config', args: {}});
 
     expect(result).toEqual({
       ok: true,

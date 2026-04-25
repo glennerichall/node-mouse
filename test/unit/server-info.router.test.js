@@ -82,4 +82,48 @@ describe('server info router token entries', () => {
       },
     });
   });
+
+  it('merges persisted and system update-check fields for the config snapshot', () => {
+    expect(__testables.buildConfigSnapshots({
+      preview: {
+        enabled: true,
+      },
+      updateCheck: {
+        enabled: true,
+        intervalMin: 60,
+      },
+    }, {
+      updateCheck: {
+        packageName: '@velor/remote-mouse',
+        currentVersion: '6.4.10',
+        checkCommand: '',
+      },
+      session: {
+        cookieSecret: 'secret-value',
+      },
+    })).toEqual({
+      config: {
+        preview: {
+          enabled: true,
+        },
+        updateCheck: {
+          enabled: true,
+          intervalMin: 60,
+          packageName: '@velor/remote-mouse',
+          currentVersion: '6.4.10',
+          checkCommand: '',
+        },
+      },
+      sysConfig: {
+        updateCheck: {
+          packageName: '@velor/remote-mouse',
+          currentVersion: '6.4.10',
+          checkCommand: '',
+        },
+        session: {
+          cookieSecret: '[redacted]',
+        },
+      },
+    });
+  });
 });

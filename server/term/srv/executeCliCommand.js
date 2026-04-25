@@ -15,6 +15,7 @@ const commandHandlers = {
   qr: executeOpenQrCommand,
   config: executeConfigCommand,
   'sys-config': executeSystemConfigCommand,
+  'system-config': executeSystemConfigCommand,
   info: executeInfoCommand,
   'system-info': executeInfoCommand,
   service: executeServiceCommand,

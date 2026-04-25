@@ -305,6 +305,7 @@ Useful CLI commands:
 - `config get <path>` prints one persisted configuration value
 - `config set <path> <value>` updates one persisted configuration value
 - `sys-config` prints the system configuration
+- `system-config` is an alias of `sys-config`
 - `service install` installs the local daemon/service
 - `service disable` disables the local daemon/service
 - `service uninstall` uninstalls the local daemon/service
