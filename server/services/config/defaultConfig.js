@@ -60,7 +60,6 @@ export const DEFAULT_SYSTEM_CONFIG = {
     updateCheck: {
         checkCommand: '',
         checkTimeoutSec: 20,
-        intervalMin: 360,
         packageName: String(packageJson.name || '').trim(),
         currentVersion: String(packageJson.version || '').trim(),
         installCommand: '',
@@ -123,6 +122,7 @@ export const DEFAULT_PERSISTED_CONFIG = {
     },
     updateCheck: {
         enabled: false,
+        intervalMin: 360,
     },
     qrOverlay: {
         enabled: true,

@@ -198,6 +198,13 @@ export const CONFIG_SCHEMA = {
         label: 'Activer la verification',
         type: 'boolean',
       },
+      intervalMin: {
+        label: 'Intervalle verification (min)',
+        type: 'integer',
+        min: 1,
+        max: 10080,
+        step: 1,
+      },
     },
   },
   qrOverlay: {

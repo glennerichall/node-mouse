@@ -32,7 +32,6 @@ export function getEnvConfig() {
         updateCheck: {
             checkCommand: readOptionalString('UPDATE_CHECK_COMMAND'),
             checkTimeoutSec: readOptionalNumber('UPDATE_CHECK_TIMEOUT_SEC'),
-            intervalMin: readOptionalNumber('UPDATE_CHECK_INTERVAL_MIN'),
             packageName: readOptionalString('UPDATE_CHECK_PACKAGE'),
             currentVersion: readOptionalString('UPDATE_CHECK_CURRENT_VERSION'),
             installCommand: readOptionalString('UPDATE_INSTALL_COMMAND'),

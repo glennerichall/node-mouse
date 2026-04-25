@@ -18,6 +18,9 @@ describe('task manager', () => {
       getEvents: () => ({
         publishState: jest.fn(),
       }),
+      getConfig: () => ({
+        updateCheck: {intervalMin: 5},
+      }),
       getTaskRunner: () => taskRunner,
       getUpdateManager: () => ({
         check: jest.fn(async () => ({})),
@@ -26,7 +29,6 @@ describe('task manager', () => {
         rotateIfNeeded: jest.fn(() => 'token'),
       }),
       getSystemConfig: () => ({
-        updateCheck: {intervalMin: 5},
         entryPath: {rotateMin: 10},
       }),
     });
@@ -57,6 +59,9 @@ describe('task manager', () => {
       getEvents: () => ({
         publishState: jest.fn(),
       }),
+      getConfig: () => ({
+        updateCheck: {intervalMin: 5},
+      }),
       getTaskRunner: () => taskRunner,
       getUpdateManager: () => ({
         check: jest.fn(async () => ({})),
@@ -65,7 +70,6 @@ describe('task manager', () => {
         rotateIfNeeded: jest.fn(() => 'token'),
       }),
       getSystemConfig: () => ({
-        updateCheck: {intervalMin: 5},
         entryPath: {rotateMin: 2, graceMin: 120},
       }),
     });

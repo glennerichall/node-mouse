@@ -37,7 +37,7 @@ export function createTaskManager(services) {
 
     getTaskRunner().run(
       wrapTask(() => services.getUpdateManager().check()),
-      () => getFixedDelayMs(services.getSystemConfig().updateCheck?.intervalMin || 1),
+      () => getFixedDelayMs(services.getConfig().updateCheck?.intervalMin || 1),
       {name: 'update-check'},
     );
 

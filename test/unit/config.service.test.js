@@ -28,6 +28,7 @@ describe('config service', () => {
     expect(configs.preview.fps).toBe(12);
     expect(configs.preview.enabled).toBe(false);
     expect(configService.getConfig('preview.fps')).toBe(12);
+    expect(configService.getConfig('updateCheck.intervalMin')).toBe(360);
   });
 
   it('publishes updates and deletions from the service', () => {

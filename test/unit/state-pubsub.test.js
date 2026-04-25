@@ -97,6 +97,9 @@ describe('state pubsub', () => {
     const taskManager = createTaskManager({
       getTaskRunner: () => taskRunner,
       getEvents: () => events,
+      getConfig: () => ({
+        updateCheck: {intervalMin: 0.5},
+      }),
       getUpdateManager: () => ({
         check: jest.fn(() => Promise.resolve()),
       }),
@@ -104,7 +107,6 @@ describe('state pubsub', () => {
         rotateIfNeeded: jest.fn(() => 'token'),
       }),
       getSystemConfig: () => ({
-        updateCheck: {intervalMin: 0.5},
         entryPath: {rotateMin: 1},
       }),
     });

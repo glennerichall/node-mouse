@@ -24,7 +24,11 @@ export function createUpdateManager(services) {
     }
 
     async function check() {
-        if (!services.getConfig().updateCheck?.enabled) {
+        const updateCheckEnabled = Boolean(services.getConfig().updateCheck?.enabled);
+        log.debug({ enabled: updateCheckEnabled, lastKey }, 'Update check: start');
+
+        if (!updateCheckEnabled) {
+            log.debug('Update check: skipped because disabled');
             lastResult = {
                 checked: true,
                 hasUpdate: false,
@@ -39,10 +43,17 @@ export function createUpdateManager(services) {
         }
 
         try {
-            const result = await chooseUpdateCheckSource(services)();
+            const runCheck = chooseUpdateCheckSource(services);
+            log.debug('Update check: source resolved');
+            const result = await runCheck();
+            log.debug({ result }, 'Update check: source returned');
 
             if (!result?.hasUpdate || !result.key || result.key === lastKey) {
-                log.debug('Update check: no update');
+                log.debug({
+                    hasUpdate: Boolean(result?.hasUpdate),
+                    key: result?.key || '',
+                    duplicateKey: Boolean(result?.key && result.key === lastKey),
+                }, 'Update check: no update');
                 lastResult = {
                     checked: true,
                     hasUpdate: false,
@@ -56,6 +67,7 @@ export function createUpdateManager(services) {
             }
 
             lastKey = result.key;
+            log.debug({ key: lastKey, ttlMs: result.ttlMs || 8000 }, 'Update check: update detected');
             lastResult = {
                 checked: true,
                 hasUpdate: true,
@@ -90,8 +102,10 @@ export function createUpdateManager(services) {
     async function update() {
         const install = chooseUpdateInstallSource(services);
         lastInstallCommand = String(install.command || '');
+        log.debug({ installCommand: lastInstallCommand }, 'Install update: source resolved');
         log.info({installCommand: lastInstallCommand}, 'Exécution commande install update');
         const result = await install();
+        log.debug({ result }, 'Install update: source returned');
         if (result.ok) {
             log.info('Install update terminée avec succès');
             return result;

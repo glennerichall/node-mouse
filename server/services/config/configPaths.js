@@ -31,6 +31,7 @@ export const CONFIG_PATHS = [
     'samsungTv.pcInputSequence',
     'samsungTv.powerOffKey',
     'updateCheck.enabled',
+    'updateCheck.intervalMin',
     'qrOverlay.enabled',
     'qrOverlay.size',
     'qrOverlay.margin',
