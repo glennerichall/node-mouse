@@ -254,6 +254,51 @@ describe('server cli', () => {
     });
   });
 
+  it('returns persisted update-manager events for update-events command', async () => {
+    const result = await executeCliCommand({
+      getPersistence: () => ({
+        updateEventLogDao: {
+          listRecentEvents: () => ([
+            {
+              id: 3,
+              eventAt: 1_777_777_777_000,
+              type: 'update.check',
+              enabled: true,
+              lastKey: '',
+              lastInstallCommand: '',
+              lastResult: {
+                checked: true,
+                hasUpdate: false,
+              },
+            },
+          ]),
+        },
+      }),
+      getRemotes: () => ({
+        adminActions: {},
+      }),
+    }, {name: 'update-events', args: {}});
+
+    expect(result).toEqual({
+      ok: true,
+      message: 'Evenements update-manager.',
+      data: [
+        {
+          id: 3,
+          eventAt: 1_777_777_777_000,
+          type: 'update.check',
+          enabled: true,
+          lastKey: '',
+          lastInstallCommand: '',
+          lastResult: {
+            checked: true,
+            hasUpdate: false,
+          },
+        },
+      ],
+    });
+  });
+
   it('detects a samsung tv without persisting host/mac', async () => {
     const result = await executeCliCommand({
       getConfig: () => ({

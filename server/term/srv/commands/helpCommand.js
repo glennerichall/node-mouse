@@ -14,6 +14,7 @@ export async function executeHelpCommand() {
       'remote-mouse service <install|disable|uninstall|restart>',
       'remote-mouse tasks',
       'remote-mouse task-manager',
+      'remote-mouse update-events',
       'remote-mouse samsung-detect',
       'remote-mouse tokens',
       'remote-mouse open-qr',

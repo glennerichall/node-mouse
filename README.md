@@ -312,6 +312,7 @@ Useful CLI commands:
 - `service restart` restarts the local daemon/service
 - `tasks` prints the task manager snapshot
 - `task-manager` is an alias of `tasks`
+- `update-events` prints persisted update-manager events
 - `samsung-detect` detects Samsung TVs available on the network
 - `tokens` lists persisted entry tokens
 - `open-qr` opens the QR page on the server

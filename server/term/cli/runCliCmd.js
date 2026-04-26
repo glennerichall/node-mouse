@@ -30,6 +30,7 @@ export async function runCliCmd(args) {
         console.log('  remote-mouse service restart Redemarre le daemon/service local');
         console.log('  remote-mouse tasks        Affiche les informations du task manager');
         console.log('  remote-mouse task-manager Alias de tasks');
+        console.log('  remote-mouse update-events Affiche les evenements persistés du update-manager');
         console.log('  remote-mouse info --verbosity 2 Affiche les capacites serveur avec logs detailles');
         console.log('  remote-mouse system-info  Alias de info');
         console.log('  remote-mouse tokens       Liste les tokens en base');

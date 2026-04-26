@@ -8,6 +8,7 @@ import {startNotificationObserver} from '../init/observers/startNotificationObse
 import {startDisplaySizeObserver} from '../init/observers/startDisplaySizeObserver.js';
 import {startQrOverlayRefreshObserver} from '../init/observers/startQrOverlayRefreshObserver.js';
 import {startQrOverlayHoverObserver} from '../init/observers/startQrOverlayHoverObserver.js';
+import {startUpdateManagerLogObserver} from '../init/observers/startUpdateManagerLogObserver.js';
 import {notifyIfRestarted} from '../remotes/admin/notifyIfRestarted.js';
 import {ensureApplicationLifecycleState} from './state.js';
 import {createLogger} from './logger.js';
@@ -41,6 +42,7 @@ export function createApplicationStart(services) {
 
     state.stopConfigObserver = startConfigObserver(services);
     state.stopNotificationObserver = startNotificationObserver(services);
+    state.stopUpdateManagerLogObserver = startUpdateManagerLogObserver(services);
     state.stopDisplaySizeObserver = startDisplaySizeObserver(services);
     state.stopQrOverlayRefreshObserver = startQrOverlayRefreshObserver(services);
     state.stopQrOverlayHoverObserver = startQrOverlayHoverObserver(services);

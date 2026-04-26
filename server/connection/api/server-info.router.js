@@ -128,6 +128,7 @@ export function createServerInfoRouter(services) {
     const tasks = services.getTaskManager().getTasksSnapshot();
     const tokenEntries = services.getPersistence().entryTokenDao.loadEntryTokens();
     const restarts = services.getPersistence().restartLogDao.listRecentRestartRecords(20);
+    const updateEvents = services.getPersistence().updateEventLogDao.listRecentEvents(20);
     const currentToken = services.getTokenManager().getToken();
     const entryPathConfig = services.getSystemConfig().entryPath;
     const daemon = await services.getApplicationDaemonService().getInfo();
@@ -150,6 +151,7 @@ export function createServerInfoRouter(services) {
       daemon,
       system,
       restarts,
+      updateEvents,
       config,
       sysConfig,
       logs,

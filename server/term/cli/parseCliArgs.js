@@ -75,6 +75,9 @@ export function parseCliArgs(args) {
     .command('task-manager', false, () => {}, () => {
       command = {name: 'task-manager', args: {}};
     })
+    .command('update-events', false, () => {}, () => {
+      command = {name: 'update-events', args: {}};
+    })
     .command('samsung-detect', false, () => {}, () => {
       command = {name: 'samsung-detect', args: {}};
     })

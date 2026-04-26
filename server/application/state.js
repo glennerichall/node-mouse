@@ -8,6 +8,7 @@ export function ensureApplicationLifecycleState(services) {
       shuttingDown: false,
       stopConfigObserver: () => {},
       stopNotificationObserver: () => {},
+      stopUpdateManagerLogObserver: () => {},
       stopDisplaySizeObserver: () => {},
       stopQrOverlayRefreshObserver: () => {},
       stopQrOverlayHoverObserver: () => {},

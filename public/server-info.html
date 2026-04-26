@@ -151,6 +151,28 @@
     </section>
 
     <section>
+      <h2>Update-manager events</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Type</th>
+              <th>At</th>
+              <th>Enabled</th>
+              <th>Key</th>
+              <th>Checked</th>
+              <th>Has update</th>
+              <th>Skipped</th>
+              <th>Error</th>
+            </tr>
+          </thead>
+          <tbody id="update-events-table"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
       <h2 data-i18n="serverInfo.section.capabilities">Capabilities</h2>
       <pre id="capabilities"></pre>
     </section>
@@ -192,6 +214,7 @@
     const tasksTable = document.getElementById('tasks-table');
     const tokensTable = document.getElementById('tokens-table');
     const restartsTable = document.getElementById('restarts-table');
+    const updateEventsTable = document.getElementById('update-events-table');
     const capabilitiesEl = document.getElementById('capabilities');
     const configEl = document.getElementById('config');
     const sysConfigEl = document.getElementById('sys-config');
@@ -202,10 +225,6 @@
       timeStyle: 'medium',
     });
     let logsAutoScroll = true;
-    let configStream = null;
-    let configSubscriptionId = '';
-    let pendingConfigPayload = null;
-    let applyingConfigPayload = false;
 
     function t(key, params) {
       return i18n.t(key, params);
@@ -349,6 +368,33 @@
       }
     }
 
+    function renderUpdateEvents(updateEvents) {
+      updateEventsTable.innerHTML = '';
+      if (!Array.isArray(updateEvents) || updateEvents.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="9">No update-manager events.</td>';
+        updateEventsTable.appendChild(row);
+        return;
+      }
+
+      for (const event of updateEvents) {
+        const row = document.createElement('tr');
+        const result = event.lastResult || {};
+        row.innerHTML = `
+          <td>${event.id ?? ''}</td>
+          <td>${event.type || '-'}</td>
+          <td>${formatDateTime(event.eventAt)}</td>
+          <td>${event.enabled ? 'yes' : 'no'}</td>
+          <td>${event.lastKey || '-'}</td>
+          <td>${Object.hasOwn(result, 'checked') ? (result.checked ? 'yes' : 'no') : '-'}</td>
+          <td>${Object.hasOwn(result, 'hasUpdate') ? (result.hasUpdate ? 'yes' : 'no') : '-'}</td>
+          <td>${Object.hasOwn(result, 'skipped') ? (result.skipped ? 'yes' : 'no') : '-'}</td>
+          <td>${result.error || '-'}</td>
+        `;
+        updateEventsTable.appendChild(row);
+      }
+    }
+
     function renderLogs(logs) {
       const previousScrollTop = logsEl.scrollTop;
       const shouldAutoScroll = logsAutoScroll;
@@ -446,33 +492,6 @@
       sysConfigEl.textContent = JSON.stringify(snapshot || {}, null, 2);
     }
 
-    function flushPendingConfigPayload() {
-      if (applyingConfigPayload || !pendingConfigPayload) {
-        return;
-      }
-
-      applyingConfigPayload = true;
-      const payload = pendingConfigPayload;
-      pendingConfigPayload = null;
-
-      try {
-        renderConfigSnapshot(payload.config);
-        renderSystemConfigSnapshot(payload.sysConfig);
-      } finally {
-        applyingConfigPayload = false;
-        if (pendingConfigPayload) {
-          flushPendingConfigPayload();
-        }
-      }
-    }
-
-    function scheduleConfigPayload(payload) {
-      pendingConfigPayload = payload;
-      queueMicrotask(() => {
-        flushPendingConfigPayload();
-      });
-    }
-
     async function refresh() {
       try {
         const response = await fetch('/api/admin/server-info/data', { cache: 'no-store' });
@@ -498,60 +517,14 @@
         renderTasks(data.tasks || []);
         renderTokens(data.tokens || []);
         renderRestarts(data.restarts || []);
+        renderUpdateEvents(data.updateEvents || []);
         renderCapabilities(data.system || null);
-        scheduleConfigPayload({
-          config: data.config,
-          sysConfig: data.sysConfig,
-        });
+        renderConfigSnapshot(data.config);
+        renderSystemConfigSnapshot(data.sysConfig);
         renderLogs(data.logs || []);
       } catch (error) {
         logsEl.textContent = t('serverInfo.loadError', {message: error?.message || error});
       }
-    }
-
-    async function subscribeToConfigEvents() {
-      if (typeof window.EventSource !== 'function') {
-        return;
-      }
-
-      const response = await fetch('/api/admin/subs/configs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({scope: 'config'}),
-      });
-      if (!response.ok) {
-        throw new Error(t('serverInfo.sseCreateError'));
-      }
-
-      const payload = await response.json();
-      configSubscriptionId = String(payload.id || '');
-      if (!configSubscriptionId || !payload.eventsUrl) {
-        throw new Error(t('serverInfo.sseInvalid'));
-      }
-
-      configStream?.close();
-      configStream = new EventSource(payload.eventsUrl);
-      configStream.addEventListener('config.changed', (event) => {
-        try {
-          scheduleConfigPayload(JSON.parse(event.data || '{}'));
-        } catch (_error) {
-          // Best effort.
-        }
-      });
-    }
-
-    function unsubscribeFromConfigEvents() {
-      if (!configSubscriptionId) {
-        return;
-      }
-
-      fetch(`/api/admin/subs/${encodeURIComponent(configSubscriptionId)}`, {
-        method: 'DELETE',
-        keepalive: true,
-      }).catch(() => {});
-      configSubscriptionId = '';
     }
 
     logsEl.addEventListener('scroll', () => {
@@ -560,14 +533,9 @@
 
     refresh();
     setInterval(refresh, 2000);
-    subscribeToConfigEvents().catch(() => {});
     i18n.onChange(() => {
       i18n.translateRoot(document);
       refresh();
-    });
-    window.addEventListener('beforeunload', () => {
-      configStream?.close();
-      unsubscribeFromConfigEvents();
     });
   </script>
 </body>

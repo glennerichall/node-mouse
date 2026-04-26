@@ -7,6 +7,7 @@ import {executeServiceCommand} from './commands/serviceCommand.js';
 import {executeSystemConfigCommand} from './commands/systemConfigCommand.js';
 import {executeTasksCommand} from './commands/tasksCommand.js';
 import {executeTokensCommand} from './commands/tokensCommand.js';
+import {executeUpdateEventsCommand} from './commands/updateEventsCommand.js';
 import {formatCliCommand} from '../cli/parseCliArgs.js';
 
 const commandHandlers = {
@@ -21,6 +22,7 @@ const commandHandlers = {
   service: executeServiceCommand,
   tasks: executeTasksCommand,
   'task-manager': executeTasksCommand,
+  'update-events': executeUpdateEventsCommand,
   'samsung-detect': executeSamsungDetectCommand,
   tokens: executeTokensCommand,
 };
