@@ -96,6 +96,13 @@ export function createSamsungDeviceConfigResolver({
         const selected = pickSamsungDevice(candidates, selectionConfig);
 
         if (!selected) {
+            if (config.host && config.mac && candidates.length === 0) {
+                return {
+                    ip: config.host,
+                    mac: config.mac,
+                };
+            }
+
             if (!candidates.length) {
                 throw new Error('aucune TV Samsung reveillee detectee sur le reseau');
             }

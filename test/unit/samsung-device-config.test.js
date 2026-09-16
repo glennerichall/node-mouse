@@ -106,6 +106,25 @@ describe('samsung device config', () => {
     expect(getAwakeSamsungDevicesFn.calledOnce).toBe(true);
   });
 
+  it('falls back to configured host and mac when an off TV cannot be discovered', async () => {
+    const resolveDeviceConfig = createSamsungDeviceConfigResolver({
+      getConfig: () => ({
+        alwaysAutoResolve: true,
+        host: '192.168.1.55',
+        mac: 'AA:BB:CC:DD:EE:FF',
+        discoveryTimeoutMs: 3000,
+      }),
+      getLogger: () => ({info: sandbox.stub()}),
+      getLastConnectedDeviceFn: sandbox.stub().returns(null),
+      getAwakeSamsungDevicesFn: sandbox.stub().resolves([]),
+    });
+
+    await expect(resolveDeviceConfig()).resolves.toEqual({
+      ip: '192.168.1.55',
+      mac: 'AA:BB:CC:DD:EE:FF',
+    });
+  });
+
   it('throws when several devices are discovered without a selector', async () => {
     const getLogger = () => ({info: sandbox.stub()});
     const resolveDeviceConfig = createSamsungDeviceConfigResolver({

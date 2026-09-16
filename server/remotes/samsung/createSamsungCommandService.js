@@ -13,6 +13,7 @@ export function createSamsungCommandService({getConfig, discoverDevices, getSams
         checkedAt: 0,
     };
     let powerStatePromise = null;
+    let powerStateGeneration = 0;
 
     function getEnabledRemote() {
         if (getConfig().enabled) {
@@ -22,10 +23,12 @@ export function createSamsungCommandService({getConfig, discoverDevices, getSams
     }
 
     function invalidatePowerState() {
+        powerStateGeneration += 1;
         powerStateCache = {
             value: 'unknown',
             checkedAt: 0,
         };
+        powerStatePromise = null;
     }
 
     async function computePowerState() {
@@ -51,18 +54,24 @@ export function createSamsungCommandService({getConfig, discoverDevices, getSams
         }
 
         if (!powerStatePromise) {
-            powerStatePromise = (async () => {
+            const generation = powerStateGeneration;
+            const pendingPromise = (async () => {
                 try {
                     const value = await computePowerState();
-                    powerStateCache = {
-                        value,
-                        checkedAt: Date.now(),
-                    };
+                    if (generation === powerStateGeneration) {
+                        powerStateCache = {
+                            value,
+                            checkedAt: Date.now(),
+                        };
+                    }
                     return value;
                 } finally {
-                    powerStatePromise = null;
+                    if (powerStatePromise === pendingPromise) {
+                        powerStatePromise = null;
+                    }
                 }
             })();
+            powerStatePromise = pendingPromise;
         }
 
         return powerStatePromise;
@@ -126,6 +135,7 @@ export function createSamsungCommandService({getConfig, discoverDevices, getSams
                 return disabledRemote.turnOn();
             }
             try {
+                invalidatePowerState();
                 const samsungTv = await getSamsungTv();
                 await samsungTv.wakeTV();
                 invalidatePowerState();

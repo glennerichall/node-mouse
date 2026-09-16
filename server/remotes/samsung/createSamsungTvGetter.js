@@ -1,5 +1,5 @@
 import { SamsungTvRemote } from 'samsung-tv-remote';
-import { pingHost } from '../../utils/network.js';
+import { isTcpPortOpen, wakeHost } from '../../utils/network.js';
 
 function isNoAwakeTvError(error) {
   return String(error?.message || error || '').includes('aucune TV Samsung reveillee');
@@ -12,7 +12,8 @@ function isAmbiguousTvError(error) {
 export function createSamsungTvGetter({
   getConfig,
   resolveDeviceConfig,
-  pingHostFn = pingHost,
+  isTcpPortOpenFn = isTcpPortOpen,
+  wakeHostFn = wakeHost,
   SamsungTvRemoteClass = SamsungTvRemote,
 }) {
   let tvPromise = null;
@@ -51,9 +52,10 @@ export function createSamsungTvGetter({
               if (!device?.ip) {
                 return 'unknown';
               }
-              const reachable = await pingHostFn(
+              const reachable = await isTcpPortOpenFn(
                 device.ip,
-                Math.max(500, Number(config.timeoutMs) || 2000),
+                config.port,
+                Math.min(2000, Math.max(500, Number(config.timeoutMs) || 1500)),
               );
               return reachable ? 'on' : 'off';
             },
@@ -64,7 +66,7 @@ export function createSamsungTvGetter({
               await remote.sendKeys(keys);
             },
             async wakeTV() {
-              await remote.wakeTV();
+              await wakeHostFn(device.mac);
             },
           };
         } catch (error) {
