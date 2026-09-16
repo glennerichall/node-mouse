@@ -137,6 +137,8 @@ export const it = {
   'main.shift': 'Maiusc',
   'main.alt': 'Alt',
   'main.ctrl': 'Ctrl',
+  'main.copy': 'Copia',
+  'main.paste': 'Incolla',
   'main.leftClick': 'Clic sinistro',
   'main.rightClick': 'Clic destro',
   'main.enter': 'Invio',

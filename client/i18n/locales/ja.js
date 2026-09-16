@@ -137,6 +137,8 @@ export const ja = {
   'main.shift': 'Shift',
   'main.alt': 'Alt',
   'main.ctrl': 'Ctrl',
+  'main.copy': 'コピー',
+  'main.paste': '貼り付け',
   'main.leftClick': '左クリック',
   'main.rightClick': '右クリック',
   'main.enter': 'Enter',

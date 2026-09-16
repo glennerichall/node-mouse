@@ -36,6 +36,8 @@ function getKeyboardRemoteDom() {
     keyboardShift: getElement('keyboard-shift'),
     keyboardAlt: getElement('keyboard-alt'),
     keyboardCtrl: getElement('keyboard-ctrl'),
+    keyboardCopy: getElement('keyboard-copy'),
+    keyboardPaste: getElement('keyboard-paste'),
     btnTextEntry: getElement('btn-text-entry'),
     btnLiveKeyboard: getElement('btn-live-keyboard'),
     btnSendText: getElement('send-text'),

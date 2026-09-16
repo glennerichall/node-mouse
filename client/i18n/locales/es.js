@@ -140,6 +140,8 @@ export const es = {
   'main.shift': 'Mayus',
   'main.alt': 'Alt',
   'main.ctrl': 'Ctrl',
+  'main.copy': 'Copiar',
+  'main.paste': 'Pegar',
   'main.leftClick': 'Clic izquierdo',
   'main.rightClick': 'Clic derecho',
   'main.enter': 'Enter',

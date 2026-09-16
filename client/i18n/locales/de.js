@@ -137,6 +137,8 @@ export const de = {
   'main.shift': 'Umschalt',
   'main.alt': 'Alt',
   'main.ctrl': 'Strg',
+  'main.copy': 'Kopieren',
+  'main.paste': 'Einfuegen',
   'main.leftClick': 'Linksklick',
   'main.rightClick': 'Rechtsklick',
   'main.enter': 'Enter',

@@ -137,6 +137,8 @@ export const pt = {
   'main.shift': 'Shift',
   'main.alt': 'Alt',
   'main.ctrl': 'Ctrl',
+  'main.copy': 'Copiar',
+  'main.paste': 'Colar',
   'main.leftClick': 'Clique esquerdo',
   'main.rightClick': 'Clique direito',
   'main.enter': 'Enter',

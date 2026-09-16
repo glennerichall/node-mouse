@@ -148,6 +148,8 @@ export const en = {
   'main.shift': 'Shift',
   'main.alt': 'Alt',
   'main.ctrl': 'Ctrl',
+  'main.copy': 'Copy',
+  'main.paste': 'Paste',
   'main.leftClick': 'Left click',
   'main.rightClick': 'Right click',
   'main.enter': 'Enter',

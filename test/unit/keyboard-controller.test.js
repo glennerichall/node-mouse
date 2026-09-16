@@ -54,4 +54,18 @@ describe('createKeyboardController', () => {
     expect(robot.keyTap.secondCall.args).toEqual(['enter']);
     expect(robot.typeString.thirdCall.args).toEqual(['c']);
   });
+
+  it('allows copy and paste keyboard shortcuts', () => {
+    const robot = {
+      typeString: sandbox.stub(),
+      keyTap: sandbox.stub(),
+    };
+
+    const keyboard = createKeyboardController(robot);
+    keyboard.pressSpecialKey('c', ['control']);
+    keyboard.pressSpecialKey('v', ['control']);
+
+    expect(robot.keyTap.firstCall.args).toEqual(['c', ['control']]);
+    expect(robot.keyTap.secondCall.args).toEqual(['v', ['control']]);
+  });
 });

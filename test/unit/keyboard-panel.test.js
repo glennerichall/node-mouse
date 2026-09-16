@@ -1,6 +1,9 @@
 import {jest} from '@jest/globals';
 import {bindKeyboardPanel} from '../../client/ui/main/keyboard-panel.js';
-import {REMOTE_EVENT_KEYBOARD_TEXT} from '../../utils/remoteCommands.js';
+import {
+  REMOTE_EVENT_KEYBOARD_KEY,
+  REMOTE_EVENT_KEYBOARD_TEXT,
+} from '../../utils/remoteCommands.js';
 
 class FakeElement extends EventTarget {
   constructor() {
@@ -49,6 +52,8 @@ function createFixture() {
     keyboardShift: new FakeElement(),
     keyboardAlt: new FakeElement(),
     keyboardCtrl: new FakeElement(),
+    keyboardCopy: new FakeElement(),
+    keyboardPaste: new FakeElement(),
     btnTextEntry: new FakeElement(),
     btnLiveKeyboard: new FakeElement(),
     btnSendText: new FakeElement(),
@@ -76,10 +81,11 @@ describe('keyboard panel', () => {
     delete global.document;
   });
 
-  it('sends Android composition text only once after it is committed', () => {
+  it('sends Android composition text incrementally without duplicating the commit', () => {
     const {keyboard, socket} = createFixture();
     const input = keyboard.liveTextInput;
 
+    input.dispatchEvent(new Event('compositionstart'));
     input.dispatchEvent(createInputEvent('beforeinput', {
       data: 'h',
       inputType: 'insertCompositionText',
@@ -87,6 +93,10 @@ describe('keyboard panel', () => {
     }));
     input.value = 'h';
     input.dispatchEvent(createInputEvent('input', {isComposing: true}));
+    expect(socket.emit).toHaveBeenCalledWith(
+      REMOTE_EVENT_KEYBOARD_TEXT,
+      expect.objectContaining({text: 'h'}),
+    );
 
     input.dispatchEvent(createInputEvent('beforeinput', {
       data: 'hé',
@@ -96,15 +106,47 @@ describe('keyboard panel', () => {
     input.value = 'hé';
     input.dispatchEvent(createInputEvent('input', {isComposing: true}));
 
-    input.dispatchEvent(new Event('compositionend'));
+    input.dispatchEvent(createInputEvent('compositionend', {data: 'hé'}));
     input.dispatchEvent(createInputEvent('input', {isComposing: false}));
     jest.runOnlyPendingTimers();
 
-    expect(socket.emit).toHaveBeenCalledTimes(1);
-    expect(socket.emit).toHaveBeenCalledWith(
-      REMOTE_EVENT_KEYBOARD_TEXT,
-      expect.objectContaining({text: 'hé'}),
-    );
+    const transmittedText = socket.emit.mock.calls
+      .filter(([eventName]) => eventName === REMOTE_EVENT_KEYBOARD_TEXT)
+      .map(([, payload]) => payload.text)
+      .join('');
+    expect(transmittedText).toBe('hé');
     expect(input.value).toBe('');
+  });
+
+  it('applies an active modifier to the next directly typed key', () => {
+    const {keyboard, socket} = createFixture();
+
+    keyboard.keyboardCtrl.dispatchEvent(new Event('click'));
+    keyboard.liveTextInput.value = 'c';
+    keyboard.liveTextInput.dispatchEvent(createInputEvent('input', {isComposing: false}));
+
+    expect(socket.emit).toHaveBeenCalledWith(
+      REMOTE_EVENT_KEYBOARD_KEY,
+      expect.objectContaining({key: 'c', modifiers: ['control']}),
+    );
+    expect(socket.emit).not.toHaveBeenCalledWith(
+      REMOTE_EVENT_KEYBOARD_TEXT,
+      expect.objectContaining({text: 'c'}),
+    );
+  });
+
+  it('provides dedicated copy and paste shortcuts', () => {
+    const {keyboard, socket} = createFixture();
+
+    keyboard.keyboardCopy.dispatchEvent(new Event('click'));
+    keyboard.keyboardPaste.dispatchEvent(new Event('click'));
+
+    const shortcutPayloads = socket.emit.mock.calls
+      .filter(([eventName]) => eventName === REMOTE_EVENT_KEYBOARD_KEY)
+      .map(([, payload]) => payload);
+    expect(shortcutPayloads).toEqual([
+      expect.objectContaining({key: 'c', modifiers: ['control']}),
+      expect.objectContaining({key: 'v', modifiers: ['control']}),
+    ]);
   });
 });

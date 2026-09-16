@@ -21,6 +21,8 @@ export function bindKeyboardPanel(services, dom) {
     keyboardShift,
     keyboardAlt,
     keyboardCtrl,
+    keyboardCopy,
+    keyboardPaste,
     btnTextEntry,
     btnLiveKeyboard,
     btnSendText,
@@ -32,6 +34,8 @@ export function bindKeyboardPanel(services, dom) {
   };
   let activeMode = '';
   let compositionFallbackTimer = null;
+  let mirroredCompositionText = '';
+  let compositionCommitPending = false;
 
   function setPreviewActive(active) {
     appState.set(APP_STATE_KEYBOARD_PREVIEW_ACTIVE, Boolean(active));
@@ -158,15 +162,50 @@ export function bindKeyboardPanel(services, dom) {
     emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key, modifiers });
   }
 
-  function sendLiveText() {
-    const text = liveTextInput.value;
+  function emitLiveText(text) {
     if (!text) {
       return;
     }
 
-    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_TEXT, { text });
-    liveTextInput.value = '';
+    const characters = Array.from(text);
+    if (getActiveModifiers().length > 0 && /^[a-zA-Z0-9]$/.test(characters[0] || '')) {
+      pressKeyboardAction(characters.shift().toLowerCase());
+    }
+    if (characters.length > 0) {
+      emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_TEXT, { text: characters.join('') });
+    }
     setPreviewActive(true);
+  }
+
+  function sendLiveText() {
+    emitLiveText(liveTextInput.value);
+    liveTextInput.value = '';
+  }
+
+  function syncCompositionText(text = liveTextInput.value) {
+    const previousCharacters = Array.from(mirroredCompositionText);
+    const nextCharacters = Array.from(text);
+    let commonLength = 0;
+
+    while (
+      commonLength < previousCharacters.length
+      && commonLength < nextCharacters.length
+      && previousCharacters[commonLength] === nextCharacters[commonLength]
+    ) {
+      commonLength += 1;
+    }
+
+    for (let index = commonLength; index < previousCharacters.length; index += 1) {
+      sendSpecialKey('backspace');
+    }
+    emitLiveText(nextCharacters.slice(commonLength).join(''));
+    mirroredCompositionText = nextCharacters.join('');
+  }
+
+  function resetComposition() {
+    mirroredCompositionText = '';
+    compositionCommitPending = false;
+    liveTextInput.value = '';
   }
 
   function getActiveModifiers() {
@@ -208,6 +247,12 @@ export function bindKeyboardPanel(services, dom) {
     restoreInputFocus();
   }
 
+  function pressKeyboardShortcut(key, modifiers) {
+    sendSpecialKey(key, modifiers);
+    setPreviewActive(true);
+    restoreInputFocus();
+  }
+
   [
     keyboardEsc,
     keyboardTab,
@@ -215,6 +260,8 @@ export function bindKeyboardPanel(services, dom) {
     keyboardShift,
     keyboardAlt,
     keyboardCtrl,
+    keyboardCopy,
+    keyboardPaste,
     btnSendText,
   ].forEach(preserveKeyboard);
 
@@ -227,6 +274,8 @@ export function bindKeyboardPanel(services, dom) {
   keyboardShift.addEventListener('click', () => toggleModifier('shift'));
   keyboardAlt.addEventListener('click', () => toggleModifier('alt'));
   keyboardCtrl.addEventListener('click', () => toggleModifier('control'));
+  keyboardCopy.addEventListener('click', () => pressKeyboardShortcut('c', ['control']));
+  keyboardPaste.addEventListener('click', () => pressKeyboardShortcut('v', ['control']));
 
   textInput.addEventListener('keydown', (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
@@ -254,6 +303,7 @@ export function bindKeyboardPanel(services, dom) {
 
   liveTextInput.addEventListener('input', (event) => {
     if (event.isComposing) {
+      syncCompositionText();
       return;
     }
 
@@ -261,13 +311,26 @@ export function bindKeyboardPanel(services, dom) {
       window.clearTimeout(compositionFallbackTimer);
       compositionFallbackTimer = null;
     }
+    if (compositionCommitPending || mirroredCompositionText) {
+      syncCompositionText();
+      resetComposition();
+      return;
+    }
     sendLiveText();
   });
 
-  liveTextInput.addEventListener('compositionend', () => {
+  liveTextInput.addEventListener('compositionstart', () => {
+    mirroredCompositionText = '';
+    compositionCommitPending = false;
+  });
+
+  liveTextInput.addEventListener('compositionend', (event) => {
+    const committedText = liveTextInput.value || (typeof event.data === 'string' ? event.data : '');
+    syncCompositionText(committedText);
+    compositionCommitPending = true;
     compositionFallbackTimer = window.setTimeout(() => {
       compositionFallbackTimer = null;
-      sendLiveText();
+      resetComposition();
     }, 0);
   });
 

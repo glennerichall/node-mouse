@@ -148,6 +148,8 @@ export const fr = {
   'main.shift': 'Shift',
   'main.alt': 'Alt',
   'main.ctrl': 'Ctrl',
+  'main.copy': 'Copier',
+  'main.paste': 'Coller',
   'main.leftClick': 'Clic G',
   'main.rightClick': 'Clic D',
   'main.enter': 'Entree',

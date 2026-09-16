@@ -102,6 +102,8 @@ export const ru = {
   'main.shift': 'Shift',
   'main.alt': 'Alt',
   'main.ctrl': 'Ctrl',
+  'main.copy': 'Копировать',
+  'main.paste': 'Вставить',
   'main.leftClick': 'Левый клик',
   'main.rightClick': 'Правый клик',
   'main.enter': 'Enter',

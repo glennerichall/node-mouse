@@ -137,6 +137,8 @@ export const zh = {
   'main.shift': 'Shift',
   'main.alt': 'Alt',
   'main.ctrl': 'Ctrl',
+  'main.copy': '复制',
+  'main.paste': '粘贴',
   'main.leftClick': '左键点击',
   'main.rightClick': '右键点击',
   'main.enter': 'Enter',
