@@ -170,6 +170,7 @@ export const it = {
   'preferences.section.browsers.description': 'Scegli quali browser locali possono essere mostrati nella remote browser.',
   'preferences.remote.keyboard': 'Tastiera',
   'preferences.remote.browser': 'Browser',
+  'preferences.remote.system': 'Sistema',
   'preferences.remote.vlc': 'VLC',
   'preferences.remote.samsung': 'Samsung TV',
   'preferences.remote.preview': 'Anteprima cursore',

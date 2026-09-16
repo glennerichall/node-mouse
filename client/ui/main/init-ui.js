@@ -39,6 +39,7 @@ export function initUi(services) {
   for (const key of [
     'effective.remote.browser.visible',
     'effective.remote.keyboard.visible',
+    'effective.remote.system.visible',
     'effective.remote.vlc.visible',
     'effective.remote.samsung.visible',
     'effective.remote.preview.visible',

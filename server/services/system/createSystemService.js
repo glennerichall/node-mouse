@@ -75,6 +75,13 @@ function buildRemoteCapabilities({applications, config}) {
       enabled: isConfigEnabled(config, 'keyboard'),
     },
     {
+      id: 'system',
+      labelKey: 'preferences.remote.system',
+      applicationIds: [],
+      available: true,
+      enabled: true,
+    },
+    {
       id: 'vlc',
       labelKey: 'preferences.remote.vlc',
       applicationIds: isVlcAvailable ? ['vlc'] : [],

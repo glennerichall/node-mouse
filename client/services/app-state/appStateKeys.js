@@ -13,6 +13,7 @@ export const APP_STATE_BROWSER_VISIBILITY = 'preferences.browserVisibility';
 
 export const APP_STATE_EFFECTIVE_BROWSER_REMOTE_VISIBLE = 'effective.remote.browser.visible';
 export const APP_STATE_EFFECTIVE_KEYBOARD_REMOTE_VISIBLE = 'effective.remote.keyboard.visible';
+export const APP_STATE_EFFECTIVE_SYSTEM_REMOTE_VISIBLE = 'effective.remote.system.visible';
 export const APP_STATE_EFFECTIVE_VLC_REMOTE_VISIBLE = 'effective.remote.vlc.visible';
 export const APP_STATE_EFFECTIVE_SAMSUNG_REMOTE_VISIBLE = 'effective.remote.samsung.visible';
 export const APP_STATE_EFFECTIVE_PREVIEW_REMOTE_VISIBLE = 'effective.remote.preview.visible';
@@ -20,6 +21,7 @@ export const APP_STATE_EFFECTIVE_PREVIEW_REMOTE_VISIBLE = 'effective.remote.prev
 export const EFFECTIVE_APP_STATE_KEYS = [
   APP_STATE_EFFECTIVE_BROWSER_REMOTE_VISIBLE,
   APP_STATE_EFFECTIVE_KEYBOARD_REMOTE_VISIBLE,
+  APP_STATE_EFFECTIVE_SYSTEM_REMOTE_VISIBLE,
   APP_STATE_EFFECTIVE_VLC_REMOTE_VISIBLE,
   APP_STATE_EFFECTIVE_SAMSUNG_REMOTE_VISIBLE,
   APP_STATE_EFFECTIVE_PREVIEW_REMOTE_VISIBLE,

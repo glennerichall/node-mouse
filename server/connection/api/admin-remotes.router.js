@@ -33,6 +33,11 @@ export function createAdminRemotesRouter(services) {
         enabled: config?.keyboard?.enabled !== false,
       },
       {
+        id: 'system',
+        labelKey: 'preferences.remote.system',
+        enabled: true,
+      },
+      {
         id: 'preview',
         labelKey: 'preferences.remote.preview',
         enabled: config?.preview?.enabled !== false,

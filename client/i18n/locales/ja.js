@@ -170,6 +170,7 @@ export const ja = {
   'preferences.section.browsers.description': 'ブラウザー remote に表示できるローカルブラウザーを選択します。',
   'preferences.remote.keyboard': 'キーボード',
   'preferences.remote.browser': 'ブラウザー',
+  'preferences.remote.system': 'システム',
   'preferences.remote.vlc': 'VLC',
   'preferences.remote.samsung': 'Samsung TV',
   'preferences.remote.preview': 'カーソルプレビュー',

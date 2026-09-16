@@ -170,6 +170,7 @@ export const zh = {
   'preferences.section.browsers.description': '选择哪些本地浏览器可以显示在浏览器 remote 中。',
   'preferences.remote.keyboard': '键盘',
   'preferences.remote.browser': '浏览器',
+  'preferences.remote.system': '系统',
   'preferences.remote.vlc': 'VLC',
   'preferences.remote.samsung': 'Samsung TV',
   'preferences.remote.preview': '光标预览',

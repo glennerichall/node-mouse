@@ -173,6 +173,7 @@ export const es = {
   'preferences.section.browsers.description': 'Elija que navegadores locales pueden mostrarse en la remote del navegador.',
   'preferences.remote.keyboard': 'Teclado',
   'preferences.remote.browser': 'Navegador',
+  'preferences.remote.system': 'Sistema',
   'preferences.remote.vlc': 'VLC',
   'preferences.remote.samsung': 'Samsung TV',
   'preferences.remote.preview': 'Vista previa del cursor',

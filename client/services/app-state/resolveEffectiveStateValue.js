@@ -4,6 +4,7 @@ import {
   APP_STATE_EFFECTIVE_KEYBOARD_REMOTE_VISIBLE,
   APP_STATE_EFFECTIVE_PREVIEW_REMOTE_VISIBLE,
   APP_STATE_EFFECTIVE_SAMSUNG_REMOTE_VISIBLE,
+  APP_STATE_EFFECTIVE_SYSTEM_REMOTE_VISIBLE,
   APP_STATE_EFFECTIVE_VLC_REMOTE_VISIBLE,
   APP_STATE_REMOTE_VISIBILITY,
 } from './appStateKeys.js';
@@ -33,6 +34,9 @@ export function resolveEffectiveStateValue(key, {stateStore, persistStore, clien
     case APP_STATE_EFFECTIVE_KEYBOARD_REMOTE_VISIBLE:
       return getConfigSection(config, 'keyboard').enabled !== false
         && getRecordFlag(remoteVisibility, 'keyboard', true);
+
+    case APP_STATE_EFFECTIVE_SYSTEM_REMOTE_VISIBLE:
+      return getRecordFlag(remoteVisibility, 'system', true);
 
     case APP_STATE_EFFECTIVE_VLC_REMOTE_VISIBLE:
       return getConfigSection(config, 'vlc').enabled !== false

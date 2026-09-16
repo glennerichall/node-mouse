@@ -1,5 +1,6 @@
 export const LOCAL_REMOTE_DEFINITIONS = [
   {id: 'keyboard', labelKey: 'preferences.remote.keyboard'},
+  {id: 'system', labelKey: 'preferences.remote.system'},
 ];
 
 export function createPreferencesState() {

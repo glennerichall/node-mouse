@@ -1,6 +1,7 @@
 import {
   APP_STATE_EFFECTIVE_BROWSER_REMOTE_VISIBLE,
   APP_STATE_EFFECTIVE_SAMSUNG_REMOTE_VISIBLE,
+  APP_STATE_EFFECTIVE_SYSTEM_REMOTE_VISIBLE,
   APP_STATE_KEYBOARD_PREVIEW_ACTIVE,
   APP_STATE_PREVIEW_ACTIVITY_AT,
   APP_STATE_REMOTE_ACCORDION_EXPANDED_PANEL,
@@ -152,6 +153,16 @@ describe('client app state service', () => {
     clientConfig.setConfig({samsungTv: {enabled: true}});
 
     expect(appState.get(APP_STATE_EFFECTIVE_SAMSUNG_REMOTE_VISIBLE)).toBe(true);
+  });
+
+  it('computes system remote visibility from local preferences', () => {
+    const {appState} = createAppStateTestHarness({
+      persistState: {
+        [APP_STATE_REMOTE_VISIBILITY]: {system: false},
+      },
+    });
+
+    expect(appState.get(APP_STATE_EFFECTIVE_SYSTEM_REMOTE_VISIBLE)).toBe(false);
   });
 
   it('builds stable pubsub event names for state properties', () => {

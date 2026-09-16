@@ -154,6 +154,7 @@ export const ru = {
   'preferences.section.browsers.description': 'Выберите, какие локальные браузеры можно показывать в пульте браузера.',
   'preferences.remote.keyboard': 'Клавиатура',
   'preferences.remote.browser': 'Браузер',
+  'preferences.remote.system': 'Система',
   'preferences.remote.vlc': 'VLC',
   'preferences.remote.samsung': 'Samsung TV',
   'preferences.remote.preview': 'Превью курсора',

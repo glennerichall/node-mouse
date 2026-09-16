@@ -89,6 +89,12 @@ describe('system service', () => {
       ]),
       allRemotes: expect.arrayContaining([
         expect.objectContaining({
+          id: 'system',
+          available: true,
+          enabled: true,
+          inactiveReasons: [],
+        }),
+        expect.objectContaining({
           id: 'samsung',
           available: true,
           enabled: false,

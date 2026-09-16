@@ -3,6 +3,7 @@ import {
   APP_STATE_EFFECTIVE_KEYBOARD_REMOTE_VISIBLE,
   APP_STATE_EFFECTIVE_PREVIEW_REMOTE_VISIBLE,
   APP_STATE_EFFECTIVE_SAMSUNG_REMOTE_VISIBLE,
+  APP_STATE_EFFECTIVE_SYSTEM_REMOTE_VISIBLE,
   APP_STATE_EFFECTIVE_VLC_REMOTE_VISIBLE,
 } from '../../services/app-state/createAppStateService.js';
 
@@ -16,6 +17,8 @@ export function applyRemoteVisibilityState({
   const browserVisible = appState.get(APP_STATE_EFFECTIVE_BROWSER_REMOTE_VISIBLE);
   
   const keyboardVisible = appState.get(APP_STATE_EFFECTIVE_KEYBOARD_REMOTE_VISIBLE);
+
+  const systemVisible = appState.get(APP_STATE_EFFECTIVE_SYSTEM_REMOTE_VISIBLE);
   
   const vlcVisible = appState.get(APP_STATE_EFFECTIVE_VLC_REMOTE_VISIBLE);
   
@@ -45,6 +48,10 @@ export function applyRemoteVisibilityState({
   
   if (remotes.samsung.root) {
     remotes.samsung.root.hidden = !samsungVisible;
+  }
+
+  if (remotes.system.root) {
+    remotes.system.root.hidden = !systemVisible;
   }
   
   if (remotes.vlc.root) {
