@@ -23,11 +23,11 @@ export function createUpdateManager(services) {
         }, {type});
     }
 
-    async function check() {
+    async function check({force = false} = {}) {
         const updateCheckEnabled = Boolean(services.getConfig().updateCheck?.enabled);
-        log.debug({ enabled: updateCheckEnabled, lastKey }, 'Update check: start');
+        log.debug({ enabled: updateCheckEnabled, force, lastKey }, 'Update check: start');
 
-        if (!updateCheckEnabled) {
+        if (!updateCheckEnabled && !force) {
             log.debug('Update check: skipped because disabled');
             lastResult = {
                 checked: true,
@@ -48,7 +48,7 @@ export function createUpdateManager(services) {
             const result = await runCheck();
             log.debug({ result }, 'Update check: source returned');
 
-            if (!result?.hasUpdate || !result.key || result.key === lastKey) {
+            if (!result?.hasUpdate || !result.key || (!force && result.key === lastKey)) {
                 log.debug({
                     hasUpdate: Boolean(result?.hasUpdate),
                     key: result?.key || '',

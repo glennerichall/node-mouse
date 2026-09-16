@@ -76,6 +76,27 @@ describe('createUpdateManager', () => {
     });
   });
 
+  it('checks npm when a manual check is forced while automatic checks are disabled', async () => {
+    const check = jest.fn(async () => ({
+      hasUpdate: true,
+      key: 'npm:6.7.0',
+      title: 'Mise a jour disponible',
+      message: 'Version 6.7.0 disponible.',
+    }));
+    chooseUpdateCheckSource.mockReturnValue(check);
+    const updateManager = createUpdateManager(createServices({
+      config: {updateCheck: {enabled: false}},
+    }));
+
+    await expect(updateManager.check({force: true})).resolves.toEqual({
+      checked: true,
+      hasUpdate: true,
+      key: 'npm:6.7.0',
+    });
+
+    expect(check).toHaveBeenCalledTimes(1);
+  });
+
   it('publishes an available update when the source detects one', async () => {
     const events = {publishState: jest.fn()};
     const check = jest.fn(async () => ({
@@ -146,6 +167,25 @@ describe('createUpdateManager', () => {
       },
     }, {
       type: 'update.check',
+    });
+  });
+
+  it('reports an already known update during a forced manual check', async () => {
+    const check = jest.fn(async () => ({
+      hasUpdate: true,
+      key: 'npm:6.7.0',
+      title: 'Mise a jour disponible',
+      message: 'Version 6.7.0 disponible.',
+    }));
+    chooseUpdateCheckSource.mockReturnValue(check);
+    const updateManager = createUpdateManager(createServices());
+
+    await updateManager.check();
+
+    await expect(updateManager.check({force: true})).resolves.toEqual({
+      checked: true,
+      hasUpdate: true,
+      key: 'npm:6.7.0',
     });
   });
 
