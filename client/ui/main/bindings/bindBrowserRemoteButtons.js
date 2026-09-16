@@ -28,6 +28,7 @@ export function bindBrowserRemoteButtons(services, dom) {
         btnVideoFullscreen,
     } = dom.remotes.browser;
     let launcherButtons = [];
+    let launcherLoadId = 0;
     const staticButtons = [
         btnBrowserBack,
         btnBrowserForward,
@@ -60,6 +61,7 @@ export function bindBrowserRemoteButtons(services, dom) {
             return;
         }
 
+        const loadId = ++launcherLoadId;
         browserLaunchers.textContent = '';
         launcherButtons = [];
 
@@ -69,6 +71,9 @@ export function bindBrowserRemoteButtons(services, dom) {
 
         try {
             const payload = await backend.getAvailableBrowsers();
+            if (loadId !== launcherLoadId) {
+                return;
+            }
             const browsers = Array.isArray(payload?.browsers) ? payload.browsers : [];
 
             for (const browser of browsers) {
@@ -91,6 +96,9 @@ export function bindBrowserRemoteButtons(services, dom) {
                 bindTouchPassthrough(launcherButtons, touchpad);
             }
         } catch (_error) {
+            if (loadId !== launcherLoadId) {
+                return;
+            }
             browserLaunchers.textContent = '';
             launcherButtons = [];
         }
