@@ -15,12 +15,22 @@ export function createPreviewStreamer(services) {
     let timer = null;
 
     function scheduleNextFrame() {
+      if (!active || !socket.connected) {
+        return;
+      }
+
       const previewConfig = getPreviewConfig();
       const fps = Number(previewConfig.fps) || DEFAULT_PERSISTED_CONFIG.preview.fps;
       const intervalMs = Math.max(50, Math.round(1000 / fps));
 
       timer = setTimeout(async () => {
-        if (!active) {
+        timer = null;
+        if (!active || !socket.connected) {
+          return;
+        }
+
+        if (!socket.conn.transport.writable) {
+          scheduleNextFrame();
           return;
         }
 
@@ -30,6 +40,9 @@ export function createPreviewStreamer(services) {
           const frameWidth = Number(currentPreviewConfig.width) || DEFAULT_PERSISTED_CONFIG.preview.width;
           const frameHeight = Number(currentPreviewConfig.height) || DEFAULT_PERSISTED_CONFIG.preview.height;
           const screen = await services.getSystem().getScreenInfo();
+          if (!active || !socket.connected) {
+            return;
+          }
           if (!screen) {
             throw new Error('Screen size unavailable');
           }
@@ -43,7 +56,7 @@ export function createPreviewStreamer(services) {
             cursorFrameY,
           } = captureAroundCursor(robot, frameWidth, frameHeight, screen);
           const frame = bgraToRgbaBuffer(capture, frameWidth, frameHeight);
-          socket.emit(
+          socket.volatile.emit(
             'preview:frame',
             {
               width: frameWidth,

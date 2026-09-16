@@ -31,6 +31,7 @@ export function bindKeyboardPanel(services, dom) {
     shift: false,
   };
   let activeMode = '';
+  let compositionFallbackTimer = null;
 
   function setPreviewActive(active) {
     appState.set(APP_STATE_KEYBOARD_PREVIEW_ACTIVE, Boolean(active));
@@ -157,6 +158,17 @@ export function bindKeyboardPanel(services, dom) {
     emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, { key, modifiers });
   }
 
+  function sendLiveText() {
+    const text = liveTextInput.value;
+    if (!text) {
+      return;
+    }
+
+    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_TEXT, { text });
+    liveTextInput.value = '';
+    setPreviewActive(true);
+  }
+
   function getActiveModifiers() {
     return Object.entries(modifierState)
       .filter(([, enabled]) => enabled)
@@ -234,19 +246,29 @@ export function bindKeyboardPanel(services, dom) {
   liveTextInput.addEventListener('beforeinput', (event) => {
     const inputType = String(event.inputType || '');
 
-    if (inputType.startsWith('delete')) {
+    if (inputType.startsWith('delete') && !event.isComposing) {
       pressKeyboardAction('backspace');
       setPreviewActive(true);
+    }
+  });
+
+  liveTextInput.addEventListener('input', (event) => {
+    if (event.isComposing) {
       return;
     }
 
-    const text = typeof event.data === 'string' ? event.data : '';
-    if (!text) {
-      return;
+    if (compositionFallbackTimer) {
+      window.clearTimeout(compositionFallbackTimer);
+      compositionFallbackTimer = null;
     }
+    sendLiveText();
+  });
 
-    emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_TEXT, { text });
-    setPreviewActive(true);
+  liveTextInput.addEventListener('compositionend', () => {
+    compositionFallbackTimer = window.setTimeout(() => {
+      compositionFallbackTimer = null;
+      sendLiveText();
+    }, 0);
   });
 
   liveTextInput.addEventListener('keydown', (event) => {

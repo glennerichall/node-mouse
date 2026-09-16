@@ -110,7 +110,7 @@ describe('service builders resolve providers only in methods', () => {
     expect(getRobot).not.toHaveBeenCalled();
     expect(getConfig).not.toHaveBeenCalled();
 
-    preview.startForSocket({emit: jest.fn()}).stop();
+    preview.startForSocket({connected: true, emit: jest.fn()}).stop();
     expect(getConfig).toHaveBeenCalled();
   });
 
