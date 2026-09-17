@@ -1,5 +1,4 @@
-import {spawnDetached} from '../../utils/process.js';
-import {commandExists} from './process.js';
+import {commandExists, spawnLinuxDesktopProcess} from './process.js';
 
 export async function openLinuxUrl(url) {
   const safeUrl = String(url || '').trim();
@@ -8,10 +7,10 @@ export async function openLinuxUrl(url) {
   }
 
   if (await commandExists('xdg-open')) {
-    return spawnDetached('xdg-open', [safeUrl]);
+    return spawnLinuxDesktopProcess('xdg-open', [safeUrl]);
   }
   if (await commandExists('gio')) {
-    return spawnDetached('gio', ['open', safeUrl]);
+    return spawnLinuxDesktopProcess('gio', ['open', safeUrl]);
   }
   return false;
 }

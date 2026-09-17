@@ -1,6 +1,6 @@
-import {execFileAsync, spawnDetached} from '../../utils/process.js';
+import {execFileAsync} from '../../utils/process.js';
 import {activateWindow, closeWindow, findWindows, toggleWindow} from './windows.js';
-import {resolveLinuxCommand} from './process.js';
+import {resolveLinuxCommand, spawnLinuxDesktopProcess} from './process.js';
 import {sleep} from "../../../utils/sync.js";
 
 export async function isAnyProcessRunning(processNames = []) {
@@ -75,7 +75,7 @@ export async function openOrFocusLinuxApp(spec, {maximize = false} = {}) {
     }
   }
 
-  const launched = await spawnDetached(resolved.launchCommand, resolved.launchArgs);
+  const launched = await spawnLinuxDesktopProcess(resolved.launchCommand, resolved.launchArgs);
   if (!launched) {
     return false;
   }

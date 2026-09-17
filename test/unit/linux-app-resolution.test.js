@@ -46,4 +46,64 @@ describe('linux app resolution', () => {
       processNames: ['vlc', 'vlc.bin'],
     }));
   });
+
+  it('launches a browser in an independent systemd scope when running as a service', async () => {
+    const previousDaemon = process.env.REMOTE_MOUSE_DAEMON;
+    process.env.REMOTE_MOUSE_DAEMON = '1';
+    const spawnDetached = jest.fn(async () => true);
+    const execFileAsync = jest.fn(async (command, args) => {
+      if (command === 'which' && args[0] === 'firefox') {
+        return {ok: true, stdout: '/usr/bin/firefox\n', stderr: ''};
+      }
+      if (command === 'which' && args[0] === 'systemd-run') {
+        return {ok: true, stdout: '/usr/bin/systemd-run\n', stderr: ''};
+      }
+      return {ok: false, stdout: '', stderr: ''};
+    });
+
+    jest.unstable_mockModule('../../server/utils/process.js', () => ({
+      execFileAsync,
+      spawnDetached,
+    }));
+    jest.unstable_mockModule('../../server/os/linux/windows.js', () => ({
+      activateWindow: jest.fn(),
+      closeWindow: jest.fn(),
+      findWindows: jest.fn(async () => []),
+      toggleWindow: jest.fn(),
+    }));
+    jest.unstable_mockModule('../../utils/sync.js', () => ({
+      sleep: jest.fn(async () => {}),
+    }));
+    jest.unstable_mockModule('../../server/application/logger.js', () => ({
+      createLogger: () => ({
+        debug: jest.fn(),
+        trace: jest.fn(),
+      }),
+    }));
+
+    try {
+      const {openOrFocusLinuxApp} = await import('../../server/os/linux/app.js');
+      await openOrFocusLinuxApp({
+        linux: {
+          commands: ['firefox'],
+          processNames: ['firefox'],
+          windowClasses: ['firefox'],
+        },
+      });
+
+      expect(spawnDetached).toHaveBeenCalledWith('/usr/bin/systemd-run', [
+        '--user',
+        '--scope',
+        '--quiet',
+        '--',
+        '/usr/bin/firefox',
+      ]);
+    } finally {
+      if (previousDaemon === undefined) {
+        delete process.env.REMOTE_MOUSE_DAEMON;
+      } else {
+        process.env.REMOTE_MOUSE_DAEMON = previousDaemon;
+      }
+    }
+  });
 });

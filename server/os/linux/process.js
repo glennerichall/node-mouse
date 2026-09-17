@@ -1,5 +1,6 @@
 import {createLogger} from '../../application/logger.js';
-import {execFileAsync} from '../../utils/process.js';
+import {execFileAsync, spawnDetached} from '../../utils/process.js';
+import {isDaemonProcess} from '../../services/application/utils.js';
 
 const LINUX_COMMAND_EXTRA_PATHS = [
   '/snap/bin',
@@ -66,4 +67,24 @@ export async function resolveLinuxCommand(command) {
 
 export async function commandExists(command) {
   return Boolean(await resolveLinuxCommand(command));
+}
+
+export async function spawnLinuxDesktopProcess(command, args = []) {
+  if (!isDaemonProcess()) {
+    return spawnDetached(command, args);
+  }
+
+  const systemdRun = await resolveLinuxCommand('systemd-run');
+  if (!systemdRun) {
+    return spawnDetached(command, args);
+  }
+
+  return spawnDetached(systemdRun, [
+    '--user',
+    '--scope',
+    '--quiet',
+    '--',
+    command,
+    ...args,
+  ]);
 }
