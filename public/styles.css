@@ -4,7 +4,7 @@
   --bg-2: #1a2228;
   --fg: #f0f4f7;
   --accent: #4bd4ff;
-  --menu-h: 58px;
+  --menu-h: 46px;
   --scroll-zone-width: 36px;
   --scroll-zone-edge-gap: 10px;
   --preview-gap-from-scroll: 8px;
@@ -843,8 +843,16 @@ html[data-theme="light"] #live-text-input {
 }
 
 #live-text-input {
-  min-height: 44px;
-  height: 44px;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  min-height: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 html[data-theme="light"] #keyboard-panel-preview {
