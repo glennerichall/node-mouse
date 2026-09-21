@@ -25,6 +25,19 @@ describe('createKeyboardController', () => {
     expect(robot.keyTap.called).toBe(false);
   });
 
+  it('types a hyphen directly instead of using Linux unicode composition', () => {
+    const robot = {
+      typeString: sandbox.stub(),
+      keyTap: sandbox.stub(),
+    };
+
+    const keyboard = createKeyboardController(robot);
+    keyboard.typeText('-');
+
+    expect(robot.typeString.calledOnceWithExactly('-')).toBe(true);
+    expect(robot.keyTap.called).toBe(false);
+  });
+
   it('uses unicode input for special characters on linux', () => {
     const robot = {
       typeString: sandbox.stub(),

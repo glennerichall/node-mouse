@@ -17,7 +17,7 @@ const ALLOWED_MODIFIERS = new Set(['control', 'shift', 'alt', 'command']);
 const DEFAULT_KEYBOARD_DELAY_MS = 20;
 
 function isDirectTypeSafe(character) {
-    return /^[a-zA-Z0-9 ]$/.test(character);
+    return /^[a-zA-Z0-9 -]$/.test(character);
 }
 
 function typeUnicodeCharacter(robot, character) {

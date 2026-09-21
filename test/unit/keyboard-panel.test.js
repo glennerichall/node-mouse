@@ -54,6 +54,10 @@ function createFixture() {
     keyboardCtrl: new FakeElement(),
     keyboardCopy: new FakeElement(),
     keyboardPaste: new FakeElement(),
+    keyboardLeft: new FakeElement(),
+    keyboardUp: new FakeElement(),
+    keyboardDown: new FakeElement(),
+    keyboardRight: new FakeElement(),
     btnTextEntry: new FakeElement(),
     btnLiveKeyboard: new FakeElement(),
     btnSendText: new FakeElement(),
@@ -148,5 +152,19 @@ describe('keyboard panel', () => {
       expect.objectContaining({key: 'c', modifiers: ['control']}),
       expect.objectContaining({key: 'v', modifiers: ['control']}),
     ]);
+  });
+
+  it('provides dedicated arrow keys', () => {
+    const {keyboard, socket} = createFixture();
+
+    keyboard.keyboardLeft.dispatchEvent(new Event('click'));
+    keyboard.keyboardUp.dispatchEvent(new Event('click'));
+    keyboard.keyboardDown.dispatchEvent(new Event('click'));
+    keyboard.keyboardRight.dispatchEvent(new Event('click'));
+
+    const arrowPayloads = socket.emit.mock.calls
+      .filter(([eventName]) => eventName === REMOTE_EVENT_KEYBOARD_KEY)
+      .map(([, payload]) => payload.key);
+    expect(arrowPayloads).toEqual(['left', 'up', 'down', 'right']);
   });
 });

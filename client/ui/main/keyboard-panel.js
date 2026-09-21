@@ -23,6 +23,10 @@ export function bindKeyboardPanel(services, dom) {
     keyboardCtrl,
     keyboardCopy,
     keyboardPaste,
+    keyboardLeft,
+    keyboardUp,
+    keyboardDown,
+    keyboardRight,
     btnTextEntry,
     btnLiveKeyboard,
     btnSendText,
@@ -262,6 +266,10 @@ export function bindKeyboardPanel(services, dom) {
     keyboardCtrl,
     keyboardCopy,
     keyboardPaste,
+    keyboardLeft,
+    keyboardUp,
+    keyboardDown,
+    keyboardRight,
     btnSendText,
   ].forEach(preserveKeyboard);
 
@@ -276,6 +284,10 @@ export function bindKeyboardPanel(services, dom) {
   keyboardCtrl.addEventListener('click', () => toggleModifier('control'));
   keyboardCopy.addEventListener('click', () => pressKeyboardShortcut('c', ['control']));
   keyboardPaste.addEventListener('click', () => pressKeyboardShortcut('v', ['control']));
+  keyboardLeft.addEventListener('click', () => pressKeyboardAction('left'));
+  keyboardUp.addEventListener('click', () => pressKeyboardAction('up'));
+  keyboardDown.addEventListener('click', () => pressKeyboardAction('down'));
+  keyboardRight.addEventListener('click', () => pressKeyboardAction('right'));
 
   textInput.addEventListener('keydown', (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {

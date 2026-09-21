@@ -812,6 +812,14 @@ html[data-theme="light"] #keyboard-shortcuts-bar button[aria-pressed="true"]:act
   gap: 8px;
 }
 
+.keyboard-arrow {
+  min-height: 22px;
+  height: 22px;
+  padding-block: 0;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
 .keyboard-mode.hidden {
   display: none;
 }

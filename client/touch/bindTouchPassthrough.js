@@ -22,6 +22,7 @@ export function bindTouchPassthrough(buttons, touchpad) {
         let startTouch = null;
         let isPassthrough = false;
         let suppressNextClick = false;
+        let suppressNextClickTimer = null;
 
         const resetState = () => {
             activeTouchId = null;
@@ -54,6 +55,7 @@ export function bindTouchPassthrough(buttons, touchpad) {
         };
 
         const onTouchEnd = (event) => {
+            const wasPassthrough = isPassthrough;
             const trackedTouch = getTrackedTouch(event.changedTouches) || getTrackedTouch(event.touches) || startTouch;
             if (isPassthrough && trackedTouch) {
                 event.preventDefault();
@@ -62,6 +64,13 @@ export function bindTouchPassthrough(buttons, touchpad) {
             }
 
             resetState();
+            if (wasPassthrough) {
+                clearTimeout(suppressNextClickTimer);
+                suppressNextClickTimer = setTimeout(() => {
+                    suppressNextClick = false;
+                    suppressNextClickTimer = null;
+                }, 500);
+            }
         };
 
         const onTouchStart = (event) => {
@@ -70,6 +79,9 @@ export function bindTouchPassthrough(buttons, touchpad) {
             }
 
             const touch = event.changedTouches[0];
+            clearTimeout(suppressNextClickTimer);
+            suppressNextClickTimer = null;
+            suppressNextClick = false;
             activeTouchId = touch.identifier;
             startTouch = touch;
             isPassthrough = false;
@@ -81,6 +93,8 @@ export function bindTouchPassthrough(buttons, touchpad) {
             }
 
             suppressNextClick = false;
+            clearTimeout(suppressNextClickTimer);
+            suppressNextClickTimer = null;
             event.preventDefault();
             event.stopImmediatePropagation();
         };
