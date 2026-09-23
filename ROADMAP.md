@@ -1,376 +1,394 @@
-# Roadmap de Remote Mouse
+# Roadmap globale de Remote Mouse
 
-> Feuille de route technique et fonctionnelle pour sécuriser, déployer et faire évoluer Remote Mouse.
+> Feuille de route générale du projet. Les détails propres à l'installation PWA,
+> TLS et aux transports réseau se trouvent dans
+> [ROADMAP-PWA.md](./ROADMAP-PWA.md).
 
 ## Vision
 
 Faire de Remote Mouse une télécommande web :
 
-- simple à installer sur mobile comme Progressive Web App (PWA) ;
+- simple à installer et à utiliser depuis un téléphone, une tablette ou un
+  navigateur ;
 - fluide et fiable sur un réseau local ou à distance ;
-- accessible exclusivement en HTTPS/WSS ;
+- utilisable avec ou sans installation PWA ;
+- compatible avec plusieurs stratégies HTTP, HTTPS, Socket.IO et WebRTC ;
 - sécurisée avant toute exposition à Internet ;
-- facile à installer, mettre à jour, superviser et dépanner ;
-- compatible à terme avec Linux, Windows et macOS.
-
-## État actuel
-
-Le projet possède déjà une base solide :
-
-- interface mobile de contrôle de la souris et du clavier ;
-- commandes navigateur, VLC, système et téléviseur Samsung ;
-- API Express et communication temps réel Socket.IO ;
-- accès initial par QR code et jeton ;
-- persistance SQLite ;
-- manifest PWA, icônes et service worker ;
-- prise en charge directe de HTTPS avec une clé et un certificat fournis ;
-- installateurs Linux et Windows ;
-- reconnexion Socket.IO après la mise en veille du mobile ;
-- 196 tests unitaires et 18 tests navigateur fonctionnels au moment de cette analyse.
-
-La couverture actuelle est d'environ 60 % pour les lignes et 45 % pour les branches.
+- facile à configurer, mettre à jour, sauvegarder et dépanner ;
+- compatible à terme avec Linux, Windows et macOS ;
+- extensible sans dupliquer la logique métier entre API, Socket.IO et les futurs
+  transports.
 
 ## Principes directeurs
 
-1. La sécurité précède l'exposition à Internet.
-2. Le service qui contrôle la souris, le clavier et les applications reste sur le PC contrôlé.
-3. Le serveur tiers ne sert que de point d'entrée TLS et de relais sécurisé.
-4. Le client HTTP, l'API, les flux SSE et Socket.IO utilisent une origine HTTPS unique.
-5. Les fonctions administratives sont séparées des fonctions ordinaires de télécommande.
-6. Toute évolution importante est accompagnée de tests et d'une documentation d'exploitation.
+1. **Préserver le fonctionnement local.** Aucun service Internet ne doit être
+   requis pour utiliser Remote Mouse sur le LAN.
+2. **Rendre les fonctions optionnelles.** PWA, TLS, WebRTC, proxy VPN, VLC et TV
+   doivent pouvoir être activés selon les besoins.
+3. **Séparer métier et transport.** Une commande ne doit pas être réimplémentée
+   pour HTTP, Socket.IO ou WebRTC.
+4. **Préférer les composants interchangeables.** Les stratégies de transport,
+   d'authentification, de découverte et de déploiement doivent être des
+   adaptateurs configurables.
+5. **Sécuriser avant d'exposer.** Une option d'accès distant ne doit jamais
+   affaiblir silencieusement le mode local.
+6. **Mesurer avant d'optimiser.** Latence, pertes, CPU et stabilité doivent être
+   observés sur des appareils réels.
+7. **Tester les plateformes réellement supportées.** L'émulation navigateur ne
+   remplace pas les tests Android, iOS, Linux, Windows et macOS.
 
-## Architecture cible
+## État du projet
 
-### Option recommandée avec serveur tiers
+Le projet propose déjà :
+
+- contrôle de la souris, du clavier et des fenêtres ;
+- raccourcis de navigateurs ;
+- commandes VLC et téléviseur Samsung ;
+- prévisualisation autour du curseur ;
+- interface mobile et préférences locales ;
+- API Express, Socket.IO et SSE ;
+- QR code et jetons d'entrée ;
+- configuration et journaux persistés dans SQLite ;
+- administration, diagnostic et commandes CLI ;
+- installation Linux et Windows ;
+- manifest, icônes et service worker PWA ;
+- HTTP ou HTTPS configurables ;
+- 196 tests unitaires et 18 tests navigateur fonctionnels au moment de cette
+  analyse.
+
+La couverture actuelle est d'environ 60 % pour les lignes et 45 % pour les
+branches.
+
+## Priorités générales
+
+| Priorité | Axe | Résultat attendu |
+| --- | --- | --- |
+| P0 | Sécurité | Corriger les contournements et vulnérabilités avant exposition réseau |
+| P0 | Stabilité | Préserver les commandes fondamentales sur toutes les plateformes supportées |
+| P1 | Architecture | Découpler logique métier, protocoles et déploiements |
+| P1 | Installation | Rendre Linux/Windows fiables et ajouter macOS |
+| P1 | Qualité | CI, tests réseau, couverture ciblée et releases reproductibles |
+| P2 | Expérience | Appareils associés, diagnostics, profils et multi-écrans |
+| P2 | PWA | Offrir plusieurs modes TLS/transport installables en drop-in |
+| P3 | Extensions | Presse-papiers, macros, Wayland et prévisualisation avancée |
+
+## Axe 1 — Sécurité et contrôle d'accès
+
+### Correctifs immédiats
+
+- [ ] Ne plus interpréter directement `X-Forwarded-For` pour accorder un accès
+  local.
+- [ ] Configurer explicitement les proxies de confiance.
+- [ ] Supprimer ou encadrer strictement le bypass d'authentification localhost.
+- [ ] Refuser `SESSION_COOKIE_SECRET=change-me` en production.
+- [ ] Mettre à jour les dépendances présentant des vulnérabilités connues,
+  notamment la chaîne Socket.IO/Engine.IO/WebSocket.
+- [ ] Limiter la taille et la fréquence des requêtes et messages temps réel.
+- [ ] Filtrer jetons, cookies et secrets dans tous les journaux.
+- [ ] Corriger l'écart entre la durée de grâce documentée et configurée des
+  jetons d'entrée.
+
+### Sessions et autorisations
+
+- [ ] Séparer le jeton d'association temporaire de la session d'un appareil.
+- [ ] Ajouter une liste des appareils associés.
+- [ ] Permettre la révocation d'un appareil ou de toutes les sessions.
+- [ ] Séparer les rôles `controller` et `admin`.
+- [ ] Appliquer les mêmes autorisations à HTTP, Socket.IO et WebRTC.
+- [ ] Protéger les écritures HTTP avec vérification Origin et CSRF adaptée.
+- [ ] Ajouter un historique local des associations et révocations.
+
+### Critères de sortie
+
+- aucun en-tête client forgé ne permet un accès local privilégié ;
+- un contrôleur ne peut appeler aucune action administrative ;
+- un appareil révoqué perd immédiatement son accès ;
+- aucune vulnérabilité élevée connue ne subsiste en production.
+
+## Axe 2 — Architecture modulaire
+
+### Logique métier partagée
+
+- [ ] Extraire des handlers réseau un dispatcher de commandes ou des services
+  applicatifs communs.
+- [ ] Faire utiliser les mêmes services par les routes, Socket.IO et les futurs
+  transports.
+- [ ] Définir un format commun de succès, d'erreur et d'accusé de réception.
+- [ ] Versionner le protocole client/serveur.
+- [ ] Éviter que les contrôleurs HTTP et sockets connaissent les détails de
+  RobotJS ou des intégrations externes.
+
+### Adaptateurs configurables
 
 ```text
-Téléphone / PWA
-  HTTPS + WSS
-       │
-       ▼
-Serveur tiers / VPS
-  Caddy :443
-  Certificat TLS automatique
-       │
-       ▼
-Tunnel WireGuard privé
-       │
-       ▼
-PC contrôlé
-  Remote Mouse :3000
-  RobotJS / VLC / navigateurs
+Interface utilisateur
+        │
+        ▼
+Contrat de transport
+├── Socket.IO local
+├── Socket.IO derrière proxy
+└── WebRTC DataChannel
+        │
+        ▼
+Dispatcher de commandes
+├── Souris / clavier
+├── Fenêtres / navigateurs
+├── VLC / TV
+└── Administration
 ```
 
-Le navigateur accède à une adresse stable telle que
-`https://mouse.example.com`. Caddy termine la connexion TLS et transmet les
-requêtes HTTP, SSE et WebSocket au PC à travers WireGuard.
+- [ ] Introduire un contrat de transport client minimal.
+- [ ] Sélectionner le transport à partir de la configuration et des capacités.
+- [ ] Introduire un registre d'adaptateurs de déploiement sans conditions
+  dispersées.
+- [ ] Conserver la compatibilité avec Socket.IO pendant la migration.
+- [ ] Ajouter des tests de contrat exécutables contre chaque transport.
 
-Cette architecture permet de :
+### Configuration système
 
-- conserver toutes les intégrations système sur le PC contrôlé ;
-- ne publier aucun port Remote Mouse directement sur Internet ;
-- automatiser l'émission et le renouvellement du certificat TLS ;
-- chiffrer également le trajet entre le VPS et le PC ;
-- rendre la PWA installable depuis une origine sécurisée reconnue ;
-- conserver Socket.IO sur la même origine, en `wss://`.
+- [ ] Distinguer `LISTEN_HOST`, `PORT`, `PUBLIC_BASE_URL` et les proxies fiables.
+- [ ] Séparer clairement configuration système et configuration fonctionnelle.
+- [ ] Valider la configuration au démarrage avec des erreurs actionnables.
+- [ ] Permettre l'export/import de la configuration non secrète.
+- [ ] Ajouter une commande CLI de diagnostic de configuration.
 
-### Alternative privée simplifiée
+## Axe 3 — Fiabilité et performance
 
-Pour un usage strictement personnel, **Tailscale Serve** constitue une solution
-plus simple : HTTPS automatique, accès limité aux appareils du tailnet et proxy
-local vers Remote Mouse, sans point d'entrée publiquement accessible.
+### Temps réel
 
-Cette option est à privilégier si l'installation de Tailscale sur chaque mobile
-est acceptable. L'option VPS + Caddy + WireGuard reste préférable lorsqu'un nom
-de domaine public et un accès sans client VPN sont nécessaires.
+- [ ] Mesurer la latence des mouvements, clics et frappes.
+- [ ] Regrouper ou abandonner les mouvements devenus obsolètes sous charge.
+- [ ] Gérer explicitement la backpressure.
+- [ ] Améliorer les reconnexions après veille, changement Wi-Fi et redémarrage
+  du serveur.
+- [ ] Rendre les délais et heartbeats configurables par transport.
+- [ ] Ajouter un état de connexion détaillé dans l'interface.
 
-## Risques à traiter en priorité
+### Prévisualisation
 
-### P0 — Bloquants avant exposition réseau
+- [ ] Adapter résolution, fréquence et compression à la bande passante.
+- [ ] Mesurer séparément capture, conversion, transport et rendu.
+- [ ] Suspendre la capture lorsqu'aucun client ne l'affiche.
+- [ ] Prévenir l'accumulation de frames périmées.
+- [ ] Étudier une piste vidéo WebRTC sans l'imposer aux autres modes.
 
-- [ ] Corriger la confiance accordée à `X-Forwarded-For`.
-  Le code ne doit jamais interpréter directement cet en-tête pour autoriser un
-  accès local. Seuls les proxies explicitement approuvés doivent être reconnus.
-- [ ] Supprimer ou fortement encadrer le contournement d'authentification fondé
-  sur l'adresse `127.0.0.1`.
-- [ ] Refuser le démarrage en production lorsque
-  `SESSION_COOKIE_SECRET=change-me`.
-- [ ] Mettre à jour les dépendances de production. L'audit initial a détecté
-  huit alertes, dont trois élevées dans la chaîne Engine.IO, Socket.IO parser et
-  WebSocket.
-- [ ] Séparer le jeton temporaire du QR code de la session persistante créée
-  pour un appareil.
-- [ ] Créer des rôles distincts `controller` et `admin`.
-- [ ] Protéger les routes HTTP d'administration au même niveau que les actions
-  administratives Socket.IO.
-- [ ] Ajouter une validation stricte de l'origine, une protection CSRF pour les
-  écritures et une limitation de débit.
-- [ ] Limiter la taille des corps HTTP et des messages Socket.IO.
-- [ ] Ne jamais écrire les jetons, cookies ou secrets dans les journaux.
+### Cycle de vie
 
-### P1 — Cohérence et fiabilité
+- [ ] Tester arrêt gracieux et destruction des connexions.
+- [ ] Traiter proprement les erreurs de port occupé ou interdit.
+- [ ] Améliorer la reprise après crash du service.
+- [ ] Ajouter des contrôles de santé internes et externes distincts.
+- [ ] Tester les migrations et corruptions SQLite.
 
-- [ ] Aligner la durée de grâce documentée des anciens jetons avec le défaut du
-  code. La documentation indique actuellement 120 minutes tandis que le code
-  utilise une semaine.
-- [ ] Ajouter un véritable hôte d'écoute au serveur Node. `SERVER_HOST` ne
-  détermine actuellement que l'adresse affichée dans les URL.
-- [ ] Distinguer l'adresse d'écoute, l'adresse du backend et l'URL publique.
-- [ ] Ajouter un endpoint de santé interne utilisable par le proxy sans exposer
-  les informations d'administration.
-- [ ] Gérer proprement les erreurs d'écoute du serveur, par exemple un port déjà
-  occupé ou interdit.
+## Axe 4 — Expérience utilisateur
 
-## Jalons
+### Appareils et connexion
 
-### Jalon 0 — Décisions d'architecture
+- [ ] Afficher les appareils associés, leur rôle et leur dernière activité.
+- [ ] Nommer un appareil pendant l'association.
+- [ ] Expliquer précisément les erreurs : serveur absent, session expirée,
+  certificat refusé, permission LAN refusée ou transport indisponible.
+- [ ] Afficher le mode de transport et le chemin réseau actifs.
+- [ ] Fournir une action simple pour réassocier ou révoquer un appareil.
 
-**Objectif :** figer le mode d'accès et les responsabilités de chaque composant.
+### Contrôle
 
-- [ ] Choisir entre VPS + Caddy + WireGuard et Tailscale Serve.
-- [ ] Choisir et réserver le nom de domaine public.
-- [ ] Choisir un VPS proche des utilisateurs afin de limiter la latence.
-- [ ] Définir si l'accès distant doit être public, privé ou limité à certains
-  comptes.
-- [ ] Rédiger une courte décision d'architecture documentant les compromis.
+- [ ] Ajouter le retour haptique configurable.
+- [ ] Créer des profils : général, présentation, multimédia, navigateur et TV.
+- [ ] Permettre de réordonner ou masquer les commandes.
+- [ ] Améliorer la précision du glisser-déposer et du défilement.
+- [ ] Ajouter la gestion de plusieurs écrans.
+- [ ] Ajouter des réglages distincts par appareil client.
 
-**Estimation :** 0,5 à 1 jour.
+### Accessibilité et internationalisation
 
-### Jalon 1 — Durcissement de la sécurité
+- [ ] Tester la navigation clavier et les lecteurs d'écran.
+- [ ] Garantir des zones tactiles et contrastes suffisants.
+- [ ] Respecter `prefers-reduced-motion`.
+- [ ] Vérifier la cohérence des traductions existantes.
+- [ ] Prévoir une stratégie de fallback pour les traductions incomplètes.
 
-**Objectif :** rendre l'application suffisamment sûre pour être placée derrière
-un proxy accessible depuis Internet.
+## Axe 5 — Plateformes et intégrations système
 
-- [ ] Corriger l'identification de l'adresse cliente derrière un proxy.
-- [ ] Introduire une liste explicite de proxies autorisés.
-- [ ] Générer un secret de cookie fort pendant l'installation.
-- [ ] Introduire des sessions propres à chaque appareil.
-- [ ] Ajouter la révocation d'une session ou de tous les appareils.
-- [ ] Ajouter les rôles et autorisations administratives.
-- [ ] Ajouter les protections CSRF, Origin et rate limiting.
-- [ ] Ajouter les en-têtes CSP, HSTS, `X-Content-Type-Options` et une politique
-  de permissions minimale.
-- [ ] Mettre à jour les dépendances et traiter les alertes de sécurité.
-- [ ] Ajouter les tests de non-régression associés à chaque correctif.
+### Linux
 
-**Estimation :** 3 à 5 jours.
+- [ ] Consolider l'installation et le service `systemd --user`.
+- [ ] Documenter X11, DISPLAY, XAUTHORITY et la session graphique.
+- [ ] Étudier Wayland via les portails desktop ou des adaptateurs dédiés.
+- [ ] Détecter clairement les capacités indisponibles.
 
-### Jalon 2 — Compatibilité reverse proxy
+### Windows
 
-**Objectif :** rendre l'application indépendante de l'endroit où TLS est
-terminé.
+- [ ] Tester l'installation sur versions Windows prises en charge.
+- [ ] Fiabiliser le service, PowerShell et les dépendances natives.
+- [ ] Vérifier mise à jour et désinstallation sans résidus.
+- [ ] Signaler les restrictions de session interactive.
 
-Variables de configuration proposées :
+### macOS
 
-```dotenv
-LISTEN_HOST=10.60.0.2
-PORT=3000
-PUBLIC_BASE_URL=https://mouse.example.com
-TRUSTED_PROXY=10.60.0.1
-EXTERNAL_HTTPS=true
-```
+- [ ] Créer un installateur macOS.
+- [ ] Gérer le lancement automatique dans la session utilisateur.
+- [ ] Guider l'autorisation Accessibilité requise pour le contrôle.
+- [ ] Tester AppleScript, fenêtres et navigateurs.
 
-- [ ] Utiliser `LISTEN_HOST` lors de l'appel à `server.listen`.
-- [ ] Utiliser `PUBLIC_BASE_URL` pour le QR code et tous les liens publics.
-- [ ] Marquer les cookies `Secure` lorsque l'origine publique est en HTTPS,
-  même si le backend Node reçoit du HTTP dans le tunnel.
-- [ ] Valider l'en-tête `Host` et l'origine Socket.IO attendue.
-- [ ] Conserver HTTP, API, SSE et Socket.IO sur la même origine.
-- [ ] Tester le comportement avec des en-têtes proxy légitimes et falsifiés.
-- [ ] Tester les cookies et la reconnexion WebSocket derrière Caddy.
+### Intégrations
 
-**Estimation :** 2 à 3 jours.
+- [ ] Renforcer la détection et les erreurs VLC.
+- [ ] Rendre les commandes navigateurs déclaratives et extensibles.
+- [ ] Améliorer la découverte et l'association Samsung TV.
+- [ ] Prévoir un contrat de plugin ou d'adaptateur avant d'ajouter de nouvelles
+  télécommandes.
 
-### Jalon 3 — Déploiement TLS sur serveur tiers
+## Axe 6 — PWA, TLS et modes de déploiement
 
-**Objectif :** fournir une URL HTTPS stable et renouvelée automatiquement.
+Cet axe est détaillé dans [ROADMAP-PWA.md](./ROADMAP-PWA.md).
 
-#### Serveur tiers
+Les modes à préserver ou développer sont :
 
-- [ ] Configurer le DNS de `mouse.example.com` vers le VPS.
-- [ ] Installer Caddy comme service système.
-- [ ] Autoriser uniquement les ports publics 80 et 443 ainsi que le port
-  WireGuard choisi.
-- [ ] Configurer le certificat TLS automatique et la redirection HTTP vers
-  HTTPS.
-- [ ] Configurer le reverse proxy vers l'adresse WireGuard du PC.
-- [ ] Vérifier le passage des connexions WebSocket sans configuration spéciale
-  ou contournement de sécurité.
-- [ ] Activer des journaux structurés avec une durée de rétention limitée.
-- [ ] Superviser Caddy, le tunnel et la disponibilité du backend.
+1. serveur local autonome en HTTP ou HTTPS, sans PWA publique ;
+2. service PWA gratuit avec connexion WebRTC au serveur on-premise ;
+3. PWA et signalisation WebRTC sur le VPS de l'utilisateur ;
+4. PWA sur VPS avec reverse proxy vers le serveur à travers un VPN ;
+5. PWA sur VPS avec relais applicatif par reverse WebSocket initié par le
+   serveur on-premise ;
+6. PWA publique avec HTTPS/WSS direct vers un serveur local certifié.
 
-Exemple minimal de principe :
+### Socle commun attendu
 
-```caddyfile
-mouse.example.com {
-    encode zstd gzip
-    reverse_proxy 10.60.0.2:3000
-}
-```
+- [ ] Produire la PWA comme artefact statique indépendant.
+- [ ] Conserver le serveur local et Socket.IO fonctionnels.
+- [ ] Ajouter WebRTC comme adaptateur optionnel.
+- [ ] Publier les composants auto-hébergeables.
+- [ ] Publier le relais WebSocket custom comme composant optionnel indépendant
+  du proxy VPN.
+- [ ] Ne jamais changer automatiquement de chemin réseau sans l'indiquer.
+- [ ] Tester l'installation Android, iOS et desktop.
+- [ ] Fournir des diagnostics TLS, permission LAN, ICE et proxy.
 
-La configuration de production devra aussi inclure la politique d'en-têtes,
-les journaux, les délais adaptés aux connexions longues et les contrôles de
-santé.
+## Axe 7 — Installation, mises à jour et exploitation
 
-#### PC contrôlé
+### Installation
 
-- [ ] Configurer WireGuard pour initier ou maintenir le tunnel vers le VPS.
-- [ ] Faire écouter Remote Mouse uniquement sur l'interface WireGuard.
-- [ ] Refuser le port applicatif depuis les autres interfaces réseau.
-- [ ] Démarrer Remote Mouse avec la session graphique appropriée.
-- [ ] Sauvegarder le fichier SQLite et la configuration.
-- [ ] Documenter la rotation des clés WireGuard et des secrets applicatifs.
+- [ ] Rendre les scripts idempotents.
+- [ ] Séparer clairement dépendances système, installation npm, configuration
+  et service.
+- [ ] Générer les secrets pendant l'installation.
+- [ ] Ajouter un mode non interactif documenté.
+- [ ] Vérifier les prérequis et afficher les actions correctives.
 
-**Estimation :** 2 à 4 jours.
+### Mise à jour
 
-### Jalon 4 — PWA installable et maintenable
+- [ ] Signer ou vérifier l'origine des artefacts de release.
+- [ ] Séparer vérification, téléchargement, installation et redémarrage.
+- [ ] Prévoir un retour arrière après échec.
+- [ ] Conserver la configuration et la base pendant une mise à jour.
+- [ ] Afficher un historique local des mises à jour.
 
-**Objectif :** offrir une installation fiable sur Android, iOS et ordinateur.
+### Sauvegarde et diagnostic
 
-Le manifest, les icônes et le service worker existent déjà. Ils seront
-conservés et renforcés.
+- [ ] Ajouter export, sauvegarde et restauration SQLite.
+- [ ] Fournir une archive de diagnostic expurgée des secrets.
+- [ ] Ajouter rotation et rétention des journaux.
+- [ ] Exposer version, transport, capacités et santé dans la CLI.
+- [ ] Documenter récupération après base corrompue ou secret perdu.
 
-- [ ] Ajouter un bouton « Installer l'application » avec
-  `beforeinstallprompt` lorsque le navigateur le permet.
-- [ ] Afficher des instructions dédiées à Safari/iOS.
-- [ ] Ajouter un écran hors ligne explicite.
-- [ ] Ne pas laisser croire que les commandes sont utilisables lorsque le
-  serveur est déconnecté.
-- [ ] Générer la version du cache lors de chaque release.
-- [ ] Informer l'utilisateur lorsqu'une nouvelle version est prête.
-- [ ] Ajouter des captures d'écran et des raccourcis au manifest.
-- [ ] Vérifier la zone sûre des icônes `maskable`.
-- [ ] Tester l'installation, la mise à jour, la désinstallation et la
-  reconnexion après mise en veille.
-- [ ] Valider Android/Chrome, iOS/Safari et Chromium desktop.
+## Axe 8 — Qualité et livraison
 
-Les service workers requièrent une origine sécurisée en dehors de `localhost`.
-Le certificat TLS reconnu est donc une condition de cette étape, et pas
-seulement une amélioration facultative.
+### Tests
 
-**Estimation :** 2 à 4 jours.
+- [ ] Ajouter une CI pour tests unitaires et Playwright.
+- [ ] Augmenter d'abord la couverture des zones critiques plutôt qu'un objectif
+  global artificiel.
+- [ ] Ajouter des tests de sécurité pour sessions, rôles et proxies.
+- [ ] Ajouter des tests de contrat pour les transports.
+- [ ] Ajouter des tests d'installation Linux, Windows et macOS.
+- [ ] Tester sur de vrais appareils Android et iOS avant une release PWA.
 
-### Jalon 5 — Industrialisation
+### Outillage et releases
 
-**Objectif :** rendre les releases reproductibles et l'exploitation prévisible.
-
-- [ ] Ajouter une CI exécutant les tests unitaires et Playwright.
-- [ ] Ajouter des tests d'intégration HTTPS/WSS derrière un vrai proxy Caddy.
-- [ ] Fixer les versions de Node.js officiellement prises en charge.
-- [ ] Ajouter un contrôle automatisé des dépendances vulnérables.
-- [ ] Tester l'installation et les services sur Linux et Windows.
-- [ ] Ajouter une procédure de sauvegarde et de restauration SQLite.
-- [ ] Ajouter des diagnostics de tunnel, DNS, certificat et WebSocket à la CLI.
-- [ ] Documenter le déploiement, la mise à jour et le retour arrière.
-- [ ] Définir des objectifs de disponibilité et de latence.
-
-**Estimation :** 3 à 5 jours.
+- [ ] Déclarer les versions Node.js prises en charge.
+- [ ] Ajouter formatage et lint automatiques si leur coût reste raisonnable.
+- [ ] Automatiser l'audit des dépendances.
+- [ ] Générer changelog, artefacts et checksums.
+- [ ] Définir les canaux stable et préversion.
+- [ ] Documenter la compatibilité client/serveur entre versions.
 
 ## Backlog fonctionnel
 
-### Priorité haute
+### Prochaines fonctions
 
-- [ ] **Appareils associés** — nom, rôle, dernière activité et révocation.
-- [ ] **État de connexion détaillé** — serveur indisponible, tunnel interrompu,
-  session expirée ou mise à jour en cours.
-- [ ] **Multi-écrans** — sélection de l'écran et déplacement entre moniteurs.
-- [ ] **Retour haptique** — vibration configurable sur les commandes tactiles.
-- [ ] **Profils de contrôle** — présentation, multimédia, navigation et TV.
+- [ ] Multi-écrans.
+- [ ] Profils de commandes.
+- [ ] Appareils associés et révocation.
+- [ ] Retour haptique.
+- [ ] Presse-papiers bidirectionnel avec consentement explicite.
+- [ ] Macros limitées à des actions autorisées.
+- [ ] Wake-on-LAN lorsqu'un agent local peut émettre le paquet.
+- [ ] Personnalisation de l'interface par appareil.
 
-### Priorité moyenne
+### Explorations
 
-- [ ] **Presse-papiers bidirectionnel** avec consentement explicite.
-- [ ] **Macros sécurisées** limitées à une liste d'actions autorisées.
-- [ ] **Personnalisation des commandes** et de leur disposition.
-- [ ] **Optimisation adaptative de la prévisualisation** selon la bande passante
-  et la latence.
-- [ ] **Wake-on-LAN du PC** lorsque l'architecture réseau le permet.
+- [ ] API de plugins pour de nouvelles télécommandes.
+- [ ] Prévisualisation par piste vidéo WebRTC.
+- [ ] Découverte locale mDNS lorsque les navigateurs le permettent.
+- [ ] Gestion centralisée optionnelle de plusieurs serveurs on-premise.
+- [ ] Paquets natifs ou signatures pour simplifier les permissions système.
 
-### Compatibilité et accessibilité
+## Jalons proposés
 
-- [ ] Étudier un contrôle natif sous Wayland ou via les portails desktop.
-- [ ] Ajouter un installateur et un service macOS.
-- [ ] Tester les lecteurs d'écran et la navigation au clavier.
-- [ ] Ajouter des tailles de contrôle et contrastes configurables.
-- [ ] Réduire les mouvements et animations selon les préférences système.
+### Jalon A — Stabilisation et sécurité
 
-## Stratégie de tests
+- correctifs P0 ;
+- dépendances mises à jour ;
+- sessions et rôles séparés ;
+- tests de sécurité anti-régression.
 
-Chaque jalon doit conserver ou améliorer les garanties existantes.
+### Jalon B — Socle modulaire
 
-### Tests unitaires
+- dispatcher métier partagé ;
+- contrat de transport ;
+- protocole versionné ;
+- configuration d'écoute et d'URL clarifiée.
 
-- configuration publique et hôte d'écoute ;
-- proxies autorisés et adresses clientes falsifiées ;
-- création, expiration et révocation des sessions ;
-- autorisation `controller`/`admin` ;
-- cookies derrière TLS direct et TLS terminé par proxy ;
-- validation Origin/CSRF et limites de taille.
+### Jalon C — Expérience et plateformes
 
-### Tests d'intégration
+- appareils associés ;
+- diagnostics de connexion ;
+- installation Linux/Windows consolidée ;
+- première prise en charge macOS et étude Wayland.
 
-- Caddy vers Remote Mouse à travers le tunnel ;
-- HTTP redirigé vers HTTPS ;
-- API, SSE et Socket.IO via la même origine ;
-- renouvellement ou remplacement du certificat ;
-- perte et reprise du tunnel WireGuard ;
-- redémarrage du backend avec reconnexion du client.
+### Jalon D — PWA multi-déploiement
 
-### Tests navigateur
+- artefact PWA public ;
+- service gratuit WebRTC ;
+- paquet WebRTC auto-hébergeable ;
+- exemple proxy VPN ;
+- relais reverse WebSocket auto-hébergeable ;
+- mode HTTPS/WSS local documenté.
 
-- installation PWA ;
-- démarrage depuis l'icône installée ;
-- mise à jour du service worker ;
-- session persistante après fermeture ;
-- révocation immédiate d'un appareil ;
-- mise en veille et reprise sur mobile ;
-- affichage cohérent en mode hors ligne.
+### Jalon E — Fonctions avancées
 
-## Critères de livraison de la première version distante
+- multi-écrans ;
+- profils ;
+- presse-papiers ;
+- prévisualisation adaptative ;
+- architecture de plugins.
 
-- [ ] Un en-tête `X-Forwarded-For: 127.0.0.1` falsifié ne donne aucun accès.
-- [ ] Le port Node n'est pas accessible depuis Internet.
-- [ ] Le QR code ouvre l'URL HTTPS publique attendue.
-- [ ] Les cookies utilisent `Secure`, `HttpOnly` et une politique `SameSite`
-  documentée.
-- [ ] HTTP, API, SSE et Socket.IO fonctionnent derrière Caddy.
-- [ ] La PWA s'installe et se reconnecte après une mise en veille.
-- [ ] Un appareil révoqué perd immédiatement l'accès.
-- [ ] Un contrôleur ordinaire ne peut exécuter aucune action administrative.
-- [ ] Le certificat TLS est renouvelé automatiquement.
-- [ ] Les sauvegardes et la restauration ont été testées.
-- [ ] Les tests unitaires, d'intégration et navigateur passent dans la CI.
-- [ ] Aucune vulnérabilité élevée connue ne subsiste dans les dépendances de
-  production.
+## Definition of Done d'une évolution
 
-## Ordre de réalisation conseillé
+Une évolution est terminée lorsque :
 
-```text
-Décision d'architecture
-        ↓
-Correctifs de sécurité
-        ↓
-Support du reverse proxy
-        ↓
-Tunnel + Caddy + certificat TLS
-        ↓
-Parcours d'installation PWA
-        ↓
-CI, supervision et sauvegardes
-        ↓
-Nouvelles fonctionnalités
-```
-
-## Documentation de référence
-
-- [Caddy — HTTPS automatique](https://caddyserver.com/docs/automatic-https)
-- [Caddy — reverse proxy et WebSocket](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy)
-- [Tailscale Serve](https://tailscale.com/docs/features/tailscale-serve)
-- [MDN — Service Worker API](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
-- [web.dev — critères d'installation d'une PWA](https://web.dev/articles/install-criteria)
+- la logique métier n'est pas dupliquée entre transports ;
+- les erreurs et limites sont documentées ;
+- les secrets ne sont ni persistés ni journalisés inutilement ;
+- les tests unitaires et d'intégration pertinents passent ;
+- les modes existants restent compatibles ou la rupture est explicitement
+  versionnée ;
+- les scripts d'installation et la documentation sont mis à jour si nécessaire ;
+- le comportement a été vérifié sur les plateformes concernées.
 
 ---
 
-Cette roadmap est un document vivant. Les cases doivent être cochées à partir
-de changements vérifiés et livrés, et non uniquement à partir d'une
-implémentation locale non testée.
+Cette roadmap est un document vivant. Les priorités doivent être réévaluées à
+partir des retours utilisateurs, des mesures de stabilité et des contraintes
+réelles des plateformes.
