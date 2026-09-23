@@ -4,6 +4,9 @@
 > TLS et aux transports réseau se trouvent dans
 > [ROADMAP-PWA.md](./ROADMAP-PWA.md).
 
+Le suivi des tâches en cours et de leur Definition of Done se trouve dans
+[DEVELOPMENT.md](./DEVELOPMENT.md).
+
 ## Vision
 
 Faire de Remote Mouse une télécommande web :
