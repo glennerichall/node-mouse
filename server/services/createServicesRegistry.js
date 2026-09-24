@@ -19,6 +19,7 @@ import {createSseService} from './sse/createSseService.js';
 import {createApplicationDaemonService} from './application/createApplicationDaemonService.js';
 import {createOsService} from './os/index.js';
 import {createSystemService} from './system/createSystemService.js';
+import {createSecurityService} from './security/createSecurityService.js';
 
 
 export function createServicesRegistry() {
@@ -28,6 +29,7 @@ export function createServicesRegistry() {
         createPersistence,
         createOsService,
         createSystemService,
+        createSecurityService,
         createConfigService,
         createSseService,
         createEventStore,

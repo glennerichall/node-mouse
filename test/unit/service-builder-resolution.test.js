@@ -115,23 +115,18 @@ describe('service builders resolve providers only in methods', () => {
   });
 
   it('createSocketSessionAuthMiddleware does not read services during builder creation', () => {
-    const getSystemConfig = jest.fn(() => ({
-      session: {
-        cookieName: 'session',
-      },
+    const authenticateSocket = jest.fn(() => ({
+      allowed: true,
+      reason: 'valid-session',
+      context: {authenticated: true},
     }));
-    const isValid = jest.fn(() => true);
-    const getTokenManager = jest.fn(() => ({
-      isValid,
-    }));
+    const getSecurity = jest.fn(() => ({authenticateSocket}));
 
     const authorizeSocket = createSocketSessionAuthMiddleware({
-      getSystemConfig,
-      getTokenManager,
+      getSecurity,
     });
 
-    expect(getSystemConfig).not.toHaveBeenCalled();
-    expect(getTokenManager).not.toHaveBeenCalled();
+    expect(getSecurity).not.toHaveBeenCalled();
 
     authorizeSocket({
       request: {
@@ -140,9 +135,8 @@ describe('service builders resolve providers only in methods', () => {
       },
     }, jest.fn());
 
-    expect(getSystemConfig).toHaveBeenCalled();
-    expect(getTokenManager).toHaveBeenCalled();
-    expect(isValid).toHaveBeenCalledWith('token-abc');
+    expect(getSecurity).toHaveBeenCalled();
+    expect(authenticateSocket).toHaveBeenCalled();
   });
 
   it('createRotateEntryTokenAction does not read services during builder creation', async () => {

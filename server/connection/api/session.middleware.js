@@ -4,7 +4,6 @@ import {
     PUBSUB_EVENT_SESSION_CREATED,
     PUBSUB_SERVICE_SESSION
 } from '../../services/pubsub/serviceEventConstants.js';
-import {isLocalAddress, resolveClientAddress} from '../../utils/clientAddress.js';
 
 export const createSessionCreationMiddleware = ({
                                                     cookieName,
@@ -29,17 +28,12 @@ export function createSessionGuard(services, {
     onUnauthorized = sendUnauthorizedResponse,
 } = {}) {
     return (req, res, next) => {
-        const tokenManager = services.getTokenManager();
-        const cookieName = services.getSystemConfig().session.cookieName;
-        const clientIp = resolveClientAddress(req, services.getSystemConfig().trustProxy);
-        const allowBypass = isLocalAddress(clientIp);
-
-        const token = req.signedCookies && req.signedCookies[cookieName];
-        if (!allowBypass && !tokenManager.isValid(token)) {
+        const decision = services.getSecurity().authenticateHttp(req);
+        req.securityContext = decision.context;
+        if (!decision.allowed) {
             onUnauthorized(req, res);
             return;
         }
-        req.sessionToken = token;
         next();
     }
 }
@@ -54,9 +48,13 @@ export function createSessionRouter(services) {
             sendUnauthorizedResponse(req, res);
             return;
         }
-        const clientIp = resolveClientAddress(req, services.getSystemConfig().trustProxy);
+        const securityContext = services.getSecurity().createClientContext({
+            transport: 'http',
+            request: req,
+        });
         services.getEvents().publishEvent(PUBSUB_SERVICE_SESSION, PUBSUB_EVENT_SESSION_CREATED, {
-            address: String(clientIp || '').trim(),
+            address: securityContext.clientAddress,
+            correlationId: securityContext.correlationId,
             token,
         });
         res.createSession(token);

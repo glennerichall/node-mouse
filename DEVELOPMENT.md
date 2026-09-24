@@ -22,7 +22,7 @@ la clôture du lot, puis sont déplacées dans le journal des lots terminés.
 | --- | --- |
 | Lot actif | A — Stabilisation et sécurité |
 | Statut | En cours |
-| Prochaine tâche | `SEC-002` — Centraliser l'orchestration de sécurité |
+| Prochaine tâche | `SEC-003` — Garantir un secret de session sûr |
 | Roadmap globale | [ROADMAP.md](./ROADMAP.md) |
 | Roadmap PWA | [ROADMAP-PWA.md](./ROADMAP-PWA.md) |
 
@@ -52,19 +52,19 @@ la clôture du lot, puis sont déplacées dans le journal des lots terminés.
 **Terminé lorsque :** les tests échouent avant le correctif, réussissent après,
 et aucun client direct ne peut se présenter comme localhost.
 
-### SEC-002 — Centraliser l'orchestration de sécurité ➡️
+### SEC-002 — Centraliser l'orchestration de sécurité
 
-- [ ] Définir un contexte de sécurité commun à HTTP et Socket.IO.
-- [ ] Introduire un service de sécurité servant de façade d'orchestration.
-- [ ] Lui confier la résolution des informations clientes, l'authentification et
+- [x] Définir un contexte de sécurité commun à HTTP et Socket.IO.
+- [x] Introduire un service de sécurité servant de façade d'orchestration.
+- [x] Lui confier la résolution des informations clientes, l'authentification et
   la construction des décisions utilisées par les guards.
-- [ ] Conserver les fonctions réseau pures et les gestionnaires de jetons dans
+- [x] Conserver les fonctions réseau pures et les gestionnaires de jetons dans
   des composants spécialisés réutilisables.
-- [ ] Retourner des décisions structurées avec motif de refus et identifiant de
+- [x] Retourner des décisions structurées avec motif de refus et identifiant de
   corrélation, sans exposer de secret.
-- [ ] Réduire les guards HTTP et Socket.IO à l'adaptation de leur transport.
-- [ ] Ajouter des tests de parité entre les décisions HTTP et Socket.IO.
-- [ ] Préparer les points d'extension pour les sessions d'appareil, les rôles,
+- [x] Réduire les guards HTTP et Socket.IO à l'adaptation de leur transport.
+- [x] Ajouter des tests de parité entre les décisions HTTP et Socket.IO.
+- [x] Préparer les points d'extension pour les sessions d'appareil, les rôles,
   WebRTC et la journalisation des événements de sécurité.
 
 **Terminé lorsque :** HTTP et Socket.IO construisent le même contexte client et
@@ -72,7 +72,7 @@ obtiennent leurs décisions d'authentification du service partagé, tandis que l
 cryptographie, les jetons et la résolution réseau restent des composants
 spécialisés testables indépendamment.
 
-### SEC-003 — Garantir un secret de session sûr
+### SEC-003 — Garantir un secret de session sûr ➡️
 
 - [ ] Définir le comportement attendu en développement, test et production.
 - [ ] Refuser le démarrage en production avec le secret `change-me`.

@@ -61,7 +61,7 @@ export function bootstrapApi(services) {
     app.use(createSessionGuard(services));
     
     app.get('/', (req, res, next) => {
-        if (req.sessionToken) {
+        if (req.securityContext?.authenticationMethod === 'session') {
             res.createSession(getTokenManager().getToken());
         }
         next();

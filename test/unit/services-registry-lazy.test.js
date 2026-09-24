@@ -45,6 +45,7 @@ const createSseService = jest.fn(() => ({}));
 const createApplicationDaemonService = jest.fn(() => ({}));
 const createOsService = jest.fn(() => ({}));
 const createSystemService = jest.fn(() => ({}));
+const createSecurityService = jest.fn(() => ({}));
 
 jest.unstable_mockModule('../../server/services/persistence/index.js', () => ({
   createPersistence,
@@ -126,6 +127,10 @@ jest.unstable_mockModule('../../server/services/system/createSystemService.js', 
   createSystemService,
 }));
 
+jest.unstable_mockModule('../../server/services/security/createSecurityService.js', () => ({
+  createSecurityService,
+}));
+
 describe('createServicesRegistry', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -141,6 +146,7 @@ describe('createServicesRegistry', () => {
     expect(typeof services.getServer).toBe('function');
     expect(typeof services.getRobot).toBe('function');
     expect(typeof services.getQrOverlay).toBe('function');
+    expect(typeof services.getSecurity).toBe('function');
     expect(typeof services.initializeCoreServices).toBe('undefined');
     expect(services.getRobot()).toEqual({});
     expect(services.getQrOverlay()).toEqual({});
@@ -165,5 +171,6 @@ describe('createServicesRegistry', () => {
     expect(createApplicationDaemonService).not.toHaveBeenCalled();
     expect(createOsService).not.toHaveBeenCalled();
     expect(createSystemService).not.toHaveBeenCalled();
+    expect(createSecurityService).not.toHaveBeenCalled();
   });
 });

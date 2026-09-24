@@ -1,5 +1,6 @@
 import sinon from 'sinon';
 import {createSocketSessionAuthMiddleware} from '../../server/connection/socket/createSocketSessionAuthMiddleware.js';
+import {createSecurityService} from '../../server/services/security/createSecurityService.js';
 
 describe('createSocketSessionAuthMiddleware', () => {
   let sandbox;
@@ -13,7 +14,7 @@ describe('createSocketSessionAuthMiddleware', () => {
   });
 
   function createServices({isValid = () => false, cookieName = 'session', trustProxy = ''} = {}) {
-    return {
+    const services = {
       getSystemConfig: () => ({
         trustProxy,
         session: {
@@ -24,6 +25,8 @@ describe('createSocketSessionAuthMiddleware', () => {
         isValid,
       }),
     };
+    services.getSecurity = () => createSecurityService(services);
+    return services;
   }
 
   it('allows localhost socket without cookie', () => {
@@ -62,6 +65,8 @@ describe('createSocketSessionAuthMiddleware', () => {
     expect(next.firstCall.args[0].data).toEqual({
       code: 'ENTRY_TOKEN_INVALID',
       message: 'Rescannez le code QR du serveur.',
+      reason: 'invalid-session',
+      correlationId: expect.any(String),
     });
   });
 
@@ -83,7 +88,7 @@ describe('createSocketSessionAuthMiddleware', () => {
     expect(next.firstCall.args[0]).toBeInstanceOf(Error);
   });
 
-  it('accepts remote authorized socket and sets sessionToken', () => {
+  it('accepts remote authorized socket and sets its security context', () => {
     const isValid = sandbox.stub().returns(true);
     const authorizeSocket = createSocketSessionAuthMiddleware(createServices({isValid}));
     const next = sandbox.stub();
@@ -97,7 +102,12 @@ describe('createSocketSessionAuthMiddleware', () => {
     authorizeSocket(socket, next);
 
     expect(next.calledOnceWithExactly()).toBe(true);
-    expect(socket.sessionToken).toBe('token-abc');
+    expect(socket.securityContext).toEqual(expect.objectContaining({
+      authenticated: true,
+      authenticationMethod: 'session',
+      clientAddress: '10.0.0.8',
+      transport: 'socket.io',
+    }));
   });
 
   it('uses x-forwarded-for when the direct peer is a trusted proxy', () => {

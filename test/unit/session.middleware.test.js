@@ -3,6 +3,14 @@ import {
   createSessionRouter,
   createSessionGuard,
 } from '../../server/connection/api/session.middleware.js';
+import {createSecurityService} from '../../server/services/security/createSecurityService.js';
+
+function withSecurity(services) {
+  return {
+    ...services,
+    getSecurity: () => createSecurityService(services),
+  };
+}
 
 function createResponseSpy() {
   const state = {
@@ -41,14 +49,14 @@ describe('createSessionValidationMiddleware', () => {
   it('bypasses auth for localhost request', () => {
     const isValid = sandbox.stub().returns(false);
     const getTokenManager = sandbox.stub().returns({isValid});
-    const middleware = createSessionGuard({
+    const middleware = createSessionGuard(withSecurity({
       getTokenManager,
       getSystemConfig: () => ({
         session: {
           cookieName: 'session',
         },
       }),
-    });
+    }));
 
     const req = {
       ip: '127.0.0.1',
@@ -62,7 +70,7 @@ describe('createSessionValidationMiddleware', () => {
 
     middleware(req, res, next);
 
-    expect(getTokenManager.calledOnce).toBe(true);
+    expect(getTokenManager.called).toBe(false);
     expect(next.calledOnce).toBe(true);
     expect(isValid.called).toBe(false);
     expect(res.state.statusCode).toBeNull();
@@ -71,14 +79,14 @@ describe('createSessionValidationMiddleware', () => {
   it('rejects remote unauthorized request', () => {
     const isValid = sandbox.stub().returns(false);
     const getTokenManager = sandbox.stub().returns({isValid});
-    const middleware = createSessionGuard({
+    const middleware = createSessionGuard(withSecurity({
       getTokenManager,
       getSystemConfig: () => ({
         session: {
           cookieName: 'session',
         },
       }),
-    });
+    }));
 
     const req = {
       ip: '10.0.0.12',
@@ -102,10 +110,10 @@ describe('createSessionValidationMiddleware', () => {
 
   it('rejects a direct remote request spoofing localhost through x-forwarded-for', () => {
     const isValid = sandbox.stub().returns(false);
-    const middleware = createSessionGuard({
+    const middleware = createSessionGuard(withSecurity({
       getTokenManager: () => ({isValid}),
       getSystemConfig: () => ({session: {cookieName: 'session'}}),
-    });
+    }));
     const req = {
       ip: '10.0.0.12',
       headers: {'x-forwarded-for': '127.0.0.1'},
@@ -122,17 +130,17 @@ describe('createSessionValidationMiddleware', () => {
     expect(res.state.statusCode).toBe(401);
   });
 
-  it('accepts remote valid request and sets req.sessionToken', () => {
+  it('accepts a remote valid request and sets its security context', () => {
     const isValid = sandbox.stub().returns(true);
     const getTokenManager = sandbox.stub().returns({isValid});
-    const middleware = createSessionGuard({
+    const middleware = createSessionGuard(withSecurity({
       getTokenManager,
       getSystemConfig: () => ({
         session: {
           cookieName: 'session',
         },
       }),
-    });
+    }));
 
     const req = {
       ip: '10.0.0.12',
@@ -148,20 +156,25 @@ describe('createSessionValidationMiddleware', () => {
 
     expect(getTokenManager.calledOnce).toBe(true);
     expect(next.calledOnce).toBe(true);
-    expect(req.sessionToken).toBe('token-123');
+    expect(req.securityContext).toEqual(expect.objectContaining({
+      authenticated: true,
+      authenticationMethod: 'session',
+      clientAddress: '10.0.0.12',
+      transport: 'http',
+    }));
   });
 
   it('returns friendly html page for browser unauthorized request', () => {
     const isValid = sandbox.stub().returns(false);
     const getTokenManager = sandbox.stub().returns({isValid});
-    const middleware = createSessionGuard({
+    const middleware = createSessionGuard(withSecurity({
       getTokenManager,
       getSystemConfig: () => ({
         session: {
           cookieName: 'session',
         },
       }),
-    });
+    }));
 
     const req = {
       ip: '10.0.0.12',
@@ -198,7 +211,7 @@ describe('createSessionRouter', () => {
   it('redirects browser entry requests after creating the session', () => {
     const isValid = sandbox.stub().withArgs('token-123').returns(true);
     const getTokenManager = sandbox.stub().returns({isValid});
-    const router = createSessionRouter({
+    const services = {
       getEvents: () => ({
         publishEvent: sandbox.stub(),
       }),
@@ -208,7 +221,8 @@ describe('createSessionRouter', () => {
           cookieName: 'session',
         },
       }),
-    });
+    };
+    const router = createSessionRouter(withSecurity(services));
     const layer = router.stack.find((entry) => entry.route?.path === '/:token' && entry.route.methods.get);
     const handler = layer.route.stack[0].handle;
     const req = {
