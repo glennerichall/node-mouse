@@ -21,8 +21,8 @@ la clôture du lot, puis sont déplacées dans le journal des lots terminés.
 | Élément | Valeur |
 | --- | --- |
 | Lot actif | A — Stabilisation et sécurité |
-| Statut | Prêt à démarrer |
-| Prochaine tâche | `SEC-001` — Sécuriser l'adresse cliente |
+| Statut | En cours |
+| Prochaine tâche | `SEC-002` — Centraliser l'orchestration de sécurité |
 | Roadmap globale | [ROADMAP.md](./ROADMAP.md) |
 | Roadmap PWA | [ROADMAP-PWA.md](./ROADMAP-PWA.md) |
 
@@ -37,22 +37,42 @@ la clôture du lot, puis sont déplacées dans le journal des lots terminés.
 
 ## Lot A — Stabilisation et sécurité
 
-### SEC-001 — Sécuriser l'adresse cliente ➡️
+### SEC-001 — Sécuriser l'adresse cliente
 
-- [ ] Écrire un test démontrant qu'un client peut falsifier
+- [x] Écrire un test démontrant qu'un client peut falsifier
   `X-Forwarded-For: 127.0.0.1` dans l'implémentation actuelle.
-- [ ] Supprimer la lecture directe de `X-Forwarded-For` dans les guards HTTP et
+- [x] Supprimer la lecture directe de `X-Forwarded-For` dans les guards HTTP et
   Socket.IO.
-- [ ] Définir une configuration explicite des proxies de confiance.
-- [ ] Utiliser une source unique pour résoudre l'adresse cliente.
-- [ ] Tester les connexions directes, proxifiées, IPv4 et IPv6.
-- [ ] Vérifier qu'un en-tête falsifié ne contourne plus l'authentification.
-- [ ] Documenter la configuration derrière proxy.
+- [x] Définir une configuration explicite des proxies de confiance.
+- [x] Utiliser une source unique pour résoudre l'adresse cliente.
+- [x] Tester les connexions directes, proxifiées, IPv4 et IPv6.
+- [x] Vérifier qu'un en-tête falsifié ne contourne plus l'authentification.
+- [x] Documenter la configuration derrière proxy.
 
 **Terminé lorsque :** les tests échouent avant le correctif, réussissent après,
 et aucun client direct ne peut se présenter comme localhost.
 
-### SEC-002 — Garantir un secret de session sûr
+### SEC-002 — Centraliser l'orchestration de sécurité ➡️
+
+- [ ] Définir un contexte de sécurité commun à HTTP et Socket.IO.
+- [ ] Introduire un service de sécurité servant de façade d'orchestration.
+- [ ] Lui confier la résolution des informations clientes, l'authentification et
+  la construction des décisions utilisées par les guards.
+- [ ] Conserver les fonctions réseau pures et les gestionnaires de jetons dans
+  des composants spécialisés réutilisables.
+- [ ] Retourner des décisions structurées avec motif de refus et identifiant de
+  corrélation, sans exposer de secret.
+- [ ] Réduire les guards HTTP et Socket.IO à l'adaptation de leur transport.
+- [ ] Ajouter des tests de parité entre les décisions HTTP et Socket.IO.
+- [ ] Préparer les points d'extension pour les sessions d'appareil, les rôles,
+  WebRTC et la journalisation des événements de sécurité.
+
+**Terminé lorsque :** HTTP et Socket.IO construisent le même contexte client et
+obtiennent leurs décisions d'authentification du service partagé, tandis que la
+cryptographie, les jetons et la résolution réseau restent des composants
+spécialisés testables indépendamment.
+
+### SEC-003 — Garantir un secret de session sûr
 
 - [ ] Définir le comportement attendu en développement, test et production.
 - [ ] Refuser le démarrage en production avec le secret `change-me`.
@@ -64,7 +84,7 @@ et aucun client direct ne peut se présenter comme localhost.
 **Terminé lorsque :** une installation neuve possède un secret unique et une
 configuration de production faible ne peut pas démarrer silencieusement.
 
-### SEC-003 — Mettre à jour les dépendances vulnérables
+### SEC-004 — Mettre à jour les dépendances vulnérables
 
 - [ ] Sauvegarder le résultat de l'audit avant modification dans le compte rendu
   du lot.
@@ -78,7 +98,7 @@ configuration de production faible ne peut pas démarrer silencieusement.
 **Terminé lorsque :** l'audit de production ne contient plus d'alerte élevée et
 les transports existants restent fonctionnels.
 
-### SEC-004 — Séparer association et session
+### SEC-005 — Séparer association et session
 
 - [ ] Définir le cycle de vie du jeton d'association.
 - [ ] Définir le modèle d'une session d'appareil.
@@ -90,7 +110,7 @@ les transports existants restent fonctionnels.
 **Terminé lorsque :** un jeton QR est temporaire, chaque appareil possède une
 session révocable et la rotation d'un jeton ne produit pas d'accès imprévisible.
 
-### SEC-005 — Introduire les rôles d'accès
+### SEC-006 — Introduire les rôles d'accès
 
 - [ ] Définir les permissions `controller` et `admin`.
 - [ ] Centraliser l'autorisation dans un service partagé.
@@ -102,7 +122,7 @@ session révocable et la rotation d'un jeton ne produit pas d'accès imprévisib
 **Terminé lorsque :** une session `controller` ne peut modifier la
 configuration, redémarrer le service ou installer une mise à jour.
 
-### SEC-006 — Limiter et valider les entrées
+### SEC-007 — Limiter et valider les entrées
 
 - [ ] Définir les limites des corps HTTP.
 - [ ] Définir les limites des messages Socket.IO.

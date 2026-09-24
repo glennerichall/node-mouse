@@ -17,6 +17,7 @@ import {createAdminApiRouter} from "./createAdminApiRouter.js";
 import { createRemotesRouter } from '../connection/api/remotes.router.js';
 import {readPackageVersion} from '../utils/env.js';
 import {createLogger} from '../application/logger.js';
+import {createProxyTrust} from '../utils/clientAddress.js';
 
 const packageJsonPath = path.join(projectRoot, 'package.json');
 
@@ -44,7 +45,7 @@ export function bootstrapApi(services) {
     if (!systemConfig.https.enabled) {
         log.warn('HTTPS=false: cookie session envoyé sans attribut Secure (moins sécuritaire).');
     }
-    app.set('trust proxy', 'loopback');
+    app.set('trust proxy', createProxyTrust(systemConfig.trustProxy));
     
     app.use(cookieParser);
 

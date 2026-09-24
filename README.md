@@ -289,6 +289,15 @@ Notes:
 
 Startup configuration is handled through a `.env` file. Instead of duplicating every environment variable here, use [`.env.example`](./.env.example) as the reference.
 
+### Reverse proxy
+
+Forwarded client addresses are ignored by default. When Remote Mouse runs behind
+a reverse proxy, set `TRUST_PROXY` to the proxy IP or subnet (multiple values are
+comma-separated). For a proxy on the same machine, use `TRUST_PROXY=loopback`.
+The proxy must replace, rather than append to, client-supplied forwarding headers.
+Never trust a subnet containing untrusted clients: a trusted proxy can affect the
+localhost authentication bypass as well as the address recorded for sessions.
+
 ### Access and Administration
 
 Useful server pages:

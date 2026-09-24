@@ -59,6 +59,13 @@ Demander ou utiliser :
     - Fournir la commande pour exécuter le test unitaire si elle est connue.
     - Sinon, indiquer clairement le test à lancer dans le framework utilisé.
 
+7. **Suggérer un message de commit**
+    - À la fin de chaque passe de développement, proposer un court message de
+      commit décrivant le résultat obtenu.
+    - Adapter la langue et le style aux conventions du dépôt lorsqu'elles sont
+      connues.
+    - Ne pas créer le commit sauf si l'utilisateur le demande explicitement.
+
 ## Format de réponse recommandé
 
 ### Problème identifié
@@ -67,3 +74,10 @@ Décrire brièvement la cause du bug.
 ### Correction
 ```code
 // code corrigé ici
+```
+
+### Vérification
+Indiquer les tests exécutés ou la commande à lancer.
+
+### Commit suggéré
+Proposer un message court et précis.

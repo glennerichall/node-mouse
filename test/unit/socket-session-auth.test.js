@@ -12,9 +12,10 @@ describe('createSocketSessionAuthMiddleware', () => {
     sandbox.restore();
   });
 
-  function createServices({isValid = () => false, cookieName = 'session'} = {}) {
+  function createServices({isValid = () => false, cookieName = 'session', trustProxy = ''} = {}) {
     return {
       getSystemConfig: () => ({
+        trustProxy,
         session: {
           cookieName,
         },
@@ -64,6 +65,24 @@ describe('createSocketSessionAuthMiddleware', () => {
     });
   });
 
+  it('rejects a direct remote socket spoofing localhost through x-forwarded-for', () => {
+    const isValid = sandbox.stub().returns(false);
+    const authorizeSocket = createSocketSessionAuthMiddleware(createServices({isValid}));
+    const next = sandbox.stub();
+    const socket = {
+      request: {
+        headers: {'x-forwarded-for': '127.0.0.1'},
+        socket: {remoteAddress: '10.0.0.8'},
+        signedCookies: {},
+      },
+    };
+
+    authorizeSocket(socket, next);
+
+    expect(isValid.calledOnce).toBe(true);
+    expect(next.firstCall.args[0]).toBeInstanceOf(Error);
+  });
+
   it('accepts remote authorized socket and sets sessionToken', () => {
     const isValid = sandbox.stub().returns(true);
     const authorizeSocket = createSocketSessionAuthMiddleware(createServices({isValid}));
@@ -81,9 +100,12 @@ describe('createSocketSessionAuthMiddleware', () => {
     expect(socket.sessionToken).toBe('token-abc');
   });
 
-  it('prefers x-forwarded-for over socket remoteAddress', () => {
+  it('uses x-forwarded-for when the direct peer is a trusted proxy', () => {
     const isValid = sandbox.stub().returns(true);
-    const authorizeSocket = createSocketSessionAuthMiddleware(createServices({isValid}));
+    const authorizeSocket = createSocketSessionAuthMiddleware(createServices({
+      isValid,
+      trustProxy: 'loopback',
+    }));
     const next = sandbox.stub();
     const socket = {
       request: {

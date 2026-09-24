@@ -1,16 +1,4 @@
-function isLocalAddress(value) {
-    const address = String(value || '').toLowerCase();
-    return (
-        address === '127.0.0.1'
-        || address === '::1'
-        || address === '::ffff:127.0.0.1'
-    );
-}
-
-function getForwardedFor(request) {
-    const raw = String(request?.headers?.['x-forwarded-for'] || '').split(',')[0].trim();
-    return raw || null;
-}
+import {isLocalAddress, resolveClientAddress} from '../../utils/clientAddress.js';
 
 export function createSocketSessionAuthMiddleware(services) {
     function createUnauthorizedError() {
@@ -23,14 +11,13 @@ export function createSocketSessionAuthMiddleware(services) {
     }
 
     function authorizeSocket(socket, next) {
-        const forwarded = getForwardedFor(socket.request);
-        const remoteAddress = forwarded || socket.request?.socket?.remoteAddress;
+        const systemConfig = services.getSystemConfig();
+        const remoteAddress = resolveClientAddress(socket.request, systemConfig.trustProxy);
         if (isLocalAddress(remoteAddress)) {
             next();
             return;
         }
 
-        const systemConfig = services.getSystemConfig();
         const tokenManager = services.getTokenManager();
         const cookieName = systemConfig.session.cookieName;
 

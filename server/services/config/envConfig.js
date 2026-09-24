@@ -8,6 +8,7 @@ export function getEnvConfig() {
     return {
         port: readOptionalNumber('PORT'),
         serverHost: readOptionalString('SERVER_HOST'),
+        trustProxy: readOptionalString('TRUST_PROXY'),
         entryPath: {
             enabled: readOptionalBoolean('ENTRY_PATH_ENABLED'),
             fixed: readOptionalString('ENTRY_PATH_FIXED'),

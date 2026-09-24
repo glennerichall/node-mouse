@@ -4,20 +4,7 @@ import {
     PUBSUB_EVENT_SESSION_CREATED,
     PUBSUB_SERVICE_SESSION
 } from '../../services/pubsub/serviceEventConstants.js';
-
-function isLocalAddress(value) {
-    const address = String(value || '').toLowerCase();
-    return (
-        address === '127.0.0.1'
-        || address === '::1'
-        || address === '::ffff:127.0.0.1'
-    );
-}
-
-function getForwardedFor(req) {
-    const raw = String(req.headers?.['x-forwarded-for'] || '').split(',')[0].trim();
-    return raw || null;
-}
+import {isLocalAddress, resolveClientAddress} from '../../utils/clientAddress.js';
 
 export const createSessionCreationMiddleware = ({
                                                     cookieName,
@@ -44,8 +31,7 @@ export function createSessionGuard(services, {
     return (req, res, next) => {
         const tokenManager = services.getTokenManager();
         const cookieName = services.getSystemConfig().session.cookieName;
-        const forwarded = getForwardedFor(req);
-        const clientIp = forwarded || req.ip || req.socket?.remoteAddress;
+        const clientIp = resolveClientAddress(req, services.getSystemConfig().trustProxy);
         const allowBypass = isLocalAddress(clientIp);
 
         const token = req.signedCookies && req.signedCookies[cookieName];
@@ -68,8 +54,7 @@ export function createSessionRouter(services) {
             sendUnauthorizedResponse(req, res);
             return;
         }
-        const forwarded = getForwardedFor(req);
-        const clientIp = forwarded || req.ip || req.socket?.remoteAddress || '';
+        const clientIp = resolveClientAddress(req, services.getSystemConfig().trustProxy);
         services.getEvents().publishEvent(PUBSUB_SERVICE_SESSION, PUBSUB_EVENT_SESSION_CREATED, {
             address: String(clientIp || '').trim(),
             token,

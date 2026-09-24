@@ -100,6 +100,28 @@ describe('createSessionValidationMiddleware', () => {
     expect(res.state.body).toBe('Unauthorized');
   });
 
+  it('rejects a direct remote request spoofing localhost through x-forwarded-for', () => {
+    const isValid = sandbox.stub().returns(false);
+    const middleware = createSessionGuard({
+      getTokenManager: () => ({isValid}),
+      getSystemConfig: () => ({session: {cookieName: 'session'}}),
+    });
+    const req = {
+      ip: '10.0.0.12',
+      headers: {'x-forwarded-for': '127.0.0.1'},
+      socket: {remoteAddress: '10.0.0.12'},
+      signedCookies: {},
+    };
+    const res = createResponseSpy();
+    const next = sandbox.stub();
+
+    middleware(req, res, next);
+
+    expect(next.called).toBe(false);
+    expect(isValid.calledOnce).toBe(true);
+    expect(res.state.statusCode).toBe(401);
+  });
+
   it('accepts remote valid request and sets req.sessionToken', () => {
     const isValid = sandbox.stub().returns(true);
     const getTokenManager = sandbox.stub().returns({isValid});
