@@ -95,8 +95,8 @@ branches.
 - [x] Refuser un secret de session par défaut ou trop court en production.
 - [x] Mettre à jour les dépendances présentant des vulnérabilités élevées,
   notamment la chaîne Socket.IO/Engine.IO/WebSocket.
-- [ ] Limiter la taille et la fréquence des requêtes et messages temps réel.
-- [ ] Filtrer jetons, cookies et secrets dans tous les journaux.
+- [x] Limiter la taille et la fréquence des requêtes et messages temps réel.
+- [x] Filtrer jetons, cookies et secrets des journaux structurés.
 - [ ] Corriger l'écart entre la durée de grâce documentée et configurée des
   jetons d'entrée.
 
@@ -111,18 +111,18 @@ branches.
   les sessions jumelées; accès loopback administrateur).
 - [x] Appliquer les mêmes autorisations à HTTP et Socket.IO via le service
   d'autorisation commun; WebRTC pourra réutiliser son contrat.
-- [ ] Protéger les écritures HTTP avec vérification Origin et CSRF adaptée.
+- [x] Protéger les écritures HTTP avec vérification Origin et CSRF adaptée.
 - [ ] Ajouter un historique local des associations et révocations.
 
 ### Critères de sortie
 
 - [x] Aucun en-tête client forgé ne permet un accès local privilégié.
-- [ ] Un contrôleur ne peut appeler aucune action administrative.
+- [x] Un contrôleur ne peut appeler aucune action administrative.
 - [x] Un appareil révoqué perd immédiatement son accès.
 - [x] Aucune vulnérabilité élevée connue ne subsiste en production.
 
-La prochaine itération est `SEC-007` : limiter et valider les entrées HTTP et
-Socket.IO, notamment les tailles, le débit, les origines et la protection CSRF.
+La prochaine itération est `SEC-008` : gérer les appareils associés et
+permettre à un administrateur de révoquer leurs sessions.
 
 ## Axe 2 — Architecture modulaire
 

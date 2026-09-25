@@ -5,6 +5,7 @@ import {getPublicUrl} from '../../utils/network.js';
 import cookieParser from "cookie-parser";
 import {createHttpsServer} from "./createHttpsServer.js";
 import {createLogger} from '../../application/logger.js';
+import {isOriginAllowed} from '../../connection/security/origin.js';
 
 export function createServer(services) {
     const log = createLogger('server:create');
@@ -22,7 +23,20 @@ export function createServer(services) {
         : http.createServer(app);
     const sockets = new Set();
 
-    const io = new Server(server, {});
+    const io = new Server(server, {
+        maxHttpBufferSize: 64 * 1024,
+        cors: {origin: true, credentials: true},
+        allowRequest: (request, callback) => {
+            const origin = request.headers?.origin;
+            if (!origin) {
+                callback(null, true);
+                return;
+            }
+            const host = request.headers?.host;
+            const expectedOrigin = host ? `${config.protocol}://${host}` : '';
+            callback(null, isOriginAllowed(origin, expectedOrigin, config.allowedOrigins));
+        },
+    });
     log.debug({
         protocol: config.protocol,
         port: config.port,

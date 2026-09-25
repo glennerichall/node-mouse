@@ -366,9 +366,11 @@ insuffisante.
   `controller`, accès loopback en `admin`).
 - [x] Protéger les actions administratives via HTTP et Socket.IO avec un
   service d'autorisation partagé.
-- [ ] Limiter la taille et le rythme des messages entrants.
-- [ ] Ne jamais écrire les offres WebRTC, candidats ICE, jetons, cookies ou
-  secrets dans les journaux.
+- [x] Limiter la taille et le rythme des messages entrants.
+- [x] Filtrer jetons, cookies et secrets des journaux structurés.
+- [ ] Ne jamais écrire les offres WebRTC ni candidats ICE dans les journaux
+  lorsque la signalisation sera ajoutée.
+- [x] Valider Origin et protéger les écritures HTTP contre les requêtes CSRF.
 
 ### P1 — Cohérence et fiabilité
 
@@ -671,7 +673,7 @@ protocole custom augmente la surface de code critique à maintenir.
 - [ ] Le canal WebRTC fonctionne sur Android et iOS réels.
 - [ ] Les commandes temps réel et fiables utilisent les canaux appropriés.
 - [ ] Un appareil révoqué perd immédiatement l'accès.
-- [ ] Un contrôleur ordinaire ne peut exécuter aucune action administrative.
+- [x] Un contrôleur ordinaire ne peut exécuter aucune action administrative.
 - [ ] Les tests unitaires, d'intégration et navigateur passent dans la CI.
 - [ ] Aucune vulnérabilité élevée connue ne subsiste dans les dépendances de
   production.

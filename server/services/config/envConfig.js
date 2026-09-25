@@ -9,6 +9,10 @@ export function getEnvConfig() {
         port: readOptionalNumber('PORT'),
         serverHost: readOptionalString('SERVER_HOST'),
         trustProxy: readOptionalString('TRUST_PROXY'),
+        allowedOrigins: readOptionalString('ALLOWED_ORIGINS')
+            ?.split(',')
+            .map((origin) => origin.trim())
+            .filter(Boolean),
         entryPath: {
             enabled: readOptionalBoolean('ENTRY_PATH_ENABLED'),
             fixed: readOptionalString('ENTRY_PATH_FIXED'),

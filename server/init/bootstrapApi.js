@@ -2,7 +2,6 @@ import {staticShareRouter} from '../connection/api/client.router.js';
 import path from 'node:path';
 import {projectRoot} from '../utils/paths.js';
 import {
-    sessionGuardMiddleware,
     sessionManagementRouter,
     sessionRouter,
 } from '../connection/api/session.middleware.js';
@@ -14,6 +13,8 @@ import {readPackageVersion} from '../utils/env.js';
 import {createLogger} from '../application/logger.js';
 import {createProxyTrust} from '../utils/clientAddress.js';
 import {createRequestScopeMiddleware} from '../connection/api/request-scope.middleware.js';
+import {createHttpErrorMiddleware} from '../connection/api/http-input.middleware.js';
+import {securityIngressRouter, securityRouter} from '../connection/api/security.router.js';
 
 const packageJsonPath = path.join(projectRoot, 'package.json');
 
@@ -46,11 +47,10 @@ export function bootstrapApi(services) {
     app.set('trust proxy', createProxyTrust(systemConfig.trustProxy));
 
     app.use(cookieParser);
-
+    app.use(securityIngressRouter);
     app.use('/api/sessions', sessionRouter);
 
-
-    app.use(sessionGuardMiddleware);
+    app.use(securityRouter);
     app.use('/api/sessions', sessionManagementRouter);
 
     app.use(staticShareRouter);
@@ -67,4 +67,6 @@ export function bootstrapApi(services) {
             version: readPackageVersion(packageJsonPath),
         });
     });
+
+    app.use(createHttpErrorMiddleware({log}));
 }

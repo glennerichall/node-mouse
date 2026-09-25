@@ -313,6 +313,14 @@ The proxy must replace, rather than append to, client-supplied forwarding header
 Never trust a subnet containing untrusted clients: a trusted proxy can affect the
 localhost authentication bypass as well as the address recorded for sessions.
 
+Same-origin browser requests are allowed by default. If a separately hosted PWA
+needs to call this server, set `ALLOWED_ORIGINS` to its exact origin (or a
+comma-separated list of exact origins), including the scheme and port when
+non-default. Wildcard origins are not supported; this setting permits credentialed
+browser requests and should only contain trusted origins. It does not yet change
+the session cookie's `SameSite` policy, so a separately hosted cross-site PWA
+still needs the dedicated cookie/deployment work planned for the PWA milestone.
+
 ### Access and Administration
 
 Useful server pages:

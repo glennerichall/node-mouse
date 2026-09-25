@@ -31,7 +31,8 @@ Internet.
 | --- | --- |
 | Lot actif | A — Stabilisation et sécurité |
 | Statut | En cours |
-| Prochaine tâche | `SEC-007` — Limiter et valider les entrées |
+| Prochaine tâche | `SEC-008` — Gérer les appareils associés |
+| Version | `6.9.1` — bump `patch` pour le durcissement SEC-007 |
 | Roadmap globale | [ROADMAP.md](./ROADMAP.md) |
 | Roadmap PWA | [ROADMAP-PWA.md](./ROADMAP-PWA.md) |
 
@@ -162,7 +163,8 @@ forme de SHA-256 et expirant avec le cookie. Le jeton QR ne sert qu'à créer un
 session et n'est jamais accepté comme cookie : après cette mise à jour, les
 appareils déjà jumelés devront rescanner le QR une fois. Les sessions peuvent
 être révoquées individuellement via `DELETE /api/sessions/current`; la
-révocation d'autres appareils attend un mécanisme dédié de gestion des appareils.
+révocation d'autres appareils attend SEC-008, qui ajoutera la gestion des
+appareils associés et leur révocation par un administrateur.
 
 Vérification : 225 tests unitaires (61 suites) et 18 tests navigateur passent.
 Le test de flux confirme qu'un jeton d'association produit un cookie indépendant
@@ -187,16 +189,35 @@ Vérification : 232 tests unitaires et 18 tests navigateur passent.
 
 ### SEC-007 — Limiter et valider les entrées
 
-- [ ] Définir les limites des corps HTTP.
-- [ ] Définir les limites des messages Socket.IO.
-- [ ] Ajouter une limitation de débit aux opérations sensibles.
-- [ ] Valider `Origin` pour HTTP et Socket.IO.
-- [ ] Ajouter une protection CSRF adaptée aux écritures HTTP.
-- [ ] Vérifier que les erreurs ne divulguent aucun secret.
-- [ ] Ajouter les tests de dépassement et de refus.
+- [x] Définir les limites des corps HTTP.
+- [x] Définir les limites des messages Socket.IO.
+- [x] Ajouter une limitation de débit aux opérations sensibles.
+- [x] Valider `Origin` pour HTTP et Socket.IO.
+- [x] Ajouter une protection CSRF adaptée aux écritures HTTP.
+- [x] Vérifier que les erreurs ne divulguent aucun secret.
+- [x] Ajouter les tests de dépassement et de refus.
 
 **Terminé lorsque :** les entrées surdimensionnées, trop fréquentes ou issues
 d'une origine non autorisée sont rejetées proprement.
+
+Limites appliquées : 32 Kio par corps JSON HTTP, 16 Kio par paquet Socket.IO
+(avec un plafond Engine.IO de 64 Kio), 10 associations/minute par IP, 60
+écritures HTTP/minute et 15 événements admin Socket.IO/minute par session.
+`ALLOWED_ORIGINS` accepte des origines exactes séparées par des virgules; les
+requêtes même origine sont permises par défaut. Cette liste ne modifie pas encore
+la politique `SameSite` du cookie; l'authentification d'une PWA réellement
+cross-site reste dans le lot PWA.
+
+Vérification : 247 tests unitaires et 22 tests navigateur passent. `npm audit
+--omit=dev` signale deux vulnérabilités modérées de `uuid`, transitive via
+`node-notifier`; aucune vulnérabilité élevée de production n'est signalée.
+
+### SEC-008 — Gérer les appareils associés
+
+- [ ] Lister les sessions d'appareils pour un administrateur.
+- [ ] Révoquer une session ou toutes les sessions depuis l'API.
+- [ ] Afficher le nom, le rôle, la dernière activité et l'état de chaque appareil.
+- [ ] Journaliser localement les associations et révocations.
 
 ## Lot B — Socle modulaire
 

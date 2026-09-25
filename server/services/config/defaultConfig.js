@@ -42,6 +42,7 @@ export const DEFAULT_SYSTEM_CONFIG = {
     port: 3000,
     serverHost: '',
     trustProxy: '',
+    allowedOrigins: [],
     entryPath: {
         enabled: true,
         fixed: '',

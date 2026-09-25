@@ -80,7 +80,7 @@ async function getManagedContext(services) {
     });
   });
 
-  adminConfigsRouter.patch('/:configId', express.json(), async (req, res) => {
+  adminConfigsRouter.patch('/:configId', async (req, res) => {
     const {services} = req;
     const pathKey = String(req.params.configId || '').trim();
     const {
@@ -131,7 +131,7 @@ async function getManagedContext(services) {
     } catch (error) {
       res.status(400).json({
         ok: false,
-        message: `Configuration invalide: ${error.message}`,
+        message: 'Configuration invalide.',
       });
     }
   });

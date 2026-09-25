@@ -47,7 +47,7 @@ export const adminConfigActionsRouter = express.Router();
         } catch (error) {
             res.status(500).json({
                 ok: false,
-                message: String(error?.message || error || 'Erreur de decouverte Samsung.'),
+                message: 'Erreur lors de la découverte Samsung.',
             });
         }
     });

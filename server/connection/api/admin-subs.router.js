@@ -3,7 +3,7 @@ import {PUBSUB_SERVICE_CONFIG} from '../../services/pubsub/serviceEventConstants
 
 export const adminSubsRouter = express.Router();
 
-  adminSubsRouter.post('/configs', express.json(), (req, res) => {
+  adminSubsRouter.post('/configs', (req, res) => {
     const {services} = req;
     const id = services.getSseService().createSubscription({
       filters: {

@@ -8,6 +8,7 @@ import {
 } from "../services/pubsub/serviceEventConstants.js";
 import { REMOTE_EVENT_SYSTEM_RELOAD } from '../../utils/remoteCommands.js';
 import {createLogger} from '../application/logger.js';
+import {createSocketInputGuard, createSocketOriginGuard} from '../connection/socket/socket-input-guard.middleware.js';
 
 function broadcast(...functions) {
     return (...args) => functions.flatMap(f => f).map(f => f(...args));
@@ -63,11 +64,17 @@ export function bootstrapSocket(services) {
     const log = createLogger('socket:bootstrap');
 
     const {io, cookieParser} = getServer();
+    const systemConfig = services.getSystemConfig();
     log.debug('Initialisation Socket.IO');
 
     io.engine.use((...args) => cookieParser(...args));
     
+    io.use(createSocketOriginGuard({
+        protocol: systemConfig.protocol,
+        getAllowedOrigins: () => systemConfig.allowedOrigins,
+    }));
     io.use(createSocketSessionAuthMiddleware(services));
+    io.use(createSocketInputGuard());
     io.use(createSocketGuardMiddleware(services));
     log.trace('Middlewares Socket.IO enregistres');
 

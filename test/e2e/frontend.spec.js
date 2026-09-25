@@ -1,5 +1,31 @@
 import {expect, test} from '@playwright/test';
 
+test('HTTP rejects oversized JSON bodies with a generic response', async ({request}) => {
+  const response = await request.post('/api/admin/configs/input.mouseSpeed', {
+    headers: {'content-type': 'application/json'},
+    data: JSON.stringify({value: 'x'.repeat(40_000)}),
+  });
+
+  expect(response.status()).toBe(413);
+  await expect(response.json()).resolves.toEqual({
+    ok: false,
+    message: 'Corps de requête trop volumineux.',
+  });
+});
+
+test('HTTP rejects writes from an untrusted Origin', async ({request}) => {
+  const response = await request.post('/api/admin/restart-service', {
+    headers: {
+      origin: 'https://untrusted.example',
+      'content-type': 'application/json',
+    },
+    data: '{}',
+  });
+
+  expect(response.status()).toBe(403);
+  await expect(response.json()).resolves.toEqual({ok: false, message: 'Origine non autorisée.'});
+});
+
 test('main remote page loads and connects to the websocket', async ({page}) => {
   await page.setViewportSize({width: 390, height: 844});
   await page.goto('/');

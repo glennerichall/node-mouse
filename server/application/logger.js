@@ -155,6 +155,14 @@ function buildRootLogger() {
   const logger = pino({
     level: systemLogLevel,
     timestamp: pino.stdTimeFunctions.isoTime,
+    redact: {
+      paths: [
+        'cookie', 'cookies', 'token', 'accessToken', 'sessionToken', 'authorization',
+        'headers.cookie', 'headers.authorization', 'req.headers.cookie', 'req.headers.authorization',
+        '*.cookie', '*.token', '*.accessToken', '*.sessionToken', '*.authorization',
+      ],
+      censor: '[REDACTED]',
+    },
   }, pino.multistream([
     {level: systemLogLevel, stream: systemDestination},
     {level: 'trace', stream: createRecentLogTransport()},
