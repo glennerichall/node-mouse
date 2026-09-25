@@ -1,22 +1,18 @@
 import express from "express";
-import {createServerInfoRouter} from "../connection/api/server-info.router.js";
-import {createAdminConfigsRouter} from "../connection/api/admin-configs.router.js";
-import {createAdminConfigActionsRouter} from "../connection/api/admin-actions.router.js";
-import {createAdminSubsRouter} from "../connection/api/admin-subs.router.js";
-import {createAdminRemotesRouter} from '../connection/api/admin-remotes.router.js';
+import {serverInfoRouter} from "../connection/api/server-info.router.js";
+import {adminConfigsRouter} from "../connection/api/admin-configs.router.js";
+import {adminConfigActionsRouter} from "../connection/api/admin-actions.router.js";
+import {adminSubsRouter} from "../connection/api/admin-subs.router.js";
+import {adminRemotesRouter} from '../connection/api/admin-remotes.router.js';
 
-export function createAdminApiRouter(services) {
-    const router = express.Router();
+export const adminApiRouter = express.Router();
 
-    router.use('/server-info', createServerInfoRouter(services));
+    adminApiRouter.use('/server-info', serverInfoRouter);
 
-    router.use('/configs', createAdminConfigsRouter(services));
+    adminApiRouter.use('/configs', adminConfigsRouter);
     
-    router.use('/remotes', createAdminRemotesRouter(services));
+    adminApiRouter.use('/remotes', adminRemotesRouter);
 
-    router.use('/subs', createAdminSubsRouter(services));
+    adminApiRouter.use('/subs', adminSubsRouter);
 
-    router.use('/', createAdminConfigActionsRouter(services));
-
-    return router;
-}
+    adminApiRouter.use('/', adminConfigActionsRouter);

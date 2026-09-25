@@ -13,10 +13,10 @@ export {
     coerceConfigValue,
 } from './configs.js';
 
-export function createAdminConfigActionsRouter(services) {
-    const router = express.Router();
+export const adminConfigActionsRouter = express.Router();
 
-    router.post('/configs/samsung/discover', async (_req, res) => {
+    adminConfigActionsRouter.post('/configs/samsung/discover', async (req, res) => {
+        const {services} = req;
         try {
             const discoverDevices = discoverSamsungDevices({
                 getConfig: () => services.getConfig().samsungTv,
@@ -52,7 +52,8 @@ export function createAdminConfigActionsRouter(services) {
         }
     });
 
-    router.post('/restart-service', async (_req, res) => {
+    adminConfigActionsRouter.post('/restart-service', async (req, res) => {
+        const {services} = req;
         const result = await services.getApplicationDaemonService().restart({
             cause: 'user',
             source: 'admin-http',
@@ -60,6 +61,3 @@ export function createAdminConfigActionsRouter(services) {
 
         res.status(result?.ok ? 200 : 500).json(result);
     });
-
-    return router;
-}

@@ -1,10 +1,10 @@
 import express from 'express';
 import {PUBSUB_SERVICE_CONFIG} from '../../services/pubsub/serviceEventConstants.js';
 
-export function createAdminSubsRouter(services) {
-  const router = express.Router();
+export const adminSubsRouter = express.Router();
 
-  router.post('/configs', express.json(), (_req, res) => {
+  adminSubsRouter.post('/configs', express.json(), (req, res) => {
+    const {services} = req;
     const id = services.getSseService().createSubscription({
       filters: {
         service: PUBSUB_SERVICE_CONFIG,
@@ -18,7 +18,8 @@ export function createAdminSubsRouter(services) {
     });
   });
 
-  router.get('/:id', (req, res) => {
+  adminSubsRouter.get('/:id', (req, res) => {
+    const {services} = req;
     const connected = services.getSseService().connect(String(req.params.id || '').trim(), req, res);
     if (connected) {
       return;
@@ -30,7 +31,8 @@ export function createAdminSubsRouter(services) {
     });
   });
 
-  router.delete('/:id', (req, res) => {
+  adminSubsRouter.delete('/:id', (req, res) => {
+    const {services} = req;
     const removed = services.getSseService().deleteSubscription(String(req.params.id || '').trim());
     if (!removed) {
       res.status(404).json({
@@ -44,6 +46,3 @@ export function createAdminSubsRouter(services) {
       ok: true,
     });
   });
-
-  return router;
-}

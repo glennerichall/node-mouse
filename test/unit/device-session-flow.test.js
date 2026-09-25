@@ -7,7 +7,7 @@ import {createDeviceSessionDao} from '../../server/services/persistence/createDe
 import {createEntryTokenDao} from '../../server/services/persistence/createEntryTokenDao.js';
 import {createDeviceSessionService} from '../../server/services/security/createDeviceSessionService.js';
 import {createSecurityService} from '../../server/services/security/createSecurityService.js';
-import {createSessionRouter} from '../../server/connection/api/session.middleware.js';
+import {sessionRouter} from '../../server/connection/api/session.middleware.js';
 
 describe('device session flow', () => {
   let tempDir;
@@ -49,7 +49,7 @@ describe('device session flow', () => {
     services.getDeviceSessionService = () => createDeviceSessionService(services);
     services.getSecurity = () => createSecurityService(services);
 
-    const router = createSessionRouter(services);
+    const router = sessionRouter;
     const response = {
       cookie: jest.fn(),
       redirect: jest.fn(),
@@ -62,6 +62,7 @@ describe('device session flow', () => {
       url: '/pairing-token',
       originalUrl: '/pairing-token',
       baseUrl: '',
+      services,
       headers: {'user-agent': 'test phone'},
       socket: {remoteAddress: '10.0.0.8'},
       get: (name) => name === 'user-agent' ? 'test phone' : undefined,

@@ -1,15 +1,8 @@
 import express from 'express';
+import {clientDir, publicDir, sharedUtilsDir} from '../../utils/paths.js';
 
-export function createStaticShareRouter({
-                                    publicDir,
-                                    clientDir,
-                                    sharedUtilsDir,
-                                }) {
-    const router = express.Router();
+export const staticShareRouter = express.Router();
 
-    router.use(express.static(publicDir));
-    router.use('/client', express.static(clientDir));
-    router.use('/utils', express.static(sharedUtilsDir));
-    return router;
-}
-
+staticShareRouter.use(express.static(publicDir));
+staticShareRouter.use('/client', express.static(clientDir));
+staticShareRouter.use('/utils', express.static(sharedUtilsDir));

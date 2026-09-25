@@ -1,8 +1,8 @@
 import sinon from 'sinon';
 import {
-  createSessionManagementRouter,
-  createSessionRouter,
-  createSessionGuard,
+  sessionManagementRouter,
+  sessionRouter,
+  sessionGuardMiddleware,
 } from '../../server/connection/api/session.middleware.js';
 import {createSecurityService} from '../../server/services/security/createSecurityService.js';
 
@@ -14,6 +14,13 @@ function withSecurity(services) {
   return {
     ...configuredServices,
     getSecurity: () => createSecurityService(configuredServices),
+  };
+}
+
+function createTestSessionGuard(services) {
+  return (req, res, next) => {
+    req.services = withSecurity(services);
+    sessionGuardMiddleware(req, res, next);
   };
 }
 
@@ -53,12 +60,12 @@ describe('createSessionValidationMiddleware', () => {
 
   it('bypasses auth for localhost request', () => {
     const authenticate = sandbox.stub().returns(null);
-    const middleware = createSessionGuard(withSecurity({
+    const middleware = createTestSessionGuard({
       getDeviceSessionService: () => ({authenticate}),
       getSystemConfig: () => ({
         session: {cookieName: 'session'},
       }),
-    }));
+    });
 
     const req = {
       ip: '127.0.0.1',
@@ -79,12 +86,12 @@ describe('createSessionValidationMiddleware', () => {
 
   it('rejects remote unauthorized request', () => {
     const authenticate = sandbox.stub().returns(null);
-    const middleware = createSessionGuard(withSecurity({
+    const middleware = createTestSessionGuard({
       getDeviceSessionService: () => ({authenticate}),
       getSystemConfig: () => ({
         session: {cookieName: 'session'},
       }),
-    }));
+    });
 
     const req = {
       ip: '10.0.0.12',
@@ -107,10 +114,10 @@ describe('createSessionValidationMiddleware', () => {
 
   it('rejects a direct remote request spoofing localhost through x-forwarded-for', () => {
     const authenticate = sandbox.stub().returns(null);
-    const middleware = createSessionGuard(withSecurity({
+    const middleware = createTestSessionGuard({
       getDeviceSessionService: () => ({authenticate}),
       getSystemConfig: () => ({session: {cookieName: 'session'}}),
-    }));
+    });
     const req = {
       ip: '10.0.0.12',
       headers: {'x-forwarded-for': '127.0.0.1'},
@@ -129,14 +136,14 @@ describe('createSessionValidationMiddleware', () => {
 
   it('accepts a remote valid request and sets its security context', () => {
     const authenticate = sandbox.stub().returns({id: 'session-123'});
-    const middleware = createSessionGuard(withSecurity({
+    const middleware = createTestSessionGuard({
       getDeviceSessionService: () => ({authenticate}),
       getSystemConfig: () => ({
         session: {
           cookieName: 'session',
         },
       }),
-    }));
+    });
 
     const req = {
       ip: '10.0.0.12',
@@ -162,14 +169,14 @@ describe('createSessionValidationMiddleware', () => {
 
   it('returns friendly html page for browser unauthorized request', () => {
     const authenticate = sandbox.stub().returns(null);
-    const middleware = createSessionGuard(withSecurity({
+    const middleware = createTestSessionGuard({
       getDeviceSessionService: () => ({authenticate}),
       getSystemConfig: () => ({
         session: {
           cookieName: 'session',
         },
       }),
-    }));
+    });
 
     const req = {
       ip: '10.0.0.12',
@@ -225,12 +232,13 @@ describe('createSessionRouter', () => {
         https: {enabled: true},
       }),
     };
-    const router = createSessionRouter(withSecurity(services));
+    const router = sessionRouter;
     const req = {
       method: 'GET',
       url: '/token-123',
       originalUrl: '/token-123',
       baseUrl: '',
+      services: withSecurity(services),
       headers: {'user-agent': 'test browser'},
       socket: {remoteAddress: '10.0.0.8'},
       get: (name) => name === 'user-agent' ? 'test browser' : undefined,
@@ -279,13 +287,14 @@ describe('createSessionRouter', () => {
         session: {cookieName: 'session'},
       }),
     };
-    const router = createSessionManagementRouter(services);
+    const router = sessionManagementRouter;
     router({
       method: 'DELETE',
       url: '/current',
       originalUrl: '/current',
       baseUrl: '',
       headers: {},
+      services,
       securityContext: {authenticationMethod: 'session', deviceSessionId: 'session-123'},
     }, {
       clearCookie, status, end,

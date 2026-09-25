@@ -5,94 +5,85 @@ import {
     PUBSUB_SERVICE_SESSION
 } from '../../services/pubsub/serviceEventConstants.js';
 
-export function createSessionGuard(services, {
-    onUnauthorized = sendUnauthorizedResponse,
-} = {}) {
-    return (req, res, next) => {
-        const decision = services.getSecurity().authenticateHttp(req);
-        req.securityContext = decision.context;
-        if (!decision.allowed) {
-            onUnauthorized(req, res);
-            return;
-        }
-        next();
+export function sessionGuardMiddleware(req, res, next) {
+    const decision = req.services.getSecurity().authenticateHttp(req);
+    req.securityContext = decision.context;
+    if (!decision.allowed) {
+        sendUnauthorizedResponse(req, res);
+        return;
     }
+    next();
 }
 
-export function createSessionManagementRouter(services) {
-    const router = express.Router();
+export const sessionManagementRouter = express.Router();
 
-    router.delete('/current', (req, res) => {
-        const sessionId = req.securityContext?.deviceSessionId;
-        if (req.securityContext?.authenticationMethod !== 'session' || !sessionId) {
-            sendUnauthorizedResponse(req, res);
-            return;
-        }
+sessionManagementRouter.delete('/current', (req, res) => {
+    const {services} = req;
+    const sessionId = req.securityContext?.deviceSessionId;
+    if (req.securityContext?.authenticationMethod !== 'session' || !sessionId) {
+        sendUnauthorizedResponse(req, res);
+        return;
+    }
 
-        services.getDeviceSessionService().revokeSession(sessionId);
-        const sessionConfig = services.getSystemConfig().session;
-        res.clearCookie(sessionConfig.cookieName, {
-            httpOnly: true,
-            secure: Boolean(services.getSystemConfig().https.enabled),
-            sameSite: 'lax',
-            path: '/',
-        });
-        res.status(204).end();
+    services.getDeviceSessionService().revokeSession(sessionId);
+    const config = services.getSystemConfig();
+    res.clearCookie(config.session.cookieName, {
+        httpOnly: true,
+        secure: Boolean(config.https.enabled),
+        sameSite: 'lax',
+        path: '/',
+    });
+    res.status(204).end();
+});
+
+export const sessionRouter = express.Router();
+
+const issueDeviceSession = (req, res, next) => {
+    const {services} = req;
+    const context = services.getSecurity().createClientContext({
+        transport: 'http',
+        request: req,
     });
 
-    return router;
-}
+    const {token, session} = services.getDeviceSessionService().createSession({
+        clientAddress: context.clientAddress,
+        userAgent: req.get?.('user-agent') || req.headers?.['user-agent'] || '',
+    });
 
-export function createSessionRouter(services) {
-    const router = express.Router();
+    services.getEvents().publishEvent(PUBSUB_SERVICE_SESSION, PUBSUB_EVENT_SESSION_CREATED, {
+        address: context.clientAddress,
+        correlationId: context.correlationId,
+        sessionId: session.id,
+    });
 
-    const issueDeviceSession = (req, res, next) => {
-        const context = services.getSecurity().createClientContext({
-            transport: 'http',
-            request: req,
-        });
+    const config = services.getSystemConfig();
 
-        const {token, session} = services.getDeviceSessionService().createSession({
-            clientAddress: context.clientAddress,
-            userAgent: req.get?.('user-agent') || req.headers?.['user-agent'] || '',
-        });
+    res.cookie(config.session.cookieName, token, {
+        signed: true,
+        httpOnly: true,
+        secure: Boolean(config.https.enabled),
+        sameSite: 'lax',
+        maxAge: Math.max(1, config.session.cookieMaxAgeDays) * 24 * 60 * 60 * 1000,
+        path: '/',
+    });
 
-        services.getEvents().publishEvent(PUBSUB_SERVICE_SESSION, PUBSUB_EVENT_SESSION_CREATED, {
-            address: context.clientAddress,
-            correlationId: context.correlationId,
-            sessionId: session.id,
-        });
+    next();
+};
 
-        const config = services.getSystemConfig();
+const guardToken = (req, res, next) => {
+    const {services} = req;
+    const tokenManager = services.getTokenManager();
+    const token = req.params.token;
+    if (!tokenManager.isValid(token)) {
+        sendUnauthorizedResponse(req, res);
+        return;
+    }
+    next();
+};
 
-        res.cookie(config.session.cookieName, token, {
-            signed: true,
-            httpOnly: true,
-            secure: Boolean(config.https.enabled),
-            sameSite: 'lax',
-            maxAge: Math.max(1, config.session.cookieMaxAgeDays) * 24 * 60 * 60 * 1000,
-            path: '/',
-        });
+const redirect = (req, res) => res.redirect('/');
 
-        next();
-    };
-
-    const guardToken = (req, res, next) => {
-        const tokenManager = services.getTokenManager();
-        const token = req.params.token;
-        if (!tokenManager.isValid(token)) {
-            sendUnauthorizedResponse(req, res);
-            return;
-        }
-        next();
-    };
-
-    const redirect = (req, res) => res.redirect('/');
-
-    router.get('/:token',
-        guardToken,
-        issueDeviceSession,
-        redirect);
-
-    return router;
-}
+sessionRouter.get('/:token',
+    guardToken,
+    issueDeviceSession,
+    redirect);

@@ -1,13 +1,13 @@
 import express from 'express';
 
-export function createAdminRemotesRouter(services) {
-  const router = express.Router();
+export const adminRemotesRouter = express.Router();
 
   function isBrowserEnabled(config, browserId) {
     return config?.browser?.enabled !== false && config?.browser?.[browserId] !== false;
   }
 
-  router.get('/browsers', async (_req, res) => {
+  adminRemotesRouter.get('/browsers', async (req, res) => {
+    const {services} = req;
     const config = services.getConfig();
     const browsers = await services.getSystem().listBrowsers();
     res.json({
@@ -18,7 +18,8 @@ export function createAdminRemotesRouter(services) {
     });
   });
 
-  router.get('/', async (_req, res) => {
+  adminRemotesRouter.get('/', async (req, res) => {
+    const {services} = req;
     const config = services.getConfig();
     const vlcAvailable = await services.getSystem().isVlcAvailable();
     const remotes = [
@@ -61,6 +62,3 @@ export function createAdminRemotesRouter(services) {
       remotes,
     });
   });
-
-  return router;
-}

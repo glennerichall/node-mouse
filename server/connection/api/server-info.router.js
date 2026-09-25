@@ -111,14 +111,14 @@ function buildTokenEntries({entries, currentToken, entryPathConfig}) {
   return tokenEntries;
 }
 
-export function createServerInfoRouter(services) {
-  const router = express.Router();
+export const serverInfoRouter = express.Router();
 
-  router.get('/', (_req, res) => {
+serverInfoRouter.get('/', (_req, res) => {
     res.sendFile(path.join(publicDir, 'server-info.html'));
   });
 
-  router.get('/data', async (_req, res) => {
+serverInfoRouter.get('/data', async (req, res) => {
+    const {services} = req;
     const clients = getConnectedClients(services.getServer().io);
     const rawConfig = services.getConfig();
     const rawSystemConfig = services.getSystemConfig();
@@ -157,8 +157,6 @@ export function createServerInfoRouter(services) {
       logs,
     });
   });
-  return router;
-}
 
 export const __testables = {
   buildTokenEntries,

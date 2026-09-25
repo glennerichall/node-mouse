@@ -10,43 +10,41 @@ import {
   getManagedConfigSnapshot,
 } from './configs.js';
 
-export function createAdminConfigsRouter(services) {
-  const getConfig = services.getConfig;
-  const getSystemConfig = services.getSystemConfig;
-  const router = express.Router();
+export const adminConfigsRouter = express.Router();
 
-  async function getManagedContext() {
-    const vlcAvailable = await services.getRemotes().vlc.isAvailable();
-    const managedPaths = CONFIG_PATHS;
-    const schema = adminConfigSchema;
-    const defaults = getManagedConfigSnapshot({
-      ...adminConfigDefaults,
-      vlc: {
-        enabled: false,
-      },
-    }, managedPaths);
-    const config = getManagedConfigSnapshot({
-      ...getConfig(),
-      vlc: {
-        enabled: vlcAvailable ? getConfig()?.vlc?.enabled : false,
-      },
-    }, managedPaths);
+async function getManagedContext(services) {
+  const vlcAvailable = await services.getRemotes().vlc.isAvailable();
+  const managedPaths = CONFIG_PATHS;
+  const schema = adminConfigSchema;
+  const defaults = getManagedConfigSnapshot({
+    ...adminConfigDefaults,
+    vlc: {
+      enabled: false,
+    },
+  }, managedPaths);
+  const config = getManagedConfigSnapshot({
+    ...services.getConfig(),
+    vlc: {
+      enabled: vlcAvailable ? services.getConfig()?.vlc?.enabled : false,
+    },
+  }, managedPaths);
 
-    return {
-      managedPaths,
-      schema,
-      defaults,
-      config,
-    };
-  }
+  return {
+    managedPaths,
+    schema,
+    defaults,
+    config,
+  };
+}
 
-  router.get('/', async (_req, res) => {
+  adminConfigsRouter.get('/', async (req, res) => {
+    const {services} = req;
     const {
       managedPaths,
       schema,
       defaults,
       config,
-    } = await getManagedContext();
+    } = await getManagedContext(services);
 
     res.json({
       configs: managedPaths.map((pathKey) => buildConfigEntry(pathKey, schema, config, defaults)),
@@ -54,19 +52,20 @@ export function createAdminConfigsRouter(services) {
       schema,
       managedPaths,
       systemConfig: {
-        adminActionsEnabled: Boolean(getSystemConfig().adminActionsEnabled),
+        adminActionsEnabled: Boolean(services.getSystemConfig().adminActionsEnabled),
       },
     });
   });
 
-  router.get('/:configId', async (req, res) => {
+  adminConfigsRouter.get('/:configId', async (req, res) => {
+    const {services} = req;
     const pathKey = String(req.params.configId || '').trim();
     const {
       managedPaths,
       schema,
       defaults,
       config,
-    } = await getManagedContext();
+    } = await getManagedContext(services);
 
     if (!managedPaths.includes(pathKey)) {
       res.status(404).json({
@@ -81,13 +80,14 @@ export function createAdminConfigsRouter(services) {
     });
   });
 
-  router.patch('/:configId', express.json(), async (req, res) => {
+  adminConfigsRouter.patch('/:configId', express.json(), async (req, res) => {
+    const {services} = req;
     const pathKey = String(req.params.configId || '').trim();
     const {
       managedPaths,
       schema,
       defaults,
-    } = await getManagedContext();
+    } = await getManagedContext(services);
 
     if (!managedPaths.includes(pathKey)) {
       res.status(404).json({
@@ -122,7 +122,7 @@ export function createAdminConfigsRouter(services) {
         services.getConfigService().setConfig(pathKey, nextValue);
       }
 
-      const nextContext = await getManagedContext();
+      const nextContext = await getManagedContext(services);
       res.json({
         ok: true,
         message: 'Configuration updated.',
@@ -136,13 +136,14 @@ export function createAdminConfigsRouter(services) {
     }
   });
 
-  router.delete('/:configId', async (req, res) => {
+  adminConfigsRouter.delete('/:configId', async (req, res) => {
+    const {services} = req;
     const pathKey = String(req.params.configId || '').trim();
     const {
       managedPaths,
       schema,
       defaults,
-    } = await getManagedContext();
+    } = await getManagedContext(services);
 
     if (!managedPaths.includes(pathKey)) {
       res.status(404).json({
@@ -153,13 +154,10 @@ export function createAdminConfigsRouter(services) {
     }
 
     services.getConfigService().resetConfig(pathKey);
-    const nextContext = await getManagedContext();
+    const nextContext = await getManagedContext(services);
     res.json({
       ok: true,
       message: `${pathKey} reset to default.`,
       config: buildConfigEntry(pathKey, schema, nextContext.config, defaults),
     });
   });
-
-  return router;
-}

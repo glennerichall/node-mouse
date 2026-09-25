@@ -1,9 +1,9 @@
 import express from 'express';
 
-export function createRemotesRouter(services) {
-  const router = express.Router();
+export const remotesRouter = express.Router();
 
-  router.get('/:remoteId/status', async (req, res) => {
+remotesRouter.get('/:remoteId/status', async (req, res) => {
+    const {services} = req;
     const remoteId = String(req.params.remoteId || '').trim();
 
     if (remoteId === 'samsung') {
@@ -24,7 +24,4 @@ export function createRemotesRouter(services) {
       ok: false,
       message: 'Unknown remote.',
     });
-  });
-
-  return router;
-}
+});
