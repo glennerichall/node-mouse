@@ -13,6 +13,7 @@ import {remotesRouter} from '../connection/api/remotes.router.js';
 import {readPackageVersion} from '../utils/env.js';
 import {createLogger} from '../application/logger.js';
 import {createProxyTrust} from '../utils/clientAddress.js';
+import {randomUUID} from 'node:crypto';
 
 const packageJsonPath = path.join(projectRoot, 'package.json');
 
@@ -27,13 +28,29 @@ export function bootstrapApi(services) {
         cookieParser
     } = getServer();
 
+
+    const log = createLogger('createApp');
+
+    // Chaque requête reçoit une façade de services distincte, sans recréer les
+    // services partagés. Son UUID sert au logger enfant et au contexte de sécurité.
+    // Le logger est créé paresseusement et reste propre à cette requête.
     app.use((req, _res, next) => {
-        req.services = services;
+        const requestId = randomUUID();
+        let requestLogger;
+        req.requestId = requestId;
+        req.services = {
+            ...services,
+            getLogger: () => {
+                if (!requestLogger) {
+                    requestLogger = createLogger('http:request').child({requestId});
+                }
+                return requestLogger;
+            },
+        };
         next();
     });
 
     const systemConfig = getSystemConfig();
-    const log = createLogger('createApp');
 
     log.debug({
         httpsEnabled: Boolean(systemConfig.https.enabled),
@@ -45,7 +62,7 @@ export function bootstrapApi(services) {
         log.warn('HTTPS=false: cookie session envoyé sans attribut Secure (moins sécuritaire).');
     }
     app.set('trust proxy', createProxyTrust(systemConfig.trustProxy));
-    
+
     app.use(cookieParser);
 
     app.use('/api/sessions', sessionRouter);
@@ -53,9 +70,9 @@ export function bootstrapApi(services) {
 
     app.use(sessionGuardMiddleware);
     app.use('/api/sessions', sessionManagementRouter);
-    
+
     app.use(staticShareRouter);
-    
+
     app.get('/qr', qrPageHandler);
     app.use('/api/remotes', remotesRouter);
     app.use('/api/admin', adminApiRouter);

@@ -59,6 +59,15 @@ describe('createSecurityService', () => {
     expect(http.reason).toBe(SECURITY_REASON_VALID_SESSION);
   });
 
+  it('reuses the request id as the HTTP security correlation id', () => {
+    const decision = createService().authenticateHttp({
+      ...createRequest({address: '10.0.0.8'}),
+      requestId: 'http-request-123',
+    });
+
+    expect(decision.context.correlationId).toBe('http-request-123');
+  });
+
   it('rejects an invalid session without exposing its token in the decision', () => {
     const decision = createService().authenticateHttp(createRequest({
       address: '10.0.0.8',

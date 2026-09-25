@@ -14,7 +14,7 @@ export function createSecurityService(services) {
         const clientAddress = resolveClientAddress(request, config.trustProxy);
 
         return {
-            correlationId: randomUUID(),
+            correlationId: request?.requestId || randomUUID(),
             transport,
             clientAddress,
             local: isLocalAddress(clientAddress),
