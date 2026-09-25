@@ -46,5 +46,10 @@
     "@playwright/test": "^1.59.1",
     "jest": "^30.3.0",
     "sinon": "^21.0.3"
+  },
+  "overrides": {
+    "express": {
+      "qs": "~6.16.0"
+    }
   }
 }

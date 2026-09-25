@@ -1,5 +1,10 @@
 import {jest} from '@jest/globals';
-import {createSystemService} from '../../server/services/system/createSystemService.js';
+
+jest.unstable_mockModule('../../server/os/linux/screen.js', () => ({
+  resolveLinuxScreenSize: jest.fn(async () => null),
+}));
+
+const {createSystemService} = await import('../../server/services/system/createSystemService.js');
 
 describe('system service', () => {
   function createLogger() {
@@ -114,7 +119,7 @@ describe('system service', () => {
     }));
   });
 
-  it('returns null screen info when robot is unavailable', async () => {
+  it('returns null screen info when robot and Linux screen detection are unavailable', async () => {
     const service = createSystemService({
       getLogger: () => createLogger(),
       getOs: () => ({

@@ -22,7 +22,7 @@ la clôture du lot, puis sont déplacées dans le journal des lots terminés.
 | --- | --- |
 | Lot actif | A — Stabilisation et sécurité |
 | Statut | En cours |
-| Prochaine tâche | `SEC-004` — Mettre à jour les dépendances vulnérables |
+| Prochaine tâche | `SEC-005` — Séparer association et session |
 | Roadmap globale | [ROADMAP.md](./ROADMAP.md) |
 | Roadmap PWA | [ROADMAP-PWA.md](./ROADMAP-PWA.md) |
 
@@ -87,17 +87,54 @@ configuration de production faible ne peut pas démarrer silencieusement.
 
 ### SEC-004 — Mettre à jour les dépendances vulnérables ➡️
 
-- [ ] Sauvegarder le résultat de l'audit avant modification dans le compte rendu
+- [x] Sauvegarder le résultat de l'audit avant modification dans le compte rendu
   du lot.
-- [ ] Mettre à jour en priorité Engine.IO, Socket.IO parser et `ws`.
-- [ ] Traiter séparément les mises à jour nécessitant une rupture majeure.
-- [ ] Exécuter les tests unitaires et navigateur après chaque groupe de mises à
+- [x] Mettre à jour en priorité Engine.IO, Socket.IO parser et `ws`.
+- [x] Traiter séparément les mises à jour nécessitant une rupture majeure.
+- [x] Exécuter les tests unitaires et navigateur après chaque groupe de mises à
   jour.
-- [ ] Vérifier les connexions Socket.IO et Samsung TV.
-- [ ] Confirmer l'absence de vulnérabilité élevée de production.
+- [x] Vérifier les régressions Socket.IO et Samsung TV avec les tests du projet.
+- [x] Confirmer l'absence de vulnérabilité élevée de production.
 
 **Terminé lorsque :** l'audit de production ne contient plus d'alerte élevée et
 les transports existants restent fonctionnels.
+
+#### SEC-004 — Baseline d'audit (2026-09-24)
+
+Commande : `npm audit --omit=dev --json` avant mise à jour.
+
+| Sévérité | Nombre |
+| --- | ---: |
+| Élevée | 3 |
+| Modérée | 4 |
+| Faible | 1 |
+| Critique | 0 |
+
+Dépendances signalées : `engine.io` (DoS polling et WebTransport SID),
+`socket.io-parser` (épuisement mémoire), `ws` (DoS et divulgation mémoire),
+`qs` (DoS), `body-parser` (DoS avec limite invalide), `socket.io-adapter`,
+`node-notifier` et sa dépendance `uuid`. L'audit npm indique des corrections
+sans rupture pour la chaîne Socket.IO, `ws`, `qs` et `body-parser`. Pour
+`node-notifier`, npm propose `6.0.0`, un changement majeur à examiner
+séparément.
+
+#### SEC-004 — Résultat après mise à jour
+
+`npm audit fix --omit=dev` a mis à jour `engine.io` (6.6.6 → 6.6.11),
+`socket.io-parser` (4.2.6 → 4.2.7), `socket.io-adapter` (2.5.6 → 2.5.8),
+`ws` (8.18.3/8.20.0 → 8.21.3) et `body-parser` (1.20.4 → 1.20.8). Une
+surcharge limitée à Express met `qs` à 6.16.0, version corrigée. La version
+directe de Socket.IO (4.8.3) et les plages de dépendances applicatives restent
+compatibles.
+
+Audit final `npm audit --omit=dev` : aucune vulnérabilité élevée ou critique;
+2 alertes modérées subsistent sur `uuid` via `node-notifier@10.0.1`. npm ne
+propose de les supprimer qu'en rétrogradant `node-notifier` vers 6.0.0. Cette
+rupture n'a pas été appliquée : le notifier n'appelle que `uuid.v4()` sans
+buffer, alors que l'avis porte sur les API v3/v5/v6 avec buffer. Les tests
+unitaires et navigateur passent (216 tests unitaires, 18 tests navigateur);
+les scénarios Samsung sont simulés et ne remplacent pas une vérification sur
+téléviseur physique.
 
 ### SEC-005 — Séparer association et session
 
