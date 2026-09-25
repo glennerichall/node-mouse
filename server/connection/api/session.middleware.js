@@ -19,33 +19,6 @@ export function createSessionGuard(services, {
     }
 }
 
-export function issueDeviceSession(services, req, res, securityContext = null) {
-    const context = securityContext || services.getSecurity().createClientContext({
-        transport: 'http',
-        request: req,
-    });
-    const {token, session} = services.getDeviceSessionService().createSession({
-        clientAddress: context.clientAddress,
-        userAgent: req.get?.('user-agent') || req.headers?.['user-agent'] || '',
-    });
-
-    services.getEvents().publishEvent(PUBSUB_SERVICE_SESSION, PUBSUB_EVENT_SESSION_CREATED, {
-        address: context.clientAddress,
-        correlationId: context.correlationId,
-        sessionId: session.id,
-    });
-    const config = services.getSystemConfig();
-    res.cookie(config.session.cookieName, token, {
-        signed: true,
-        httpOnly: true,
-        secure: Boolean(config.https.enabled),
-        sameSite: 'lax',
-        maxAge: Math.max(1, config.session.cookieMaxAgeDays) * 24 * 60 * 60 * 1000,
-        path: '/',
-    });
-    return session;
-}
-
 export function createSessionManagementRouter(services) {
     const router = express.Router();
 
@@ -73,20 +46,53 @@ export function createSessionManagementRouter(services) {
 export function createSessionRouter(services) {
     const router = express.Router();
 
-    router.get('/:token', (req, res) => {
+    const issueDeviceSession = (req, res, next) => {
+        const context = services.getSecurity().createClientContext({
+            transport: 'http',
+            request: req,
+        });
+
+        const {token, session} = services.getDeviceSessionService().createSession({
+            clientAddress: context.clientAddress,
+            userAgent: req.get?.('user-agent') || req.headers?.['user-agent'] || '',
+        });
+
+        services.getEvents().publishEvent(PUBSUB_SERVICE_SESSION, PUBSUB_EVENT_SESSION_CREATED, {
+            address: context.clientAddress,
+            correlationId: context.correlationId,
+            sessionId: session.id,
+        });
+
+        const config = services.getSystemConfig();
+
+        res.cookie(config.session.cookieName, token, {
+            signed: true,
+            httpOnly: true,
+            secure: Boolean(config.https.enabled),
+            sameSite: 'lax',
+            maxAge: Math.max(1, config.session.cookieMaxAgeDays) * 24 * 60 * 60 * 1000,
+            path: '/',
+        });
+
+        next();
+    };
+
+    const guardToken = (req, res, next) => {
         const tokenManager = services.getTokenManager();
         const token = req.params.token;
         if (!tokenManager.isValid(token)) {
             sendUnauthorizedResponse(req, res);
             return;
         }
-        const securityContext = services.getSecurity().createClientContext({
-            transport: 'http',
-            request: req,
-        });
-        issueDeviceSession(services, req, res, securityContext);
-        res.redirect('/');
-    });
+        next();
+    };
+
+    const redirect = (req, res) => res.redirect('/');
+
+    router.get('/:token',
+        guardToken,
+        issueDeviceSession,
+        redirect);
 
     return router;
 }

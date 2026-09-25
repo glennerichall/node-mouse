@@ -50,17 +50,21 @@ describe('device session flow', () => {
     services.getSecurity = () => createSecurityService(services);
 
     const router = createSessionRouter(services);
-    const layer = router.stack.find((entry) => entry.route?.path === '/:token' && entry.route.methods.get);
-    const handler = layer.route.stack[0].handle;
     const response = {
       cookie: jest.fn(),
       redirect: jest.fn(),
+      locals: {},
+      headersSent: false,
     };
 
-    handler({
-      params: {token: 'pairing-token'},
+    router({
+      method: 'GET',
+      url: '/pairing-token',
+      originalUrl: '/pairing-token',
+      baseUrl: '',
       headers: {'user-agent': 'test phone'},
       socket: {remoteAddress: '10.0.0.8'},
+      get: (name) => name === 'user-agent' ? 'test phone' : undefined,
     }, response);
 
     const sessionCookie = response.cookie.mock.calls[0][1];

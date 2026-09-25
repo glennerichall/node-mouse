@@ -226,19 +226,25 @@ describe('createSessionRouter', () => {
       }),
     };
     const router = createSessionRouter(withSecurity(services));
-    const layer = router.stack.find((entry) => entry.route?.path === '/:token' && entry.route.methods.get);
-    const handler = layer.route.stack[0].handle;
     const req = {
-      params: {token: 'token-123'},
+      method: 'GET',
+      url: '/token-123',
+      originalUrl: '/token-123',
+      baseUrl: '',
       headers: {'user-agent': 'test browser'},
       socket: {remoteAddress: '10.0.0.8'},
+      get: (name) => name === 'user-agent' ? 'test browser' : undefined,
     };
     const res = {
       cookie: sandbox.stub(),
       redirect: sandbox.stub(),
+      locals: {},
+      headersSent: false,
     };
 
-    handler(req, res);
+    router(req, res, (error) => {
+      if (error) throw error;
+    });
 
     expect(getTokenManager.calledOnce).toBe(true);
     expect(createSession.calledOnceWithExactly({
@@ -274,11 +280,19 @@ describe('createSessionRouter', () => {
       }),
     };
     const router = createSessionManagementRouter(services);
-    const layer = router.stack.find((entry) => entry.route?.path === '/current' && entry.route.methods.delete);
-    const handler = layer.route.stack[0].handle;
-
-    handler({securityContext: {authenticationMethod: 'session', deviceSessionId: 'session-123'}}, {
+    router({
+      method: 'DELETE',
+      url: '/current',
+      originalUrl: '/current',
+      baseUrl: '',
+      headers: {},
+      securityContext: {authenticationMethod: 'session', deviceSessionId: 'session-123'},
+    }, {
       clearCookie, status, end,
+      locals: {},
+      headersSent: false,
+    }, (error) => {
+      if (error) throw error;
     });
 
     expect(revokeSession.calledOnceWithExactly('session-123')).toBe(true);
