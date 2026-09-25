@@ -6,7 +6,7 @@ import {
 } from '../../services/pubsub/serviceEventConstants.js';
 
 export function sessionGuardMiddleware(req, res, next) {
-    const decision = req.services.getSecurity().authenticateHttp(req);
+    const decision = req.services.getSecurity().authenticate();
     req.securityContext = decision.context;
     if (!decision.allowed) {
         sendUnauthorizedResponse(req, res);
@@ -40,10 +40,7 @@ export const sessionRouter = express.Router();
 
 const issueDeviceSession = (req, res, next) => {
     const {services} = req;
-    const context = services.getSecurity().createClientContext({
-        transport: 'http',
-        request: req,
-    });
+    const context = services.getSecurity().createClientContext();
 
     const {token, session} = services.getDeviceSessionService().createSession({
         clientAddress: context.clientAddress,

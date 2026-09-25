@@ -23,8 +23,7 @@ export function createSecurityService(services) {
         };
     }
 
-    function authenticate({transport, request}) {
-        const context = createClientContext({transport, request});
+    function authenticate({transport, request, context = createClientContext({transport, request})}) {
         if (context.local) {
             return {
                 allowed: true,
@@ -55,9 +54,29 @@ export function createSecurityService(services) {
         };
     }
 
+    function createRequestSecurity(transport, request) {
+        let context;
+        const getContext = () => {
+            if (!context) {
+                context = createClientContext({transport, request});
+            }
+            return context;
+        };
+
+        return {
+            createClientContext: getContext,
+            authenticate: () => authenticate({
+                transport,
+                request,
+                context: getContext(),
+            }),
+        };
+    }
+
     return {
         createClientContext,
         authenticateHttp: (request) => authenticate({transport: 'http', request}),
         authenticateSocket: (socket) => authenticate({transport: 'socket.io', request: socket?.request}),
+        forHttpRequest: (request) => createRequestSecurity('http', request),
     };
 }

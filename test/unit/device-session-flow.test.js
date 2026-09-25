@@ -57,16 +57,23 @@ describe('device session flow', () => {
       headersSent: false,
     };
 
-    router({
+    const pairingRequest = {
       method: 'GET',
       url: '/pairing-token',
       originalUrl: '/pairing-token',
       baseUrl: '',
-      services,
       headers: {'user-agent': 'test phone'},
       socket: {remoteAddress: '10.0.0.8'},
       get: (name) => name === 'user-agent' ? 'test phone' : undefined,
-    }, response);
+    };
+    pairingRequest.services = {
+      ...services,
+      getSecurity: () => services.getSecurity().forHttpRequest(pairingRequest),
+    };
+
+    router(pairingRequest, response, (error) => {
+      if (error) throw error;
+    });
 
     const sessionCookie = response.cookie.mock.calls[0][1];
     expect(sessionCookie).toBeTruthy();

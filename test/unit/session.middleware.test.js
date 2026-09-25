@@ -6,20 +6,27 @@ import {
 } from '../../server/connection/api/session.middleware.js';
 import {createSecurityService} from '../../server/services/security/createSecurityService.js';
 
-function withSecurity(services) {
+function withSecurity(services, request) {
   const configuredServices = {
     ...services,
     getDeviceSessionService: services.getDeviceSessionService || (() => ({authenticate: () => null})),
   };
+  let requestSecurity;
   return {
     ...configuredServices,
-    getSecurity: () => createSecurityService(configuredServices),
+    getSecurity: () => {
+      if (!request) {
+        return createSecurityService(configuredServices);
+      }
+      requestSecurity ||= createSecurityService(configuredServices).forHttpRequest(request);
+      return requestSecurity;
+    },
   };
 }
 
 function createTestSessionGuard(services) {
   return (req, res, next) => {
-    req.services = withSecurity(services);
+    req.services = withSecurity(services, req);
     sessionGuardMiddleware(req, res, next);
   };
 }
@@ -238,7 +245,7 @@ describe('createSessionRouter', () => {
       url: '/token-123',
       originalUrl: '/token-123',
       baseUrl: '',
-      services: withSecurity(services),
+      services: null,
       headers: {'user-agent': 'test browser'},
       socket: {remoteAddress: '10.0.0.8'},
       get: (name) => name === 'user-agent' ? 'test browser' : undefined,
@@ -249,6 +256,7 @@ describe('createSessionRouter', () => {
       locals: {},
       headersSent: false,
     };
+    req.services = withSecurity(services, req);
 
     router(req, res, (error) => {
       if (error) throw error;

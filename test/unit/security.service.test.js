@@ -68,6 +68,23 @@ describe('createSecurityService', () => {
     expect(decision.context.correlationId).toBe('http-request-123');
   });
 
+  it('binds HTTP security methods to the request and reuses its context', () => {
+    const authenticate = jest.fn(() => ({id: 'session-123'}));
+    const service = createService({authenticate});
+    const request = createRequest({address: '10.0.0.8', token: 'session-token'});
+    request.requestId = 'http-request-456';
+    const requestSecurity = service.forHttpRequest(request);
+
+    const initialContext = requestSecurity.createClientContext();
+    const decision = requestSecurity.authenticate();
+
+    expect(initialContext.transport).toBe('http');
+    expect(initialContext.correlationId).toBe('http-request-456');
+    expect(decision.context.correlationId).toBe(initialContext.correlationId);
+    expect(authenticate).toHaveBeenCalledWith('session-token');
+    expect(decision.allowed).toBe(true);
+  });
+
   it('rejects an invalid session without exposing its token in the decision', () => {
     const decision = createService().authenticateHttp(createRequest({
       address: '10.0.0.8',
