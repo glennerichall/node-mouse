@@ -352,19 +352,19 @@ insuffisante.
 
 ### P0 — Bloquants avant exposition réseau
 
-- [ ] Corriger la confiance accordée à `X-Forwarded-For`. Le code ne doit
+- [x] Corriger la confiance accordée à `X-Forwarded-For`. Le code ne doit
   jamais interpréter directement cet en-tête pour accorder un accès local.
-- [ ] Supprimer ou fortement encadrer le contournement d'authentification fondé
-  sur l'adresse `127.0.0.1`.
-- [ ] Refuser le démarrage en production avec
+- [x] Encadrer le contournement sans session au loopback réellement local; les
+  clients directs ne peuvent pas l'usurper avec un en-tête.
+- [x] Refuser le démarrage en production avec
   `SESSION_COOKIE_SECRET=change-me`.
-- [ ] Mettre à jour les dépendances de production. L'audit initial a détecté
-  huit alertes, dont trois élevées dans la chaîne Engine.IO, Socket.IO parser et
-  WebSocket.
-- [ ] Séparer le jeton temporaire d'association de la session persistante d'un
+- [x] Traiter les vulnérabilités élevées des dépendances de production relevées
+  par l'audit, notamment dans Engine.IO, Socket.IO parser et WebSocket.
+- [x] Séparer le jeton temporaire d'association de la session persistante d'un
   appareil.
 - [ ] Créer des rôles distincts `controller` et `admin`.
-- [ ] Protéger les actions administratives quel que soit le transport utilisé.
+- [ ] Protéger les actions administratives quel que soit le transport utilisé
+  (prochaine étape : `SEC-006`).
 - [ ] Limiter la taille et le rythme des messages entrants.
 - [ ] Ne jamais écrire les offres WebRTC, candidats ICE, jetons, cookies ou
   secrets dans les journaux.
@@ -408,13 +408,15 @@ commande ne traverse le serveur tiers.
 
 **Objectif :** corriger les vulnérabilités indépendamment du futur transport.
 
-- [ ] Corriger l'identification de l'adresse cliente.
-- [ ] Générer un secret de cookie fort pendant l'installation.
-- [ ] Introduire des sessions propres à chaque appareil.
-- [ ] Ajouter la révocation d'une session ou de tous les appareils.
+- [x] Corriger l'identification de l'adresse cliente.
+- [x] Générer un secret de cookie fort pendant l'installation.
+- [x] Introduire des sessions propres à chaque appareil.
+- [x] Permettre à un appareil de révoquer sa session courante.
+- [ ] Ajouter la révocation administrative d'un autre appareil ou de toutes les
+  sessions.
 - [ ] Ajouter les rôles et autorisations administratives.
-- [ ] Mettre à jour les dépendances et traiter les alertes de sécurité.
-- [ ] Ajouter les tests de non-régression associés.
+- [x] Mettre à jour les dépendances et traiter les alertes élevées de sécurité.
+- [x] Ajouter les tests de non-régression associés.
 
 **Estimation :** 3 à 5 jours.
 

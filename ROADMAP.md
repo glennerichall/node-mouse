@@ -40,6 +40,14 @@ Faire de Remote Mouse une télécommande web :
 7. **Tester les plateformes réellement supportées.** L'émulation navigateur ne
    remplace pas les tests Android, iOS, Linux, Windows et macOS.
 
+## Hypothèse de déploiement actuelle
+
+Le mode visé aujourd'hui est un serveur sur le réseau local, avec son QR affiché
+sur place et un petit groupe d'utilisateurs physiquement présents. Ce modèle ne
+protège pas contre un client hostile déjà présent sur le LAN ni contre une
+exposition accidentelle à Internet. Les modes d'accès distant restent des
+évolutions distinctes à sécuriser et à documenter avant leur activation.
+
 ## État du projet
 
 Le projet propose déjà :
@@ -79,12 +87,13 @@ branches.
 
 ### Correctifs immédiats
 
-- [ ] Ne plus interpréter directement `X-Forwarded-For` pour accorder un accès
+- [x] Ne plus interpréter directement `X-Forwarded-For` pour accorder un accès
   local.
-- [ ] Configurer explicitement les proxies de confiance.
-- [ ] Supprimer ou encadrer strictement le bypass d'authentification localhost.
+- [x] Configurer explicitement les proxies de confiance.
+- [x] Limiter le bypass sans session au loopback réellement local; un client
+  direct ne peut pas le contourner avec `X-Forwarded-For`.
 - [x] Refuser un secret de session par défaut ou trop court en production.
-- [ ] Mettre à jour les dépendances présentant des vulnérabilités connues,
+- [x] Mettre à jour les dépendances présentant des vulnérabilités élevées,
   notamment la chaîne Socket.IO/Engine.IO/WebSocket.
 - [ ] Limiter la taille et la fréquence des requêtes et messages temps réel.
 - [ ] Filtrer jetons, cookies et secrets dans tous les journaux.
@@ -93,9 +102,11 @@ branches.
 
 ### Sessions et autorisations
 
-- [ ] Séparer le jeton d'association temporaire de la session d'un appareil.
+- [x] Séparer le jeton d'association temporaire de la session d'un appareil.
 - [ ] Ajouter une liste des appareils associés.
-- [ ] Permettre la révocation d'un appareil ou de toutes les sessions.
+- [x] Permettre à un appareil de révoquer sa session courante.
+- [ ] Permettre à un administrateur de révoquer un autre appareil ou toutes les
+  sessions depuis l'interface/API.
 - [ ] Séparer les rôles `controller` et `admin`.
 - [ ] Appliquer les mêmes autorisations à HTTP, Socket.IO et WebRTC.
 - [ ] Protéger les écritures HTTP avec vérification Origin et CSRF adaptée.
@@ -103,10 +114,13 @@ branches.
 
 ### Critères de sortie
 
-- aucun en-tête client forgé ne permet un accès local privilégié ;
-- un contrôleur ne peut appeler aucune action administrative ;
-- un appareil révoqué perd immédiatement son accès ;
-- aucune vulnérabilité élevée connue ne subsiste en production.
+- [x] Aucun en-tête client forgé ne permet un accès local privilégié.
+- [ ] Un contrôleur ne peut appeler aucune action administrative.
+- [x] Un appareil révoqué perd immédiatement son accès.
+- [x] Aucune vulnérabilité élevée connue ne subsiste en production.
+
+La prochaine itération est `SEC-006` : définir puis appliquer les rôles
+minimaux `controller` et `admin`, en cohérence avec le déploiement LAN visé.
 
 ## Axe 2 — Architecture modulaire
 
