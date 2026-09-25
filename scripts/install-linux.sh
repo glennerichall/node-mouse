@@ -489,7 +489,7 @@ generate_cookie_secret() {
   if command -v openssl >/dev/null 2>&1; then
     openssl rand -hex 32
   else
-    date +%s%N
+    node -e "process.stdout.write(require('node:crypto').randomBytes(32).toString('hex'))"
   fi
 }
 

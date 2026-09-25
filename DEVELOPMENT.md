@@ -22,7 +22,7 @@ la clôture du lot, puis sont déplacées dans le journal des lots terminés.
 | --- | --- |
 | Lot actif | A — Stabilisation et sécurité |
 | Statut | En cours |
-| Prochaine tâche | `SEC-003` — Garantir un secret de session sûr |
+| Prochaine tâche | `SEC-004` — Mettre à jour les dépendances vulnérables |
 | Roadmap globale | [ROADMAP.md](./ROADMAP.md) |
 | Roadmap PWA | [ROADMAP-PWA.md](./ROADMAP-PWA.md) |
 
@@ -72,19 +72,20 @@ obtiennent leurs décisions d'authentification du service partagé, tandis que l
 cryptographie, les jetons et la résolution réseau restent des composants
 spécialisés testables indépendamment.
 
-### SEC-003 — Garantir un secret de session sûr ➡️
+### SEC-003 — Garantir un secret de session sûr
 
-- [ ] Définir le comportement attendu en développement, test et production.
-- [ ] Refuser le démarrage en production avec le secret `change-me`.
-- [ ] Générer un secret fort pendant l'installation initiale.
-- [ ] Éviter toute impression du secret dans les logs ou diagnostics.
-- [ ] Ajouter les tests de configuration et d'installation.
-- [ ] Documenter la rotation du secret et son impact sur les sessions.
+- [x] Définir le comportement attendu en développement, test et production.
+- [x] Refuser le démarrage en production avec le secret `change-me` ou une
+  valeur de moins de 64 caractères.
+- [x] Générer un secret fort pendant l'installation initiale Linux et Windows.
+- [x] Éviter toute impression du secret dans les logs ou diagnostics.
+- [x] Ajouter les tests de configuration et vérifier les installateurs.
+- [x] Documenter la rotation du secret et son impact sur les sessions.
 
 **Terminé lorsque :** une installation neuve possède un secret unique et une
 configuration de production faible ne peut pas démarrer silencieusement.
 
-### SEC-004 — Mettre à jour les dépendances vulnérables
+### SEC-004 — Mettre à jour les dépendances vulnérables ➡️
 
 - [ ] Sauvegarder le résultat de l'audit avant modification dans le compte rendu
   du lot.

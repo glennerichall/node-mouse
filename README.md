@@ -91,6 +91,21 @@ powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 -Yes
 
 macOS installer scripts will be added later.
 
+### Session cookie secret
+
+The Linux and Windows installers generate a unique 32-byte random
+`SESSION_COOKIE_SECRET` in the configuration `.env` file. Production startup
+refuses the default `change-me` value and secrets shorter than 64 characters.
+For a manual production setup, generate a secret with
+`openssl rand -hex 32` and keep it private; never include it in logs or support
+reports.
+
+To rotate the secret, replace `SESSION_COOKIE_SECRET` in the configuration
+`.env` with a newly generated value and restart Remote Mouse. Existing browser
+session cookies will no longer be valid, so connected clients must establish a
+new session. Back up the configuration file securely before editing it, and do
+not reuse the previous secret.
+
 The automatic installer is expected to handle:
 
 - Node.js installation or validation

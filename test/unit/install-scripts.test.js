@@ -295,6 +295,8 @@ exit 0
     expect(script).toContain('function Ensure-Python');
     expect(script).toContain('function Install-NpmPackage');
     expect(script).toContain('function Configure-Https');
+    expect(script).toContain('function New-CookieSecret');
+    expect(script).toContain('SESSION_COOKIE_SECRET=$cookieSecret');
     expect(script).toContain('function Write-EnvFile');
     expect(script).toContain('function Install-Service');
     expect(script).toContain('[switch]$Https');

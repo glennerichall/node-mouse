@@ -36,7 +36,18 @@ export function normalizeSystemConfig(defaultSystemConfig) {
 }
 
 export function getStartupSystemConfigSnapshot() {
-  return deepMerge(DEFAULT_SYSTEM_CONFIG, readEnvConfig());
+  const config = deepMerge(DEFAULT_SYSTEM_CONFIG, readEnvConfig());
+
+  if (process.env.NODE_ENV === 'production') {
+    const secret = String(config.session?.cookieSecret || '');
+    if (secret === 'change-me' || secret.length < 64) {
+      throw new Error(
+        'Invalid session cookie secret for production. Set SESSION_COOKIE_SECRET to a unique random value of at least 64 characters.',
+      );
+    }
+  }
+
+  return config;
 }
 
 export function getSystemConfig() {

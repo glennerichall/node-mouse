@@ -83,7 +83,7 @@ branches.
   local.
 - [ ] Configurer explicitement les proxies de confiance.
 - [ ] Supprimer ou encadrer strictement le bypass d'authentification localhost.
-- [ ] Refuser `SESSION_COOKIE_SECRET=change-me` en production.
+- [x] Refuser un secret de session par défaut ou trop court en production.
 - [ ] Mettre à jour les dépendances présentant des vulnérabilités connues,
   notamment la chaîne Socket.IO/Engine.IO/WebSocket.
 - [ ] Limiter la taille et la fréquence des requêtes et messages temps réel.
