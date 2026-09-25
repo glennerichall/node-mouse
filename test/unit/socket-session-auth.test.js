@@ -13,7 +13,7 @@ describe('createSocketSessionAuthMiddleware', () => {
     sandbox.restore();
   });
 
-  function createServices({isValid = () => false, cookieName = 'session', trustProxy = ''} = {}) {
+  function createServices({authenticate = () => null, cookieName = 'session', trustProxy = ''} = {}) {
     const services = {
       getSystemConfig: () => ({
         trustProxy,
@@ -21,17 +21,15 @@ describe('createSocketSessionAuthMiddleware', () => {
           cookieName,
         },
       }),
-      getTokenManager: () => ({
-        isValid,
-      }),
+      getDeviceSessionService: () => ({authenticate}),
     };
     services.getSecurity = () => createSecurityService(services);
     return services;
   }
 
   it('allows localhost socket without cookie', () => {
-    const isValid = sandbox.stub().returns(false);
-    const authorizeSocket = createSocketSessionAuthMiddleware(createServices({isValid}));
+    const authenticate = sandbox.stub().returns(null);
+    const authorizeSocket = createSocketSessionAuthMiddleware(createServices({authenticate}));
     const next = sandbox.stub();
     const socket = {
       request: {
@@ -43,12 +41,12 @@ describe('createSocketSessionAuthMiddleware', () => {
     authorizeSocket(socket, next);
 
     expect(next.calledOnceWithExactly()).toBe(true);
-    expect(isValid.called).toBe(false);
+    expect(authenticate.called).toBe(false);
   });
 
   it('rejects remote unauthorized socket', () => {
-    const isValid = sandbox.stub().returns(false);
-    const authorizeSocket = createSocketSessionAuthMiddleware(createServices({isValid}));
+    const authenticate = sandbox.stub().returns(null);
+    const authorizeSocket = createSocketSessionAuthMiddleware(createServices({authenticate}));
     const next = sandbox.stub();
     const socket = {
       request: {
@@ -71,8 +69,8 @@ describe('createSocketSessionAuthMiddleware', () => {
   });
 
   it('rejects a direct remote socket spoofing localhost through x-forwarded-for', () => {
-    const isValid = sandbox.stub().returns(false);
-    const authorizeSocket = createSocketSessionAuthMiddleware(createServices({isValid}));
+    const authenticate = sandbox.stub().returns(null);
+    const authorizeSocket = createSocketSessionAuthMiddleware(createServices({authenticate}));
     const next = sandbox.stub();
     const socket = {
       request: {
@@ -84,13 +82,13 @@ describe('createSocketSessionAuthMiddleware', () => {
 
     authorizeSocket(socket, next);
 
-    expect(isValid.calledOnce).toBe(true);
+    expect(authenticate.calledOnce).toBe(true);
     expect(next.firstCall.args[0]).toBeInstanceOf(Error);
   });
 
   it('accepts remote authorized socket and sets its security context', () => {
-    const isValid = sandbox.stub().returns(true);
-    const authorizeSocket = createSocketSessionAuthMiddleware(createServices({isValid}));
+    const authenticate = sandbox.stub().withArgs('token-abc').returns({id: 'session-123'});
+    const authorizeSocket = createSocketSessionAuthMiddleware(createServices({authenticate}));
     const next = sandbox.stub();
     const socket = {
       request: {
@@ -105,15 +103,16 @@ describe('createSocketSessionAuthMiddleware', () => {
     expect(socket.securityContext).toEqual(expect.objectContaining({
       authenticated: true,
       authenticationMethod: 'session',
+      deviceSessionId: 'session-123',
       clientAddress: '10.0.0.8',
       transport: 'socket.io',
     }));
   });
 
   it('uses x-forwarded-for when the direct peer is a trusted proxy', () => {
-    const isValid = sandbox.stub().returns(true);
+    const authenticate = sandbox.stub().withArgs('token-abc').returns({id: 'session-123'});
     const authorizeSocket = createSocketSessionAuthMiddleware(createServices({
-      isValid,
+      authenticate,
       trustProxy: 'loopback',
     }));
     const next = sandbox.stub();
@@ -129,7 +128,7 @@ describe('createSocketSessionAuthMiddleware', () => {
 
     authorizeSocket(socket, next);
 
-    expect(isValid.calledOnceWithExactly('token-abc')).toBe(true);
+    expect(authenticate.calledOnceWithExactly('token-abc')).toBe(true);
     expect(next.calledOnceWithExactly()).toBe(true);
   });
 });

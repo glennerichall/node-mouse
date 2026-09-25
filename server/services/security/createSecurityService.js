@@ -40,7 +40,8 @@ export function createSecurityService(services) {
         const config = services.getSystemConfig();
         const cookieName = config.session.cookieName;
         const token = request?.signedCookies?.[cookieName];
-        const valid = services.getTokenManager().isValid(token);
+        const deviceSession = services.getDeviceSessionService().authenticate(token);
+        const valid = Boolean(deviceSession);
 
         return {
             allowed: valid,
@@ -48,7 +49,8 @@ export function createSecurityService(services) {
             context: {
                 ...context,
                 authenticated: valid,
-                authenticationMethod: valid ? 'session' : null,
+                authenticationMethod: deviceSession ? 'session' : null,
+                deviceSessionId: deviceSession?.id || null,
             },
         };
     }

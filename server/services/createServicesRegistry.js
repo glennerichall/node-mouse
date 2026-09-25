@@ -20,6 +20,7 @@ import {createApplicationDaemonService} from './application/createApplicationDae
 import {createOsService} from './os/index.js';
 import {createSystemService} from './system/createSystemService.js';
 import {createSecurityService} from './security/createSecurityService.js';
+import {createDeviceSessionService} from './security/createDeviceSessionService.js';
 
 
 export function createServicesRegistry() {
@@ -30,6 +31,7 @@ export function createServicesRegistry() {
         createOsService,
         createSystemService,
         createSecurityService,
+        createDeviceSessionService,
         createConfigService,
         createSseService,
         createEventStore,

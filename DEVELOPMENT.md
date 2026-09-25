@@ -16,13 +16,22 @@ Une case ne doit être cochée qu'après validation de ses critères d'acceptati
 et des tests pertinents. Les tâches terminées restent dans ce fichier jusqu'à
 la clôture du lot, puis sont déplacées dans le journal des lots terminés.
 
+## Modèle de déploiement visé
+
+Remote Mouse est conçu pour un serveur accessible sur le réseau local, dont le
+QR est affiché sur place. Le nombre d'utilisateurs est limité et ceux-ci sont
+normalement physiquement présents et se connaissent. Ce contexte réduit le
+besoin d'une gestion lourde des comptes, mais ne protège pas contre un client
+malveillant déjà présent sur le LAN ni contre une exposition accidentelle à
+Internet.
+
 ## État courant
 
 | Élément | Valeur |
 | --- | --- |
 | Lot actif | A — Stabilisation et sécurité |
 | Statut | En cours |
-| Prochaine tâche | `SEC-005` — Séparer association et session |
+| Prochaine tâche | `SEC-006` — Introduire les rôles d'accès |
 | Roadmap globale | [ROADMAP.md](./ROADMAP.md) |
 | Roadmap PWA | [ROADMAP-PWA.md](./ROADMAP-PWA.md) |
 
@@ -85,7 +94,7 @@ spécialisés testables indépendamment.
 **Terminé lorsque :** une installation neuve possède un secret unique et une
 configuration de production faible ne peut pas démarrer silencieusement.
 
-### SEC-004 — Mettre à jour les dépendances vulnérables ➡️
+### SEC-004 — Mettre à jour les dépendances vulnérables
 
 - [x] Sauvegarder le résultat de l'audit avant modification dans le compte rendu
   du lot.
@@ -138,15 +147,27 @@ téléviseur physique.
 
 ### SEC-005 — Séparer association et session
 
-- [ ] Définir le cycle de vie du jeton d'association.
-- [ ] Définir le modèle d'une session d'appareil.
-- [ ] Ne plus utiliser directement le jeton QR comme session longue durée.
-- [ ] Ajouter expiration, révocation et dernière activité.
-- [ ] Prévoir une migration compatible avec les sessions existantes.
-- [ ] Ajouter les tests DAO, service, HTTP et Socket.IO.
+- [x] Définir le cycle de vie du jeton d'association.
+- [x] Définir le modèle d'une session d'appareil.
+- [x] Ne plus utiliser directement le jeton QR comme session longue durée.
+- [x] Ajouter expiration, révocation et dernière activité.
+- [x] Refuser les anciens cookies d'association et exiger un nouveau jumelage.
+- [x] Ajouter les tests DAO, service, HTTP et Socket.IO.
 
 **Terminé lorsque :** un jeton QR est temporaire, chaque appareil possède une
 session révocable et la rotation d'un jeton ne produit pas d'accès imprévisible.
+
+Les nouvelles associations créent un secret de session indépendant, stocké sous
+forme de SHA-256 et expirant avec le cookie. Le jeton QR ne sert qu'à créer une
+session et n'est jamais accepté comme cookie : après cette mise à jour, les
+appareils déjà jumelés devront rescanner le QR une fois. Les sessions peuvent
+être révoquées individuellement via `DELETE /api/sessions/current`; la
+révocation d'autres appareils attend le contrôle des rôles de `SEC-006`.
+
+Vérification : 225 tests unitaires (61 suites) et 18 tests navigateur passent.
+Le test de flux confirme qu'un jeton d'association produit un cookie indépendant
+utilisable sur HTTP et Socket.IO, que l'ancien jeton est refusé comme cookie et
+que la révocation rend la session immédiatement invalide.
 
 ### SEC-006 — Introduire les rôles d'accès
 

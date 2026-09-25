@@ -14,12 +14,13 @@ function createRequest({address, token, forwardedFor} = {}) {
   };
 }
 
-function createService({isValid = () => false, trustProxy = ''} = {}) {
+function createService({isValid = () => false, authenticate = () => null, trustProxy = ''} = {}) {
   return createSecurityService({
     getSystemConfig: () => ({
       trustProxy,
       session: {cookieName: 'session'},
     }),
+    getDeviceSessionService: () => ({authenticate}),
     getTokenManager: () => ({isValid}),
   });
 }
@@ -46,8 +47,8 @@ describe('createSecurityService', () => {
   });
 
   it('returns equivalent decisions for HTTP and Socket.IO', () => {
-    const isValid = jest.fn((token) => token === 'valid-token');
-    const service = createService({isValid});
+    const authenticate = jest.fn((token) => token === 'valid-token' ? {id: 'device-session-1'} : null);
+    const service = createService({authenticate});
     const request = createRequest({address: '10.0.0.8', token: 'valid-token'});
 
     const http = service.authenticateHttp(request);
@@ -67,6 +68,48 @@ describe('createSecurityService', () => {
     expect(decision.allowed).toBe(false);
     expect(decision.reason).toBe(SECURITY_REASON_INVALID_SESSION);
     expect(JSON.stringify(decision)).not.toContain('sensitive-token');
+  });
+
+  it('authenticates a device session without validating the pairing token', () => {
+    const isValid = jest.fn(() => false);
+    const authenticate = jest.fn(() => ({id: 'device-session-1'}));
+    const decision = createService({isValid, authenticate}).authenticateHttp(createRequest({
+      address: '10.0.0.8',
+      token: 'opaque-session-token',
+    }));
+
+    expect(decision.allowed).toBe(true);
+    expect(decision.context).toEqual(expect.objectContaining({
+      authenticationMethod: 'session',
+      deviceSessionId: 'device-session-1',
+    }));
+    expect(authenticate).toHaveBeenCalledWith('opaque-session-token');
+    expect(isValid).not.toHaveBeenCalled();
+    expect(JSON.stringify(decision)).not.toContain('opaque-session-token');
+  });
+
+  it('uses the same device session decision for HTTP and Socket.IO', () => {
+    const service = createService({
+      authenticate: (token) => token === 'device-token' ? {id: 'session-1'} : null,
+    });
+    const request = createRequest({address: '10.0.0.8', token: 'device-token'});
+    const http = service.authenticateHttp(request);
+    const socket = service.authenticateSocket({request});
+
+    expect({...http, context: {...http.context, correlationId: '', transport: ''}})
+      .toEqual({...socket, context: {...socket.context, correlationId: '', transport: ''}});
+    expect(http.context.authenticationMethod).toBe('session');
+    expect(http.context.deviceSessionId).toBe('session-1');
+  });
+
+  it('rejects a legacy entry-token cookie instead of treating it as a session', () => {
+    const isValid = jest.fn(() => true);
+    const decision = createService({isValid})
+      .authenticateHttp(createRequest({address: '10.0.0.8', token: 'legacy-token'}));
+
+    expect(decision.allowed).toBe(false);
+    expect(decision.context.authenticationMethod).toBeNull();
+    expect(isValid).not.toHaveBeenCalled();
   });
 
   it('resolves a forwarded client only through a configured trusted proxy', () => {

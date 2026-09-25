@@ -1,14 +1,19 @@
 import sinon from 'sinon';
 import {
+  createSessionManagementRouter,
   createSessionRouter,
   createSessionGuard,
 } from '../../server/connection/api/session.middleware.js';
 import {createSecurityService} from '../../server/services/security/createSecurityService.js';
 
 function withSecurity(services) {
-  return {
+  const configuredServices = {
     ...services,
-    getSecurity: () => createSecurityService(services),
+    getDeviceSessionService: services.getDeviceSessionService || (() => ({authenticate: () => null})),
+  };
+  return {
+    ...configuredServices,
+    getSecurity: () => createSecurityService(configuredServices),
   };
 }
 
@@ -47,14 +52,11 @@ describe('createSessionValidationMiddleware', () => {
   });
 
   it('bypasses auth for localhost request', () => {
-    const isValid = sandbox.stub().returns(false);
-    const getTokenManager = sandbox.stub().returns({isValid});
+    const authenticate = sandbox.stub().returns(null);
     const middleware = createSessionGuard(withSecurity({
-      getTokenManager,
+      getDeviceSessionService: () => ({authenticate}),
       getSystemConfig: () => ({
-        session: {
-          cookieName: 'session',
-        },
+        session: {cookieName: 'session'},
       }),
     }));
 
@@ -70,21 +72,17 @@ describe('createSessionValidationMiddleware', () => {
 
     middleware(req, res, next);
 
-    expect(getTokenManager.called).toBe(false);
     expect(next.calledOnce).toBe(true);
-    expect(isValid.called).toBe(false);
+    expect(authenticate.called).toBe(false);
     expect(res.state.statusCode).toBeNull();
   });
 
   it('rejects remote unauthorized request', () => {
-    const isValid = sandbox.stub().returns(false);
-    const getTokenManager = sandbox.stub().returns({isValid});
+    const authenticate = sandbox.stub().returns(null);
     const middleware = createSessionGuard(withSecurity({
-      getTokenManager,
+      getDeviceSessionService: () => ({authenticate}),
       getSystemConfig: () => ({
-        session: {
-          cookieName: 'session',
-        },
+        session: {cookieName: 'session'},
       }),
     }));
 
@@ -100,18 +98,17 @@ describe('createSessionValidationMiddleware', () => {
 
     middleware(req, res, next);
 
-    expect(getTokenManager.calledOnce).toBe(true);
     expect(next.called).toBe(false);
-    expect(isValid.calledOnce).toBe(true);
+    expect(authenticate.calledOnceWithExactly(undefined)).toBe(true);
     expect(res.state.statusCode).toBe(401);
     expect(res.state.contentType).toBe('text/plain');
     expect(res.state.body).toBe('Unauthorized');
   });
 
   it('rejects a direct remote request spoofing localhost through x-forwarded-for', () => {
-    const isValid = sandbox.stub().returns(false);
+    const authenticate = sandbox.stub().returns(null);
     const middleware = createSessionGuard(withSecurity({
-      getTokenManager: () => ({isValid}),
+      getDeviceSessionService: () => ({authenticate}),
       getSystemConfig: () => ({session: {cookieName: 'session'}}),
     }));
     const req = {
@@ -126,15 +123,14 @@ describe('createSessionValidationMiddleware', () => {
     middleware(req, res, next);
 
     expect(next.called).toBe(false);
-    expect(isValid.calledOnce).toBe(true);
+    expect(authenticate.calledOnceWithExactly(undefined)).toBe(true);
     expect(res.state.statusCode).toBe(401);
   });
 
   it('accepts a remote valid request and sets its security context', () => {
-    const isValid = sandbox.stub().returns(true);
-    const getTokenManager = sandbox.stub().returns({isValid});
+    const authenticate = sandbox.stub().returns({id: 'session-123'});
     const middleware = createSessionGuard(withSecurity({
-      getTokenManager,
+      getDeviceSessionService: () => ({authenticate}),
       getSystemConfig: () => ({
         session: {
           cookieName: 'session',
@@ -154,7 +150,7 @@ describe('createSessionValidationMiddleware', () => {
 
     middleware(req, res, next);
 
-    expect(getTokenManager.calledOnce).toBe(true);
+    expect(authenticate.calledOnceWithExactly('token-123')).toBe(true);
     expect(next.calledOnce).toBe(true);
     expect(req.securityContext).toEqual(expect.objectContaining({
       authenticated: true,
@@ -165,10 +161,9 @@ describe('createSessionValidationMiddleware', () => {
   });
 
   it('returns friendly html page for browser unauthorized request', () => {
-    const isValid = sandbox.stub().returns(false);
-    const getTokenManager = sandbox.stub().returns({isValid});
+    const authenticate = sandbox.stub().returns(null);
     const middleware = createSessionGuard(withSecurity({
-      getTokenManager,
+      getDeviceSessionService: () => ({authenticate}),
       getSystemConfig: () => ({
         session: {
           cookieName: 'session',
@@ -189,7 +184,7 @@ describe('createSessionValidationMiddleware', () => {
 
     middleware(req, res, next);
 
-    expect(getTokenManager.calledOnce).toBe(true);
+    expect(authenticate.calledOnceWithExactly(undefined)).toBe(true);
     expect(next.called).toBe(false);
     expect(res.state.statusCode).toBe(401);
     expect(res.state.contentType).toBe('text/html');
@@ -211,15 +206,23 @@ describe('createSessionRouter', () => {
   it('redirects browser entry requests after creating the session', () => {
     const isValid = sandbox.stub().withArgs('token-123').returns(true);
     const getTokenManager = sandbox.stub().returns({isValid});
+    const createSession = sandbox.stub().returns({
+      token: 'device-session-token',
+      session: {id: 'session-123'},
+    });
+    const publishEvent = sandbox.stub();
     const services = {
       getEvents: () => ({
-        publishEvent: sandbox.stub(),
+        publishEvent,
       }),
+      getDeviceSessionService: () => ({createSession}),
       getTokenManager,
       getSystemConfig: () => ({
         session: {
           cookieName: 'session',
+          cookieMaxAgeDays: 1,
         },
+        https: {enabled: true},
       }),
     };
     const router = createSessionRouter(withSecurity(services));
@@ -227,16 +230,62 @@ describe('createSessionRouter', () => {
     const handler = layer.route.stack[0].handle;
     const req = {
       params: {token: 'token-123'},
+      headers: {'user-agent': 'test browser'},
+      socket: {remoteAddress: '10.0.0.8'},
     };
     const res = {
-      createSession: sandbox.stub(),
+      cookie: sandbox.stub(),
       redirect: sandbox.stub(),
     };
 
     handler(req, res);
 
     expect(getTokenManager.calledOnce).toBe(true);
-    expect(res.createSession.calledOnceWithExactly('token-123')).toBe(true);
+    expect(createSession.calledOnceWithExactly({
+      clientAddress: '10.0.0.8',
+      userAgent: 'test browser',
+    })).toBe(true);
+    expect(res.cookie.calledOnceWithExactly('session', 'device-session-token', {
+      signed: true,
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000,
+      path: '/',
+    })).toBe(true);
+    expect(publishEvent.firstCall.args[2]).toEqual(expect.objectContaining({
+      sessionId: 'session-123',
+      address: '10.0.0.8',
+    }));
+    expect(JSON.stringify(publishEvent.firstCall.args[2])).not.toContain('device-session-token');
     expect(res.redirect.calledOnceWithExactly('/')).toBe(true);
+  });
+
+  it('revokes and clears only the authenticated device session', () => {
+    const revokeSession = sandbox.stub().returns(true);
+    const clearCookie = sandbox.stub();
+    const status = sandbox.stub().returnsThis();
+    const end = sandbox.stub();
+    const services = {
+      getDeviceSessionService: () => ({revokeSession}),
+      getSystemConfig: () => ({
+        https: {enabled: false},
+        session: {cookieName: 'session'},
+      }),
+    };
+    const router = createSessionManagementRouter(services);
+    const layer = router.stack.find((entry) => entry.route?.path === '/current' && entry.route.methods.delete);
+    const handler = layer.route.stack[0].handle;
+
+    handler({securityContext: {authenticationMethod: 'session', deviceSessionId: 'session-123'}}, {
+      clearCookie, status, end,
+    });
+
+    expect(revokeSession.calledOnceWithExactly('session-123')).toBe(true);
+    expect(clearCookie.calledOnce).toBe(true);
+    expect(clearCookie.firstCall.args[0]).toBe('session');
+    expect(clearCookie.firstCall.args[1]).toEqual(expect.objectContaining({path: '/'}));
+    expect(status.calledOnceWithExactly(204)).toBe(true);
+    expect(end.calledOnce).toBe(true);
   });
 });

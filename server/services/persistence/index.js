@@ -1,5 +1,6 @@
 import {createConfigDao} from './createConfigDao.js';
 import {createEntryTokenDao} from './createEntryTokenDao.js';
+import {createDeviceSessionDao} from './createDeviceSessionDao.js';
 import {createDatabaseProvider} from './createDatabaseProvider.js';
 import {createRestartLogDao} from './createRestartLogDao.js';
 import {createUpdateEventLogDao} from './createUpdateEventLogDao.js';
@@ -15,6 +16,7 @@ export function createPersistence(services) {
             getDatabase,
         }),
         entryTokenDao: createEntryTokenDao({getDatabase}),
+        deviceSessionDao: createDeviceSessionDao({getDatabase}),
         restartLogDao: createRestartLogDao({getDatabase}),
         updateEventLogDao: createUpdateEventLogDao({getDatabase}),
     };

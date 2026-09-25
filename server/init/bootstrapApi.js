@@ -7,8 +7,8 @@ import {
     sharedUtilsDir
 } from '../utils/paths.js';
 import {
-    createSessionCreationMiddleware,
     createSessionGuard,
+    createSessionManagementRouter,
     createSessionRouter,
 } from '../connection/api/session.middleware.js';
 import {createQrPageHandler} from '../connection/api/qr-page.handler.js';
@@ -23,7 +23,6 @@ const packageJsonPath = path.join(projectRoot, 'package.json');
 
 export function bootstrapApi(services) {
     const {
-        getTokenManager,
         getSystemConfig,
         getServer,
     } = services;
@@ -49,24 +48,12 @@ export function bootstrapApi(services) {
     
     app.use(cookieParser);
 
-    app.use(createSessionCreationMiddleware({
-        cookieName: systemConfig.session.cookieName,
-        cookieMaxAgeMs: Math.max(1, systemConfig.session.cookieMaxAgeDays) * 24 * 60 * 60 * 1000,
-        secureCookies: systemConfig.https.enabled,
-    }));
-
     app.use('/api/sessions', createSessionRouter(services));
 
 
     app.use(createSessionGuard(services));
+    app.use('/api/sessions', createSessionManagementRouter(services));
     
-    app.get('/', (req, res, next) => {
-        if (req.securityContext?.authenticationMethod === 'session') {
-            res.createSession(getTokenManager().getToken());
-        }
-        next();
-    });
-
     app.use(createStaticShareRouter({
         publicDir,
         clientDir,
