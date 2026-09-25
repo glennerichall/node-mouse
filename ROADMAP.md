@@ -107,8 +107,10 @@ branches.
 - [x] Permettre à un appareil de révoquer sa session courante.
 - [ ] Permettre à un administrateur de révoquer un autre appareil ou toutes les
   sessions depuis l'interface/API.
-- [ ] Séparer les rôles `controller` et `admin`.
-- [ ] Appliquer les mêmes autorisations à HTTP, Socket.IO et WebRTC.
+- [x] Séparer les rôles `controller` et `admin` (contrôleur par défaut pour
+  les sessions jumelées; accès loopback administrateur).
+- [x] Appliquer les mêmes autorisations à HTTP et Socket.IO via le service
+  d'autorisation commun; WebRTC pourra réutiliser son contrat.
 - [ ] Protéger les écritures HTTP avec vérification Origin et CSRF adaptée.
 - [ ] Ajouter un historique local des associations et révocations.
 
@@ -119,8 +121,8 @@ branches.
 - [x] Un appareil révoqué perd immédiatement son accès.
 - [x] Aucune vulnérabilité élevée connue ne subsiste en production.
 
-La prochaine itération est `SEC-006` : définir puis appliquer les rôles
-minimaux `controller` et `admin`, en cohérence avec le déploiement LAN visé.
+La prochaine itération est `SEC-007` : limiter et valider les entrées HTTP et
+Socket.IO, notamment les tailles, le débit, les origines et la protection CSRF.
 
 ## Axe 2 — Architecture modulaire
 

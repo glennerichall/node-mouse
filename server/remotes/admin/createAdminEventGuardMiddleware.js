@@ -2,6 +2,7 @@ import { REMOTE_EVENT_ADMIN_PREFIX } from '../../../utils/remoteCommands.js';
 
 export function createAdminEventGuardMiddleware({
   isAdminActionsEnabled,
+  isAdmin,
   client,
   log,
   respondAdminAction,
@@ -10,6 +11,17 @@ export function createAdminEventGuardMiddleware({
     const eventName = String(packet?.[0] || '');
     if (!eventName.startsWith(REMOTE_EVENT_ADMIN_PREFIX)) {
       next();
+      return;
+    }
+
+    if (!isAdmin) {
+      const action = eventName.replace(REMOTE_EVENT_ADMIN_PREFIX, '');
+      log.warn({client, action}, 'Action admin refusée: rôle insuffisant');
+      respondAdminAction(action, {
+        ok: false,
+        message: 'Permission administrateur requise.',
+      });
+      next(new Error('admin_forbidden'));
       return;
     }
 

@@ -32,6 +32,7 @@ export function createSecurityService(services) {
                     ...context,
                     authenticated: true,
                     authenticationMethod: 'local',
+                    role: 'admin',
                 },
             };
         }
@@ -50,6 +51,7 @@ export function createSecurityService(services) {
                 authenticated: valid,
                 authenticationMethod: deviceSession ? 'session' : null,
                 deviceSessionId: deviceSession?.id || null,
+                role: deviceSession ? 'controller' : null,
             },
         };
     }

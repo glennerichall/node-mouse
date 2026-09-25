@@ -42,6 +42,7 @@ describe('createSecurityService', () => {
         local: true,
         authenticated: true,
         authenticationMethod: 'local',
+        role: 'admin',
       },
     });
   });
@@ -108,6 +109,7 @@ describe('createSecurityService', () => {
     expect(decision.context).toEqual(expect.objectContaining({
       authenticationMethod: 'session',
       deviceSessionId: 'device-session-1',
+      role: 'controller',
     }));
     expect(authenticate).toHaveBeenCalledWith('opaque-session-token');
     expect(isValid).not.toHaveBeenCalled();

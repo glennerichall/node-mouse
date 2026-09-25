@@ -31,7 +31,7 @@ Internet.
 | --- | --- |
 | Lot actif | A — Stabilisation et sécurité |
 | Statut | En cours |
-| Prochaine tâche | `SEC-006` — Introduire les rôles d'accès |
+| Prochaine tâche | `SEC-007` — Limiter et valider les entrées |
 | Roadmap globale | [ROADMAP.md](./ROADMAP.md) |
 | Roadmap PWA | [ROADMAP-PWA.md](./ROADMAP-PWA.md) |
 
@@ -162,7 +162,7 @@ forme de SHA-256 et expirant avec le cookie. Le jeton QR ne sert qu'à créer un
 session et n'est jamais accepté comme cookie : après cette mise à jour, les
 appareils déjà jumelés devront rescanner le QR une fois. Les sessions peuvent
 être révoquées individuellement via `DELETE /api/sessions/current`; la
-révocation d'autres appareils attend le contrôle des rôles de `SEC-006`.
+révocation d'autres appareils attend un mécanisme dédié de gestion des appareils.
 
 Vérification : 225 tests unitaires (61 suites) et 18 tests navigateur passent.
 Le test de flux confirme qu'un jeton d'association produit un cookie indépendant
@@ -171,15 +171,19 @@ que la révocation rend la session immédiatement invalide.
 
 ### SEC-006 — Introduire les rôles d'accès
 
-- [ ] Définir les permissions `controller` et `admin`.
-- [ ] Centraliser l'autorisation dans un service partagé.
-- [ ] Appliquer les permissions aux routes HTTP.
-- [ ] Appliquer les mêmes permissions aux événements Socket.IO.
-- [ ] Prévoir leur réutilisation par WebRTC.
-- [ ] Tester tous les refus d'actions administratives.
+- [x] Définir les permissions `controller` et `admin`.
+- [x] Centraliser l'autorisation dans un service partagé.
+- [x] Appliquer les permissions aux routes HTTP.
+- [x] Appliquer les mêmes permissions aux événements Socket.IO.
+- [x] Exposer un contrat d'autorisation réutilisable par WebRTC.
+- [x] Tester les refus d'actions administratives.
 
 **Terminé lorsque :** une session `controller` ne peut modifier la
-configuration, redémarrer le service ou installer une mise à jour.
+configuration, redémarrer le service ou installer une mise à jour. Les sessions
+jumelées sont `controller`; les clients loopback sont `admin`. L'élévation d'un
+appareil distant n'est pas encore exposée.
+
+Vérification : 232 tests unitaires et 18 tests navigateur passent.
 
 ### SEC-007 — Limiter et valider les entrées
 

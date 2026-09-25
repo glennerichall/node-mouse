@@ -362,9 +362,10 @@ insuffisante.
   par l'audit, notamment dans Engine.IO, Socket.IO parser et WebSocket.
 - [x] Séparer le jeton temporaire d'association de la session persistante d'un
   appareil.
-- [ ] Créer des rôles distincts `controller` et `admin`.
-- [ ] Protéger les actions administratives quel que soit le transport utilisé
-  (prochaine étape : `SEC-006`).
+- [x] Créer des rôles distincts `controller` et `admin` (jumelage en
+  `controller`, accès loopback en `admin`).
+- [x] Protéger les actions administratives via HTTP et Socket.IO avec un
+  service d'autorisation partagé.
 - [ ] Limiter la taille et le rythme des messages entrants.
 - [ ] Ne jamais écrire les offres WebRTC, candidats ICE, jetons, cookies ou
   secrets dans les journaux.
@@ -414,7 +415,7 @@ commande ne traverse le serveur tiers.
 - [x] Permettre à un appareil de révoquer sa session courante.
 - [ ] Ajouter la révocation administrative d'un autre appareil ou de toutes les
   sessions.
-- [ ] Ajouter les rôles et autorisations administratives.
+- [x] Ajouter les rôles et autorisations administratives pour HTTP et Socket.IO.
 - [x] Mettre à jour les dépendances et traiter les alertes élevées de sécurité.
 - [x] Ajouter les tests de non-régression associés.
 

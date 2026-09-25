@@ -24,7 +24,11 @@ export function createSocketActionRegistrars(services) {
         },
         (socket) => {
             const {adminActions} = services.getRemotes();
-            return createAdminEventRegistrar({adminActions, getSystemConfig: services.getSystemConfig})(socket);
+            return createAdminEventRegistrar({
+                adminActions,
+                getSystemConfig: services.getSystemConfig,
+                getAuthorization: services.getAuthorization,
+            })(socket);
         },
         (socket) => {
             const {preview} = services.getRemotes();

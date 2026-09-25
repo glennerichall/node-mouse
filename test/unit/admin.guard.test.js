@@ -23,6 +23,7 @@ describe('createAdminEventGuardMiddleware', () => {
     const next = sandbox.stub();
     const guard = createAdminEventGuardMiddleware({
       isAdminActionsEnabled: false,
+      isAdmin: true,
       client: 'abc12345',
       log: {warn},
       respondAdminAction,
@@ -41,6 +42,7 @@ describe('createAdminEventGuardMiddleware', () => {
     const next = sandbox.stub();
     const guard = createAdminEventGuardMiddleware({
       isAdminActionsEnabled: true,
+      isAdmin: true,
       client: 'abc12345',
       log: {warn},
       respondAdminAction,
@@ -59,6 +61,7 @@ describe('createAdminEventGuardMiddleware', () => {
     const next = sandbox.stub();
     const guard = createAdminEventGuardMiddleware({
       isAdminActionsEnabled: false,
+      isAdmin: true,
       client: 'abc12345',
       log: {warn},
       respondAdminAction,
@@ -76,5 +79,27 @@ describe('createAdminEventGuardMiddleware', () => {
     expect(next.calledOnce).toBe(true);
     expect(next.firstCall.args[0]).toBeInstanceOf(Error);
     expect(next.firstCall.args[0].message).toBe('admin_actions_disabled');
+  });
+
+  it('blocks admin events from a controller even when admin actions are enabled', () => {
+    const warn = sandbox.stub();
+    const respondAdminAction = sandbox.stub();
+    const next = sandbox.stub();
+    const guard = createAdminEventGuardMiddleware({
+      isAdminActionsEnabled: true,
+      isAdmin: false,
+      client: 'abc12345',
+      log: {warn},
+      respondAdminAction,
+    });
+
+    guard([REMOTE_EVENT_ADMIN_SERVICE_RESTART, {}], next);
+
+    expect(respondAdminAction.calledOnceWithExactly('service-restart', {
+      ok: false,
+      message: 'Permission administrateur requise.',
+    })).toBe(true);
+    expect(next.firstCall.args[0]).toBeInstanceOf(Error);
+    expect(next.firstCall.args[0].message).toBe('admin_forbidden');
   });
 });

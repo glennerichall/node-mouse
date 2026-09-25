@@ -20,7 +20,7 @@ function getModuleLog() {
   return log;
 }
 
-export function createAdminEventRegistrar({ adminActions, getSystemConfig }) {
+export function createAdminEventRegistrar({ adminActions, getSystemConfig, getAuthorization }) {
   const log = getModuleLog();
   return function registerAdminEvents(socket) {
     const config = getSystemConfig();
@@ -29,9 +29,11 @@ export function createAdminEventRegistrar({ adminActions, getSystemConfig }) {
       eventName: REMOTE_EVENT_ADMIN_RESULT,
     });
     const client = socket.id.slice(0, 8);
+    const authorization = getAuthorization().authorize(socket.securityContext, 'admin:manage');
 
     socket.use(createAdminEventGuardMiddleware({
       isAdminActionsEnabled: config.adminActionsEnabled,
+      isAdmin: authorization.allowed,
       client,
       log,
       respondAdminAction,
