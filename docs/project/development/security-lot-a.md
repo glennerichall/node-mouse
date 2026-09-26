@@ -1,8 +1,9 @@
 # Développement actif
 
 > Tableau de suivi opérationnel de Remote Mouse. Les orientations à long terme
-> restent dans [ROADMAP.md](./ROADMAP.md) et les travaux PWA/TLS dans
-> [ROADMAP-PWA.md](./ROADMAP-PWA.md).
+> restent dans [la roadmap globale](../ROADMAP.md) et les travaux PWA/TLS dans
+> [l'axe PWA](../axes/pwa.md). Ce fichier conserve l'historique du lot A;
+> le suivi actif est désormais réparti par axe.
 
 ## Utilisation
 
@@ -33,8 +34,8 @@ Internet.
 | Statut | En cours |
 | Prochaine tâche | `SEC-008` — Gérer les appareils associés |
 | Version | `6.9.1` — bump `patch` pour le durcissement SEC-007 |
-| Roadmap globale | [ROADMAP.md](./ROADMAP.md) |
-| Roadmap PWA | [ROADMAP-PWA.md](./ROADMAP-PWA.md) |
+| Roadmap globale | [ROADMAP.md](../ROADMAP.md) |
+| Axe PWA | [pwa.md](../axes/pwa.md) |
 
 ## Travaux préparatoires terminés
 
@@ -254,7 +255,7 @@ Vérification : 247 tests unitaires et 22 tests navigateur passent. `npm audit
 - [ ] `PWA-009` — Tester l'installation sur Android, iOS et desktop.
 
 Les critères détaillés de ces tâches sont définis dans
-[ROADMAP-PWA.md](./ROADMAP-PWA.md).
+[l'axe PWA](../axes/pwa.md).
 
 ## Vérifications obligatoires avant de cocher une tâche
 

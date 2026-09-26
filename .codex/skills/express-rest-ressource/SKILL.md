@@ -8,6 +8,8 @@ Cette skill sert à créer ou refactorer une ressource REST dans le projet.
 
 # Workflow obligatoire
 
+Avant la conception, appliquer [le workflow roadmap](../roadmap-driven-development/SKILL.md): identifier l'axe, la tâche et les critères d'acceptation, puis mettre à jour le plan et le journal après vérification.
+
 ## Étape 1 — inspection de l’existant
 Avant toute écriture :
 - localiser les routes similaires ;

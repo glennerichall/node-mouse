@@ -23,6 +23,7 @@ Utiliser cette skill quand l'utilisateur demande de faire un commit, de choisir 
 Avant tout commit :
 - lire `git status --short` ;
 - inspecter le diff utile pour comprendre l'impact reel ;
+- verifier que les changements de developpement ont une tache/criteres dans `docs/project/axes/` et que l'etat et le journal sont a jour selon `docs/project/development/README.md` ;
 - distinguer breaking change, nouvelle capacite, correctif, refactor, test, doc et chore.
 
 ## 2. Decision semver

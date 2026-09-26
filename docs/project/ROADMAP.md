@@ -2,10 +2,16 @@
 
 > Feuille de route générale du projet. Les détails propres à l'installation PWA,
 > TLS et aux transports réseau se trouvent dans
-> [ROADMAP-PWA.md](./ROADMAP-PWA.md).
+> [axe PWA](./axes/pwa.md).
 
 Le suivi des tâches en cours et de leur Definition of Done se trouve dans
-[DEVELOPMENT.md](./DEVELOPMENT.md).
+[le journal de développement](./development/README.md).
+
+Les plans par domaine sont conservés dans les documents d'[architecture](./axes/architecture.md),
+de [sécurité](./axes/security.md), [fiabilité](./axes/reliability.md),
+d'[expérience](./axes/user-experience.md), des [plateformes](./axes/platforms.md),
+de [PWA](./axes/pwa.md), de l'[exploitation](./axes/operations.md) et de la
+[qualité](./axes/quality.md), avec un [backlog transversal](./axes/backlog.md).
 
 ## Vision
 
@@ -260,7 +266,7 @@ Dispatcher de commandes
 
 ## Axe 6 — PWA, TLS et modes de déploiement
 
-Cet axe est détaillé dans [ROADMAP-PWA.md](./ROADMAP-PWA.md).
+Cet axe est détaillé dans [son document dédié](./axes/pwa.md).
 
 Les modes à préserver ou développer sont :
 

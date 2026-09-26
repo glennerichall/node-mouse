@@ -4,7 +4,7 @@
 > Progressive Web App, avec plusieurs modes de connexion interchangeables.
 
 La vision générale, les fonctionnalités et les autres axes du projet sont
-suivis dans [ROADMAP.md](./ROADMAP.md).
+suivis dans [la roadmap globale](../ROADMAP.md).
 
 ## Vision
 

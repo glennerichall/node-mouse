@@ -13,6 +13,8 @@ Utiliser Socket.IO proprement dans un projet déjà structuré autour d’Expres
 - Les événements doivent être nommés par domaine métier, pas par implémentation technique.
 
 # Procédure
+
+Avant toute modification, appliquer [le workflow roadmap](../roadmap-driven-development/SKILL.md): identifier l'axe, la tâche et ses critères d'acceptation; mettre à jour la roadmap et créer un journal d'itération après les vérifications.
 1. Identifier les flux déjà couverts par HTTP.
 2. Déterminer ce qui doit être temps réel et ce qui doit rester REST.
 3. Mutualiser la logique métier dans des services partagés.

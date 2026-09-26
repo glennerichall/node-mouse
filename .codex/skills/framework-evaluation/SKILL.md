@@ -11,6 +11,8 @@ Décider s’il faut :
 
 # Démarche
 
+Avant d'évaluer une intégration destinée au projet, appliquer [le workflow roadmap](../roadmap-driven-development/SKILL.md): vérifier que le besoin est planifié dans l'axe pertinent et consigner l'arbitrage ainsi que ses conséquences dans le journal d'itération.
+
 ## 1. Définir le besoin exact
 Clarifier :
 - problème à résoudre ;

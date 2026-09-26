@@ -28,6 +28,8 @@ Demander ou utiliser :
 
 ## Méthode
 
+0. Appliquer d'abord le workflow [roadmap-driven-development](../roadmap-driven-development/SKILL.md): lire vision, roadmap, axe et journal; rattacher ou inscrire le bug avant le correctif; consigner le résultat dans un nouveau journal d'itération.
+
 1. **Lire le code attentivement**
     - Identifier le langage, le contexte et les dépendances.
     - Repérer les erreurs évidentes : syntaxe, noms de variables, imports, types, logique.

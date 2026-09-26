@@ -1,5 +1,8 @@
 # Remote Mouse
 
+Le [dossier de projet](./docs/project/README.md) contient la vision, la
+roadmap globale et le suivi de développement par axe.
+
 Remote Mouse is a web-based remote control for operating a computer from a phone, tablet, or another browser on the same network. The server exposes a mobile-friendly interface for mouse and keyboard control, browser shortcuts, admin actions, and optional Samsung TV remote commands.
 
 ## Overview

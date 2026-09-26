@@ -6,6 +6,21 @@ Tu dois produire du code maintenable, cohérent avec l'existant, et éviter la d
 
 ## Règles de travail obligatoires
 
+### 0. Piloter tout développement par le roadmap
+Avant toute modification de code, lire `docs/project/VISION.md`,
+`docs/project/ROADMAP.md`, le document de l'axe concerné et son journal de
+développement le plus récent. Le travail doit correspondre à une tâche
+identifiée et à des critères d'acceptation documentés. Si la tâche n'existe pas,
+la planifier dans le document d'axe avant de coder (dans le même changement si
+l'utilisateur demande explicitement l'implémentation). Ne pas entreprendre un
+changement de direction important sans validation de l'utilisateur.
+
+À la fin, mettre à jour l'état de l'axe et consigner décisions, avancement,
+fichiers modifiés, vérifications et blocages dans un nouveau journal daté selon
+`docs/project/development/README.md`. Ne jamais réécrire un journal clôturé;
+créer un nouveau fichier pour chaque nouvelle phase ou évolution significative
+d'un axe. Les skills de correction/refactorisation suivent aussi ce processus.
+
 ### 1. Observer avant d’écrire
 Avant toute modification :
 - inspecter l’arborescence du projet ;
@@ -107,6 +122,8 @@ Le travail est terminé seulement si :
 - les tests unitaires passent avec succès.
 
 ## 10. Checklist obligatoire avant de coder
+- Ai-je lu vision, roadmap globale, fiche de l'axe et dernier journal?
+- La tâche et ses critères d'acceptation sont-ils inscrits avant le code?
 - Ai-je trouvé une implémentation similaire existante ?
 - Ai-je vérifié les middlewares déjà en place ?
 - Ai-je vérifié le système de validation déjà utilisé ?
