@@ -53,4 +53,28 @@ describe('device session service', () => {
     });
     expect(service.authenticate('revoked-credential')).toBeNull();
   });
+
+  it('lists safe session metadata with role, state and local history', () => {
+    const listSessions = jest.fn(() => [
+      {id: 'active', expiresAt: 2_000, revokedAt: null},
+      {id: 'expired', expiresAt: 999, revokedAt: null},
+      {id: 'revoked', expiresAt: 2_000, revokedAt: 900},
+    ]);
+    const listEvents = jest.fn(() => [
+      {id: 1, sessionId: 'active', type: 'associated', occurredAt: 800},
+    ]);
+    const service = createDeviceSessionService({
+      getSystemConfig: () => ({session: {cookieMaxAgeDays: 7}}),
+      getPersistence: () => ({deviceSessionDao: {listSessions, listEvents}}),
+    }, {now: () => 1_000});
+
+    expect(service.listSessions()).toEqual([
+      expect.objectContaining({id: 'active', role: 'controller', state: 'active'}),
+      expect.objectContaining({id: 'expired', role: 'controller', state: 'expired'}),
+      expect.objectContaining({id: 'revoked', role: 'controller', state: 'revoked'}),
+    ]);
+    expect(service.listHistory()).toEqual([
+      {id: 1, sessionId: 'active', type: 'associated', occurredAt: 800},
+    ]);
+  });
 });

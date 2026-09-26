@@ -47,7 +47,18 @@ export function createDeviceSessionService(services, {now = Date.now} = {}) {
   }
 
   function listSessions() {
-    return services.getPersistence().deviceSessionDao.listSessions();
+    const timestamp = now();
+    return services.getPersistence().deviceSessionDao.listSessions().map((session) => ({
+      ...session,
+      role: 'controller',
+      state: session.revokedAt !== null
+        ? 'revoked'
+        : session.expiresAt <= timestamp ? 'expired' : 'active',
+    }));
+  }
+
+  function listHistory() {
+    return services.getPersistence().deviceSessionDao.listEvents();
   }
 
   function revokeSession(id) {
@@ -66,6 +77,7 @@ export function createDeviceSessionService(services, {now = Date.now} = {}) {
     createSession,
     authenticate,
     listSessions,
+    listHistory,
     revokeSession,
     revokeAllSessions,
     cleanupExpired,

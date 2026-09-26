@@ -4,6 +4,7 @@ import {adminConfigsRouter} from "../connection/api/admin-configs.router.js";
 import {adminConfigActionsRouter} from "../connection/api/admin-actions.router.js";
 import {adminSubsRouter} from "../connection/api/admin-subs.router.js";
 import {adminRemotesRouter} from '../connection/api/admin-remotes.router.js';
+import {adminSessionsRouter} from '../connection/api/admin-sessions.router.js';
 import {guardAdmin} from '../connection/api/guard.admin.js';
 
 export const adminApiRouter = express.Router()
@@ -15,6 +16,8 @@ export const adminApiRouter = express.Router()
     .use('/configs', adminConfigsRouter)
 
     .use('/remotes', adminRemotesRouter)
+
+    .use('/sessions', adminSessionsRouter)
 
     .use('/subs', adminSubsRouter)
 

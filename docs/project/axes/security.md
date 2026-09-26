@@ -1,6 +1,7 @@
 # Axe — Sécurité et contrôle d'accès
 
-**État:** SEC-001 à SEC-007 terminés; prochaine itération planifiée: SEC-008.
+**État:** SEC-001 à SEC-008 terminés; prochaine tâche: corriger l'écart de
+durée de grâce des jetons.
 
 ## Résultat visé
 
@@ -16,9 +17,9 @@ considérer le LAN comme une frontière de confiance.
 - [x] Secret de session robuste et dépendances de production examinées.
 - [x] Séparer jeton d'association et session d'appareil; rôles controller/admin.
 - [x] Limites de taille/débit, vérification Origin/CSRF et expurgation des logs.
-- [ ] **SEC-008:** lister les appareils associés et leurs métadonnées.
-- [ ] **SEC-008:** révoquer une session ou toutes les sessions via API admin.
-- [ ] **SEC-008:** conserver un historique local des associations/révocations.
+- [x] **SEC-008:** lister les appareils associés et leurs métadonnées.
+- [x] **SEC-008:** révoquer une session ou toutes les sessions via API admin.
+- [x] **SEC-008:** conserver un historique local des associations/révocations.
 - [ ] Corriger l'écart de durée de grâce documentée/configurée des jetons.
 
 ## Critères d'acceptation

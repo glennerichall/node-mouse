@@ -50,6 +50,12 @@ describe('device session dao', () => {
     });
     expect(dao.findSessionByTokenHash('sha256-hash')).toEqual(session);
     expect(JSON.stringify(dao.listSessions())).not.toContain('sha256-hash');
+    expect(dao.listEvents()).toEqual([{
+      id: 1,
+      sessionId: 'session-1',
+      type: 'associated',
+      occurredAt: 100,
+    }]);
   });
 
   it('touches, revokes and deletes expired sessions', () => {
@@ -68,5 +74,25 @@ describe('device session dao', () => {
     expect(dao.revokeSession('active', 250)).toBe(0);
     expect(dao.deleteExpiredSessions(100)).toBe(2);
     expect(dao.listSessions()).toEqual([]);
+    expect(dao.listEvents().map(({sessionId, type, occurredAt}) => ({sessionId, type, occurredAt}))).toEqual([
+      {sessionId: 'active', type: 'revoked', occurredAt: 200},
+      {sessionId: 'active', type: 'associated', occurredAt: 100},
+      {sessionId: 'expired', type: 'associated', occurredAt: 50},
+    ]);
+  });
+
+  it('revokes all active sessions except an explicitly preserved session and audits each change', () => {
+    for (const id of ['one', 'two', 'preserved']) {
+      dao.createSession({
+        id, tokenHash: `${id}-hash`, createdAt: 100, expiresAt: 500,
+        lastActivityAt: 100, clientAddress: '', userAgent: '', deviceName: '',
+      });
+    }
+
+    expect(dao.revokeAllSessions(200, {exceptId: 'preserved'})).toBe(2);
+    expect(dao.findSessionById('one').revokedAt).toBe(200);
+    expect(dao.findSessionById('two').revokedAt).toBe(200);
+    expect(dao.findSessionById('preserved').revokedAt).toBeNull();
+    expect(dao.listEvents().filter(({type}) => type === 'revoked')).toHaveLength(2);
   });
 });

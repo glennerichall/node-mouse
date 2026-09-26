@@ -109,16 +109,16 @@ branches.
 ### Sessions et autorisations
 
 - [x] Séparer le jeton d'association temporaire de la session d'un appareil.
-- [ ] Ajouter une liste des appareils associés.
+- [x] Ajouter une liste des appareils associés via l'API administrateur.
 - [x] Permettre à un appareil de révoquer sa session courante.
-- [ ] Permettre à un administrateur de révoquer un autre appareil ou toutes les
+- [x] Permettre à un administrateur de révoquer un autre appareil ou toutes les
   sessions depuis l'interface/API.
 - [x] Séparer les rôles `controller` et `admin` (contrôleur par défaut pour
   les sessions jumelées; accès loopback administrateur).
 - [x] Appliquer les mêmes autorisations à HTTP et Socket.IO via le service
   d'autorisation commun; WebRTC pourra réutiliser son contrat.
 - [x] Protéger les écritures HTTP avec vérification Origin et CSRF adaptée.
-- [ ] Ajouter un historique local des associations et révocations.
+- [x] Ajouter un historique local des associations et révocations.
 
 ### Critères de sortie
 
@@ -127,8 +127,10 @@ branches.
 - [x] Un appareil révoqué perd immédiatement son accès.
 - [x] Aucune vulnérabilité élevée connue ne subsiste en production.
 
-La prochaine itération est `SEC-008` : gérer les appareils associés et
-permettre à un administrateur de révoquer leurs sessions.
+`SEC-008` est terminée : l'API administrateur gère les appareils associés,
+leurs révocations et leur historique local. L'interface graphique reste
+planifiée dans `UX-001` et `UX-002`. La prochaine tâche de sécurité est de
+corriger l'écart de durée de grâce documentée/configurée des jetons d'entrée.
 
 ## Axe 2 — Architecture modulaire
 

@@ -32,7 +32,7 @@ Internet.
 | --- | --- |
 | Lot actif | A — Stabilisation et sécurité |
 | Statut | En cours |
-| Prochaine tâche | `SEC-008` — Gérer les appareils associés |
+| Prochaine tâche | Corriger l'écart de durée de grâce des jetons d'entrée |
 | Version | `6.9.1` — bump `patch` pour le durcissement SEC-007 |
 | Roadmap globale | [ROADMAP.md](../ROADMAP.md) |
 | Axe PWA | [pwa.md](../axes/pwa.md) |
@@ -215,10 +215,19 @@ Vérification : 247 tests unitaires et 22 tests navigateur passent. `npm audit
 
 ### SEC-008 — Gérer les appareils associés
 
-- [ ] Lister les sessions d'appareils pour un administrateur.
-- [ ] Révoquer une session ou toutes les sessions depuis l'API.
-- [ ] Afficher le nom, le rôle, la dernière activité et l'état de chaque appareil.
-- [ ] Journaliser localement les associations et révocations.
+- [x] Lister les sessions d'appareils pour un administrateur.
+- [x] Révoquer une session ou toutes les sessions depuis l'API.
+- [x] Exposer le nom, le rôle, la dernière activité et l'état de chaque appareil.
+- [x] Journaliser localement les associations et révocations.
+
+**Terminé lorsque :** l'API administrateur n'expose aucun secret, la révocation
+est immédiatement effective et chaque association/révocation est conservée
+localement. L'interface graphique reste planifiée dans `UX-001` et `UX-002`.
+
+Vérification : 252 tests unitaires et 22 tests navigateur passent. L'audit de
+production conserve deux vulnérabilités modérées connues de `uuid`, transitives
+via `node-notifier`; la correction proposée impose toujours la rupture
+`node-notifier@6.0.0` déjà écartée lors de SEC-004.
 
 ## Lot B — Socle modulaire
 
