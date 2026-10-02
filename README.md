@@ -276,11 +276,15 @@ WantedBy=default.target
 
 Depending on the graphical environment, passing the user session environment may be necessary for UI-related integrations.
 
-An X11 session is required for the Linux desktop control features.
+An X11 session is currently required for the Linux desktop control features.
+Ubuntu 26.04 no longer provides a GNOME/Ubuntu Xorg session. X11 remains
+available through desktop environments that still ship an Xorg session, such
+as Xfce, MATE, KDE/X11 or i3.
 Under Wayland, Remote Mouse detects that RobotJS screen capture is unavailable
 and disables cursor preview to prevent a native `X_GetImage` failure. Use an
-Xorg session when preview is required; native Wayland capture remains planned
-through the desktop ScreenCast portal and PipeWire.
+Xorg-based desktop session during the transition. Native Wayland mouse,
+keyboard and capture support is planned through the RemoteDesktop portal,
+libei, ScreenCast and PipeWire.
 
 #### Windows Deployment
 

@@ -22,7 +22,7 @@ function createFixture(options = {
   };
   const streamer = createPreviewStreamer({
     getConfig: () => ({preview: {width: 2, height: 2, fps: 20}}),
-    getRobot: () => ({getMousePos: () => ({x: 100, y: 100}), screen: {capture}}),
+    getDesktopController: () => ({getMousePos: () => ({x: 100, y: 100}), screen: {capture}}),
     getSystem: () => ({getScreenInfo}),
   }, options);
   return {streamer, socket, capture, getScreenInfo, queuedFrames};

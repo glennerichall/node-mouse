@@ -30,11 +30,11 @@ function isPointInsideBounds(point, bounds) {
 }
 
 export function startQrOverlayHoverObserver(services) {
-  const robot = services.getRobot();
+  const desktopController = services.getDesktopController();
   const qrOverlay = services.getQrOverlay();
   let suppressedAt = 0;
 
-  if (!robot?.getMousePos || !qrOverlay?.getBounds || !qrOverlay?.setSuppressed) {
+  if (!desktopController?.getMousePos || !qrOverlay?.getBounds || !qrOverlay?.setSuppressed) {
     return () => {};
   }
 
@@ -56,7 +56,7 @@ export function startQrOverlayHoverObserver(services) {
       return;
     }
 
-    const cursor = robot.getMousePos();
+    const cursor = desktopController.getMousePos();
     const entryMarginPx = Math.max(0, Number(overlayConfig.hoverEntryMarginPx) || 10);
     const exitMarginPx = Math.max(0, Number(overlayConfig.hoverExitMarginPx) || 18);
     const showDelayMs = Math.max(0, Number(overlayConfig.hoverShowDelayMs) || 1200);

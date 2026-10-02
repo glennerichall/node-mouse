@@ -112,7 +112,7 @@ describe('startServer', () => {
         close: jest.fn(),
         update,
       }),
-      getRobot: () => ({
+      getDesktopController: () => ({
         getMousePos: jest.fn(() => ({x: 0, y: 0})),
       }),
       getSystemConfig: () => ({

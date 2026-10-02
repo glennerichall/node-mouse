@@ -43,7 +43,7 @@ export async function createServicesContainer({
                                                   createEventStore,
                                                   createServiceEvents,
                                                   createTokenManager,
-                                                  createRobot,
+                                                  createDesktopController,
                                                   createNotifier,
                                                   createPubSub,
                                                   createTaskRunner,
@@ -55,7 +55,7 @@ export async function createServicesContainer({
                                                   createInputController,
                                                   createRemotes
                                               }) {
-    let robotInstance;
+    let desktopControllerInstance;
     let qrOverlayInstance;
 
     let container = {
@@ -84,13 +84,13 @@ export async function createServicesContainer({
         getUrls: () => urlFactory(container),
         getInputController: createLazy(() => createInputController(container)),
         getRemotes: createLazy(() => createRemotes(container)),
-        getRobot: () => robotInstance,
+        getDesktopController: () => desktopControllerInstance,
 
     };
 
-    log.debug('Initialisation service robot');
-    robotInstance = await createRobot(container);
-    log.debug('Service robot initialise');
+    log.debug('Initialisation du controleur de bureau');
+    desktopControllerInstance = await createDesktopController();
+    log.debug('Controleur de bureau initialise');
 
     log.debug('Initialisation service QR overlay');
     qrOverlayInstance = await createQrOverlay(container);

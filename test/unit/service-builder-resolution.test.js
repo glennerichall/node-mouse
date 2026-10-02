@@ -89,7 +89,7 @@ describe('service builders resolve providers only in methods', () => {
   });
 
   it('createPreviewStreamer does not read services during builder creation', () => {
-    const getRobot = jest.fn(() => ({
+    const getDesktopController = jest.fn(() => ({
       getScreenSize: jest.fn(() => ({width: 100, height: 100})),
       getMousePos: jest.fn(() => ({x: 50, y: 50})),
       captureScreen: jest.fn(),
@@ -103,14 +103,14 @@ describe('service builders resolve providers only in methods', () => {
     }));
 
     const preview = createPreviewStreamer({
-      getRobot,
+      getDesktopController,
       getConfig,
     }, {
       platform: 'linux',
       env: {XDG_SESSION_TYPE: 'x11', DISPLAY: ':0'},
     });
 
-    expect(getRobot).not.toHaveBeenCalled();
+    expect(getDesktopController).not.toHaveBeenCalled();
     expect(getConfig).not.toHaveBeenCalled();
 
     preview.startForSocket({connected: true, emit: jest.fn()}).stop();
@@ -196,8 +196,8 @@ describe('service builders resolve providers only in methods', () => {
     expect(getRemotes).toHaveBeenCalled();
   });
 
-  it('input builders do not read robot during builder creation', () => {
-    const getRobot = jest.fn(() => ({
+  it('input builders do not read the desktop controller during builder creation', () => {
+    const getDesktopController = jest.fn(() => ({
       getScreenSize: jest.fn(() => ({width: 100, height: 100})),
       getMousePos: jest.fn(() => ({x: 10, y: 10})),
       moveMouse: jest.fn(),
@@ -213,19 +213,19 @@ describe('service builders resolve providers only in methods', () => {
       },
     }));
 
-    const mouse = createMouseController({getRobot, getConfig});
-    const keyboard = createKeyboardController({getRobot});
+    const mouse = createMouseController({getDesktopController, getConfig});
+    const keyboard = createKeyboardController({getDesktopController});
 
-    expect(getRobot).not.toHaveBeenCalled();
+    expect(getDesktopController).not.toHaveBeenCalled();
 
     mouse.click('left');
     keyboard.pressSpecialKey('enter');
 
-    expect(getRobot).toHaveBeenCalled();
+    expect(getDesktopController).toHaveBeenCalled();
   });
 
   it('mouse controller uses drag when left button is held', async () => {
-    const robot = {
+    const desktopController = {
       getScreenSize: jest.fn(() => ({width: 100, height: 100})),
       getMousePos: jest.fn(() => ({x: 10, y: 10})),
       moveMouse: jest.fn(),
@@ -235,7 +235,7 @@ describe('service builders resolve providers only in methods', () => {
       mouseClick: jest.fn(),
     };
     const mouse = createMouseController({
-      getRobot: () => robot,
+      getDesktopController: () => desktopController,
       getConfig: () => ({
         input: {
           mouseSpeed: 1,
@@ -251,14 +251,14 @@ describe('service builders resolve providers only in methods', () => {
     await mouse.move(5, 4);
     mouse.setButtonState('left', 'up');
 
-    expect(robot.mouseToggle).toHaveBeenNthCalledWith(1, 'down', 'left');
-    expect(robot.dragMouse).toHaveBeenCalledWith(15, 14);
-    expect(robot.mouseToggle).toHaveBeenNthCalledWith(2, 'up', 'left');
-    expect(robot.moveMouse).not.toHaveBeenCalled();
+    expect(desktopController.mouseToggle).toHaveBeenNthCalledWith(1, 'down', 'left');
+    expect(desktopController.dragMouse).toHaveBeenCalledWith(15, 14);
+    expect(desktopController.mouseToggle).toHaveBeenNthCalledWith(2, 'up', 'left');
+    expect(desktopController.moveMouse).not.toHaveBeenCalled();
   });
 
   it('mouse controller clamps stale coordinates after display size changes', async () => {
-    const robot = {
+    const desktopController = {
       getScreenSize: jest.fn(() => ({width: 1280, height: 720})),
       getMousePos: jest.fn(() => ({x: 1919, y: 1079})),
       moveMouse: jest.fn(),
@@ -268,7 +268,7 @@ describe('service builders resolve providers only in methods', () => {
       mouseClick: jest.fn(),
     };
     const mouse = createMouseController({
-      getRobot: () => robot,
+      getDesktopController: () => desktopController,
       getConfig: () => ({
         input: {
           mouseSpeed: 1,
@@ -282,11 +282,11 @@ describe('service builders resolve providers only in methods', () => {
 
     await mouse.move(-10, -8);
 
-    expect(robot.moveMouse).toHaveBeenCalledWith(1269, 711);
+    expect(desktopController.moveMouse).toHaveBeenCalledWith(1269, 711);
   });
 
   it('mouse controller remaps coordinates when display size grows', () => {
-    const robot = {
+    const desktopController = {
       getScreenSize: jest.fn(() => ({width: 1920, height: 1080})),
       getMousePos: jest.fn(() => ({x: 1279, y: 719})),
       moveMouse: jest.fn(),
@@ -296,7 +296,7 @@ describe('service builders resolve providers only in methods', () => {
       mouseClick: jest.fn(),
     };
     const mouse = createMouseController({
-      getRobot: () => robot,
+      getDesktopController: () => desktopController,
       getConfig: () => ({
         input: {
           mouseSpeed: 1,
@@ -307,11 +307,11 @@ describe('service builders resolve providers only in methods', () => {
 
     mouse.remapToScreenSize({width: 1280, height: 720}, {width: 1920, height: 1080});
 
-    expect(robot.moveMouse).toHaveBeenCalledWith(1919, 1079);
+    expect(desktopController.moveMouse).toHaveBeenCalledWith(1919, 1079);
   });
 
-  it('mouse controller uses fresh display size override instead of stale robot size', async () => {
-    const robot = {
+  it('mouse controller uses fresh display size override instead of stale controller size', async () => {
+    const desktopController = {
       getScreenSize: jest.fn(() => ({width: 1280, height: 720})),
       getMousePos: jest.fn(() => ({x: 1910, y: 1070})),
       moveMouse: jest.fn(),
@@ -321,7 +321,7 @@ describe('service builders resolve providers only in methods', () => {
       mouseClick: jest.fn(),
     };
     const mouse = createMouseController({
-      getRobot: () => robot,
+      getDesktopController: () => desktopController,
       getConfig: () => ({
         input: {
           mouseSpeed: 1,
@@ -336,12 +336,12 @@ describe('service builders resolve providers only in methods', () => {
     mouse.setScreenSizeOverride({width: 1920, height: 1080});
     await mouse.move(5, 5);
 
-    expect(robot.moveMouse).toHaveBeenCalledWith(1915, 1075);
+    expect(desktopController.moveMouse).toHaveBeenCalledWith(1915, 1075);
   });
 
   it('keyboard controller serializes text and special key input', async () => {
     const calls = [];
-    const robot = {
+    const desktopController = {
       setKeyboardDelay: jest.fn((value) => {
         calls.push(`delay:${value}`);
       }),
@@ -355,7 +355,7 @@ describe('service builders resolve providers only in methods', () => {
     };
 
     const keyboard = createKeyboardController({
-      getRobot: () => robot,
+      getDesktopController: () => desktopController,
     });
 
     const first = keyboard.typeText('ab\n');
@@ -363,7 +363,7 @@ describe('service builders resolve providers only in methods', () => {
 
     await Promise.all([first, second]);
 
-    expect(robot.setKeyboardDelay).toHaveBeenCalledWith(20);
+    expect(desktopController.setKeyboardDelay).toHaveBeenCalledWith(20);
     expect(calls).toEqual([
       'delay:20',
       'type:ab',

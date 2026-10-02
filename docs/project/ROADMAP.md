@@ -244,7 +244,8 @@ Dispatcher de commandes
 
 - [ ] Consolider l'installation et le service `systemd --user`.
 - [ ] Documenter X11, DISPLAY, XAUTHORITY et la session graphique.
-- [ ] Étudier Wayland via les portails desktop ou des adaptateurs dédiés.
+- [ ] Implémenter le [plan Wayland](./axes/wayland.md) avec RemoteDesktop/libei
+  pour les entrées et ScreenCast/PipeWire pour la prévisualisation.
 - [x] Détecter sous Wayland l'indisponibilité de la capture X11 RobotJS et
   neutraliser la prévisualisation sans interrompre le serveur.
 - [ ] Détecter clairement les capacités indisponibles.

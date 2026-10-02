@@ -1,7 +1,7 @@
 import {jest} from '@jest/globals';
 
 const createPersistence = jest.fn(() => ({}));
-const loadRobot = jest.fn(async () => ({}));
+const loadDesktopController = jest.fn(async () => ({}));
 const createServer = jest.fn(() => ({
   server: {},
   io: {},
@@ -51,8 +51,8 @@ jest.unstable_mockModule('../../server/services/persistence/index.js', () => ({
   createPersistence,
 }));
 
-jest.unstable_mockModule('../../server/utils/robot.js', () => ({
-  loadRobot,
+jest.unstable_mockModule('../../server/services/desktop/loadDesktopController.js', () => ({
+  loadDesktopController,
 }));
 
 jest.unstable_mockModule('../../server/services/server/createServer.js', () => ({
@@ -144,15 +144,15 @@ describe('createServicesRegistry', () => {
 
     expect(services).toBeTruthy();
     expect(typeof services.getServer).toBe('function');
-    expect(typeof services.getRobot).toBe('function');
+    expect(typeof services.getDesktopController).toBe('function');
     expect(typeof services.getQrOverlay).toBe('function');
     expect(typeof services.getSecurity).toBe('function');
     expect(typeof services.initializeCoreServices).toBe('undefined');
-    expect(services.getRobot()).toEqual({});
+    expect(services.getDesktopController()).toEqual({});
     expect(services.getQrOverlay()).toEqual({});
 
     expect(createPersistence).not.toHaveBeenCalled();
-    expect(loadRobot).toHaveBeenCalledTimes(1);
+    expect(loadDesktopController).toHaveBeenCalledTimes(1);
     expect(createServer).not.toHaveBeenCalled();
     expect(createInputController).not.toHaveBeenCalled();
     expect(getSystemConfig).not.toHaveBeenCalled();

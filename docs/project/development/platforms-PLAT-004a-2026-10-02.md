@@ -45,3 +45,10 @@
 
 - La prévisualisation restera indisponible sous Wayland jusqu'à l'intégration
   d'un adaptateur compatible avec le portail du bureau.
+
+## Rectification factuelle — 2026-10-02
+
+La mention ci-dessus indiquant que « les autres remotes restent fonctionnelles »
+ne vaut pas pour la souris et le clavier globaux: RobotJS passant par X11, leur
+fonctionnement sous XWayland n'est ni complet ni supporté. PLAT-004 doit donc
+couvrir les entrées avec RemoteDesktop/libei en plus de la capture PipeWire.

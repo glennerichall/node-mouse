@@ -40,7 +40,7 @@ describe('system service', () => {
         preview: {enabled: true},
         samsungTv: {enabled: false},
       }),
-      getRobot: () => ({
+      getDesktopController: () => ({
         getScreenSize: () => ({
           width: 1920,
           height: 1080,
@@ -122,7 +122,7 @@ describe('system service', () => {
     }));
   });
 
-  it('returns null screen info when robot and Linux screen detection are unavailable', async () => {
+  it('returns null screen info when the desktop controller and Linux screen detection are unavailable', async () => {
     const service = createSystemService({
       getLogger: () => createLogger(),
       getOs: () => ({
@@ -136,8 +136,8 @@ describe('system service', () => {
           isAvailable: jest.fn(async () => false),
         },
       }),
-      getRobot: () => {
-        throw new Error('robot unavailable');
+      getDesktopController: () => {
+        throw new Error('desktop controller unavailable');
       },
       getSystemConfig: () => ({
         protocol: 'http',

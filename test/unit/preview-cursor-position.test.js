@@ -3,7 +3,7 @@ import {jest} from '@jest/globals';
 import {captureAroundCursor} from '../../server/remotes/preview/captureAroundCursor.js';
 import {parsePreviewFrame} from '../../client/preview/parse-preview-frame.js';
 
-function createRobot({screenSize, mousePos}) {
+function createDesktopController({screenSize, mousePos}) {
   return {
     screenSize,
     getMousePos: () => mousePos,
@@ -15,12 +15,12 @@ function createRobot({screenSize, mousePos}) {
 
 describe('preview cursor position', () => {
   it('keeps cursor at frame center when capture is not clamped', () => {
-    const robot = createRobot({
+    const desktopController = createDesktopController({
       screenSize: {width: 1920, height: 1080},
       mousePos: {x: 960, y: 540},
     });
 
-    const result = captureAroundCursor(robot, 128, 84, robot.screenSize);
+    const result = captureAroundCursor(desktopController, 128, 84, desktopController.screenSize);
 
     expect(result).toEqual(expect.objectContaining({
       x: 896,
@@ -33,12 +33,12 @@ describe('preview cursor position', () => {
   });
 
   it('moves cursor inside the frame when capture is clamped at the top-left screen edge', () => {
-    const robot = createRobot({
+    const desktopController = createDesktopController({
       screenSize: {width: 1920, height: 1080},
       mousePos: {x: 3, y: 4},
     });
 
-    const result = captureAroundCursor(robot, 128, 84, robot.screenSize);
+    const result = captureAroundCursor(desktopController, 128, 84, desktopController.screenSize);
 
     expect(result).toEqual(expect.objectContaining({
       x: 0,
@@ -51,12 +51,12 @@ describe('preview cursor position', () => {
   });
 
   it('moves cursor inside the frame when capture is clamped at the bottom-right screen edge', () => {
-    const robot = createRobot({
+    const desktopController = createDesktopController({
       screenSize: {width: 1920, height: 1080},
       mousePos: {x: 1919, y: 1079},
     });
 
-    const result = captureAroundCursor(robot, 128, 84, robot.screenSize);
+    const result = captureAroundCursor(desktopController, 128, 84, desktopController.screenSize);
 
     expect(result).toEqual(expect.objectContaining({
       x: 1792,

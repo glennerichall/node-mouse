@@ -34,6 +34,8 @@ portent le périmètre et les tâches planifiées.
   ressources clientes en lecture et des ressources administrateur.
 - [Plateformes — PLAT-004a](./platforms-PLAT-004a-2026-10-02.md): détection de
   la capture RobotJS indisponible sous Wayland et prévention du crash X11.
+- [Plateformes — PLAT-004b](./platforms-PLAT-004b-2026-10-02.md): extraction de
+  RobotJS derrière `DesktopController` et préparation des chargeurs d'adaptateurs.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/pwa.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

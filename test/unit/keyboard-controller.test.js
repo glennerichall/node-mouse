@@ -13,72 +13,72 @@ describe('createKeyboardController', () => {
   });
 
   it('types plain text directly', () => {
-    const robot = {
+    const desktopController = {
       typeString: sandbox.stub(),
       keyTap: sandbox.stub(),
     };
 
-    const keyboard = createKeyboardController(robot);
+    const keyboard = createKeyboardController(desktopController);
     keyboard.typeText('abc 123');
 
-    expect(robot.typeString.calledOnceWithExactly('abc 123')).toBe(true);
-    expect(robot.keyTap.called).toBe(false);
+    expect(desktopController.typeString.calledOnceWithExactly('abc 123')).toBe(true);
+    expect(desktopController.keyTap.called).toBe(false);
   });
 
   it('types a hyphen directly instead of using Linux unicode composition', () => {
-    const robot = {
+    const desktopController = {
       typeString: sandbox.stub(),
       keyTap: sandbox.stub(),
     };
 
-    const keyboard = createKeyboardController(robot);
+    const keyboard = createKeyboardController(desktopController);
     keyboard.typeText('-');
 
-    expect(robot.typeString.calledOnceWithExactly('-')).toBe(true);
-    expect(robot.keyTap.called).toBe(false);
+    expect(desktopController.typeString.calledOnceWithExactly('-')).toBe(true);
+    expect(desktopController.keyTap.called).toBe(false);
   });
 
   it('uses unicode input for special characters on linux', () => {
-    const robot = {
+    const desktopController = {
       typeString: sandbox.stub(),
       keyTap: sandbox.stub(),
     };
 
-    const keyboard = createKeyboardController(robot);
+    const keyboard = createKeyboardController(desktopController);
     keyboard.typeText('@');
 
-    expect(robot.keyTap.firstCall.args).toEqual(['u', ['control', 'shift']]);
-    expect(robot.typeString.calledOnceWithExactly('40')).toBe(true);
-    expect(robot.keyTap.secondCall.args).toEqual(['enter']);
+    expect(desktopController.keyTap.firstCall.args).toEqual(['u', ['control', 'shift']]);
+    expect(desktopController.typeString.calledOnceWithExactly('40')).toBe(true);
+    expect(desktopController.keyTap.secondCall.args).toEqual(['enter']);
   });
 
   it('keeps mixed text in order', () => {
-    const robot = {
+    const desktopController = {
       typeString: sandbox.stub(),
       keyTap: sandbox.stub(),
     };
 
-    const keyboard = createKeyboardController(robot);
+    const keyboard = createKeyboardController(desktopController);
     keyboard.typeText('ab@c');
 
-    expect(robot.typeString.firstCall.args).toEqual(['ab']);
-    expect(robot.keyTap.firstCall.args).toEqual(['u', ['control', 'shift']]);
-    expect(robot.typeString.secondCall.args).toEqual(['40']);
-    expect(robot.keyTap.secondCall.args).toEqual(['enter']);
-    expect(robot.typeString.thirdCall.args).toEqual(['c']);
+    expect(desktopController.typeString.firstCall.args).toEqual(['ab']);
+    expect(desktopController.keyTap.firstCall.args).toEqual(['u', ['control', 'shift']]);
+    expect(desktopController.typeString.secondCall.args).toEqual(['40']);
+    expect(desktopController.keyTap.secondCall.args).toEqual(['enter']);
+    expect(desktopController.typeString.thirdCall.args).toEqual(['c']);
   });
 
   it('allows copy and paste keyboard shortcuts', () => {
-    const robot = {
+    const desktopController = {
       typeString: sandbox.stub(),
       keyTap: sandbox.stub(),
     };
 
-    const keyboard = createKeyboardController(robot);
+    const keyboard = createKeyboardController(desktopController);
     keyboard.pressSpecialKey('c', ['control']);
     keyboard.pressSpecialKey('v', ['control']);
 
-    expect(robot.keyTap.firstCall.args).toEqual(['c', ['control']]);
-    expect(robot.keyTap.secondCall.args).toEqual(['v', ['control']]);
+    expect(desktopController.keyTap.firstCall.args).toEqual(['c', ['control']]);
+    expect(desktopController.keyTap.secondCall.args).toEqual(['v', ['control']]);
   });
 });

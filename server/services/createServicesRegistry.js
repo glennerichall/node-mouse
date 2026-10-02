@@ -1,6 +1,6 @@
 import {createPersistence} from './persistence/index.js';
 import {createServicesContainer,} from './createServicesContainer.js';
-import {loadRobot} from '../utils/robot.js';
+import {loadDesktopController} from './desktop/loadDesktopController.js';
 import {createServer} from "./server/createServer.js";
 import {createInputController} from "./input/createInputController.js";
 import {getSystemConfig} from "./config/index.js";
@@ -39,7 +39,7 @@ export function createServicesRegistry() {
         createEventStore,
         createServiceEvents,
         createTokenManager,
-        createRobot: loadRobot,
+        createDesktopController: loadDesktopController,
         createNotifier,
         createPubSub,
         createTaskRunner,

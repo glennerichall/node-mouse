@@ -97,27 +97,27 @@ export function createMouseController(services) {
     }
 
     async function move(dx, dy) {
-        const robot = services.getRobot();
+        const desktopController = services.getDesktopController();
         const inputConfig = getInputConfig();
         const mouseSpeed = Number(inputConfig.mouseSpeed) || DEFAULT_PERSISTED_CONFIG.input.mouseSpeed;
         const screenSize = await getActiveScreenSize();
-        const current = robot.getMousePos();
+        const current = desktopController.getMousePos();
         const position = getCurrentPosition(current, screenSize);
         rememberScreenSize(screenSize);
         const nextX = clamp(Math.round(position.x + dx * mouseSpeed), 0, screenSize.maxX);
         const nextY = clamp(Math.round(position.y + dy * mouseSpeed), 0, screenSize.maxY);
-        if (pressedButton === 'left' && typeof robot.dragMouse === 'function') {
-            robot.dragMouse(nextX, nextY);
+        if (pressedButton === 'left' && typeof desktopController.dragMouse === 'function') {
+            desktopController.dragMouse(nextX, nextY);
             return;
         }
-        robot.moveMouse(nextX, nextY);
+        desktopController.moveMouse(nextX, nextY);
     }
 
     function remapToScreenSize(previousScreen, nextScreen) {
-        const robot = services.getRobot();
+        const desktopController = services.getDesktopController();
         const previousScreenSize = getScreenSize(previousScreen);
         const nextScreenSize = getScreenSize(nextScreen);
-        const current = robot.getMousePos();
+        const current = desktopController.getMousePos();
         const nextX = scaleCoordinate(
             clamp(Math.round(getCoordinate(current.x)), 0, previousScreenSize.maxX),
             previousScreenSize.maxX,
@@ -130,35 +130,35 @@ export function createMouseController(services) {
         );
         screenSizeOverride = nextScreenSize;
         rememberScreenSize(nextScreenSize);
-        robot.moveMouse(nextX, nextY);
+        desktopController.moveMouse(nextX, nextY);
     }
 
     function scroll(deltaY) {
-        const robot = services.getRobot();
+        const desktopController = services.getDesktopController();
         const inputConfig = getInputConfig();
         const scrollSpeed = Number(inputConfig.scrollSpeed) || DEFAULT_PERSISTED_CONFIG.input.scrollSpeed;
         const total = -deltaY * scrollSpeed + scrollRemainder;
         const amount = total > 0 ? Math.floor(total) : Math.ceil(total);
         scrollRemainder = total - amount;
         if (amount !== 0) {
-            robot.scrollMouse(0, amount);
+            desktopController.scrollMouse(0, amount);
         }
     }
 
     function click(button) {
-        const robot = services.getRobot();
+        const desktopController = services.getDesktopController();
         const mouseButton = button === 'right' ? 'right' : 'left';
-        robot.mouseClick(mouseButton);
+        desktopController.mouseClick(mouseButton);
     }
 
     function setButtonState(button, state) {
-        const robot = services.getRobot();
+        const desktopController = services.getDesktopController();
         const mouseButton = button === 'right' ? 'right' : 'left';
         const nextState = state === 'down' ? 'down' : 'up';
-        if (typeof robot.mouseToggle === 'function') {
-            robot.mouseToggle(nextState, mouseButton);
+        if (typeof desktopController.mouseToggle === 'function') {
+            desktopController.mouseToggle(nextState, mouseButton);
         } else if (nextState === 'up') {
-            robot.mouseClick(mouseButton);
+            desktopController.mouseClick(mouseButton);
         }
 
         if (nextState === 'down') {

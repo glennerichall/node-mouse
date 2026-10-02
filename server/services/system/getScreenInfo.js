@@ -24,7 +24,7 @@ export async function getScreenInfo(services) {
     } catch (_error) {}
 
     try {
-        const screen = services.getRobot().getScreenSize();
+        const screen = services.getDesktopController().getScreenSize();
         return normalizeScreenInfo(screen);
     } catch (_error) {
         return null;

@@ -44,7 +44,7 @@ export function createPreviewStreamer(services, runtime = {}) {
         }
 
         try {
-          const robot = services.getRobot();
+          const desktopController = services.getDesktopController();
           const currentPreviewConfig = getPreviewConfig();
           const frameWidth = Number(currentPreviewConfig.width) || DEFAULT_PERSISTED_CONFIG.preview.width;
           const frameHeight = Number(currentPreviewConfig.height) || DEFAULT_PERSISTED_CONFIG.preview.height;
@@ -63,7 +63,7 @@ export function createPreviewStreamer(services, runtime = {}) {
             cursorY,
             cursorFrameX,
             cursorFrameY,
-          } = captureAroundCursor(robot, frameWidth, frameHeight, screen);
+          } = captureAroundCursor(desktopController, frameWidth, frameHeight, screen);
           const frame = bgraToRgbaBuffer(capture, frameWidth, frameHeight);
           socket.volatile.emit(
             'preview:frame',

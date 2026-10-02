@@ -20,43 +20,43 @@ function isDirectTypeSafe(character) {
     return /^[a-zA-Z0-9 -]$/.test(character);
 }
 
-function typeUnicodeCharacter(robot, character) {
+function typeUnicodeCharacter(desktopController, character) {
     const codePoint = character.codePointAt(0);
     if (!codePoint) {
         return;
     }
 
     if (process.platform !== 'linux') {
-        robot.typeString(character);
+        desktopController.typeString(character);
         return;
     }
 
-    robot.keyTap('u', ['control', 'shift']);
-    robot.typeString(codePoint.toString(16));
-    robot.keyTap('enter');
+    desktopController.keyTap('u', ['control', 'shift']);
+    desktopController.typeString(codePoint.toString(16));
+    desktopController.keyTap('enter');
 }
 
-export function createKeyboardController(servicesOrRobot) {
-    const getRobot = servicesOrRobot?.getRobot
-        ? () => servicesOrRobot.getRobot()
-        : () => servicesOrRobot;
+export function createKeyboardController(servicesOrDesktopController) {
+    const getDesktopController = servicesOrDesktopController?.getDesktopController
+        ? () => servicesOrDesktopController.getDesktopController()
+        : () => servicesOrDesktopController;
     let keyboardConfigured = false;
 
-    function configureKeyboard(robot) {
+    function configureKeyboard(desktopController) {
         if (keyboardConfigured) {
             return;
         }
 
-        if (typeof robot?.setKeyboardDelay === 'function') {
-            robot.setKeyboardDelay(DEFAULT_KEYBOARD_DELAY_MS);
+        if (typeof desktopController?.setKeyboardDelay === 'function') {
+            desktopController.setKeyboardDelay(DEFAULT_KEYBOARD_DELAY_MS);
         }
         keyboardConfigured = true;
     }
 
     function enqueue(task) {
-        const robot = getRobot();
-        configureKeyboard(robot);
-        return task(robot);
+        const desktopController = getDesktopController();
+        configureKeyboard(desktopController);
+        return task(desktopController);
     }
 
     function typeText(text) {
@@ -64,24 +64,24 @@ export function createKeyboardController(servicesOrRobot) {
             return;
         }
 
-        return enqueue((robot) => {
+        return enqueue((desktopController) => {
             let directBuffer = '';
             for (const character of Array.from(text)) {
                 if (character === '\n') {
                     if (directBuffer) {
-                        robot.typeString(directBuffer);
+                        desktopController.typeString(directBuffer);
                         directBuffer = '';
                     }
-                    robot.keyTap('enter');
+                    desktopController.keyTap('enter');
                     continue;
                 }
 
                 if (character === '\t') {
                     if (directBuffer) {
-                        robot.typeString(directBuffer);
+                        desktopController.typeString(directBuffer);
                         directBuffer = '';
                     }
-                    robot.keyTap('tab');
+                    desktopController.keyTap('tab');
                     continue;
                 }
 
@@ -91,14 +91,14 @@ export function createKeyboardController(servicesOrRobot) {
                 }
 
                 if (directBuffer) {
-                    robot.typeString(directBuffer);
+                    desktopController.typeString(directBuffer);
                     directBuffer = '';
                 }
-                typeUnicodeCharacter(robot, character);
+                typeUnicodeCharacter(desktopController, character);
             }
 
             if (directBuffer) {
-                robot.typeString(directBuffer);
+                desktopController.typeString(directBuffer);
             }
         });
     }
@@ -108,9 +108,9 @@ export function createKeyboardController(servicesOrRobot) {
             return;
         }
 
-        return enqueue((robot) => {
+        return enqueue((desktopController) => {
             if (!Array.isArray(modifiers) || modifiers.length === 0) {
-                robot.keyTap(key);
+                desktopController.keyTap(key);
                 return;
             }
 
@@ -119,9 +119,9 @@ export function createKeyboardController(servicesOrRobot) {
                 .filter((value) => ALLOWED_MODIFIERS.has(value));
 
             if (sanitizedModifiers.length > 0) {
-                robot.keyTap(key, sanitizedModifiers);
+                desktopController.keyTap(key, sanitizedModifiers);
             } else {
-                robot.keyTap(key);
+                desktopController.keyTap(key);
             }
         });
     }
