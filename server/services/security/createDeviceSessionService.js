@@ -9,6 +9,17 @@ function normalizeText(value, maxLength) {
 }
 
 export function createDeviceSessionService(services, {now = Date.now} = {}) {
+  const adminElevations = new Map();
+
+  function getElevation(id) {
+    const adminUntil = Number(adminElevations.get(id) || 0);
+    if (adminUntil <= now()) {
+      adminElevations.delete(id);
+      return 0;
+    }
+    return adminUntil;
+  }
+
   function getTtlMs() {
     const days = Number(services.getSystemConfig().session.cookieMaxAgeDays || 7);
     return Math.max(1, days) * 24 * 60 * 60 * 1000;
@@ -43,14 +54,30 @@ export function createDeviceSessionService(services, {now = Date.now} = {}) {
       return null;
     }
     services.getPersistence().deviceSessionDao.touchSession(session.id, timestamp);
-    return {...session, lastActivityAt: timestamp};
+    const adminUntil = getElevation(session.id);
+    return {
+      ...session,
+      lastActivityAt: timestamp,
+      role: adminUntil ? 'admin' : 'controller',
+      adminUntil: adminUntil || null,
+    };
+  }
+
+  function elevateSession(id, durationMs) {
+    const sessionId = String(id || '');
+    if (!sessionId || !services.getPersistence().deviceSessionDao.findSessionById(sessionId)) {
+      return null;
+    }
+    const adminUntil = now() + Math.max(60_000, Number(durationMs) || 0);
+    adminElevations.set(sessionId, adminUntil);
+    return adminUntil;
   }
 
   function listSessions() {
     const timestamp = now();
     return services.getPersistence().deviceSessionDao.listSessions().map((session) => ({
       ...session,
-      role: 'controller',
+      role: getElevation(session.id) ? 'admin' : 'controller',
       state: session.revokedAt !== null
         ? 'revoked'
         : session.expiresAt <= timestamp ? 'expired' : 'active',
@@ -62,6 +89,7 @@ export function createDeviceSessionService(services, {now = Date.now} = {}) {
   }
 
   function revokeSession(id) {
+    adminElevations.delete(String(id || ''));
     return services.getPersistence().deviceSessionDao.revokeSession(String(id || ''), now()) > 0;
   }
 
@@ -76,6 +104,7 @@ export function createDeviceSessionService(services, {now = Date.now} = {}) {
   return {
     createSession,
     authenticate,
+    elevateSession,
     listSessions,
     listHistory,
     revokeSession,

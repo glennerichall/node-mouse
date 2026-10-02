@@ -81,6 +81,8 @@ export const fr = {
   'main.rotateEntryToken': "Changer le jeton d'entree",
   'main.rotateEntryTokenTitle': "Forcer la rotation du jeton d'entree",
   'main.adminActionsDisabledMessage': 'Les actions admin serveur sont desactivees.',
+  'main.adminPasswordPlaceholder': 'Mot de passe administrateur',
+  'main.adminUnlock': 'Deverrouiller',
   'main.adminAppVersion': 'Version: --',
   'main.browserShortcutsAria': 'Raccourcis navigateur',
   'main.browserShortcutsLabel': 'Navigateur',

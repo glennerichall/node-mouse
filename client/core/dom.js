@@ -125,6 +125,9 @@ function getAdminRemoteDom() {
     btnOpenConfigPage: getElement('btn-open-config-page'),
     btnOpenPreferencesPage: getElement('btn-open-preferences-page'),
     btnRotateEntryToken: getElement('btn-rotate-entry-token'),
+    adminUnlockForm: getElement('admin-unlock-form'),
+    adminPassword: getElement('admin-password'),
+    adminUnlockStatus: getElement('admin-unlock-status'),
     adminActionsDisabledMessage: getElement('admin-actions-disabled-message'),
     adminAppVersion: getElement('admin-app-version'),
   };

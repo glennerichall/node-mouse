@@ -35,6 +35,8 @@ export const ru = {
   'main.rotateEntryToken': 'Сменить токен входа',
   'main.rotateEntryTokenTitle': 'Принудительно обновить токен входа',
   'main.adminActionsDisabledMessage': 'Административные действия сервера отключены.',
+  'main.adminPasswordPlaceholder': 'Пароль администратора',
+  'main.adminUnlock': 'Разблокировать',
   'main.adminAppVersion': 'Версия: --',
   'main.browserShortcutsAria': 'Ярлыки браузера',
   'main.browserShortcutsLabel': 'Браузер',

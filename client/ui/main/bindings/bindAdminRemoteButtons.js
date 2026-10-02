@@ -28,6 +28,9 @@ export function bindAdminRemoteButtons(services, dom) {
         btnOpenPreferencesPage,
         btnRotateEntryToken,
         adminActionsDisabledMessage,
+        adminUnlockForm,
+        adminPassword,
+        adminUnlockStatus,
     } = dom.remotes.admin;
     const adminButtons = [
         btnForceUpdateCheck,
@@ -44,7 +47,11 @@ export function bindAdminRemoteButtons(services, dom) {
     const emit = (eventName) => () => emitWithTimestamp(socket, eventName);
 
     const syncAdminButtonsState = () => {
-        const {adminActionsEnabled = true} = getConfigView().getSystemConfig();
+        const {
+            adminActionsEnabled = true,
+            adminUnlocked = false,
+            adminUnlockAvailable = false,
+        } = getConfigView().getSystemConfig();
         for (const button of adminButtons) {
             if (!button) {
                 continue;
@@ -54,7 +61,28 @@ export function bindAdminRemoteButtons(services, dom) {
         }
 
         adminActionsDisabledMessage?.classList.toggle('hidden', adminActionsEnabled);
+        adminUnlockForm?.classList.toggle('hidden', adminUnlocked || !adminUnlockAvailable);
     };
+
+    adminUnlockForm?.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const password = adminPassword?.value || '';
+        if (adminUnlockStatus) adminUnlockStatus.textContent = 'Déverrouillage…';
+        try {
+            const response = await fetch('/api/admin-auth/unlock', {
+                method: 'POST',
+                headers: {'content-type': 'application/json'},
+                body: JSON.stringify({password}),
+            });
+            const payload = await response.json();
+            if (!response.ok) throw new Error(payload.message || 'Déverrouillage refusé.');
+            if (adminPassword) adminPassword.value = '';
+            window.location.reload();
+        } catch (error) {
+            if (adminPassword) adminPassword.value = '';
+            if (adminUnlockStatus) adminUnlockStatus.textContent = error.message;
+        }
+    });
 
     btnForceUpdateCheck.addEventListener('click', emit(REMOTE_EVENT_ADMIN_UPDATE_CHECK));
     btnInstallUpdate.addEventListener('click', emit(REMOTE_EVENT_ADMIN_UPDATE_INSTALL));

@@ -77,4 +77,28 @@ describe('device session service', () => {
       {id: 1, sessionId: 'active', type: 'associated', occurredAt: 800},
     ]);
   });
+
+  it('temporarily elevates only the selected device session', () => {
+    let timestamp = 1_000;
+    const session = {id: 'session-1', expiresAt: 99_000, revokedAt: null};
+    const dao = {
+      findSessionById: jest.fn(() => session),
+      findSessionByTokenHash: jest.fn(() => session),
+      touchSession: jest.fn(),
+    };
+    const service = createDeviceSessionService({
+      getSystemConfig: () => ({session: {cookieMaxAgeDays: 7}}),
+      getPersistence: () => ({deviceSessionDao: dao}),
+    }, {now: () => timestamp});
+
+    expect(service.authenticate('credential').role).toBe('controller');
+    expect(service.elevateSession('session-1', 60_000)).toBe(61_000);
+    expect(service.authenticate('credential')).toEqual(expect.objectContaining({
+      role: 'admin',
+      adminUntil: 61_000,
+    }));
+
+    timestamp = 61_000;
+    expect(service.authenticate('credential').role).toBe('controller');
+  });
 });

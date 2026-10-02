@@ -57,6 +57,10 @@ export const DEFAULT_SYSTEM_CONFIG = {
         socketEventMaxAgeMs: 1200,
     },
     adminActionsEnabled: true,
+    admin: {
+        password: '',
+        unlockMinutes: 15,
+    },
     serviceName: 'remote-mouse.service',
     serviceRestartCommand: '',
     updateCheck: {

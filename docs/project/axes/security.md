@@ -23,6 +23,9 @@ considérer le LAN comme une frontière de confiance.
 - [x] **SEC-009:** séparer les lectures nécessaires à la télécommande des
   ressources administrateur afin qu'une session `controller` issue du QR puisse
   charger son état sans recevoir de droits d'écriture ni de données sensibles.
+- [x] **SEC-010:** permettre à un contrôleur de déverrouiller temporairement le
+  rôle administrateur depuis le panneau latéral avec un mot de passe serveur,
+  une expiration et une limitation stricte des tentatives.
 - [ ] Corriger l'écart de durée de grâce documentée/configurée des jetons.
 
 ## Critères d'acceptation

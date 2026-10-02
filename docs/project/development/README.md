@@ -32,6 +32,8 @@ portent le périmètre et les tâches planifiées.
   appareils associés, révocations et historique local.
 - [Sécurité — SEC-009](./security-SEC-009-2026-10-02.md): séparation des
   ressources clientes en lecture et des ressources administrateur.
+- [Sécurité — SEC-010](./security-SEC-010-2026-10-02.md): déverrouillage
+  administrateur temporaire depuis le panneau latéral.
 - [Plateformes — PLAT-004a](./platforms-PLAT-004a-2026-10-02.md): détection de
   la capture RobotJS indisponible sous Wayland et prévention du crash X11.
 - [Plateformes — PLAT-004b](./platforms-PLAT-004b-2026-10-02.md): extraction de

@@ -72,6 +72,8 @@ export const it = {
   'main.toggleQrOverlayTitle': 'Mostra o nascondi l overlay QR',
   'main.rotateEntryTokenTitle': 'Forza la rotazione del token di accesso',
   'main.adminActionsDisabledMessage': 'Le azioni admin del server sono disattivate.',
+  'main.adminPasswordPlaceholder': 'Password amministratore',
+  'main.adminUnlock': 'Sblocca',
   'main.adminAppVersion': 'Versione: --',
   'main.browserShortcutsAria': 'Scorciatoie browser',
   'main.browserShortcutsLabel': 'Browser',

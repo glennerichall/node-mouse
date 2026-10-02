@@ -86,6 +86,17 @@ html[data-theme="light"] #left-menu {
   gap: 8px;
 }
 
+.admin-unlock-form {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.admin-unlock-form input {
+  box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
+}
+
 .admin-split-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

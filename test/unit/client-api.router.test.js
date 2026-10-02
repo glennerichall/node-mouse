@@ -26,7 +26,11 @@ describe('client API router', () => {
     await getClientConfig(req, {json});
 
     const payload = json.mock.calls[0][0];
-    expect(payload.systemConfig).toEqual({adminActionsEnabled: false});
+    expect(payload.systemConfig).toEqual({
+      adminActionsEnabled: false,
+      adminUnlocked: false,
+      adminUnlockAvailable: false,
+    });
     expect(payload.config.samsungTv).toEqual({enabled: true});
     expect(payload.config.preview).toEqual({enabled: false, hideDelayMs: 5000});
     expect(JSON.stringify(payload)).not.toContain('192.168.30.20');
@@ -51,7 +55,11 @@ describe('client API router', () => {
     await getClientConfig(req, {json});
 
     expect(json).toHaveBeenCalledWith(expect.objectContaining({
-      systemConfig: {adminActionsEnabled: true},
+      systemConfig: {
+        adminActionsEnabled: true,
+        adminUnlocked: true,
+        adminUnlockAvailable: false,
+      },
     }));
   });
 });

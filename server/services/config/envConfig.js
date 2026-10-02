@@ -27,6 +27,10 @@ export function getEnvConfig() {
             socketEventMaxAgeMs: readOptionalNumber('SOCKET_EVENT_MAX_AGE_MS'),
         },
         adminActionsEnabled: readOptionalBoolean('ADMIN_ACTIONS_ENABLED'),
+        admin: {
+            password: readOptionalString('ADMIN_PASSWORD'),
+            unlockMinutes: readOptionalNumber('ADMIN_UNLOCK_MINUTES'),
+        },
         serviceName: readOptionalString('SERVICE_NAME'),
         serviceRestartCommand: readOptionalString('SERVICE_RESTART_COMMAND'),
         https: {

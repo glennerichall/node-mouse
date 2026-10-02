@@ -16,6 +16,7 @@ import {createRequestScopeMiddleware} from '../connection/api/request-scope.midd
 import {createHttpErrorMiddleware} from '../connection/api/http-input.middleware.js';
 import {securityIngressRouter, securityRouter} from '../connection/api/security.router.js';
 import {clientApiRouter} from '../connection/api/client-api.router.js';
+import {adminAuthRouter} from '../connection/api/admin-auth.router.js';
 
 const packageJsonPath = path.join(projectRoot, 'package.json');
 
@@ -58,6 +59,7 @@ export function bootstrapApi(services) {
 
     app.get('/qr', qrPageHandler);
     app.use('/api/client', clientApiRouter);
+    app.use('/api/admin-auth', adminAuthRouter);
     app.use('/api/remotes', remotesRouter);
     app.use('/api/admin', adminApiRouter);
     app.use('/ui/admin', adminUiRouter);

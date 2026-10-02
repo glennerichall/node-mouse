@@ -360,6 +360,19 @@ still needs the dedicated cookie/deployment work planned for the PWA milestone.
 
 ### Access and Administration
 
+Paired devices start with the `controller` role. To allow temporary remote
+administration, set a password of at least 12 characters in the server `.env`:
+
+```dotenv
+ADMIN_PASSWORD=replace-with-a-long-unique-password
+ADMIN_UNLOCK_MINUTES=15
+```
+
+Restart the service after changing the file. A password field then appears in
+the left drawer. A successful unlock elevates only the current paired session,
+expires automatically, and is cleared by a server restart. Prefer HTTPS before
+entering this password over a network.
+
 Useful server pages:
 
 - `/qr` displays the entry QR code

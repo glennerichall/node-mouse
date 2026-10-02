@@ -17,6 +17,8 @@ export async function getClientConfig(req, res) {
     systemConfig: {
       adminActionsEnabled: req.securityContext?.role === 'admin'
         && Boolean(req.services.getSystemConfig().adminActionsEnabled),
+      adminUnlocked: req.securityContext?.role === 'admin',
+      adminUnlockAvailable: String(req.services.getSystemConfig().admin?.password || '').length >= 12,
     },
   });
 }

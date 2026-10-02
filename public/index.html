@@ -39,6 +39,11 @@
         </div>
         <hr class="admin-separator" aria-hidden="true" />
         <div class="admin-group admin-group-access" data-i18n-aria-label="main.accessAria">
+          <form id="admin-unlock-form" class="admin-unlock-form">
+            <input id="admin-password" type="password" autocomplete="current-password" data-i18n-placeholder="main.adminPasswordPlaceholder" placeholder="Mot de passe administrateur" />
+            <button id="btn-admin-unlock" type="submit" data-i18n="main.adminUnlock">Déverrouiller</button>
+            <p id="admin-unlock-status" class="admin-drawer-message" aria-live="polite"></p>
+          </form>
           <button id="btn-toggle-qr-overlay" type="button" data-i18n="main.toggleQrOverlay" data-i18n-title="main.toggleQrOverlayTitle" data-i18n-aria-label="main.toggleQrOverlayTitle">Afficher QR</button>
           <button id="btn-rotate-entry-token" type="button" data-i18n="main.rotateEntryToken" data-i18n-title="main.rotateEntryTokenTitle" data-i18n-aria-label="main.rotateEntryTokenTitle">Changer le jeton d'entree</button>
         </div>
