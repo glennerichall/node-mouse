@@ -29,6 +29,7 @@ export function getEnvConfig() {
         adminActionsEnabled: readOptionalBoolean('ADMIN_ACTIONS_ENABLED'),
         admin: {
             password: readOptionalString('ADMIN_PASSWORD'),
+            passwordMinLength: readOptionalNumber('ADMIN_PASSWORD_MIN_LENGTH'),
             unlockMinutes: readOptionalNumber('ADMIN_UNLOCK_MINUTES'),
         },
         serviceName: readOptionalString('SERVICE_NAME'),

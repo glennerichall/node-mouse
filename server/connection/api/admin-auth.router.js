@@ -1,6 +1,10 @@
 import {createHash, timingSafeEqual} from 'node:crypto';
 import express from 'express';
 import {createRateLimitMiddleware} from '../security/createRateLimiter.js';
+import {
+  getAdminPasswordMinLength,
+  isAdminPasswordConfigured,
+} from '../../services/security/adminPasswordPolicy.js';
 
 function passwordMatches(actual, expected) {
   const actualHash = createHash('sha256').update(String(actual || '')).digest();
@@ -18,8 +22,12 @@ export function unlockAdmin(req, res) {
     res.status(400).json({ok: false, message: 'Une session appareil est requise.'});
     return;
   }
-  if (expected.length < 12) {
-    res.status(503).json({ok: false, message: 'Le déverrouillage administrateur n’est pas configuré.'});
+  if (!isAdminPasswordConfigured(config.admin)) {
+    const minimum = getAdminPasswordMinLength(config.admin?.passwordMinLength);
+    res.status(503).json({
+      ok: false,
+      message: `Le mot de passe administrateur doit contenir au moins ${minimum} caractères.`,
+    });
     return;
   }
   if (!passwordMatches(password, expected)) {

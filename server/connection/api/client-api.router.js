@@ -4,6 +4,7 @@ import {CLIENT_CONFIG_PATHS} from '../../services/config/configPaths.js';
 import {PUBSUB_SERVICE_CLIENT_CONFIG} from '../../services/pubsub/serviceEventConstants.js';
 import {getManagedConfigSnapshot} from './configs.js';
 import {remotesCatalogRouter} from './admin-remotes.router.js';
+import {isAdminPasswordConfigured} from '../../services/security/adminPasswordPolicy.js';
 
 export async function getClientConfig(req, res) {
   const config = getManagedConfigSnapshot(req.services.getConfig(), CLIENT_CONFIG_PATHS);
@@ -18,7 +19,7 @@ export async function getClientConfig(req, res) {
       adminActionsEnabled: req.securityContext?.role === 'admin'
         && Boolean(req.services.getSystemConfig().adminActionsEnabled),
       adminUnlocked: req.securityContext?.role === 'admin',
-      adminUnlockAvailable: String(req.services.getSystemConfig().admin?.password || '').length >= 12,
+      adminUnlockAvailable: isAdminPasswordConfigured(req.services.getSystemConfig().admin),
     },
   });
 }

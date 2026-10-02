@@ -37,6 +37,8 @@ portent le périmètre et les tâches planifiées.
   ressources clientes en lecture et des ressources administrateur.
 - [Sécurité — SEC-010](./security-SEC-010-2026-10-02.md): déverrouillage
   administrateur temporaire depuis le panneau latéral.
+- [Sécurité — SEC-010a](./security-SEC-010a-2026-10-02.md): seuil configurable
+  du mot de passe de déverrouillage administrateur.
 - [Sécurité — migration vers SEC-010](./security-SEC-010-migration-2026-10-02.md):
   procédure npm de bootstrap pour une installation qui ne peut pas encore se
   déverrouiller depuis le mobile.

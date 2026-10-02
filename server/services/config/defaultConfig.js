@@ -59,6 +59,7 @@ export const DEFAULT_SYSTEM_CONFIG = {
     adminActionsEnabled: true,
     admin: {
         password: '',
+        passwordMinLength: 8,
         unlockMinutes: 15,
     },
     serviceName: 'remote-mouse.service',

@@ -43,4 +43,24 @@ describe('admin unlock', () => {
     expect(res.status).toHaveBeenCalledWith(401);
     expect(elevateSession).not.toHaveBeenCalled();
   });
+
+  it('accepts a password shorter than 12 characters when the configured minimum allows it', () => {
+    const elevateSession = jest.fn(() => 61_000);
+    const req = {
+      body: {password: '123456'},
+      securityContext: {authenticationMethod: 'session', deviceSessionId: 'session-1'},
+      services: {
+        getSystemConfig: () => ({
+          admin: {password: '123456', passwordMinLength: 6, unlockMinutes: 1},
+        }),
+        getDeviceSessionService: () => ({elevateSession}),
+      },
+    };
+    const res = createResponse();
+
+    unlockAdmin(req, res);
+
+    expect(elevateSession).toHaveBeenCalledWith('session-1', 60_000);
+    expect(res.json).toHaveBeenCalledWith({ok: true, adminUntil: 61_000});
+  });
 });

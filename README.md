@@ -356,10 +356,11 @@ still needs the dedicated cookie/deployment work planned for the PWA milestone.
 ### Access and Administration
 
 Paired devices start with the `controller` role. To allow temporary remote
-administration, set a password of at least 12 characters in the server `.env`:
+administration, configure the password policy and password in the server `.env`:
 
 ```dotenv
 ADMIN_PASSWORD=replace-with-a-long-unique-password
+ADMIN_PASSWORD_MIN_LENGTH=8
 ADMIN_UNLOCK_MINUTES=15
 ```
 

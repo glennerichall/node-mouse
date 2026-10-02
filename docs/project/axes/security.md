@@ -26,6 +26,8 @@ considérer le LAN comme une frontière de confiance.
 - [x] **SEC-010:** permettre à un contrôleur de déverrouiller temporairement le
   rôle administrateur depuis le panneau latéral avec un mot de passe serveur,
   une expiration et une limitation stricte des tentatives.
+- [x] **SEC-010a:** rendre la longueur minimale du mot de passe administrateur
+  configurable sans divergence entre l'API d'authentification et l'interface.
 - [ ] Corriger l'écart de durée de grâce documentée/configurée des jetons.
 
 ## Critères d'acceptation
