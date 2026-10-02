@@ -46,6 +46,11 @@ portent le périmètre et les tâches planifiées.
   normalisation numérique des clics et touches à la frontière Node-API.
 - [Plateformes — PLAT-001a](./platforms-PLAT-001a-2026-10-02.md): installateur
   uinput autonome et migration idempotente des installations existantes.
+- [Plateformes — PLAT-001b et PLAT-004h](./platforms-PLAT-001b-PLAT-004h-2026-10-02.md):
+  migration uinput pendant la mise à jour intégrée et compatibilité YAD sous
+  Wayland via XWayland.
+- [Plateformes — PLAT-004i](./platforms-PLAT-004i-2026-10-02.md): correction du
+  rognage inférieur du QR par le widget image de YAD.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/pwa.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

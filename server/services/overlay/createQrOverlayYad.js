@@ -28,9 +28,21 @@ export function buildQrOverlayYadArgs({qrPath, size, posX, posY}) {
     `--height=${size}`,
     `--posx=${posX}`,
     `--posy=${posY}`,
-    '--size=orig',
+    '--size=fit',
     `--filename=${qrPath}`,
   ];
+}
+
+export function buildQrOverlayYadSpawnOptions(env = process.env) {
+  const isWayland = String(env.XDG_SESSION_TYPE || '').toLowerCase() === 'wayland'
+    || Boolean(env.WAYLAND_DISPLAY);
+
+  return {
+    stdio: 'ignore',
+    env: isWayland
+      ? {...env, GDK_BACKEND: 'x11'}
+      : env,
+  };
 }
 
 export async function createQrOverlayYad(services) {
@@ -102,7 +114,11 @@ export async function createQrOverlayYad(services) {
 
     const args = buildQrOverlayYadArgs({qrPath, size, posX, posY});
 
-    child = spawn('yad', args, { stdio: 'ignore' });
+    child = spawn('yad', args, buildQrOverlayYadSpawnOptions());
+    child.once('error', (error) => {
+      log.warn({err: error}, 'Impossible de lancer YAD pour l’overlay QR');
+      child = null;
+    });
     log.debug({ url: getUrl() }, 'QR overlay rafraîchi');
   }
 

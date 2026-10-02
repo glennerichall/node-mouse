@@ -65,7 +65,10 @@ describe('window toggle platform helpers', () => {
   });
 
   it('linux QR overlay uses picture mode without dialog text padding', async () => {
-    const {buildQrOverlayYadArgs} = await import('../../server/services/overlay/createQrOverlayYad.js');
+    const {
+      buildQrOverlayYadArgs,
+      buildQrOverlayYadSpawnOptions,
+    } = await import('../../server/services/overlay/createQrOverlayYad.js');
 
     const args = buildQrOverlayYadArgs({
       qrPath: '/tmp/remote-mouse-qr-overlay.png',
@@ -77,11 +80,21 @@ describe('window toggle platform helpers', () => {
     expect(args).toEqual(expect.arrayContaining([
       '--picture',
       '--borders=0',
-      '--size=orig',
+      '--size=fit',
       '--filename=/tmp/remote-mouse-qr-overlay.png',
     ]));
+    expect(args).not.toContain('--size=orig');
     expect(args).not.toContain('--text=');
     expect(args.some((arg) => arg.startsWith('--image='))).toBe(false);
+
+    expect(buildQrOverlayYadSpawnOptions({
+      XDG_SESSION_TYPE: 'wayland',
+      WAYLAND_DISPLAY: 'wayland-0',
+      DISPLAY: ':0',
+    })).toEqual(expect.objectContaining({
+      env: expect.objectContaining({GDK_BACKEND: 'x11'}),
+      stdio: 'ignore',
+    }));
   });
 
   it('darwin toggle scripts use the zoom button and do not minimize', async () => {

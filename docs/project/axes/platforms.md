@@ -11,6 +11,9 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
 - [x] PLAT-001a — rendre l'installation uinput autonome et idempotente; migrer
   une installation existante sans remplacer sa configuration, ses secrets ni
   sa base de données.
+- [x] PLAT-001b — rattacher la migration privilégiée uinput au `postinstall`
+  déclenché par la mise à jour intégrée; demander l'autorisation locale via
+  Polkit seulement lorsque la configuration système manque.
 - [ ] PLAT-002 — tester installation, service, mise à jour et désinstallation Windows.
 - [ ] PLAT-003 — créer l'installation macOS et guider les permissions Accessibilité.
 - [ ] PLAT-004 — intégrer le contrôle et la capture Wayland selon le
@@ -20,6 +23,10 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
 - [ ] PLAT-004g — utiliser un périphérique virtuel `uinput` comme stratégie
   d'entrée Wayland par défaut, conserver RemoteDesktop/libei comme stratégie
   optionnelle et limiter la permission système au seul `/dev/uinput`.
+- [x] PLAT-004h — rendre l'overlay QR YAD utilisable sous Wayland en l'exécutant
+  explicitement par XWayland lorsque le positionnement global est requis.
+- [x] PLAT-004i — empêcher YAD de rogner le QR lorsque la fenêtre a exactement
+  la taille configurée, en adaptant l'image à la zone intérieure du widget.
 - [ ] Renforcer diagnostics VLC, navigateurs et Samsung TV.
 - [ ] Définir un contrat d'adaptateur avant de multiplier les intégrations.
 

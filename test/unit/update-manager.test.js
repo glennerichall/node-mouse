@@ -1,4 +1,5 @@
 import {jest} from '@jest/globals';
+import {buildNpmGlobalUpdateCommand} from '../../server/services/update-manager/buildNpmGlobalUpdateCommand.js';
 
 const chooseUpdateCheckSource = jest.fn();
 const chooseUpdateInstallSource = jest.fn();
@@ -239,5 +240,13 @@ describe('createUpdateManager', () => {
       installCommand: 'npm update -g remote-mouse --force',
     }, 'Exécution commande install update');
     expect(logger.info).toHaveBeenNthCalledWith(2, 'Install update terminée avec succès');
+  });
+});
+
+describe('buildNpmGlobalUpdateCommand', () => {
+  it('marks npm updates as daemon-triggered for the postinstall migration', () => {
+    expect(buildNpmGlobalUpdateCommand('@velor/remote-mouse')).toBe(
+      "REMOTE_MOUSE_DAEMON=1 npm update -g '@velor/remote-mouse'",
+    );
   });
 });

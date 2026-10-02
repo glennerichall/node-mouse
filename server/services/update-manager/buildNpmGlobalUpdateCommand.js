@@ -11,5 +11,5 @@ export function buildNpmGlobalUpdateCommand(packageName) {
   if (!name) {
     return '';
   }
-  return `npm update -g ${shellQuote(name)}`;
+  return `REMOTE_MOUSE_DAEMON=1 npm update -g ${shellQuote(name)}`;
 }
