@@ -1,6 +1,6 @@
 # Axe — Sécurité et contrôle d'accès
 
-**État:** SEC-001 à SEC-008 terminés; prochaine tâche: corriger l'écart de
+**État:** SEC-001 à SEC-009 terminés; prochaine tâche: corriger l'écart de
 durée de grâce des jetons.
 
 ## Résultat visé
@@ -20,6 +20,9 @@ considérer le LAN comme une frontière de confiance.
 - [x] **SEC-008:** lister les appareils associés et leurs métadonnées.
 - [x] **SEC-008:** révoquer une session ou toutes les sessions via API admin.
 - [x] **SEC-008:** conserver un historique local des associations/révocations.
+- [x] **SEC-009:** séparer les lectures nécessaires à la télécommande des
+  ressources administrateur afin qu'une session `controller` issue du QR puisse
+  charger son état sans recevoir de droits d'écriture ni de données sensibles.
 - [ ] Corriger l'écart de durée de grâce documentée/configurée des jetons.
 
 ## Critères d'acceptation

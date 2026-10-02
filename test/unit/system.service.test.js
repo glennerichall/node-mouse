@@ -29,6 +29,9 @@ describe('system service', () => {
         vlc: {
           isAvailable: jest.fn(async () => true),
         },
+        preview: {
+          isAvailable: jest.fn(() => true),
+        },
       }),
       getConfig: () => ({
         browser: {enabled: true},

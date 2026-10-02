@@ -1,4 +1,8 @@
-import {PUBSUB_SERVICE_CONFIG} from '../../services/pubsub/serviceEventConstants.js';
+import {
+  PUBSUB_SERVICE_CLIENT_CONFIG,
+  PUBSUB_SERVICE_CONFIG,
+} from '../../services/pubsub/serviceEventConstants.js';
+import {CLIENT_CONFIG_PATHS} from '../../services/config/configPaths.js';
 import {createLogger} from '../../application/logger.js';
 
 let log;
@@ -45,6 +49,28 @@ export function startConfigObserver(services) {
         sysConfig: services.getSystemConfig(),
       },
     });
+
+    const clientChangedKeys = changedKeys.filter((path) => CLIENT_CONFIG_PATHS.includes(path));
+    if (clientChangedKeys.length > 0) {
+      sse.emit({
+        name: 'config.changed',
+        service: PUBSUB_SERVICE_CLIENT_CONFIG,
+        type: event.type,
+        payload: {
+          sequence: event.sequence,
+          at: event.at,
+          type: event.type,
+          changeType: event.payload?.changeType || '',
+          changedKeys: clientChangedKeys,
+          entries: clientChangedKeys.map((path) => ({
+            path,
+            value: path === 'preview.enabled'
+              ? services.getRemotes().preview.isAvailable() && getValueAtPath(config, path) !== false
+              : getValueAtPath(config, path),
+          })),
+        },
+      });
+    }
   }, {
     service: PUBSUB_SERVICE_CONFIG,
   });

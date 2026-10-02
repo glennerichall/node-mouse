@@ -1,7 +1,10 @@
 import {jest} from '@jest/globals';
 import {createPreviewStreamer} from '../../server/remotes/preview/createPreviewStreamer.js';
 
-function createFixture() {
+function createFixture(options = {
+  platform: 'linux',
+  env: {XDG_SESSION_TYPE: 'x11', DISPLAY: ':0'},
+}) {
   const capture = jest.fn(() => ({image: Buffer.alloc(16), byteWidth: 8}));
   const getScreenInfo = jest.fn(async () => ({width: 1920, height: 1080}));
   const queuedFrames = [];
@@ -21,7 +24,7 @@ function createFixture() {
     getConfig: () => ({preview: {width: 2, height: 2, fps: 20}}),
     getRobot: () => ({getMousePos: () => ({x: 100, y: 100}), screen: {capture}}),
     getSystem: () => ({getScreenInfo}),
-  });
+  }, options);
   return {streamer, socket, capture, getScreenInfo, queuedFrames};
 }
 
@@ -67,5 +70,25 @@ describe('preview streamer', () => {
     expect(capture).not.toHaveBeenCalled();
     expect(queuedFrames).toHaveLength(0);
     expect(jest.getTimerCount()).toBe(0);
+  });
+
+  it('never calls native X11 capture from a Wayland session', async () => {
+    const {streamer, socket, capture, queuedFrames} = createFixture({
+      platform: 'linux',
+      env: {
+        XDG_SESSION_TYPE: 'wayland',
+        WAYLAND_DISPLAY: 'wayland-0',
+        DISPLAY: ':0',
+      },
+    });
+
+    expect(streamer.isAvailable()).toBe(false);
+    const session = streamer.startForSocket(socket);
+    await jest.advanceTimersByTimeAsync(5000);
+
+    expect(capture).not.toHaveBeenCalled();
+    expect(queuedFrames).toHaveLength(0);
+    expect(jest.getTimerCount()).toBe(0);
+    session.stop();
   });
 });

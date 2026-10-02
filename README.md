@@ -277,6 +277,10 @@ WantedBy=default.target
 Depending on the graphical environment, passing the user session environment may be necessary for UI-related integrations.
 
 An X11 session is required for the Linux desktop control features.
+Under Wayland, Remote Mouse detects that RobotJS screen capture is unavailable
+and disables cursor preview to prevent a native `X_GetImage` failure. Use an
+Xorg session when preview is required; native Wayland capture remains planned
+through the desktop ScreenCast portal and PipeWire.
 
 #### Windows Deployment
 
@@ -387,6 +391,18 @@ The server exposes two main HTTP surfaces:
 - `GET /api/admin/subs/:id` opens the SSE stream for a previously created subscription
 - `DELETE /api/admin/subs/:id` deletes a previously created subscription
 - `POST /api/admin/restart-service` requests a local service restart through the application daemon service
+
+#### Client API Routes
+
+Authenticated controller sessions use a read-only API surface that does not
+expose administrative configuration:
+
+- `GET /api/client/config` returns the functional configuration required by the remote
+- `GET /api/client/remotes` returns the available remote controls
+- `GET /api/client/remotes/browsers` returns available browser launchers
+- `POST /api/client/subs/configs` creates a filtered client configuration subscription
+- `GET /api/client/subs/:id` opens its SSE stream
+- `DELETE /api/client/subs/:id` deletes the subscription
 
 #### Health Route
 

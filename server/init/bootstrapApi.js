@@ -15,6 +15,7 @@ import {createProxyTrust} from '../utils/clientAddress.js';
 import {createRequestScopeMiddleware} from '../connection/api/request-scope.middleware.js';
 import {createHttpErrorMiddleware} from '../connection/api/http-input.middleware.js';
 import {securityIngressRouter, securityRouter} from '../connection/api/security.router.js';
+import {clientApiRouter} from '../connection/api/client-api.router.js';
 
 const packageJsonPath = path.join(projectRoot, 'package.json');
 
@@ -56,6 +57,7 @@ export function bootstrapApi(services) {
     app.use(staticShareRouter);
 
     app.get('/qr', qrPageHandler);
+    app.use('/api/client', clientApiRouter);
     app.use('/api/remotes', remotesRouter);
     app.use('/api/admin', adminApiRouter);
     app.use('/ui/admin', adminUiRouter);

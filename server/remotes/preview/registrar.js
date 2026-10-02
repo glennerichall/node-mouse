@@ -8,7 +8,7 @@ export function createPreviewEventRegistrar({ preview, getConfig = () => ({}) })
     let previewSession = null;
 
     function startPreview() {
-      if (getConfig()?.preview?.enabled === false) {
+      if (getConfig()?.preview?.enabled === false || preview.isAvailable?.() === false) {
         stopPreview();
         return;
       }

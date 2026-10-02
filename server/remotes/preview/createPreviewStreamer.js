@@ -1,8 +1,13 @@
 import {captureAroundCursor} from "./captureAroundCursor.js";
 import {bgraToRgbaBuffer} from "./bgraToRgbaBuffer.js";
 import {DEFAULT_PERSISTED_CONFIG} from '../../services/config/defaultConfig.js';
+import {isScreenCaptureAvailable} from './isScreenCaptureAvailable.js';
 
-export function createPreviewStreamer(services) {
+export function createPreviewStreamer(services, runtime = {}) {
+  function isAvailable() {
+    return isScreenCaptureAvailable(runtime);
+  }
+
   function getPreviewConfig() {
     return {
       ...DEFAULT_PERSISTED_CONFIG.preview,
@@ -11,6 +16,10 @@ export function createPreviewStreamer(services) {
   }
 
   function startForSocket(socket) {
+    if (!isAvailable()) {
+      return {stop() {}};
+    }
+
     let active = true;
     let timer = null;
 
@@ -94,5 +103,5 @@ export function createPreviewStreamer(services) {
     return { stop };
   }
 
-  return { startForSocket };
+  return {isAvailable, startForSocket};
 }

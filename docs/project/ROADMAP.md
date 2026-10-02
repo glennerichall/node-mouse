@@ -119,6 +119,8 @@ branches.
   d'autorisation commun; WebRTC pourra réutiliser son contrat.
 - [x] Protéger les écritures HTTP avec vérification Origin et CSRF adaptée.
 - [x] Ajouter un historique local des associations et révocations.
+- [x] Séparer les ressources clientes en lecture des ressources administrateur,
+  sans exposer de configuration sensible aux sessions `controller`.
 
 ### Critères de sortie
 
@@ -127,10 +129,11 @@ branches.
 - [x] Un appareil révoqué perd immédiatement son accès.
 - [x] Aucune vulnérabilité élevée connue ne subsiste en production.
 
-`SEC-008` est terminée : l'API administrateur gère les appareils associés,
-leurs révocations et leur historique local. L'interface graphique reste
-planifiée dans `UX-001` et `UX-002`. La prochaine tâche de sécurité est de
-corriger l'écart de durée de grâce documentée/configurée des jetons d'entrée.
+`SEC-008` et `SEC-009` sont terminées : l'API administrateur gère les appareils
+associés, tandis que les sessions `controller` utilisent des ressources clientes
+en lecture seule. L'interface graphique de gestion reste planifiée dans
+`UX-001` et `UX-002`. La prochaine tâche de sécurité est de corriger l'écart de
+durée de grâce documentée/configurée des jetons d'entrée.
 
 ## Axe 2 — Architecture modulaire
 
@@ -242,6 +245,8 @@ Dispatcher de commandes
 - [ ] Consolider l'installation et le service `systemd --user`.
 - [ ] Documenter X11, DISPLAY, XAUTHORITY et la session graphique.
 - [ ] Étudier Wayland via les portails desktop ou des adaptateurs dédiés.
+- [x] Détecter sous Wayland l'indisponibilité de la capture X11 RobotJS et
+  neutraliser la prévisualisation sans interrompre le serveur.
 - [ ] Détecter clairement les capacités indisponibles.
 
 ### Windows

@@ -10,7 +10,9 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
 - [ ] PLAT-001 — consolider installation et service Linux; documenter X11/Wayland.
 - [ ] PLAT-002 — tester installation, service, mise à jour et désinstallation Windows.
 - [ ] PLAT-003 — créer l'installation macOS et guider les permissions Accessibilité.
-- [ ] PLAT-004 — prototyper une stratégie Wayland.
+- [ ] PLAT-004 — intégrer une capture Wayland via portail/PipeWire.
+- [x] PLAT-004a — détecter la capture RobotJS indisponible sous Wayland et
+  neutraliser la prévisualisation sans interrompre le serveur.
 - [ ] Renforcer diagnostics VLC, navigateurs et Samsung TV.
 - [ ] Définir un contrat d'adaptateur avant de multiplier les intégrations.
 

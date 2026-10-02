@@ -33,7 +33,7 @@ Internet.
 | Lot actif | A — Stabilisation et sécurité |
 | Statut | En cours |
 | Prochaine tâche | Corriger l'écart de durée de grâce des jetons d'entrée |
-| Version | `6.9.1` — bump `patch` pour le durcissement SEC-007 |
+| Version | `6.10.0` — bump `minor` pour l'API de gestion SEC-008 |
 | Roadmap globale | [ROADMAP.md](../ROADMAP.md) |
 | Axe PWA | [pwa.md](../axes/pwa.md) |
 

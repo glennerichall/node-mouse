@@ -26,8 +26,14 @@ portent le périmètre et les tâches planifiées.
 
 ## Historique existant
 
-- [Sécurité — lot A, SEC-001 à SEC-007](./security-lot-a.md): historique
-  existant conservé lors de la réorganisation; SEC-008 est encore planifié.
+- [Sécurité — lot A, SEC-001 à SEC-008](./security-lot-a.md): historique
+  existant conservé lors de la réorganisation; SEC-008 est terminée.
+- [Sécurité — SEC-008](./security-SEC-008-2026-09-26.md): API de gestion des
+  appareils associés, révocations et historique local.
+- [Sécurité — SEC-009](./security-SEC-009-2026-10-02.md): séparation des
+  ressources clientes en lecture et des ressources administrateur.
+- [Plateformes — PLAT-004a](./platforms-PLAT-004a-2026-10-02.md): détection de
+  la capture RobotJS indisponible sous Wayland et prévention du crash X11.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/pwa.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

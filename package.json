@@ -1,6 +1,6 @@
 {
   "name": "@velor/remote-mouse",
-  "version": "6.9.1",
+  "version": "6.10.0",
   "type": "module",
   "description": "Remote mouse and keyboard with mobile client",
   "homepage": "https://github.com/glennerichall/node-mouse#readme",
@@ -18,7 +18,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node index.js",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand --coverage",
+    "check:version": "node scripts/check-package-version.mjs",
+    "test": "npm run check:version && NODE_OPTIONS=--experimental-vm-modules jest --runInBand --coverage",
     "test:install": "NODE_OPTIONS=--experimental-vm-modules jest test/unit/install-scripts.test.js --runInBand",
     "test:install:integration": "node test/integration/install/run-linux-install.mjs",
     "test:all": "npm test && npm run test:e2e",

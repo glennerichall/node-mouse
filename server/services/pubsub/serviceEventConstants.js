@@ -4,6 +4,7 @@ export const PUBSUB_SERVICE_TASK_MANAGER = 'task-manager';
 export const PUBSUB_SERVICE_TOKEN_MANAGER = 'token-manager';
 export const PUBSUB_SERVICE_UPDATE_MANAGER = 'update-manager';
 export const PUBSUB_SERVICE_CONFIG = 'config';
+export const PUBSUB_SERVICE_CLIENT_CONFIG = 'client-config';
 export const PUBSUB_SERVICE_ADMIN_FORCE_UPDATE_CHECK = 'admin:force-update-check';
 export const PUBSUB_SERVICE_ADMIN_INSTALL_UPDATE = 'admin:install-update';
 export const PUBSUB_SERVICE_ADMIN_OPEN_QR_BROWSER = 'admin:open-qr-browser';

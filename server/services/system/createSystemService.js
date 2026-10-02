@@ -51,7 +51,7 @@ function buildApplications({browsers, vlcAvailable}) {
   ];
 }
 
-function buildRemoteCapabilities({applications, config}) {
+function buildRemoteCapabilities({applications, config, previewAvailable = true}) {
   const availableBrowserApplicationIds = applications
     .filter((application) => application.kind === 'browser' && application.available)
     .map((application) => application.id);
@@ -71,7 +71,7 @@ function buildRemoteCapabilities({applications, config}) {
       id: 'keyboard',
       labelKey: 'preferences.remote.keyboard',
       applicationIds: [],
-      available: true,
+      available: previewAvailable,
       enabled: isConfigEnabled(config, 'keyboard'),
     },
     {
@@ -143,9 +143,11 @@ export function createSystemService(services) {
       const browsers = await this.listBrowsers();
       const vlcAvailable = await this.isVlcAvailable();
       const applications = buildApplications({browsers, vlcAvailable});
+      const previewAvailable = services.getRemotes().preview.isAvailable();
       const allRemotes = buildRemoteCapabilities({
         applications,
         config: services.getConfig(),
+        previewAvailable,
       });
       const screen = await this.getScreenInfo();
       const network = this.getNetworkInfo();

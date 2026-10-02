@@ -1,12 +1,12 @@
 import express from 'express';
 
-export const adminRemotesRouter = express.Router();
+export const remotesCatalogRouter = express.Router();
 
   function isBrowserEnabled(config, browserId) {
     return config?.browser?.enabled !== false && config?.browser?.[browserId] !== false;
   }
 
-  adminRemotesRouter.get('/browsers', async (req, res) => {
+  remotesCatalogRouter.get('/browsers', async (req, res) => {
     const {services} = req;
     const config = services.getConfig();
     const browsers = await services.getSystem().listBrowsers();
@@ -18,7 +18,7 @@ export const adminRemotesRouter = express.Router();
     });
   });
 
-  adminRemotesRouter.get('/', async (req, res) => {
+  remotesCatalogRouter.get('/', async (req, res) => {
     const {services} = req;
     const config = services.getConfig();
     const vlcAvailable = await services.getSystem().isVlcAvailable();
@@ -62,3 +62,5 @@ export const adminRemotesRouter = express.Router();
       remotes,
     });
   });
+
+export {remotesCatalogRouter as adminRemotesRouter};

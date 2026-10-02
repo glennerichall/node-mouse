@@ -3,6 +3,18 @@ import { BROWSER_CATALOG } from '../../remotes/browser/browserCatalog.js';
 
 const BROWSER_CONFIG_PATHS = BROWSER_CATALOG.map((browser) => `browser.${browser.id}`);
 
+export const CLIENT_CONFIG_PATHS = [
+    'input.touchDragHoldMs',
+    'input.touchDragStillDistancePx',
+    'browser.enabled',
+    ...BROWSER_CONFIG_PATHS,
+    'keyboard.enabled',
+    'vlc.enabled',
+    'preview.enabled',
+    'preview.hideDelayMs',
+    'samsungTv.enabled',
+];
+
 export const CONFIG_PATHS = [
     'input.mouseSpeed',
     'input.scrollSpeed',

@@ -105,6 +105,9 @@ describe('service builders resolve providers only in methods', () => {
     const preview = createPreviewStreamer({
       getRobot,
       getConfig,
+    }, {
+      platform: 'linux',
+      env: {XDG_SESSION_TYPE: 'x11', DISPLAY: ':0'},
     });
 
     expect(getRobot).not.toHaveBeenCalled();

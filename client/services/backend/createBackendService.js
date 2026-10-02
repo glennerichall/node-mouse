@@ -21,10 +21,10 @@ export function createBackendService(services) {
     request,
     requestJson,
     async getClientConfig() {
-      return requestJson('/api/admin/configs');
+      return requestJson('/api/client/config');
     },
     async createConfigSubscription(scope = 'config') {
-      return requestJson('/api/admin/subs/configs', {
+      return requestJson('/api/client/subs/configs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -37,16 +37,16 @@ export function createBackendService(services) {
     },
     async deleteSubscription(id) {
       const encodedId = encodeURIComponent(String(id || ''));
-      return fetch(`/api/admin/subs/${encodedId}`, {
+      return fetch(`/api/client/subs/${encodedId}`, {
         method: 'DELETE',
         keepalive: true,
       });
     },
     async getAvailableRemotes() {
-      return requestJson('/api/admin/remotes');
+      return requestJson('/api/client/remotes');
     },
     async getAvailableBrowsers() {
-      return requestJson('/api/admin/remotes/browsers');
+      return requestJson('/api/client/remotes/browsers');
     },
     async getSamsungStatus() {
       return requestJson('/api/remotes/samsung/status');
