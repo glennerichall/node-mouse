@@ -35,6 +35,9 @@ export function parseCliArgs(args) {
     .command('help', false, () => {}, () => {
       command = {name: 'help', args: {}};
     })
+    .command('version', false, () => {}, () => {
+      command = {name: 'version', args: {}};
+    })
     .command('config [action] [path] [value..]', false, (builder) => builder
       .positional('action', {type: 'string'})
       .positional('path', {type: 'string'})

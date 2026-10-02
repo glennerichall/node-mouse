@@ -1,8 +1,5 @@
 # Remote Mouse
 
-Le [dossier de projet](./docs/project/README.md) contient la vision, la
-roadmap globale et le suivi de développement par axe.
-
 Remote Mouse is a web-based remote control for operating a computer from a phone, tablet, or another browser on the same network. The server exposes a mobile-friendly interface for mouse and keyboard control, browser shortcuts, admin actions, and optional Samsung TV remote commands.
 
 ## Overview
@@ -19,8 +16,6 @@ The application includes:
 - optional Samsung TV remote integration
 
 ## Screenshots
-
-Regenerate these assets with `npm run screenshots:mobile`.
 
 | Remote control | Local preferences |
 | --- | --- |
@@ -373,6 +368,27 @@ the left drawer. A successful unlock elevates only the current paired session,
 expires automatically, and is cleared by a server restart. Prefer HTTPS before
 entering this password over a network.
 
+#### Upgrading from a version without remote admin unlock
+
+The previous version cannot unlock administration from a paired mobile device.
+If its desktop page also offers no clickable way to open the left drawer, run
+the package update once from a terminal on the server (or through SSH):
+
+```bash
+npm update -g @velor/remote-mouse
+remote-mouse service restart
+```
+
+This keeps the existing configuration and database. If npm reports a permission
+error, use the same Node/npm installation and privilege method that were used
+for the original global installation. Do not delete the configuration directory
+or rerun the installer with configuration overwrite enabled.
+
+After the update, add `ADMIN_PASSWORD` and optionally `ADMIN_UNLOCK_MINUTES` to
+the existing `.env`, restart the service, rescan the QR if necessary, and use
+the password field in the left drawer. Later updates can then be installed from
+the authenticated mobile administration controls.
+
 Useful server pages:
 
 - `/qr` displays the entry QR code
@@ -382,6 +398,7 @@ Useful server pages:
 Useful CLI commands:
 
 - `help` displays the available CLI commands
+- `version` displays the installed package version without contacting the daemon
 - `info` prints the server capabilities
 - `config` prints the effective persisted configuration
 - `config get <path>` prints one persisted configuration value

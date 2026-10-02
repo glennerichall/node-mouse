@@ -7,6 +7,8 @@ diagnostic/sauvegarde sans divulgation de secrets.
 
 ## Plan de travail
 
+- [x] OPS-001 — exposer `remote-mouse version` localement, sans dépendre du
+  daemon, et documenter la commande dans l'aide et le README.
 - [ ] Rendre les installateurs idempotents et documenter le mode non interactif.
 - [ ] Générer les secrets à l'installation et valider les prérequis.
 - [ ] Vérifier l'origine des artefacts; séparer téléchargement et activation.

@@ -4,6 +4,7 @@ export async function executeHelpCommand() {
     message: [
       'Commandes disponibles:',
       'remote-mouse help',
+      'remote-mouse version',
       'remote-mouse config',
       'remote-mouse config get <path>',
       'remote-mouse config set <path> <value>',

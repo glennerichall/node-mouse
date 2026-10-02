@@ -4,6 +4,7 @@ describe('cli args parser', () => {
   it.each([
     [['info', '--verbosity', '2'], {command: {name: 'info', args: {}}, options: {verbosity: 2}}],
     [['info', '-v'], {command: {name: 'info', args: {}}, options: {verbosity: 1}}],
+    [['version'], {command: {name: 'version', args: {}}, options: {verbosity: 0}}],
     [['config'], {command: {name: 'config', args: {action: '', path: '', value: ''}}, options: {verbosity: 0}}],
     [['config', 'get', 'preview.fps'], {command: {name: 'config', args: {action: 'get', path: 'preview.fps', value: ''}}, options: {verbosity: 0}}],
     [['config', 'set', 'preview.fps', '12'], {command: {name: 'config', args: {action: 'set', path: 'preview.fps', value: '12'}}, options: {verbosity: 0}}],

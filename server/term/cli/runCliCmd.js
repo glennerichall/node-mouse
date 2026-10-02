@@ -3,6 +3,7 @@ import {executeLocalServiceCommand} from "./executeLocalServiceCommand.js";
 import {printCliLog, printCliResult} from "./printCliResult.js";
 import {sendCliCommand} from "./sendCliCommand.js";
 import {withCliVerbosity} from "../srv/executeCliRequest.js";
+import {getInstalledVersion} from './versionCommand.js';
 
 function isLocalServiceCommand(command) {
     return command?.name === 'service'
@@ -15,10 +16,16 @@ export async function runCliCmd(args) {
         : args;
     const {command, options} = parseCliArgs(normalizedArgs);
 
+    if (command?.name === 'version') {
+        console.log(getInstalledVersion());
+        process.exit(0);
+    }
+
     if (!command?.name || command.name === 'help') {
         console.log('Usage:');
         console.log('  remote-mouse              Demarre le serveur');
         console.log('  remote-mouse help         Affiche cette aide');
+        console.log('  remote-mouse version      Affiche la version installee');
         console.log('  remote-mouse config       Affiche la configuration persistée effective');
         console.log('  remote-mouse config get <path> Affiche une valeur de configuration persistée');
         console.log('  remote-mouse config set <path> <value> Met a jour une valeur de configuration persistée');

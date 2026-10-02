@@ -26,6 +26,9 @@ portent le périmètre et les tâches planifiées.
 
 ## Historique existant
 
+- [Exploitation — OPS-001](./operations-OPS-001-2026-10-02.md): commande CLI
+  locale affichant la version du paquet installé.
+
 - [Sécurité — lot A, SEC-001 à SEC-008](./security-lot-a.md): historique
   existant conservé lors de la réorganisation; SEC-008 est terminée.
 - [Sécurité — SEC-008](./security-SEC-008-2026-09-26.md): API de gestion des
@@ -34,6 +37,9 @@ portent le périmètre et les tâches planifiées.
   ressources clientes en lecture et des ressources administrateur.
 - [Sécurité — SEC-010](./security-SEC-010-2026-10-02.md): déverrouillage
   administrateur temporaire depuis le panneau latéral.
+- [Sécurité — migration vers SEC-010](./security-SEC-010-migration-2026-10-02.md):
+  procédure npm de bootstrap pour une installation qui ne peut pas encore se
+  déverrouiller depuis le mobile.
 - [Plateformes — PLAT-004a](./platforms-PLAT-004a-2026-10-02.md): détection de
   la capture RobotJS indisponible sous Wayland et prévention du crash X11.
 - [Plateformes — PLAT-004b](./platforms-PLAT-004b-2026-10-02.md): extraction de
