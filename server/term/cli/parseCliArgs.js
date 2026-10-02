@@ -84,6 +84,13 @@ export function parseCliArgs(args) {
     .command('tokens', false, () => {}, () => {
       command = {name: 'tokens', args: {}};
     })
+    .command('wayland [action]', false, (builder) => builder
+      .positional('action', {type: 'string', default: 'status'}), (argv) => {
+      command = {
+        name: 'wayland',
+        args: {action: String(argv.action || 'status').trim()},
+      };
+    })
     .command('open-qr', false, () => {}, () => {
       command = {name: 'open-qr', args: {}};
     })
@@ -110,6 +117,9 @@ export function formatCliCommand(command) {
   }
   if (command.name === 'service') {
     return joinParts(['service', command.args?.action]);
+  }
+  if (command.name === 'wayland') {
+    return joinParts(['wayland', command.args?.action]);
   }
 
   return String(command.name || '').trim();

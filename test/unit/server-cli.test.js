@@ -254,6 +254,22 @@ describe('server cli', () => {
     });
   });
 
+  it('opens Wayland consent only through the explicit local CLI command', async () => {
+    const authorize = jest.fn();
+    const result = await executeCliCommand({
+      getDesktopController: () => ({
+        authorize,
+        getCapabilities: () => ({adapter: 'wayland', status: 'permission-required'}),
+      }),
+    }, {name: 'wayland', args: {action: 'authorize'}});
+
+    expect(authorize).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({
+      ok: true,
+      message: 'Demande d autorisation Wayland ouverte sur le bureau local.',
+    });
+  });
+
   it('returns persisted update-manager events for update-events command', async () => {
     const result = await executeCliCommand({
       getPersistence: () => ({

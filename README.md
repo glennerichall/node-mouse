@@ -157,7 +157,8 @@ npm --version
 
 #### Platform Dependencies
 
-This project relies on `@hurdlegroup/robotjs`, which requires native dependencies.
+This project uses RobotJS on X11, Windows and macOS. On a Linux Wayland session,
+it uses an isolated helper based on XDG RemoteDesktop, liboeffis and libei.
 
 VLC media player is optional. Install it on the host machine if you want the VLC remote to appear and control media playback.
 
@@ -170,12 +171,23 @@ sudo apt-get update
 sudo apt-get install -y build-essential libx11-dev libxtst-dev libpng++-dev wmctrl yad
 ```
 
+For Ubuntu GNOME Wayland, also install and build the native helper:
+
+```bash
+sudo apt-get install -y pkg-config libei-dev liboeffis-dev
+npm run build:wayland
+```
+
 Notes:
 
 - `libx11-dev`, `libxtst-dev`, and `libpng++-dev` are required for the native mouse and keyboard integration
 - `wmctrl` is used for browser focus and window activation on Linux
 - `yad` is used for the Linux QR overlay
-- an X11 session is required for the Linux desktop control features
+- X11 uses RobotJS; on Wayland, an interactive terminal start opens the local
+  Remote Desktop dialog automatically. For a non-interactive `systemd` service,
+  run `remote-mouse wayland authorize`, then accept the dialog locally
+- Wayland preview is not yet available; it remains disabled until the PipeWire
+  capture adapter is implemented
 
 ##### Windows
 

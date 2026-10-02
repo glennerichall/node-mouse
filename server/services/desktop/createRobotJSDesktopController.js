@@ -1,5 +1,13 @@
 export function createRobotJSDesktopController(robotJS) {
     const desktopController = {
+        getCapabilities: () => ({
+            adapter: 'robotjs',
+            status: 'ready',
+            pointer: true,
+            keyboard: true,
+            preview: true,
+            reason: null,
+        }),
         getMousePos: (...args) => robotJS.getMousePos(...args),
         moveMouse: (...args) => robotJS.moveMouse(...args),
         scrollMouse: (...args) => robotJS.scrollMouse(...args),

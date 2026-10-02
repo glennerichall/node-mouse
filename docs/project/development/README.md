@@ -36,6 +36,10 @@ portent le périmètre et les tâches planifiées.
   la capture RobotJS indisponible sous Wayland et prévention du crash X11.
 - [Plateformes — PLAT-004b](./platforms-PLAT-004b-2026-10-02.md): extraction de
   RobotJS derrière `DesktopController` et préparation des chargeurs d'adaptateurs.
+- [Plateformes — PLAT-004c](./platforms-PLAT-004c-2026-10-02.md): helper
+  RemoteDesktop/libei, sélection Wayland, consentement local et validation réelle.
+- [Plateformes — PLAT-004c correctif souris](./platforms-PLAT-004c-mouse-fix-2026-10-02.md):
+  activation interactive du portail et arrêt robuste après fermeture du helper.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/pwa.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

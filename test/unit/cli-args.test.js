@@ -8,6 +8,8 @@ describe('cli args parser', () => {
     [['config', 'get', 'preview.fps'], {command: {name: 'config', args: {action: 'get', path: 'preview.fps', value: ''}}, options: {verbosity: 0}}],
     [['config', 'set', 'preview.fps', '12'], {command: {name: 'config', args: {action: 'set', path: 'preview.fps', value: '12'}}, options: {verbosity: 0}}],
     [['service', 'restart'], {command: {name: 'service', args: {action: 'restart'}}, options: {verbosity: 0}}],
+    [['wayland', 'authorize'], {command: {name: 'wayland', args: {action: 'authorize'}}, options: {verbosity: 0}}],
+    [['wayland'], {command: {name: 'wayland', args: {action: 'status'}}, options: {verbosity: 0}}],
     [['open-qr'], {command: {name: 'open-qr', args: {}}, options: {verbosity: 0}}],
     [['qr'], {command: {name: 'qr', args: {}}, options: {verbosity: 0}}],
   ])('parses %j', (args, expected) => {

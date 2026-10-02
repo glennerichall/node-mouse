@@ -8,6 +8,7 @@ import {executeSystemConfigCommand} from './commands/systemConfigCommand.js';
 import {executeTasksCommand} from './commands/tasksCommand.js';
 import {executeTokensCommand} from './commands/tokensCommand.js';
 import {executeUpdateEventsCommand} from './commands/updateEventsCommand.js';
+import {executeWaylandCommand} from './commands/waylandCommand.js';
 import {formatCliCommand} from '../cli/parseCliArgs.js';
 
 const commandHandlers = {
@@ -25,6 +26,7 @@ const commandHandlers = {
   'update-events': executeUpdateEventsCommand,
   'samsung-detect': executeSamsungDetectCommand,
   tokens: executeTokensCommand,
+  wayland: executeWaylandCommand,
 };
 
 export async function executeCliCommand(services, command) {

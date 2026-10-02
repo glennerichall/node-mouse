@@ -100,6 +100,10 @@ export function createMouseController(services) {
         const desktopController = services.getDesktopController();
         const inputConfig = getInputConfig();
         const mouseSpeed = Number(inputConfig.mouseSpeed) || DEFAULT_PERSISTED_CONFIG.input.mouseSpeed;
+        if (typeof desktopController.moveMouseRelative === 'function') {
+            desktopController.moveMouseRelative(dx * mouseSpeed, dy * mouseSpeed);
+            return;
+        }
         const screenSize = await getActiveScreenSize();
         const current = desktopController.getMousePos();
         const position = getCurrentPosition(current, screenSize);

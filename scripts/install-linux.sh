@@ -26,6 +26,7 @@ INSTALL_SERVICE="false"
 HTTPS_CHOICE=""
 GENERATE_CERT_CHOICE=""
 INSTALL_SERVICE_CHOICE=""
+WAYLAND_CHOICE="auto"
 
 usage() {
   cat <<'EOF'
@@ -44,6 +45,8 @@ Options:
   --ssl-cert-path <path> Existing PEM certificate path.
   --install-service      Install and restart the service without prompting.
   --no-service           Do not install the service.
+  --wayland              Install the Wayland helper build dependencies.
+  --no-wayland           Do not install the Wayland helper build dependencies.
   -h, --help             Show this help.
 
 Environment:
@@ -103,6 +106,14 @@ while [[ $# -gt 0 ]]; do
       ;;
     --no-service)
       INSTALL_SERVICE_CHOICE="false"
+      shift
+      ;;
+    --wayland)
+      WAYLAND_CHOICE="true"
+      shift
+      ;;
+    --no-wayland)
+      WAYLAND_CHOICE="false"
       shift
       ;;
     -h|--help)
@@ -232,6 +243,9 @@ package_for_dependency() {
         wmctrl) echo "wmctrl" ;;
         yad) echo "yad" ;;
         openssl) echo "openssl" ;;
+        pkgconfig) echo "pkg-config" ;;
+        ei) echo "libei-dev" ;;
+        oeffis) echo "liboeffis-dev" ;;
       esac
       ;;
     dnf|yum)
@@ -245,6 +259,9 @@ package_for_dependency() {
         wmctrl) echo "wmctrl" ;;
         yad) echo "yad" ;;
         openssl) echo "openssl" ;;
+        pkgconfig) echo "pkgconf-pkg-config" ;;
+        ei) echo "libei-devel" ;;
+        oeffis) echo "liboeffis-devel" ;;
       esac
       ;;
     pacman)
@@ -258,6 +275,9 @@ package_for_dependency() {
         wmctrl) echo "wmctrl" ;;
         yad) echo "yad" ;;
         openssl) echo "openssl" ;;
+        pkgconfig) echo "pkgconf" ;;
+        ei) echo "libei" ;;
+        oeffis) echo "libei" ;;
       esac
       ;;
     zypper)
@@ -271,6 +291,9 @@ package_for_dependency() {
         wmctrl) echo "wmctrl" ;;
         yad) echo "yad" ;;
         openssl) echo "openssl" ;;
+        pkgconfig) echo "pkg-config" ;;
+        ei) echo "libei-devel" ;;
+        oeffis) echo "liboeffis-devel" ;;
       esac
       ;;
     *)
@@ -371,6 +394,16 @@ check_functional_dependencies() {
   command -v wmctrl >/dev/null 2>&1 || MISSING_DEPS+=("wmctrl")
   command -v yad >/dev/null 2>&1 || MISSING_DEPS+=("yad")
   command -v openssl >/dev/null 2>&1 || MISSING_DEPS+=("openssl")
+
+  if [[ "$WAYLAND_CHOICE" == "true" || ( "$WAYLAND_CHOICE" == "auto" && "${XDG_SESSION_TYPE:-}" == "wayland" ) ]]; then
+    command -v pkg-config >/dev/null 2>&1 || MISSING_DEPS+=("pkgconfig")
+    if ! command -v pkg-config >/dev/null 2>&1 || ! pkg-config --exists libei-1.0; then
+      MISSING_DEPS+=("ei")
+    fi
+    if ! command -v pkg-config >/dev/null 2>&1 || ! pkg-config --exists liboeffis-1.0; then
+      MISSING_DEPS+=("oeffis")
+    fi
+  fi
 }
 
 install_packages() {

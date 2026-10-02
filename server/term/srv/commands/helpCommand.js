@@ -17,6 +17,7 @@ export async function executeHelpCommand() {
       'remote-mouse update-events',
       'remote-mouse samsung-detect',
       'remote-mouse tokens',
+      'remote-mouse wayland <status|authorize|stop>',
       'remote-mouse open-qr',
       'remote-mouse qr',
     ].join('\n'),

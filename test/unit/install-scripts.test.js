@@ -94,6 +94,7 @@ exit 0
 
     const result = await run('bash', [
       'scripts/install-linux.sh',
+      '--no-wayland',
       '-y',
       '--config-dir',
       configDir,
@@ -161,6 +162,7 @@ exit 9
 
     const result = await run('bash', [
       'scripts/install-linux.sh',
+      '--no-wayland',
       '-y',
       '--config-dir',
       configDir,
@@ -247,6 +249,7 @@ exit 0
 
     const result = await run('bash', [
       'scripts/install-linux.sh',
+      '--no-wayland',
       '-y',
       '--package',
       root,

@@ -4,6 +4,12 @@
 **État:** en cours; `PLAT-004a` est terminé et `PLAT-004b` a commencé par
 l'extraction du contrôleur de bureau RobotJS.
 
+**Avancement au 2026-10-02:** la sélection d'adaptateur et l'entrée Wayland
+RemoteDesktop/libei sont implantées. Le helper atteint l'état `ready` sous
+Ubuntu 26.04 GNOME et un mouvement réel a été validé. `PLAT-004c` reste en
+cours pour la keymap et la restauration; `PLAT-004d` (preview PipeWire) n'est
+pas encore implanté.
+
 ## Contexte et cible
 
 Ubuntu 26.04 utilise exclusivement Wayland pour la session Ubuntu/GNOME. Les

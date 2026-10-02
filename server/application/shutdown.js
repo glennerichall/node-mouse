@@ -50,6 +50,7 @@ export function createApplicationShutdown(services) {
       runShutdownStep('Erreur a l arret de l observateur du survol QR overlay', () => state.stopQrOverlayHoverObserver()),
       runShutdownStep('Erreur a la fermeture du socket CLI', () => state.cliServer?.close()),
       runShutdownStep('Erreur a la fermeture du QR overlay', () => qrOverlay.close()),
+      runShutdownStep('Erreur a la fermeture du controleur de bureau', () => services.getDesktopController()?.close?.()),
       runShutdownStep('Erreur a la fermeture des connexions SSE', () => sseService?.closeAll?.()),
       runShutdownStep('Erreur a la fermeture de Socket.IO', () => new Promise((resolve) => {
         io?.close?.(() => resolve());

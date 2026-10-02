@@ -19,13 +19,38 @@ describe('desktop controller', () => {
     };
     const robotJSLoader = jest.fn(async () => robotJS);
 
-    const desktop = await loadDesktopController({robotJSLoader});
+    const desktop = await loadDesktopController({platform: 'linux', env: {XDG_SESSION_TYPE: 'x11'}, robotJSLoader});
 
     expect(robotJSLoader).toHaveBeenCalledTimes(1);
+    expect(desktop.getCapabilities()).toEqual({
+      adapter: 'robotjs',
+      status: 'ready',
+      pointer: true,
+      keyboard: true,
+      preview: true,
+      reason: null,
+    });
     expect(desktop.getMousePos()).toEqual({x: 1, y: 2});
     desktop.moveMouse(10, 20);
     desktop.screen.capture(0, 0, 20, 10);
     expect(robotJS.moveMouse).toHaveBeenCalledWith(10, 20);
     expect(robotJS.screen.capture).toHaveBeenCalledWith(0, 0, 20, 10);
+  });
+
+  it('loads only the Wayland adapter for a Linux Wayland session', async () => {
+    const robotJSLoader = jest.fn();
+    const waylandController = {getCapabilities: jest.fn()};
+    const waylandLoader = jest.fn(async () => waylandController);
+
+    const desktop = await loadDesktopController({
+      platform: 'linux',
+      env: {XDG_SESSION_TYPE: 'wayland'},
+      robotJSLoader,
+      waylandLoader,
+    });
+
+    expect(desktop).toBe(waylandController);
+    expect(waylandLoader).toHaveBeenCalledTimes(1);
+    expect(robotJSLoader).not.toHaveBeenCalled();
   });
 });
