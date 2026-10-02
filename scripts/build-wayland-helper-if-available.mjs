@@ -5,6 +5,13 @@ if (process.platform !== 'linux') {
   process.exit(0);
 }
 
+const compiler = spawnSync('cc', ['--version']);
+if (compiler.status === 0) {
+  execFileSync('bash', ['scripts/build-uinput-helper.sh'], {stdio: 'inherit'});
+} else {
+  process.stderr.write('uinput helper not built: install a C compiler, then run npm run build:uinput.\n');
+}
+
 const dependencies = spawnSync('pkg-config', ['--exists', 'libei-1.0', 'liboeffis-1.0']);
 if (dependencies.status !== 0) {
   process.stderr.write(

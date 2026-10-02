@@ -33,7 +33,7 @@ const MODIFIER_CODES = Object.freeze({
     command: KEY_CODES.command,
 });
 
-export function createWaylandDesktopController(helper) {
+export function createWaylandDesktopController(helper, {adapter = 'wayland'} = {}) {
     const pointer = {x: 0, y: 0};
 
     function key(code, pressed) {
@@ -88,7 +88,7 @@ export function createWaylandDesktopController(helper) {
         getCapabilities() {
             const helperStatus = helper.getStatus();
             return {
-                adapter: 'wayland',
+                adapter,
                 status: helperStatus.status,
                 pointer: helperStatus.status === 'ready',
                 keyboard: helperStatus.status === 'ready',

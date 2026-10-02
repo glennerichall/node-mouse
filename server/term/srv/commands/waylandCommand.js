@@ -2,7 +2,7 @@ export async function executeWaylandCommand(services, {action = 'status'} = {}) 
   const desktopController = services.getDesktopController();
   const capabilities = desktopController?.getCapabilities?.();
 
-  if (capabilities?.adapter !== 'wayland') {
+  if (!String(capabilities?.adapter || '').startsWith('wayland')) {
     return {
       ok: false,
       message: 'Le controleur Wayland n est pas actif dans cette session.',
@@ -13,7 +13,9 @@ export async function executeWaylandCommand(services, {action = 'status'} = {}) 
     await desktopController.authorize();
     return {
       ok: true,
-      message: 'Demande d autorisation Wayland ouverte sur le bureau local.',
+      message: capabilities.adapter === 'wayland-uinput'
+        ? 'Controle uinput Wayland demarre; aucun dialogue systeme n est requis.'
+        : 'Demande d autorisation Wayland ouverte sur le bureau local.',
     };
   }
 

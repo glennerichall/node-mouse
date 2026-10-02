@@ -27,6 +27,7 @@ HTTPS_CHOICE=""
 GENERATE_CERT_CHOICE=""
 INSTALL_SERVICE_CHOICE=""
 WAYLAND_CHOICE="auto"
+WAYLAND_INPUT="${REMOTE_MOUSE_WAYLAND_INPUT:-uinput}"
 
 usage() {
   cat <<'EOF'
@@ -45,8 +46,8 @@ Options:
   --ssl-cert-path <path> Existing PEM certificate path.
   --install-service      Install and restart the service without prompting.
   --no-service           Do not install the service.
-  --wayland              Install the Wayland helper build dependencies.
-  --no-wayland           Do not install the Wayland helper build dependencies.
+  --wayland              Install Wayland helpers and configure uinput access.
+  --no-wayland           Do not install or configure Wayland helpers.
   -h, --help             Show this help.
 
 Environment:
@@ -55,6 +56,7 @@ Environment:
   REMOTE_MOUSE_PORT          server port override.
   REMOTE_MOUSE_SSL_KEY_PATH  existing PEM private key path.
   REMOTE_MOUSE_SSL_CERT_PATH existing PEM certificate path.
+  REMOTE_MOUSE_WAYLAND_INPUT Wayland input strategy: uinput (default) or portal.
 EOF
 }
 
@@ -140,6 +142,11 @@ fi
 
 if [[ -z "$PORT" ]]; then
   echo "Missing port." >&2
+  exit 1
+fi
+
+if [[ "$WAYLAND_INPUT" != "uinput" && "$WAYLAND_INPUT" != "portal" ]]; then
+  echo "REMOTE_MOUSE_WAYLAND_INPUT must be uinput or portal." >&2
   exit 1
 fi
 
@@ -395,7 +402,7 @@ check_functional_dependencies() {
   command -v yad >/dev/null 2>&1 || MISSING_DEPS+=("yad")
   command -v openssl >/dev/null 2>&1 || MISSING_DEPS+=("openssl")
 
-  if [[ "$WAYLAND_CHOICE" == "true" || ( "$WAYLAND_CHOICE" == "auto" && "${XDG_SESSION_TYPE:-}" == "wayland" ) ]]; then
+  if [[ "$WAYLAND_INPUT" == "portal" && ( "$WAYLAND_CHOICE" == "true" || ( "$WAYLAND_CHOICE" == "auto" && "${XDG_SESSION_TYPE:-}" == "wayland" ) ) ]]; then
     command -v pkg-config >/dev/null 2>&1 || MISSING_DEPS+=("pkgconfig")
     if ! command -v pkg-config >/dev/null 2>&1 || ! pkg-config --exists libei-1.0; then
       MISSING_DEPS+=("ei")
@@ -568,6 +575,22 @@ configure_https() {
   fi
 }
 
+configure_uinput_access() {
+  if [[ "$WAYLAND_INPUT" != "uinput" || ( "$WAYLAND_CHOICE" != "true" && ! ( "$WAYLAND_CHOICE" == "auto" && "${XDG_SESSION_TYPE:-}" == "wayland" ) ) ]]; then
+    return
+  fi
+
+  local group_name="remote-mouse-uinput"
+  local target_user="${SUDO_USER:-$(id -un)}"
+
+  log "Configuring restricted /dev/uinput access for $target_user."
+  sudo_cmd bash "$PROJECT_ROOT/scripts/configure-uinput-access.sh" "$target_user"
+
+  if ! id -nG "$target_user" | tr ' ' '\n' | grep -Fxq "$group_name"; then
+    echo "Reconnect the $target_user desktop session before starting Remote Mouse." >&2
+  fi
+}
+
 write_env_file() {
   mkdir -p "$CONFIG_DIR"
   local env_file="$CONFIG_DIR/.env"
@@ -608,6 +631,7 @@ SOCKET_EVENT_MAX_AGE_MS=1200
 LOG_LEVEL=info
 LOG_FORMAT=json
 ADMIN_ACTIONS_ENABLED=true
+REMOTE_MOUSE_WAYLAND_INPUT=$WAYLAND_INPUT
 SERVICE_NAME=remote-mouse.service
 SERVICE_RESTART_COMMAND=
 EOF
@@ -646,6 +670,7 @@ main() {
 
   install_npm_package
   ensure_remote_mouse_cli
+  configure_uinput_access
   configure_https
   write_env_file
   install_service

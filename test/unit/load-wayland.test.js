@@ -3,28 +3,27 @@ import {jest} from '@jest/globals';
 import {loadWayland} from '../../server/services/desktop/wayland/loadWayland.js';
 
 describe('loadWayland', () => {
-  function createHelper() {
-    return {
-      start: jest.fn(),
-      stop: jest.fn(),
-      send: jest.fn(),
-      getStatus: jest.fn(() => ({status: 'permission-required'})),
-    };
-  }
+  it('loads uinput by default', async () => {
+    const controller = {};
+    const uinputLoader = jest.fn(async () => controller);
+    const portalLoader = jest.fn();
 
-  it('opens consent when the server was started from an interactive terminal', async () => {
-    const helper = createHelper();
-
-    await loadWayland({helperFactory: () => helper, interactive: true});
-
-    expect(helper.start).toHaveBeenCalledTimes(1);
+    await expect(loadWayland({uinputLoader, portalLoader})).resolves.toBe(controller);
+    expect(uinputLoader).toHaveBeenCalledTimes(1);
+    expect(portalLoader).not.toHaveBeenCalled();
   });
 
-  it('does not open consent during a non-interactive service startup', async () => {
-    const helper = createHelper();
+  it('keeps the portal strategy selectable', async () => {
+    const controller = {};
+    const uinputLoader = jest.fn();
+    const portalLoader = jest.fn(async () => controller);
 
-    await loadWayland({helperFactory: () => helper, interactive: false});
+    await expect(loadWayland({strategy: 'portal', uinputLoader, portalLoader})).resolves.toBe(controller);
+    expect(portalLoader).toHaveBeenCalledTimes(1);
+    expect(uinputLoader).not.toHaveBeenCalled();
+  });
 
-    expect(helper.start).not.toHaveBeenCalled();
+  it('rejects an unknown strategy explicitly', async () => {
+    await expect(loadWayland({strategy: 'unknown'})).rejects.toThrow('Expected uinput or portal');
   });
 });

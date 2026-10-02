@@ -31,6 +31,14 @@ async function writeExecutable(filePath, content) {
 }
 
 describe('install scripts', () => {
+  it('limits Wayland input permissions to uinput instead of the input group', async () => {
+    const script = await readFile(path.join(process.cwd(), 'scripts/configure-uinput-access.sh'), 'utf8');
+    expect(script).toContain('GROUP="remote-mouse-uinput"');
+    expect(script).toContain('/dev/uinput');
+    expect(script).not.toContain('usermod -a -G input ');
+    expect(script).not.toContain('/dev/input/event');
+  });
+
   it('linux installer installs npm package, generates HTTPS config and installs service with mocked commands', async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'remote-mouse-install-linux-'));
     const mockBin = path.join(root, 'bin');

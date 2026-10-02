@@ -14,6 +14,9 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   [plan dédié](./wayland.md).
 - [x] PLAT-004a — détecter la capture RobotJS indisponible sous Wayland et
   neutraliser la prévisualisation sans interrompre le serveur.
+- [ ] PLAT-004g — utiliser un périphérique virtuel `uinput` comme stratégie
+  d'entrée Wayland par défaut, conserver RemoteDesktop/libei comme stratégie
+  optionnelle et limiter la permission système au seul `/dev/uinput`.
 - [ ] Renforcer diagnostics VLC, navigateurs et Samsung TV.
 - [ ] Définir un contrat d'adaptateur avant de multiplier les intégrations.
 

@@ -8,7 +8,9 @@ l'extraction du contrôleur de bureau RobotJS.
 RemoteDesktop/libei sont implantées. Le helper atteint l'état `ready` sous
 Ubuntu 26.04 GNOME et un mouvement réel a été validé. `PLAT-004c` reste en
 cours pour la keymap et la restauration; `PLAT-004d` (preview PipeWire) n'est
-pas encore implanté.
+pas encore implanté. `PLAT-004g` introduit maintenant `uinput` comme stratégie
+d'entrée par défaut afin de couvrir les compositeurs sans portail
+RemoteDesktop; l'adaptateur portal/libei est conservé comme option.
 
 ## Contexte et cible
 
@@ -28,10 +30,12 @@ Commandes applicatives partagées
         ▼
 Contrat DesktopController
 ├── RobotJsX11Adapter (existant)
-└── WaylandPortalAdapter
-    ├── RemoteDesktop portal (permission et cycle de session)
-    ├── libei / EIS (souris, boutons, défilement, clavier)
-    └── ScreenCast portal + PipeWire (capture et prévisualisation)
+└── WaylandAdapter
+    ├── UInputAdapter (entrée par défaut)
+    └── WaylandPortalAdapter (optionnel)
+        ├── RemoteDesktop portal (permission et cycle de session)
+        ├── libei / EIS (souris, boutons, défilement, clavier)
+        └── ScreenCast portal + PipeWire (capture et prévisualisation)
 ```
 
 Le contrat doit exposer des capacités et non supposer que toutes les fonctions
@@ -118,11 +122,33 @@ aucune boucle de dialogues de permission.
   fixer les seuils de sortie à partir de la baseline X11.
 - Retirer la mention « Wayland non pris en charge » seulement après validation.
 
+### PLAT-004g — Entrée Wayland portable avec uinput
+
+- Ajouter un helper natif isolé créant une souris et un clavier virtuels par
+  `/dev/uinput`, sans lire les périphériques physiques `/dev/input/event*`.
+- Charger cette stratégie paresseusement et par défaut dans une session
+  Wayland; permettre de sélectionner explicitement la stratégie portal/libei.
+- Conserver le contrat `DesktopController` et le protocole de commandes déjà
+  utilisés afin de ne pas dupliquer la logique métier.
+- Ajouter à l'installation Linux un groupe dédié `remote-mouse-uinput` et une
+  règle udev limitée à `/dev/uinput`; ne jamais ajouter l'utilisateur au groupe
+  général `input`.
+- Exposer une erreur actionnable lorsque le helper, le module ou la permission
+  manque, et couvrir la sélection ainsi que le protocole par des tests.
+
+**Sortie:** souris, boutons, défilement et clavier fonctionnent par défaut sous
+Wayland indépendamment du backend portal, tandis que `portal` reste une
+stratégie configurable et non supprimée.
+
 ## Sécurité et contraintes
 
-- Le portail et le compositeur restent l'autorité sur les permissions locales.
-- Aucun accès root, `uinput` global ou contournement du portail n'est retenu par
-  défaut; une telle option demanderait une décision de sécurité distincte.
+- Pour la stratégie portal, le portail et le compositeur restent l'autorité sur
+  les permissions locales.
+- Pour la stratégie uinput, l'installation privilégiée accorde seulement
+  l'écriture à `/dev/uinput` à un groupe dédié. Elle ne donne aucun accès aux
+  événements des claviers et souris physiques.
+- Le consentement Wayland est contourné par nature avec uinput; le contrôle
+  d'accès de Remote Mouse devient donc l'autorité avant toute injection.
 - Les descripteurs PipeWire/EIS, tokens de restauration et métadonnées d'écran
   ne doivent jamais être exposés à l'API web ni aux logs.
 - La fermeture de la session, la révocation et le verrouillage doivent stopper

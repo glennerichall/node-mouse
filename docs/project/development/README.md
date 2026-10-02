@@ -40,6 +40,8 @@ portent le périmètre et les tâches planifiées.
   RemoteDesktop/libei, sélection Wayland, consentement local et validation réelle.
 - [Plateformes — PLAT-004c correctif souris](./platforms-PLAT-004c-mouse-fix-2026-10-02.md):
   activation interactive du portail et arrêt robuste après fermeture du helper.
+- [Plateformes — PLAT-004g](./platforms-PLAT-004g-2026-10-02.md): entrée
+  Wayland uinput par défaut et conservation du portail comme stratégie optionnelle.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/pwa.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

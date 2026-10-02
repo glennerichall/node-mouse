@@ -1,7 +1,7 @@
 import {EventEmitter} from 'node:events';
 import {jest} from '@jest/globals';
 
-import {createWaylandHelperClient} from '../../server/services/desktop/wayland/createWaylandHelperClient.js';
+import {createWaylandHelperClient} from '../../server/os/linux/wayland/createWaylandHelperClient.js';
 
 function createChild() {
   const child = new EventEmitter();

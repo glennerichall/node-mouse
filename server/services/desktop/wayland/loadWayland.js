@@ -1,13 +1,17 @@
-import {createWaylandDesktopController} from './createWaylandDesktopController.js';
-import {createWaylandHelperClient} from './createWaylandHelperClient.js';
+import {loadUInput} from './loadUInput.js';
+import {loadWaylandPortal} from './loadWaylandPortal.js';
 
 export async function loadWayland({
-                                      helperFactory = createWaylandHelperClient,
-                                      interactive = Boolean(process.stdin.isTTY),
+                                      strategy = process.env.REMOTE_MOUSE_WAYLAND_INPUT || 'uinput',
+                                      uinputLoader = loadUInput,
+                                      portalLoader = loadWaylandPortal,
                                   } = {}) {
-    const helper = helperFactory();
-    if (interactive) {
-        helper.start();
+    const normalizedStrategy = String(strategy).trim().toLowerCase();
+    if (normalizedStrategy === 'uinput') {
+        return uinputLoader();
     }
-    return createWaylandDesktopController(helper);
+    if (normalizedStrategy === 'portal') {
+        return portalLoader();
+    }
+    throw new Error(`Unknown Wayland input strategy: ${strategy}. Expected uinput or portal.`);
 }

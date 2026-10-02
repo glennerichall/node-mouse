@@ -157,8 +157,9 @@ npm --version
 
 #### Platform Dependencies
 
-This project uses RobotJS on X11, Windows and macOS. On a Linux Wayland session,
-it uses an isolated helper based on XDG RemoteDesktop, liboeffis and libei.
+This project uses RobotJS on X11, Windows and macOS. On Linux Wayland it uses an
+isolated `/dev/uinput` helper by default. The XDG RemoteDesktop/libei helper is
+kept as an optional strategy when compositor-managed consent is preferred.
 
 VLC media player is optional. Install it on the host machine if you want the VLC remote to appear and control media playback.
 
@@ -171,21 +172,28 @@ sudo apt-get update
 sudo apt-get install -y build-essential libx11-dev libxtst-dev libpng++-dev wmctrl yad
 ```
 
-For Ubuntu GNOME Wayland, also install and build the native helper:
+For Wayland development, build the default uinput helper and grant only the
+desktop user access to `/dev/uinput`:
 
 ```bash
-sudo apt-get install -y pkg-config libei-dev liboeffis-dev
-npm run build:wayland
+npm run build:uinput
+sudo scripts/configure-uinput-access.sh "$USER"
 ```
+
+Reconnect the desktop session after creating the dedicated group. Do not add
+the user to the general `input` group. To use the optional portal strategy,
+install `pkg-config libei-dev liboeffis-dev`, run `npm run build:wayland`, and
+set `REMOTE_MOUSE_WAYLAND_INPUT=portal`.
 
 Notes:
 
 - `libx11-dev`, `libxtst-dev`, and `libpng++-dev` are required for the native mouse and keyboard integration
 - `wmctrl` is used for browser focus and window activation on Linux
 - `yad` is used for the Linux QR overlay
-- X11 uses RobotJS; on Wayland, an interactive terminal start opens the local
-  Remote Desktop dialog automatically. For a non-interactive `systemd` service,
-  run `remote-mouse wayland authorize`, then accept the dialog locally
+- X11 uses RobotJS; Wayland uses uinput without a system consent dialog. Remote
+  Mouse authentication remains responsible for authorizing remote commands
+- with `REMOTE_MOUSE_WAYLAND_INPUT=portal`, an interactive start opens the
+  local Remote Desktop dialog; for a service, run `remote-mouse wayland authorize`
 - Wayland preview is not yet available; it remains disabled until the PipeWire
   capture adapter is implemented
 
@@ -288,15 +296,12 @@ WantedBy=default.target
 
 Depending on the graphical environment, passing the user session environment may be necessary for UI-related integrations.
 
-An X11 session is currently required for the Linux desktop control features.
-Ubuntu 26.04 no longer provides a GNOME/Ubuntu Xorg session. X11 remains
-available through desktop environments that still ship an Xorg session, such
-as Xfce, MATE, KDE/X11 or i3.
-Under Wayland, Remote Mouse detects that RobotJS screen capture is unavailable
-and disables cursor preview to prevent a native `X_GetImage` failure. Use an
-Xorg-based desktop session during the transition. Native Wayland mouse,
-keyboard and capture support is planned through the RemoteDesktop portal,
-libei, ScreenCast and PipeWire.
+X11 control continues through RobotJS. Under Wayland, mouse and keyboard input
+use uinput by default, independently of the desktop portal backend. The portal
+implementation remains selectable with `REMOTE_MOUSE_WAYLAND_INPUT=portal`.
+Cursor preview is still disabled under Wayland to prevent the native
+`X_GetImage` failure; native capture remains planned through ScreenCast and
+PipeWire.
 
 #### Windows Deployment
 
