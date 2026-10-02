@@ -33,12 +33,12 @@ const MODIFIER_CODES = Object.freeze({
     command: KEY_CODES.command,
 });
 
-export function createWaylandDesktopController(helper, {adapter = 'wayland'} = {}) {
+export function createWaylandDesktopController(backend, {adapter = 'wayland'} = {}) {
     const pointer = {x: 0, y: 0};
 
     function key(code, pressed) {
         if (Number.isInteger(code)) {
-            helper.send(`KEY ${code} ${pressed ? 1 : 0}`);
+            backend.key(code, pressed);
         }
     }
 
@@ -72,7 +72,7 @@ export function createWaylandDesktopController(helper, {adapter = 'wayland'} = {
         const y = Number(dy) || 0;
         pointer.x += x;
         pointer.y += y;
-        helper.send(`MOVE ${x} ${y}`);
+        backend.moveRelative(x, y);
     }
 
     function buttonCode(button) {
@@ -80,13 +80,13 @@ export function createWaylandDesktopController(helper, {adapter = 'wayland'} = {
     }
 
     function mouseToggle(state, button = 'left') {
-        helper.send(`BUTTON ${buttonCode(button)} ${state === 'down' ? 1 : 0}`);
+        backend.button(buttonCode(button), state === 'down');
     }
 
     return {
-        authorize: () => helper.start(),
+        authorize: () => backend.authorize(),
         getCapabilities() {
-            const helperStatus = helper.getStatus();
+            const helperStatus = backend.getStatus();
             return {
                 adapter,
                 status: helperStatus.status,
@@ -105,7 +105,7 @@ export function createWaylandDesktopController(helper, {adapter = 'wayland'} = {
             moveMouseRelative(Number(x) - pointer.x, Number(y) - pointer.y);
         },
         scrollMouse(x, y) {
-            helper.send(`SCROLL ${Number(x) || 0} ${Number(y) || 0}`);
+            backend.scroll(Number(x) || 0, Number(y) || 0);
         },
         mouseClick(button = 'left') {
             mouseToggle('down', button);
@@ -123,6 +123,6 @@ export function createWaylandDesktopController(helper, {adapter = 'wayland'} = {
                 throw error;
             },
         },
-        close: () => helper.stop(),
+        close: () => backend.close(),
     };
 }

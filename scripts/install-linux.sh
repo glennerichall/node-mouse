@@ -46,7 +46,7 @@ Options:
   --ssl-cert-path <path> Existing PEM certificate path.
   --install-service      Install and restart the service without prompting.
   --no-service           Do not install the service.
-  --wayland              Install Wayland helpers and configure uinput access.
+  --wayland              Install Wayland native input and configure uinput.
   --no-wayland           Do not install or configure Wayland helpers.
   -h, --help             Show this help.
 

@@ -7,8 +7,8 @@ Implanter `uinput` comme stratégie d'entrée Wayland par défaut sans supprimer
 le travail RemoteDesktop/libei existant.
 
 - Le chargement Wayland sélectionne `uinput` par défaut et `portal` sur demande.
-- Le helper uinput couvre mouvement relatif, boutons, molette et clavier.
-- Le helper reste hors du processus Node.js et est chargé paresseusement.
+- Le bridge uinput couvre mouvement relatif, boutons, molette et clavier.
+- Le bridge C Node-API est chargé paresseusement dans le processus Node.js.
 - L'installation n'accorde que `/dev/uinput` à un groupe dédié, jamais le
   groupe général `input` ni les périphériques physiques.
 - Les erreurs de compilation, d'absence de périphérique et de permission sont
@@ -27,19 +27,26 @@ L'adaptateur portal/libei est conservé comme stratégie optionnelle pour les
 installations qui privilégient le consentement géré par le compositeur.
 
 La frontière architecturale place le contrat et la sélection dans
-`server/services/desktop`, mais les clients de processus natifs, chemins de
-binaires et détails de supervision Linux dans `server/os/linux/wayland`.
+`server/services/desktop`, mais le chargeur du bridge, les clients de processus
+natifs, les chemins de binaires et la supervision Linux dans
+`server/os/linux/wayland`.
+
+Après revue, uinput utilise un addon Node-API plutôt qu'un child process: son
+API est petite, synchrone et ne requiert aucune boucle d'événements. Le risque
+de crash natif est accepté et réduit par la validation des arguments. Le
+processus séparé demeure la frontière pour portal/libei et la future capture
+PipeWire, qui ont un cycle de vie externe plus complexe.
 
 ## Modifications apportées
 
-- Ajout d'un helper C uinput isolé couvrant mouvement relatif avec conservation
-  des fractions, boutons, défilement et clavier.
-- Ajout de `loadUInput()` et du client de helper; `loadWayland()` sélectionne
+- Ajout d'un bridge C Node-API uinput couvrant mouvement relatif avec
+  conservation des fractions, boutons, défilement et clavier.
+- Ajout de `loadUInput()` et du chargeur natif; `loadWayland()` sélectionne
   désormais `uinput` par défaut ou `portal` avec
   `REMOTE_MOUSE_WAYLAND_INPUT=portal`.
 - Extraction de l'ancien chargement dans `loadWaylandPortal()` sans supprimer
   le helper RemoteDesktop/libei existant.
-- Déplacement des clients de processus natifs dans
+- Placement du chargeur Node-API et du client du helper portal dans
   `server/os/linux/wayland`; la sélection et les adaptateurs du contrat restent
   dans `server/services/desktop/wayland`.
 - Ajout des scripts de compilation et de configuration udev, d'un groupe dédié
@@ -58,6 +65,10 @@ binaires et détails de supervision Linux dans `server/os/linux/wayland`.
   réussis.
 - Après séparation OS/services: 5 suites ciblées et 11 tests réussis, puis
   nouvelle exécution complète de 80 suites et 280 tests réussis.
+- Bridge Node-API compilé en `.node`, chargé réellement par Node 22 et erreur
+  d'absence de `/dev/uinput` convertie en capacité indisponible sans crash.
+- Après remplacement du child process uinput: 7 suites ciblées et 31 tests,
+  puis 80 suites complètes et 281 tests réussis.
 - Sans device système, le helper retourne correctement
   `uinput-unavailable` avec une action corrective.
 

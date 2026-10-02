@@ -43,13 +43,11 @@ sont présentes : mouvement relatif/absolu, boutons, défilement, clavier,
 position du curseur, écrans et capture. Les contrôleurs métier et Socket.IO ne
 doivent connaître ni RobotJS, ni D-Bus, ni PipeWire.
 
-L'intégration native sera isolée dans un helper local supervisé, communiquant
-avec Node.js par socket Unix et messages versionnés. Cela évite qu'une erreur de
-bibliothèque native termine le serveur HTTP et permet de redémarrer l'adaptateur
-sans perdre les sessions web. Le choix d'implémentation du helper (C/libei ou
-Rust avec bibliothèques portails/PipeWire maintenues) sera tranché par le spike,
-sur preuves de maintenance, packaging Ubuntu et gestion des descripteurs de
-fichiers D-Bus/PipeWire.
+L'entrée uinput, petite et synchrone, est intégrée par un bridge C Node-API
+chargé dans Node.js. Les intégrations à cycle de vie complexe restent isolées
+dans un helper supervisé: portal/libei aujourd'hui, puis ScreenCast/PipeWire.
+Cette frontière permet de redémarrer les sessions externes sans perdre les
+sessions web et limite la surface native directement chargée dans le serveur.
 
 ## Découpage des itérations
 
@@ -124,12 +122,14 @@ aucune boucle de dialogues de permission.
 
 ### PLAT-004g — Entrée Wayland portable avec uinput
 
-- Ajouter un helper natif isolé créant une souris et un clavier virtuels par
+- Ajouter un bridge C Node-API créant une souris et un clavier virtuels par
   `/dev/uinput`, sans lire les périphériques physiques `/dev/input/event*`.
 - Charger cette stratégie paresseusement et par défaut dans une session
   Wayland; permettre de sélectionner explicitement la stratégie portal/libei.
 - Conserver le contrat `DesktopController` et le protocole de commandes déjà
   utilisés afin de ne pas dupliquer la logique métier.
+- Garder l'isolation par processus pour portal/libei et la future capture
+  PipeWire; le bridge uinput, petit et synchrone, reste dans le processus Node.
 - Ajouter à l'installation Linux un groupe dédié `remote-mouse-uinput` et une
   règle udev limitée à `/dev/uinput`; ne jamais ajouter l'utilisateur au groupe
   général `input`.

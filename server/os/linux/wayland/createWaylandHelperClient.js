@@ -91,9 +91,15 @@ export function createWaylandHelperClient({
     }
 
     return {
+        authorize: start,
         start,
         stop,
+        close: stop,
         send,
+        moveRelative: (x, y) => send(`MOVE ${x} ${y}`),
+        button: (code, pressed) => send(`BUTTON ${code} ${pressed ? 1 : 0}`),
+        scroll: (x, y) => send(`SCROLL ${x} ${y}`),
+        key: (code, pressed) => send(`KEY ${code} ${pressed ? 1 : 0}`),
         getStatus: () => ({...status}),
         getHelperPath: () => helperPath,
     };

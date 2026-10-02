@@ -7,9 +7,9 @@ if (process.platform !== 'linux') {
 
 const compiler = spawnSync('cc', ['--version']);
 if (compiler.status === 0) {
-  execFileSync('bash', ['scripts/build-uinput-helper.sh'], {stdio: 'inherit'});
+  execFileSync('bash', ['scripts/build-uinput-bridge.sh'], {stdio: 'inherit'});
 } else {
-  process.stderr.write('uinput helper not built: install a C compiler, then run npm run build:uinput.\n');
+  process.stderr.write('uinput bridge not built: install a C compiler, then run npm run build:uinput.\n');
 }
 
 const dependencies = spawnSync('pkg-config', ['--exists', 'libei-1.0', 'liboeffis-1.0']);

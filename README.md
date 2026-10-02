@@ -158,8 +158,9 @@ npm --version
 #### Platform Dependencies
 
 This project uses RobotJS on X11, Windows and macOS. On Linux Wayland it uses an
-isolated `/dev/uinput` helper by default. The XDG RemoteDesktop/libei helper is
-kept as an optional strategy when compositor-managed consent is preferred.
+in-process C Node-API bridge to `/dev/uinput` by default. The isolated XDG
+RemoteDesktop/libei helper is kept as an optional strategy when
+compositor-managed consent is preferred.
 
 VLC media player is optional. Install it on the host machine if you want the VLC remote to appear and control media playback.
 
@@ -172,7 +173,7 @@ sudo apt-get update
 sudo apt-get install -y build-essential libx11-dev libxtst-dev libpng++-dev wmctrl yad
 ```
 
-For Wayland development, build the default uinput helper and grant only the
+For Wayland development, build the default uinput bridge and grant only the
 desktop user access to `/dev/uinput`:
 
 ```bash
