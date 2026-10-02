@@ -16,6 +16,7 @@ if [[ -f "$PROJECT_ROOT/package.json" ]]; then
 fi
 
 YES=0
+OVERWRITE_CONFIG=0
 NPM_PACKAGE="${REMOTE_MOUSE_NPM_PACKAGE:-$DEFAULT_NPM_PACKAGE}"
 CONFIG_DIR="${REMOTE_MOUSE_CONFIG_DIR:-$HOME/.config/remote-mouse}"
 PORT="${REMOTE_MOUSE_PORT:-3000}"
@@ -37,6 +38,7 @@ Options:
   -y, --yes              Answer yes to every confirmation prompt.
   --package <name>       npm package to install globally.
   --config-dir <path>    Remote Mouse config directory.
+  --overwrite-config     Replace an existing .env (preserved by default).
   --port <port>          Server port written to the generated .env.
   --https                Configure HTTPS without prompting.
   --no-https             Disable HTTPS without prompting.
@@ -73,6 +75,10 @@ while [[ $# -gt 0 ]]; do
     --config-dir)
       CONFIG_DIR="${2:-}"
       shift 2
+      ;;
+    --overwrite-config)
+      OVERWRITE_CONFIG=1
+      shift
       ;;
     --port)
       PORT="${2:-}"
@@ -582,13 +588,38 @@ configure_uinput_access() {
 
   local group_name="remote-mouse-uinput"
   local target_user="${SUDO_USER:-$(id -un)}"
+  local was_member="false"
+  local rule_file
 
   log "Configuring restricted /dev/uinput access for $target_user."
-  sudo_cmd bash "$PROJECT_ROOT/scripts/configure-uinput-access.sh" "$target_user"
+  if id -nG "$target_user" | tr ' ' '\n' | grep -Fxq "$group_name"; then
+    was_member="true"
+  fi
 
-  if ! id -nG "$target_user" | tr ' ' '\n' | grep -Fxq "$group_name"; then
+  rule_file="$(mktemp)"
+  printf '%s\n' 'KERNEL=="uinput", SUBSYSTEM=="misc", GROUP="remote-mouse-uinput", MODE="0660", OPTIONS+="static_node=uinput"' > "$rule_file"
+  sudo_cmd groupadd --force --system "$group_name"
+  sudo_cmd usermod -a -G "$group_name" "$target_user"
+  sudo_cmd install -o root -g root -m 0644 "$rule_file" /etc/udev/rules.d/70-remote-mouse-uinput.rules
+  rm -f "$rule_file"
+  sudo_cmd modprobe uinput
+  sudo_cmd udevadm control --reload-rules
+  sudo_cmd udevadm trigger --name-match=uinput
+
+  if [[ "$was_member" != "true" ]]; then
     echo "Reconnect the $target_user desktop session before starting Remote Mouse." >&2
   fi
+}
+
+migrate_env_file() {
+  local env_file="$1"
+  if ! grep -q '^REMOTE_MOUSE_WAYLAND_INPUT=' "$env_file"; then
+    printf '\nREMOTE_MOUSE_WAYLAND_INPUT=%s\n' "$WAYLAND_INPUT" >> "$env_file"
+    log "Added REMOTE_MOUSE_WAYLAND_INPUT to existing $env_file."
+  else
+    log "Keeping existing REMOTE_MOUSE_WAYLAND_INPUT in $env_file."
+  fi
+  chmod 600 "$env_file"
 }
 
 write_env_file() {
@@ -596,15 +627,6 @@ write_env_file() {
   local env_file="$CONFIG_DIR/.env"
   local cookie_secret
   cookie_secret="$(generate_cookie_secret)"
-
-  if [[ -f "$env_file" ]]; then
-    if confirm "Overwrite existing $env_file?"; then
-      :
-    else
-      log "Keeping existing $env_file."
-      return
-    fi
-  fi
 
   cat > "$env_file" <<EOF
 PORT=$PORT
@@ -640,6 +662,18 @@ EOF
   log "Wrote $env_file"
 }
 
+configure_application() {
+  local env_file="$CONFIG_DIR/.env"
+  if [[ -f "$env_file" && "$OVERWRITE_CONFIG" -ne 1 ]]; then
+    log "Migrating existing configuration without replacing secrets or paths."
+    migrate_env_file "$env_file"
+    return
+  fi
+
+  configure_https
+  write_env_file
+}
+
 install_service() {
   if [[ "$INSTALL_SERVICE_CHOICE" == "false" ]]; then
     INSTALL_SERVICE="false"
@@ -671,8 +705,7 @@ main() {
   install_npm_package
   ensure_remote_mouse_cli
   configure_uinput_access
-  configure_https
-  write_env_file
+  configure_application
   install_service
 
   log "Installation complete."

@@ -39,6 +39,89 @@ describe('install scripts', () => {
     expect(script).not.toContain('/dev/input/event');
   });
 
+  it('keeps the single-file installer autonomous for uinput setup', async () => {
+    const script = await readFile(path.join(process.cwd(), 'scripts/install-linux.sh'), 'utf8');
+    expect(script).toContain('GROUP="remote-mouse-uinput"');
+    expect(script).toContain('/etc/udev/rules.d/70-remote-mouse-uinput.rules');
+    expect(script).not.toContain('$PROJECT_ROOT/scripts/configure-uinput-access.sh');
+  });
+
+  it('migrates an existing Wayland installation without replacing secrets or data', async () => {
+    const root = await mkdtemp(path.join(tmpdir(), 'remote-mouse-migrate-linux-'));
+    const mockBin = path.join(root, 'bin');
+    const configDir = path.join(root, 'config');
+    const prefix = path.join(root, 'npm-prefix');
+    const logPath = path.join(root, 'commands.log');
+    await import('node:fs/promises').then((fs) => Promise.all([
+      fs.mkdir(mockBin, {recursive: true}),
+      fs.mkdir(configDir, {recursive: true}),
+      fs.mkdir(prefix, {recursive: true}),
+    ]));
+    const envPath = path.join(configDir, '.env');
+    const databasePath = path.join(configDir, 'remote-mouse.sqlite3');
+    const originalSecret = 'existing-secret-that-must-survive';
+    await writeFile(envPath, `PORT=4567\nSESSION_COOKIE_SECRET=${originalSecret}\nCUSTOM_SETTING=keep-me\n`);
+    await writeFile(databasePath, 'existing-database');
+
+    const commands = {
+      node: '#!/usr/bin/env bash\necho v22.0.0',
+      npm: `#!/usr/bin/env bash
+echo "npm $*" >> "$REMOTE_MOUSE_TEST_LOG"
+if [[ "$1 $2 $3" == "config get prefix" ]]; then echo "$REMOTE_MOUSE_NPM_PREFIX"; fi
+if [[ "$1" == "--version" ]]; then echo 10.0.0; fi`,
+      gcc: '#!/usr/bin/env bash\nexit 0',
+      make: '#!/usr/bin/env bash\nexit 0',
+      wmctrl: '#!/usr/bin/env bash\nexit 0',
+      yad: '#!/usr/bin/env bash\nexit 0',
+      openssl: '#!/usr/bin/env bash\nexit 0',
+      'remote-mouse': '#!/usr/bin/env bash\nexit 0',
+      id: `#!/usr/bin/env bash
+if [[ "$1" == "-u" ]]; then echo 1001; elif [[ "$1" == "-un" ]]; then echo glenn; elif [[ "$1" == "-nG" ]]; then echo glenn; else exit 0; fi`,
+      sudo: `#!/usr/bin/env bash
+echo "sudo $*" >> "$REMOTE_MOUSE_TEST_LOG"
+exec "$@"`,
+    };
+    for (const [name, content] of Object.entries(commands)) {
+      await writeExecutable(path.join(mockBin, name), content);
+    }
+    for (const name of ['groupadd', 'usermod', 'install', 'modprobe', 'udevadm']) {
+      await writeExecutable(path.join(mockBin, name), `#!/usr/bin/env bash
+echo "${name} $*" >> "$REMOTE_MOUSE_TEST_LOG"
+exit 0`);
+    }
+
+    const args = [
+      'scripts/install-linux.sh', '--wayland', '-y', '--config-dir', configDir,
+      '--no-https', '--no-service',
+    ];
+    const env = {
+      ...process.env,
+      PATH: `${mockBin}:${process.env.PATH}`,
+      REMOTE_MOUSE_TEST_LOG: logPath,
+      REMOTE_MOUSE_NPM_PREFIX: prefix,
+      XDG_SESSION_TYPE: 'wayland',
+    };
+
+    const first = await run('bash', args, {cwd: process.cwd(), env});
+    const second = await run('bash', args, {cwd: process.cwd(), env});
+    expect(first.code).toBe(0);
+    expect(second.code).toBe(0);
+
+    const migratedEnv = await readFile(envPath, 'utf8');
+    expect(migratedEnv).toContain(`PORT=4567`);
+    expect(migratedEnv).toContain(`SESSION_COOKIE_SECRET=${originalSecret}`);
+    expect(migratedEnv).toContain('CUSTOM_SETTING=keep-me');
+    expect(migratedEnv.match(/^REMOTE_MOUSE_WAYLAND_INPUT=uinput$/gm)).toHaveLength(1);
+    await expect(readFile(databasePath, 'utf8')).resolves.toBe('existing-database');
+
+    const commandLog = await readFile(logPath, 'utf8');
+    expect(commandLog).toContain('groupadd --force --system remote-mouse-uinput');
+    expect(commandLog).toContain('usermod -a -G remote-mouse-uinput glenn');
+    expect(commandLog).toContain('install -o root -g root -m 0644');
+    expect(commandLog).toContain('modprobe uinput');
+    expect(commandLog).toContain('udevadm control --reload-rules');
+  });
+
   it('linux installer installs npm package, generates HTTPS config and installs service with mocked commands', async () => {
     const root = await mkdtemp(path.join(tmpdir(), 'remote-mouse-install-linux-'));
     const mockBin = path.join(root, 'bin');
@@ -296,6 +379,7 @@ exit 0
     expect(result.stdout).toContain('--no-generate-cert');
     expect(result.stdout).toContain('--install-service');
     expect(result.stdout).toContain('--no-service');
+    expect(result.stdout).toContain('--overwrite-config');
   });
 
   it('windows installer keeps dependency, npm, HTTPS and service steps separated', async () => {

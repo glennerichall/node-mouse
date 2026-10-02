@@ -44,6 +44,8 @@ portent le périmètre et les tâches planifiées.
   Wayland uinput par défaut et conservation du portail comme stratégie optionnelle.
 - [Plateformes — PLAT-004g correctif booléens bridge](./platforms-PLAT-004g-bridge-boolean-fix-2026-10-02.md):
   normalisation numérique des clics et touches à la frontière Node-API.
+- [Plateformes — PLAT-001a](./platforms-PLAT-001a-2026-10-02.md): installateur
+  uinput autonome et migration idempotente des installations existantes.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/pwa.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

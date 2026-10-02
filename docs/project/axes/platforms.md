@@ -8,6 +8,9 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
 ## Plan de travail
 
 - [ ] PLAT-001 — consolider installation et service Linux; documenter X11/Wayland.
+- [x] PLAT-001a — rendre l'installation uinput autonome et idempotente; migrer
+  une installation existante sans remplacer sa configuration, ses secrets ni
+  sa base de données.
 - [ ] PLAT-002 — tester installation, service, mise à jour et désinstallation Windows.
 - [ ] PLAT-003 — créer l'installation macOS et guider les permissions Accessibilité.
 - [ ] PLAT-004 — intégrer le contrôle et la capture Wayland selon le

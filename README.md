@@ -64,6 +64,14 @@ When running the installer through `curl | bash`, pass options after `bash -s --
 curl -fsSL https://raw.githubusercontent.com/glennerichall/node-mouse/main/scripts/install-linux.sh | bash -s -- -y
 ```
 
+The Linux installer is also the supported migration path for an existing
+installation. It updates the npm package and missing uinput permissions while
+preserving the existing `.env`, session secret, certificates and SQLite data.
+Missing migration keys are appended idempotently. Use `--overwrite-config`
+only when replacing the complete `.env` is intentional. After uinput is added
+to an existing user, reconnect the desktop session before restarting the user
+service.
+
 Windows installer:
 
 [scripts/install-windows.ps1](https://raw.githubusercontent.com/glennerichall/node-mouse/main/scripts/install-windows.ps1)
