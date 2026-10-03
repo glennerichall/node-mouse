@@ -1,11 +1,13 @@
-# Développement actif
+# Archive historique — lot de sécurité A
 
 > Tableau de suivi opérationnel de Remote Mouse. Les orientations à long terme
 > restent dans [la roadmap globale](../ROADMAP.md) et les travaux PWA/TLS dans
-> [l'axe PWA](../axes/pwa.md). Ce fichier conserve l'historique du lot A;
-> le suivi actif est désormais réparti par axe.
+> [l'axe PWA](../axes/06-PWA-application-web.md). Ce fichier conserve l'état du
+> lot A avant la réorganisation. Ses cases sont un instantané historique et ne
+> constituent plus un suivi actif; seules les cases des documents d'axes sont
+> canoniques.
 
-## Utilisation
+## Légende historique
 
 - `[ ]` : à faire ;
 - `[x]` : terminé et vérifié ;
@@ -13,9 +15,9 @@
 - `⛔` : bloqué, avec la raison indiquée ;
 - `➡️` : prochain travail recommandé.
 
-Une case ne doit être cochée qu'après validation de ses critères d'acceptation
-et des tests pertinents. Les tâches terminées restent dans ce fichier jusqu'à
-la clôture du lot, puis sont déplacées dans le journal des lots terminés.
+Cette légende décrit le fonctionnement de l'ancien suivi. Le fichier est
+désormais archivé et ne doit plus être utilisé pour déterminer la prochaine
+itération.
 
 ## Modèle de déploiement visé
 
@@ -35,7 +37,7 @@ Internet.
 | Prochaine tâche | Corriger l'écart de durée de grâce des jetons d'entrée |
 | Version | `6.10.0` — bump `minor` pour l'API de gestion SEC-008 |
 | Roadmap globale | [ROADMAP.md](../ROADMAP.md) |
-| Axe PWA | [pwa.md](../axes/pwa.md) |
+| Axe PWA | [06-PWA-application-web.md](../axes/06-PWA-application-web.md) |
 
 ## Travaux préparatoires terminés
 
@@ -264,7 +266,7 @@ via `node-notifier`; la correction proposée impose toujours la rupture
 - [ ] `PWA-009` — Tester l'installation sur Android, iOS et desktop.
 
 Les critères détaillés de ces tâches sont définis dans
-[l'axe PWA](../axes/pwa.md).
+[l'axe PWA](../axes/06-PWA-application-web.md).
 
 ## Vérifications obligatoires avant de cocher une tâche
 

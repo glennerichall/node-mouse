@@ -1,4 +1,4 @@
-# Axe — Qualité et livraison
+# 08 — QUA — Qualité et livraison
 
 ## Résultat visé
 
@@ -14,4 +14,4 @@ compatibilité client/serveur explicitement gérée.
 - [ ] Déclarer versions Node supportées et automatiser audit dépendances.
 - [ ] Générer changelog, artefacts, checksums et documenter compatibilité.
 
-La Definition of Done globale est dans la [roadmap](../ROADMAP.md).
+La Definition of Done commune est dans la [roadmap](../ROADMAP.md).

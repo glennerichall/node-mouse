@@ -1,427 +1,72 @@
 # Roadmap globale de Remote Mouse
 
-> Feuille de route générale du projet. Les détails propres à l'installation PWA,
-> TLS et aux transports réseau se trouvent dans
-> [axe PWA](./axes/pwa.md).
+Cette roadmap ordonne les domaines du projet. Elle ne contient aucune tâche :
+les cases à cocher, critères d'acceptation et identifiants d'itération se
+trouvent exclusivement dans le document de l'axe propriétaire.
 
-Le suivi des tâches en cours et de leur Definition of Done se trouve dans
-[le journal de développement](./development/README.md).
+La [vision](./VISION.md) fixe l'intention durable du projet. Les
+[journaux de développement](./development/README.md) conservent uniquement
+l'historique des itérations réalisées.
 
-Les plans par domaine sont conservés dans les documents d'[architecture](./axes/architecture.md),
-de [sécurité](./axes/security.md), [fiabilité](./axes/reliability.md),
-d'[expérience](./axes/user-experience.md), des [plateformes](./axes/platforms.md),
-de [PWA](./axes/pwa.md), de l'[exploitation](./axes/operations.md) et de la
-[qualité](./axes/quality.md), avec un [backlog transversal](./axes/backlog.md).
+## Axes
 
-## Vision
+L'ordinal du fichier donne à chaque axe une place structurelle stable. La
+priorité courante est exprimée par l'ordre de ce tableau et peut changer sans
+entraîner de renommage.
 
-Faire de Remote Mouse une télécommande web :
+| Priorité | Axe | Résultat visé | État actuel |
+| ---: | --- | --- | --- |
+| 1 | [01 — SEC — Sécurité](./axes/01-SEC-securite.md) | Accès authentifiés, autorisations cohérentes et révocables | En cours — SEC-010b |
+| 2 | [05 — PLAT — Plateformes](./axes/05-PLAT-plateformes.md) | Contrôle fiable sur les systèmes officiellement pris en charge | En cours — Wayland et installation Linux |
+| 3 | [07 — OPS — Exploitation](./axes/07-OPS-exploitation.md) | Installation, mise à jour et diagnostic récupérables | En cours — journaux et messages techniques |
+| 4 | [02 — ARCH — Architecture](./axes/02-ARCH-architecture-modulaire.md) | Services métier indépendants des transports et adaptateurs | Planifié |
+| 5 | [03 — REL — Fiabilité](./axes/03-REL-fiabilite.md) | Commandes et prévisualisation prévisibles sous charge | Planifié |
+| 6 | [04 — UX — Expérience utilisateur](./axes/04-UX-experience-utilisateur.md) | Association, contrôle et diagnostic compréhensibles | Planifié |
+| 7 | [06 — PWA — Application web](./axes/06-PWA-application-web.md) | Installation web et transports optionnels sécurisés | Planifié |
+| 8 | [08 — QUA — Qualité](./axes/08-QUA-qualite.md) | Changements vérifiés et versions reproductibles | Continu |
+| 99 | [BACK — Backlog transversal](./axes/99-BACK-backlog-transversal.md) | Idées à promouvoir dans un axe avant implantation | Exploration |
 
-- simple à installer et à utiliser depuis un téléphone, une tablette ou un
-  navigateur ;
-- fluide et fiable sur un réseau local ou à distance ;
-- utilisable avec ou sans installation PWA ;
-- compatible avec plusieurs stratégies HTTP, HTTPS, Socket.IO et WebRTC ;
-- sécurisée avant toute exposition à Internet ;
-- facile à configurer, mettre à jour, sauvegarder et dépanner ;
-- compatible à terme avec Linux, Windows et macOS ;
-- extensible sans dupliquer la logique métier entre API, Socket.IO et les futurs
-  transports.
+## Ordre de livraison actuel
+
+1. Terminer le reverrouillage explicite de l'administration dans `SEC-010b`.
+2. Stabiliser l'entrée Wayland et l'installation Linux dans l'axe `PLAT`.
+3. Améliorer la consultation des journaux et uniformiser leurs messages dans
+   l'axe `OPS`.
+4. Reprendre ensuite les travaux structurants des axes `ARCH`, `REL` et `UX`.
+
+Cet ordre n'est pas une seconde liste de tâches. Les documents d'axes restent
+les seules sources de vérité sur le contenu et l'avancement des itérations.
 
 ## Principes directeurs
 
-1. **Préserver le fonctionnement local.** Aucun service Internet ne doit être
-   requis pour utiliser Remote Mouse sur le LAN.
-2. **Rendre les fonctions optionnelles.** PWA, TLS, WebRTC, proxy VPN, VLC et TV
-   doivent pouvoir être activés selon les besoins.
-3. **Séparer métier et transport.** Une commande ne doit pas être réimplémentée
-   pour HTTP, Socket.IO ou WebRTC.
-4. **Préférer les composants interchangeables.** Les stratégies de transport,
-   d'authentification, de découverte et de déploiement doivent être des
-   adaptateurs configurables.
-5. **Sécuriser avant d'exposer.** Une option d'accès distant ne doit jamais
-   affaiblir silencieusement le mode local.
-6. **Mesurer avant d'optimiser.** Latence, pertes, CPU et stabilité doivent être
-   observés sur des appareils réels.
-7. **Tester les plateformes réellement supportées.** L'émulation navigateur ne
-   remplace pas les tests Android, iOS, Linux, Windows et macOS.
+1. Préserver le fonctionnement local sans imposer un service Internet.
+2. Sécuriser avant toute exposition distante.
+3. Séparer la logique métier des transports et des intégrations système.
+4. Préférer des composants optionnels et interchangeables.
+5. Mesurer avant d'optimiser et tester les plateformes réellement supportées.
 
-## Hypothèse de déploiement actuelle
+## Definition of Done commune
 
-Le mode visé aujourd'hui est un serveur sur le réseau local, avec son QR affiché
-sur place et un petit groupe d'utilisateurs physiquement présents. Ce modèle ne
-protège pas contre un client hostile déjà présent sur le LAN ni contre une
-exposition accidentelle à Internet. Les modes d'accès distant restent des
-évolutions distinctes à sécuriser et à documenter avant leur activation.
+Une évolution est terminée lorsque les critères inscrits dans son axe sont
+satisfaits, que les tests pertinents réussissent, que les limitations et
+ruptures sont documentées et qu'un journal d'itération terminé conserve le
+résultat, les décisions et les vérifications. Les secrets ne doivent être ni
+persistés ni journalisés inutilement.
 
-## État du projet
-
-Le projet propose déjà :
-
-- contrôle de la souris, du clavier et des fenêtres ;
-- raccourcis de navigateurs ;
-- commandes VLC et téléviseur Samsung ;
-- prévisualisation autour du curseur ;
-- interface mobile et préférences locales ;
-- API Express, Socket.IO et SSE ;
-- QR code et jetons d'entrée ;
-- configuration et journaux persistés dans SQLite ;
-- administration, diagnostic et commandes CLI ;
-- installation Linux et Windows ;
-- manifest, icônes et service worker PWA ;
-- HTTP ou HTTPS configurables ;
-- 196 tests unitaires et 18 tests navigateur fonctionnels au moment de cette
-  analyse.
-
-La couverture actuelle est d'environ 60 % pour les lignes et 45 % pour les
-branches.
-
-## Priorités générales
-
-| Priorité | Axe | Résultat attendu |
-| --- | --- | --- |
-| P0 | Sécurité | Corriger les contournements et vulnérabilités avant exposition réseau |
-| P0 | Stabilité | Préserver les commandes fondamentales sur toutes les plateformes supportées |
-| P1 | Architecture | Découpler logique métier, protocoles et déploiements |
-| P1 | Installation | Rendre Linux/Windows fiables et ajouter macOS |
-| P1 | Qualité | CI, tests réseau, couverture ciblée et releases reproductibles |
-| P2 | Expérience | Appareils associés, diagnostics, profils et multi-écrans |
-| P2 | PWA | Offrir plusieurs modes TLS/transport installables en drop-in |
-| P3 | Extensions | Presse-papiers, macros, Wayland et prévisualisation avancée |
-
-## Axe 1 — Sécurité et contrôle d'accès
-
-### Correctifs immédiats
-
-- [x] Ne plus interpréter directement `X-Forwarded-For` pour accorder un accès
-  local.
-- [x] Configurer explicitement les proxies de confiance.
-- [x] Limiter le bypass sans session au loopback réellement local; un client
-  direct ne peut pas le contourner avec `X-Forwarded-For`.
-- [x] Refuser un secret de session par défaut ou trop court en production.
-- [x] Mettre à jour les dépendances présentant des vulnérabilités élevées,
-  notamment la chaîne Socket.IO/Engine.IO/WebSocket.
-- [x] Limiter la taille et la fréquence des requêtes et messages temps réel.
-- [x] Filtrer jetons, cookies et secrets des journaux structurés.
-- [ ] Corriger l'écart entre la durée de grâce documentée et configurée des
-  jetons d'entrée.
-
-### Sessions et autorisations
-
-- [x] Séparer le jeton d'association temporaire de la session d'un appareil.
-- [x] Ajouter une liste des appareils associés via l'API administrateur.
-- [x] Permettre à un appareil de révoquer sa session courante.
-- [x] Permettre à un administrateur de révoquer un autre appareil ou toutes les
-  sessions depuis l'interface/API.
-- [x] Séparer les rôles `controller` et `admin` (contrôleur par défaut pour
-  les sessions jumelées; accès loopback administrateur).
-- [x] Appliquer les mêmes autorisations à HTTP et Socket.IO via le service
-  d'autorisation commun; WebRTC pourra réutiliser son contrat.
-- [x] Protéger les écritures HTTP avec vérification Origin et CSRF adaptée.
-- [x] Ajouter un historique local des associations et révocations.
-- [x] Séparer les ressources clientes en lecture des ressources administrateur,
-  sans exposer de configuration sensible aux sessions `controller`.
-
-### Critères de sortie
-
-- [x] Aucun en-tête client forgé ne permet un accès local privilégié.
-- [x] Un contrôleur ne peut appeler aucune action administrative.
-- [x] Un appareil révoqué perd immédiatement son accès.
-- [x] Aucune vulnérabilité élevée connue ne subsiste en production.
-
-`SEC-008` et `SEC-009` sont terminées : l'API administrateur gère les appareils
-associés, tandis que les sessions `controller` utilisent des ressources clientes
-en lecture seule. L'interface graphique de gestion reste planifiée dans
-`UX-001` et `UX-002`. La prochaine tâche de sécurité est de corriger l'écart de
-durée de grâce documentée/configurée des jetons d'entrée.
-
-## Axe 2 — Architecture modulaire
-
-### Logique métier partagée
-
-- [ ] Extraire des handlers réseau un dispatcher de commandes ou des services
-  applicatifs communs.
-- [ ] Faire utiliser les mêmes services par les routes, Socket.IO et les futurs
-  transports.
-- [ ] Définir un format commun de succès, d'erreur et d'accusé de réception.
-- [ ] Versionner le protocole client/serveur.
-- [ ] Éviter que les contrôleurs HTTP et sockets connaissent les détails de
-  RobotJS ou des intégrations externes.
-
-### Adaptateurs configurables
+## Convention documentaire
 
 ```text
-Interface utilisateur
-        │
-        ▼
-Contrat de transport
-├── Socket.IO local
-├── Socket.IO derrière proxy
-└── WebRTC DataChannel
-        │
-        ▼
-Dispatcher de commandes
-├── Souris / clavier
-├── Fenêtres / navigateurs
-├── VLC / TV
-└── Administration
+ROADMAP.md
+  → axes/01-SEC-securite.md
+      → SEC-010b
+          → development/security-SEC-010b-AAAA-MM-JJ.md (après réalisation)
 ```
 
-- [ ] Introduire un contrat de transport client minimal.
-- [ ] Sélectionner le transport à partir de la configuration et des capacités.
-- [ ] Introduire un registre d'adaptateurs de déploiement sans conditions
-  dispersées.
-- [ ] Conserver la compatibilité avec Socket.IO pendant la migration.
-- [ ] Ajouter des tests de contrat exécutables contre chaque transport.
-
-### Configuration système
-
-- [ ] Distinguer `LISTEN_HOST`, `PORT`, `PUBLIC_BASE_URL` et les proxies fiables.
-- [ ] Séparer clairement configuration système et configuration fonctionnelle.
-- [ ] Valider la configuration au démarrage avec des erreurs actionnables.
-- [ ] Permettre l'export/import de la configuration non secrète.
-- [ ] Ajouter une commande CLI de diagnostic de configuration.
-
-## Axe 3 — Fiabilité et performance
-
-### Temps réel
-
-- [ ] Mesurer la latence des mouvements, clics et frappes.
-- [ ] Regrouper ou abandonner les mouvements devenus obsolètes sous charge.
-- [ ] Gérer explicitement la backpressure.
-- [ ] Améliorer les reconnexions après veille, changement Wi-Fi et redémarrage
-  du serveur.
-- [ ] Rendre les délais et heartbeats configurables par transport.
-- [ ] Ajouter un état de connexion détaillé dans l'interface.
-
-### Prévisualisation
-
-- [ ] Adapter résolution, fréquence et compression à la bande passante.
-- [ ] Mesurer séparément capture, conversion, transport et rendu.
-- [ ] Suspendre la capture lorsqu'aucun client ne l'affiche.
-- [ ] Prévenir l'accumulation de frames périmées.
-- [ ] Étudier une piste vidéo WebRTC sans l'imposer aux autres modes.
-
-### Cycle de vie
-
-- [ ] Tester arrêt gracieux et destruction des connexions.
-- [ ] Traiter proprement les erreurs de port occupé ou interdit.
-- [ ] Améliorer la reprise après crash du service.
-- [ ] Ajouter des contrôles de santé internes et externes distincts.
-- [ ] Tester les migrations et corruptions SQLite.
-
-## Axe 4 — Expérience utilisateur
-
-### Appareils et connexion
-
-- [ ] Afficher les appareils associés, leur rôle et leur dernière activité.
-- [ ] Nommer un appareil pendant l'association.
-- [ ] Expliquer précisément les erreurs : serveur absent, session expirée,
-  certificat refusé, permission LAN refusée ou transport indisponible.
-- [ ] Afficher le mode de transport et le chemin réseau actifs.
-- [ ] Fournir une action simple pour réassocier ou révoquer un appareil.
-
-### Contrôle
-
-- [ ] Ajouter le retour haptique configurable.
-- [ ] Créer des profils : général, présentation, multimédia, navigateur et TV.
-- [ ] Permettre de réordonner ou masquer les commandes.
-- [ ] Améliorer la précision du glisser-déposer et du défilement.
-- [ ] Ajouter la gestion de plusieurs écrans.
-- [ ] Ajouter des réglages distincts par appareil client.
-
-### Accessibilité et internationalisation
-
-- [ ] Tester la navigation clavier et les lecteurs d'écran.
-- [ ] Garantir des zones tactiles et contrastes suffisants.
-- [ ] Respecter `prefers-reduced-motion`.
-- [ ] Vérifier la cohérence des traductions existantes.
-- [ ] Prévoir une stratégie de fallback pour les traductions incomplètes.
-
-## Axe 5 — Plateformes et intégrations système
-
-### Linux
-
-- [ ] Consolider l'installation et le service `systemd --user`.
-- [ ] Documenter X11, DISPLAY, XAUTHORITY et la session graphique.
-- [ ] Implémenter le [plan Wayland](./axes/wayland.md) avec RemoteDesktop/libei
-  pour les entrées et ScreenCast/PipeWire pour la prévisualisation.
-- [x] Détecter sous Wayland l'indisponibilité de la capture X11 RobotJS et
-  neutraliser la prévisualisation sans interrompre le serveur.
-- [ ] Détecter clairement les capacités indisponibles.
-
-### Windows
-
-- [ ] Tester l'installation sur versions Windows prises en charge.
-- [ ] Fiabiliser le service, PowerShell et les dépendances natives.
-- [ ] Vérifier mise à jour et désinstallation sans résidus.
-- [ ] Signaler les restrictions de session interactive.
-
-### macOS
-
-- [ ] Créer un installateur macOS.
-- [ ] Gérer le lancement automatique dans la session utilisateur.
-- [ ] Guider l'autorisation Accessibilité requise pour le contrôle.
-- [ ] Tester AppleScript, fenêtres et navigateurs.
-
-### Intégrations
-
-- [ ] Renforcer la détection et les erreurs VLC.
-- [ ] Rendre les commandes navigateurs déclaratives et extensibles.
-- [ ] Améliorer la découverte et l'association Samsung TV.
-- [ ] Prévoir un contrat de plugin ou d'adaptateur avant d'ajouter de nouvelles
-  télécommandes.
-
-## Axe 6 — PWA, TLS et modes de déploiement
-
-Cet axe est détaillé dans [son document dédié](./axes/pwa.md).
-
-Les modes à préserver ou développer sont :
-
-1. serveur local autonome en HTTP ou HTTPS, sans PWA publique ;
-2. service PWA gratuit avec connexion WebRTC au serveur on-premise ;
-3. PWA et signalisation WebRTC sur le VPS de l'utilisateur ;
-4. PWA sur VPS avec reverse proxy vers le serveur à travers un VPN ;
-5. PWA sur VPS avec relais applicatif par reverse WebSocket initié par le
-   serveur on-premise ;
-6. PWA publique avec HTTPS/WSS direct vers un serveur local certifié.
-
-### Socle commun attendu
-
-- [ ] Produire la PWA comme artefact statique indépendant.
-- [ ] Conserver le serveur local et Socket.IO fonctionnels.
-- [ ] Ajouter WebRTC comme adaptateur optionnel.
-- [ ] Publier les composants auto-hébergeables.
-- [ ] Publier le relais WebSocket custom comme composant optionnel indépendant
-  du proxy VPN.
-- [ ] Ne jamais changer automatiquement de chemin réseau sans l'indiquer.
-- [ ] Tester l'installation Android, iOS et desktop.
-- [ ] Fournir des diagnostics TLS, permission LAN, ICE et proxy.
-
-## Axe 7 — Installation, mises à jour et exploitation
-
-### Installation
-
-- [ ] Rendre les scripts idempotents.
-- [ ] Séparer clairement dépendances système, installation npm, configuration
-  et service.
-- [ ] Générer les secrets pendant l'installation.
-- [ ] Ajouter un mode non interactif documenté.
-- [ ] Vérifier les prérequis et afficher les actions correctives.
-
-### Mise à jour
-
-- [ ] Signer ou vérifier l'origine des artefacts de release.
-- [ ] Séparer vérification, téléchargement, installation et redémarrage.
-- [ ] Prévoir un retour arrière après échec.
-- [ ] Conserver la configuration et la base pendant une mise à jour.
-- [ ] Afficher un historique local des mises à jour.
-
-### Sauvegarde et diagnostic
-
-- [ ] Ajouter export, sauvegarde et restauration SQLite.
-- [ ] Fournir une archive de diagnostic expurgée des secrets.
-- [ ] Ajouter rotation et rétention des journaux.
-- [ ] Exposer version, transport, capacités et santé dans la CLI.
-- [ ] Documenter récupération après base corrompue ou secret perdu.
-
-## Axe 8 — Qualité et livraison
-
-### Tests
-
-- [ ] Ajouter une CI pour tests unitaires et Playwright.
-- [ ] Augmenter d'abord la couverture des zones critiques plutôt qu'un objectif
-  global artificiel.
-- [ ] Ajouter des tests de sécurité pour sessions, rôles et proxies.
-- [ ] Ajouter des tests de contrat pour les transports.
-- [ ] Ajouter des tests d'installation Linux, Windows et macOS.
-- [ ] Tester sur de vrais appareils Android et iOS avant une release PWA.
-
-### Outillage et releases
-
-- [ ] Déclarer les versions Node.js prises en charge.
-- [ ] Ajouter formatage et lint automatiques si leur coût reste raisonnable.
-- [ ] Automatiser l'audit des dépendances.
-- [ ] Générer changelog, artefacts et checksums.
-- [ ] Définir les canaux stable et préversion.
-- [ ] Documenter la compatibilité client/serveur entre versions.
-
-## Backlog fonctionnel
-
-### Prochaines fonctions
-
-- [ ] Multi-écrans.
-- [ ] Profils de commandes.
-- [ ] Appareils associés et révocation.
-- [ ] Retour haptique.
-- [ ] Presse-papiers bidirectionnel avec consentement explicite.
-- [ ] Macros limitées à des actions autorisées.
-- [ ] Wake-on-LAN lorsqu'un agent local peut émettre le paquet.
-- [ ] Personnalisation de l'interface par appareil.
-
-### Explorations
-
-- [ ] API de plugins pour de nouvelles télécommandes.
-- [ ] Prévisualisation par piste vidéo WebRTC.
-- [ ] Découverte locale mDNS lorsque les navigateurs le permettent.
-- [ ] Gestion centralisée optionnelle de plusieurs serveurs on-premise.
-- [ ] Paquets natifs ou signatures pour simplifier les permissions système.
-
-## Jalons proposés
-
-### Jalon A — Stabilisation et sécurité
-
-- correctifs P0 ;
-- dépendances mises à jour ;
-- sessions et rôles séparés ;
-- tests de sécurité anti-régression.
-
-### Jalon B — Socle modulaire
-
-- dispatcher métier partagé ;
-- contrat de transport ;
-- protocole versionné ;
-- configuration d'écoute et d'URL clarifiée.
-
-### Jalon C — Expérience et plateformes
-
-- appareils associés ;
-- diagnostics de connexion ;
-- installation Linux/Windows consolidée ;
-- première prise en charge macOS et étude Wayland.
-
-### Jalon D — PWA multi-déploiement
-
-- artefact PWA public ;
-- service gratuit WebRTC ;
-- paquet WebRTC auto-hébergeable ;
-- exemple proxy VPN ;
-- relais reverse WebSocket auto-hébergeable ;
-- mode HTTPS/WSS local documenté.
-
-### Jalon E — Fonctions avancées
-
-- multi-écrans ;
-- profils ;
-- presse-papiers ;
-- prévisualisation adaptative ;
-- architecture de plugins.
-
-## Definition of Done d'une évolution
-
-Une évolution est terminée lorsque :
-
-- la logique métier n'est pas dupliquée entre transports ;
-- les erreurs et limites sont documentées ;
-- les secrets ne sont ni persistés ni journalisés inutilement ;
-- les tests unitaires et d'intégration pertinents passent ;
-- les modes existants restent compatibles ou la rupture est explicitement
-  versionnée ;
-- les scripts d'installation et la documentation sont mis à jour si nécessaire ;
-- le comportement a été vérifié sur les plateformes concernées.
-
----
-
-Cette roadmap est un document vivant. Les priorités doivent être réévaluées à
-partir des retours utilisateurs, des mesures de stabilité et des contraintes
-réelles des plateformes.
+- La roadmap globale priorise les axes sans cases à cocher.
+- Les axes définissent les tâches et sont les seuls documents avec des cases à
+  cocher.
+- Les journaux racontent les itérations réalisées et deviennent immuables une
+  fois clôturés.
+- Un plan spécialisé, comme Wayland, reprend l'ordinal et l'identifiant de son
+  axe propriétaire :
+  [05-PLAT-004-wayland.md](./axes/05-PLAT-004-wayland.md).

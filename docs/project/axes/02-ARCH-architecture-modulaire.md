@@ -1,4 +1,4 @@
-# Axe — Architecture modulaire
+# 02 — ARCH — Architecture modulaire
 
 ## Résultat visé
 
@@ -16,6 +16,7 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
 - [ ] ARCH-007 — clarifier LISTEN_HOST, PUBLIC_BASE_URL et proxies fiables.
 - [ ] Séparer configuration système et fonctionnelle; valider au démarrage.
 
-Voir aussi l'[axe PWA](./pwa.md) pour les contrats de transport et déploiement.
+Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de
+transport et déploiement.
 Chaque tâche doit préciser les modules concernés, la stratégie de compatibilité
 et les tests avant son implémentation.

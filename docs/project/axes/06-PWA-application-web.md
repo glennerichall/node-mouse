@@ -1,4 +1,4 @@
-# Roadmap PWA de Remote Mouse
+# 06 — PWA — Application web et modes de déploiement
 
 > Feuille de route spécialisée pour distribuer et installer Remote Mouse comme
 > Progressive Web App, avec plusieurs modes de connexion interchangeables.

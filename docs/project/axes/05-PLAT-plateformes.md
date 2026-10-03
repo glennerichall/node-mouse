@@ -1,4 +1,4 @@
-# Axe — Plateformes et intégrations système
+# 05 — PLAT — Plateformes et intégrations système
 
 ## Résultat visé
 
@@ -17,7 +17,7 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
 - [ ] PLAT-002 — tester installation, service, mise à jour et désinstallation Windows.
 - [ ] PLAT-003 — créer l'installation macOS et guider les permissions Accessibilité.
 - [ ] PLAT-004 — intégrer le contrôle et la capture Wayland selon le
-  [plan dédié](./wayland.md).
+  [plan dédié](./05-PLAT-004-wayland.md).
 - [x] PLAT-004a — détecter la capture RobotJS indisponible sous Wayland et
   neutraliser la prévisualisation sans interrompre le serveur.
 - [ ] PLAT-004g — utiliser un périphérique virtuel `uinput` comme stratégie
