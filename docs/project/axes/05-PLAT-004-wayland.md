@@ -140,6 +140,46 @@ aucune boucle de dialogues de permission.
 Wayland indépendamment du backend portal, tandis que `portal` reste une
 stratégie configurable et non supprimée.
 
+### PLAT-004j — Masquage au survol de l'overlay QR
+
+- Reproduire la perte du masquage au survol lorsque YAD est exécuté par
+  XWayland dans une session Wayland.
+- Vérifier que la position du pointeur et la géométrie de la fenêtre sont
+  comparées dans le même référentiel de coordonnées, y compris avec mise à
+  l'échelle et plusieurs écrans.
+- Masquer temporairement l'overlay tant que le pointeur occupe sa zone, puis le
+  réafficher après sa sortie sans boucle de masquage/réaffichage ni perte du
+  processus YAD.
+- Ajouter des tests anti-régression de la décision de survol et conserver le
+  comportement actuel sous une vraie session X11.
+- Valider le parcours sur Ubuntu 26.04 Wayland avec l'overlay positionné dans
+  plusieurs coins de l'écran.
+
+**Sortie:** le QR ne bloque pas la zone située sous l'overlay lors du survol,
+et revient automatiquement lorsque le pointeur quitte cette zone sous Wayland
+comme sous X11.
+
+### PLAT-004k — Vitesse et accélération de la souris uinput
+
+- Établir une référence X11 avec des gestes lents, moyens et rapides, à valeur
+  `input.mouseSpeed` identique, puis rejouer les mêmes deltas sous Wayland.
+- Mesurer séparément les deltas produits par le client, le multiplicateur du
+  contrôleur d'entrée, les valeurs envoyées au bridge uinput et le déplacement
+  observé à l'écran.
+- Vérifier l'effet de l'accumulation des fractions dans le bridge natif et de la
+  courbe d'accélération appliquée par le compositeur au périphérique virtuel.
+- Déterminer si la normalisation appartient à l'adaptateur uinput ou à une
+  configuration de périphérique; ne pas introduire un coefficient Wayland
+  arbitraire dans la logique métier partagée.
+- Préserver la précision des petits mouvements tout en rapprochant la distance
+  et l'accélération des gestes rapides de la référence X11.
+- Ajouter des tests de transformation des deltas et valider plusieurs valeurs
+  de `input.mouseSpeed` sur Ubuntu 26.04 Wayland réel.
+
+**Sortie:** à réglage identique, la souris Wayland offre une vitesse et une
+progression d'accélération comparables à X11, sans saut sur les petits gestes ni
+régression de la molette ou du glisser-déposer.
+
 ## Sécurité et contraintes
 
 - Pour la stratégie portal, le portail et le compositeur restent l'autorité sur

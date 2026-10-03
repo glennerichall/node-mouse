@@ -27,6 +27,17 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   explicitement par XWayland lorsque le positionnement global est requis.
 - [x] PLAT-004i — empêcher YAD de rogner le QR lorsque la fenêtre a exactement
   la taille configurée, en adaptant l'image à la zone intérieure du widget.
+- [ ] PLAT-004j — rétablir sous Wayland/XWayland le masquage temporaire de
+  l'overlay QR lorsque le pointeur le survole, puis son réaffichage après la
+  sortie du pointeur, sans oscillation, perte permanente de la fenêtre ni
+  régression du comportement X11; couvrir la logique de coordonnées par des
+  tests et valider le résultat sur Ubuntu 26.04 Wayland réel.
+- [ ] PLAT-004k — corriger la vitesse plus faible et l'accélération moins
+  perceptible de la souris avec l'adaptateur Wayland uinput : comparer des
+  séquences de mouvements identiques sous X11 et Wayland, localiser l'écart
+  entre la sensibilité applicative, la conversion en événements relatifs et la
+  courbe du compositeur, puis normaliser le comportement sans modifier la
+  signification du réglage utilisateur `input.mouseSpeed`.
 - [ ] Renforcer diagnostics VLC, navigateurs et Samsung TV.
 - [ ] Définir un contrat d'adaptateur avant de multiplier les intégrations.
 
