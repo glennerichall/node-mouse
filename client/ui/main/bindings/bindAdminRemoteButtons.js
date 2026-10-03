@@ -30,8 +30,11 @@ export function bindAdminRemoteButtons(services, dom) {
         adminActionsDisabledMessage,
         adminUnlockForm,
         adminPassword,
+        btnAdminPasswordVisibility,
+        btnAdminLock,
         adminUnlockStatus,
     } = dom.remotes.admin;
+    const i18n = services.getI18n();
     const adminButtons = [
         btnForceUpdateCheck,
         btnInstallUpdate,
@@ -50,6 +53,7 @@ export function bindAdminRemoteButtons(services, dom) {
         const {
             adminActionsEnabled = true,
             adminUnlocked = false,
+            adminRelockAvailable = false,
             adminUnlockAvailable = false,
         } = getConfigView().getSystemConfig();
         for (const button of adminButtons) {
@@ -62,14 +66,33 @@ export function bindAdminRemoteButtons(services, dom) {
 
         adminActionsDisabledMessage?.classList.toggle('hidden', adminActionsEnabled);
         adminUnlockForm?.classList.toggle('hidden', adminUnlocked || !adminUnlockAvailable);
+        btnAdminLock?.classList.toggle('hidden', !adminRelockAvailable);
     };
+
+    const syncPasswordVisibility = (visible) => {
+        if (!adminPassword || !btnAdminPasswordVisibility) return;
+        const key = visible ? 'main.adminPasswordHide' : 'main.adminPasswordShow';
+        const label = i18n.t(key);
+        adminPassword.type = visible ? 'text' : 'password';
+        btnAdminPasswordVisibility.textContent = label;
+        btnAdminPasswordVisibility.setAttribute('aria-label', label);
+        btnAdminPasswordVisibility.setAttribute('aria-pressed', visible ? 'true' : 'false');
+    };
+
+    btnAdminPasswordVisibility?.addEventListener('click', () => {
+        syncPasswordVisibility(adminPassword?.type === 'password');
+    });
+
+    i18n.onChange?.(() => {
+        syncPasswordVisibility(adminPassword?.type === 'text');
+    });
 
     adminUnlockForm?.addEventListener('submit', async (event) => {
         event.preventDefault();
         const password = adminPassword?.value || '';
         if (adminUnlockStatus) adminUnlockStatus.textContent = 'Déverrouillage…';
         try {
-            const response = await fetch('/api/admin-auth/unlock', {
+            const response = await fetch('/api/admin-auth/elevation', {
                 method: 'POST',
                 headers: {'content-type': 'application/json'},
                 body: JSON.stringify({password}),
@@ -80,6 +103,20 @@ export function bindAdminRemoteButtons(services, dom) {
             window.location.reload();
         } catch (error) {
             if (adminPassword) adminPassword.value = '';
+            if (adminUnlockStatus) adminUnlockStatus.textContent = error.message;
+        }
+    });
+
+    btnAdminLock?.addEventListener('click', async () => {
+        if (adminUnlockStatus) adminUnlockStatus.textContent = i18n.t('main.adminLocking');
+        try {
+            const response = await fetch('/api/admin-auth/elevation', {method: 'DELETE'});
+            const payload = await response.json();
+            if (!response.ok) throw new Error(payload.message || i18n.t('main.adminLockRefused'));
+            if (adminPassword) adminPassword.value = '';
+            syncPasswordVisibility(false);
+            window.location.reload();
+        } catch (error) {
             if (adminUnlockStatus) adminUnlockStatus.textContent = error.message;
         }
     });
@@ -101,5 +138,6 @@ export function bindAdminRemoteButtons(services, dom) {
     btnRotateEntryToken.addEventListener('click', emit(REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN));
 
     syncAdminButtonsState();
+    syncPasswordVisibility(false);
     clientConfig.onChange(syncAdminButtonsState);
 }

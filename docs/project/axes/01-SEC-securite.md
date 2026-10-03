@@ -1,6 +1,6 @@
 # 01 — SEC — Sécurité et contrôle d'accès
 
-**État:** SEC-001 à SEC-010a terminés; prochaine tâche: SEC-010b.
+**État:** SEC-001 à SEC-010b terminés; prochaine tâche: SEC-011.
 
 ## Résultat visé
 
@@ -27,7 +27,7 @@ considérer le LAN comme une frontière de confiance.
   une expiration et une limitation stricte des tentatives.
 - [x] **SEC-010a:** rendre la longueur minimale du mot de passe administrateur
   configurable sans divergence entre l'API d'authentification et l'interface.
-- [ ] **SEC-010b:** permettre de reverrouiller explicitement l'administration
+- [x] **SEC-010b:** permettre de reverrouiller explicitement l'administration
   depuis le panneau latéral : lorsque la session courante est administrateur,
   remplacer le formulaire et le bouton « Déverrouiller » par un bouton
   « Verrouiller », révoquer immédiatement son élévation temporaire, puis
@@ -35,7 +35,13 @@ considérer le LAN comme une frontière de confiance.
   sessions associées. Le champ doit aussi offrir un contrôle accessible
   « Afficher/Masquer le mot de passe » : valeur masquée par défaut, affichable
   en clair à la demande, sans persistance ni modification de la saisie.
-- [ ] Corriger l'écart de durée de grâce documentée/configurée des jetons.
+- [x] **SEC-010c:** modéliser l'élévation administrateur temporaire comme une
+  ressource de la session courante : `POST /api/admin-auth/elevation` la crée
+  ou la renouvelle et `DELETE /api/admin-auth/elevation` la supprime; retirer
+  le chemin RPC `/unlock` et aligner les noms des handlers sans modifier le
+  comportement de sécurité.
+- [ ] **SEC-011:** corriger l'écart de durée de grâce
+  documentée/configurée des jetons.
 
 ## Critères d'acceptation
 

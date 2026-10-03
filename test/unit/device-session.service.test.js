@@ -98,6 +98,16 @@ describe('device session service', () => {
       adminUntil: 61_000,
     }));
 
+    expect(service.revokeElevation('other-session')).toBe(false);
+    expect(service.authenticate('credential').role).toBe('admin');
+    expect(service.revokeElevation('session-1')).toBe(true);
+    expect(service.authenticate('credential')).toEqual(expect.objectContaining({
+      role: 'controller',
+      adminUntil: null,
+    }));
+
+    service.elevateSession('session-1', 60_000);
+
     timestamp = 61_000;
     expect(service.authenticate('credential').role).toBe('controller');
   });

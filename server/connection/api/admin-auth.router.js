@@ -12,7 +12,7 @@ function passwordMatches(actual, expected) {
   return timingSafeEqual(actualHash, expectedHash);
 }
 
-export function unlockAdmin(req, res) {
+export function createAdminElevation(req, res) {
   const config = req.services.getSystemConfig();
   const expected = String(config.admin?.password || '');
   const password = String(req.body?.password || '');
@@ -40,6 +40,26 @@ export function unlockAdmin(req, res) {
   res.json({ok: true, adminUntil});
 }
 
+export function deleteAdminElevation(req, res) {
+  const sessionId = req.securityContext?.deviceSessionId;
+
+  if (!sessionId || req.securityContext?.authenticationMethod !== 'session') {
+    res.status(400).json({ok: false, message: 'Une session appareil est requise.'});
+    return;
+  }
+
+  req.services.getDeviceSessionService().revokeElevation(sessionId);
+
+  const sockets = req.services.getServer().io.of('/').sockets.values();
+  for (const socket of sockets) {
+    if (socket.securityContext?.deviceSessionId === sessionId) {
+      socket.disconnect(true);
+    }
+  }
+
+  res.json({ok: true});
+}
+
 export const adminAuthRouter = express.Router()
   .use(createRateLimitMiddleware({
     limit: 5,
@@ -47,4 +67,5 @@ export const adminAuthRouter = express.Router()
     methods: ['POST'],
     keyGenerator: (req) => req.securityContext?.deviceSessionId,
   }))
-  .post('/unlock', unlockAdmin);
+  .post('/elevation', createAdminElevation)
+  .delete('/elevation', deleteAdminElevation);

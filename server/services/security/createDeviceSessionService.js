@@ -73,6 +73,10 @@ export function createDeviceSessionService(services, {now = Date.now} = {}) {
     return adminUntil;
   }
 
+  function revokeElevation(id) {
+    return adminElevations.delete(String(id || ''));
+  }
+
   function listSessions() {
     const timestamp = now();
     return services.getPersistence().deviceSessionDao.listSessions().map((session) => ({
@@ -105,6 +109,7 @@ export function createDeviceSessionService(services, {now = Date.now} = {}) {
     createSession,
     authenticate,
     elevateSession,
+    revokeElevation,
     listSessions,
     listHistory,
     revokeSession,

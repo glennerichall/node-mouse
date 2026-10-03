@@ -19,14 +19,14 @@ export async function getClientConfig(req, res) {
       adminActionsEnabled: req.securityContext?.role === 'admin'
         && Boolean(req.services.getSystemConfig().adminActionsEnabled),
       adminUnlocked: req.securityContext?.role === 'admin',
+      adminRelockAvailable: req.securityContext?.role === 'admin'
+        && req.securityContext?.authenticationMethod === 'session',
       adminUnlockAvailable: isAdminPasswordConfigured(req.services.getSystemConfig().admin),
     },
   });
 }
 
-export const clientSubsRouter = express.Router();
-
-clientSubsRouter.post('/configs', (req, res) => {
+export function createClientConfigSubscription(req, res) {
   const id = req.services.getSseService().createSubscription({
     filters: {service: PUBSUB_SERVICE_CLIENT_CONFIG},
   });
@@ -36,23 +36,28 @@ clientSubsRouter.post('/configs', (req, res) => {
     id,
     eventsUrl: `/api/client/subs/${id}`,
   });
-});
+}
 
-clientSubsRouter.get('/:id', (req, res) => {
+export function connectClientSubscription(req, res) {
   const connected = req.services.getSseService().connect(String(req.params.id || '').trim(), req, res);
   if (!connected) {
     res.status(404).json({ok: false, message: 'Subscription not found.'});
   }
-});
+}
 
-clientSubsRouter.delete('/:id', (req, res) => {
+export function deleteClientSubscription(req, res) {
   const removed = req.services.getSseService().deleteSubscription(String(req.params.id || '').trim());
   if (!removed) {
     res.status(404).json({ok: false, message: 'Subscription not found.'});
     return;
   }
   res.json({ok: true});
-});
+}
+
+export const clientSubsRouter = express.Router()
+  .post('/configs', createClientConfigSubscription)
+  .get('/:id', connectClientSubscription)
+  .delete('/:id', deleteClientSubscription);
 
 export const clientApiRouter = express.Router()
   .get('/config', getClientConfig)

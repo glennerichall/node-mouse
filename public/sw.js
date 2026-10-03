@@ -46,7 +46,7 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) {
     return;
   }
-  if (url.pathname.startsWith('/socket.io/')) {
+  if (url.pathname.startsWith('/socket.io/') || url.pathname.startsWith('/api/')) {
     return;
   }
 

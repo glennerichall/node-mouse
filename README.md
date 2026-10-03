@@ -367,7 +367,10 @@ ADMIN_UNLOCK_MINUTES=15
 Restart the service after changing the file. A password field then appears in
 the left drawer. A successful unlock elevates only the current paired session,
 expires automatically, and is cleared by a server restart. Prefer HTTPS before
-entering this password over a network.
+entering this password over a network. The password remains masked unless the
+user explicitly selects **Show password**. While the session is elevated, the
+unlock form is replaced by **Lock**, which immediately removes the elevation
+from that paired session without affecting other devices.
 
 #### Upgrading from a version without remote admin unlock
 

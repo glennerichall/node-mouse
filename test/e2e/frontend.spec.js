@@ -36,6 +36,71 @@ test('main remote page loads and connects to the websocket', async ({page}) => {
   await expect(page.locator('#connection-overlay')).toHaveClass(/hidden/);
 });
 
+test('admin drawer can reveal the password and relock an elevated session', async ({page}) => {
+  let systemConfig = {
+    adminActionsEnabled: false,
+    adminUnlocked: false,
+    adminRelockAvailable: false,
+    adminUnlockAvailable: true,
+  };
+  await page.route('**/api/client/config', async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({config: {}, systemConfig}),
+    });
+  });
+  await page.route('**/api/admin-auth/elevation', async (route) => {
+    expect(route.request().method()).toBe('DELETE');
+    systemConfig = {
+      ...systemConfig,
+      adminUnlocked: false,
+      adminRelockAvailable: false,
+    };
+    await route.fulfill({contentType: 'application/json', body: JSON.stringify({ok: true})});
+  });
+
+  await page.goto('/');
+  await page.locator('#app').evaluate((element) => element.classList.add('admin-drawer-open'));
+
+  const form = page.locator('#admin-unlock-form');
+  const password = page.locator('#admin-password');
+  const visibility = page.locator('#btn-admin-password-visibility');
+  const lock = page.locator('#btn-admin-lock');
+  await expect(form).not.toHaveClass(/hidden/);
+  await expect(lock).toHaveClass(/hidden/);
+
+  await password.evaluate((element) => {
+    element.value = 'temporary-secret';
+  });
+  await expect(password).toHaveValue('temporary-secret');
+  await visibility.evaluate((element) => element.click());
+  await expect(password).toHaveAttribute('type', 'text');
+  await expect(password).toHaveValue('temporary-secret');
+  await expect(visibility).toHaveAttribute('aria-pressed', 'true');
+
+  systemConfig = {
+    ...systemConfig,
+    adminActionsEnabled: true,
+    adminUnlocked: true,
+    adminRelockAvailable: true,
+  };
+  await page.goto('/?admin-state=elevated');
+  await expect.poll(() => page.evaluate(async () => (
+    (await fetch('/api/client/config', {cache: 'no-store'})).json()
+  )).then((payload) => payload.systemConfig?.adminRelockAvailable)).toBe(true);
+  await page.locator('#app').evaluate((element) => element.classList.add('admin-drawer-open'));
+  await expect(form).toHaveClass(/hidden/);
+  await expect(lock).not.toHaveClass(/hidden/);
+
+  const lockRequest = page.waitForRequest((request) => (
+    request.url().endsWith('/api/admin-auth/elevation') && request.method() === 'DELETE'
+  ));
+  await lock.evaluate((element) => element.click());
+  await lockRequest;
+  await expect(form).not.toHaveClass(/hidden/);
+  await expect(lock).toHaveClass(/hidden/);
+});
+
 test('main remote accordion expands one visible panel at a time', async ({page}) => {
   await page.setViewportSize({width: 390, height: 844});
   await page.goto('/');

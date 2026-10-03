@@ -28,6 +28,8 @@ l'itération et devient append-only dès sa clôture.
 
 ## Historique existant
 
+- [Architecture — ARCH-008](./architecture-ARCH-008-2026-10-03.md): handlers
+  nommés et exportés pour les routes de configuration et abonnements clients.
 - [Exploitation — OPS-001](./operations-OPS-001-2026-10-02.md): commande CLI
   locale affichant la version du paquet installé.
 
@@ -41,6 +43,10 @@ l'itération et devient append-only dès sa clôture.
   administrateur temporaire depuis le panneau latéral.
 - [Sécurité — SEC-010a](./security-SEC-010a-2026-10-02.md): seuil configurable
   du mot de passe de déverrouillage administrateur.
+- [Sécurité — SEC-010b](./security-SEC-010b-2026-10-03.md): reverrouillage
+  immédiat de la session administrateur et affichage contrôlé du mot de passe.
+- [Sécurité — SEC-010c](./security-SEC-010c-2026-10-03.md): modélisation REST
+  de l'élévation temporaire de la session administrateur.
 - [Sécurité — migration vers SEC-010](./security-SEC-010-migration-2026-10-02.md):
   procédure npm de bootstrap pour une installation qui ne peut pas encore se
   déverrouiller depuis le mobile.

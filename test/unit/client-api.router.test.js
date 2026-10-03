@@ -1,5 +1,16 @@
 import {jest} from '@jest/globals';
-import {getClientConfig} from '../../server/connection/api/client-api.router.js';
+import {
+  connectClientSubscription,
+  createClientConfigSubscription,
+  deleteClientSubscription,
+  getClientConfig,
+} from '../../server/connection/api/client-api.router.js';
+
+function createResponse() {
+  const response = {status: jest.fn(), json: jest.fn()};
+  response.status.mockReturnValue(response);
+  return response;
+}
 
 describe('client API router', () => {
   it('returns only controller-readable configuration and disables admin actions', async () => {
@@ -29,6 +40,7 @@ describe('client API router', () => {
     expect(payload.systemConfig).toEqual({
       adminActionsEnabled: false,
       adminUnlocked: false,
+      adminRelockAvailable: false,
       adminUnlockAvailable: false,
     });
     expect(payload.config.samsungTv).toEqual({enabled: true});
@@ -58,8 +70,76 @@ describe('client API router', () => {
       systemConfig: {
         adminActionsEnabled: true,
         adminUnlocked: true,
+        adminRelockAvailable: false,
         adminUnlockAvailable: false,
       },
     }));
+  });
+
+  it('offers relocking only to an administrator elevated from a device session', async () => {
+    const json = jest.fn();
+    const req = {
+      securityContext: {role: 'admin', authenticationMethod: 'session'},
+      services: {
+        getConfig: () => ({vlc: {enabled: false}}),
+        getRemotes: () => ({
+          vlc: {isAvailable: async () => false},
+          preview: {isAvailable: () => true},
+        }),
+        getSystemConfig: () => ({adminActionsEnabled: true}),
+      },
+    };
+
+    await getClientConfig(req, {json});
+
+    expect(json.mock.calls[0][0].systemConfig.adminRelockAvailable).toBe(true);
+  });
+});
+
+describe('client config subscriptions API', () => {
+  it('creates a subscription filtered to client configuration events', () => {
+    const createSubscription = jest.fn(() => 'subscription-1');
+    const req = {services: {getSseService: () => ({createSubscription})}};
+    const res = createResponse();
+
+    createClientConfigSubscription(req, res);
+
+    expect(createSubscription).toHaveBeenCalledWith({
+      filters: {service: 'client-config'},
+    });
+    expect(res.json).toHaveBeenCalledWith({
+      ok: true,
+      id: 'subscription-1',
+      eventsUrl: '/api/client/subs/subscription-1',
+    });
+  });
+
+  it('connects an existing subscription and reports a missing one', () => {
+    const connect = jest.fn(() => false);
+    const req = {
+      params: {id: ' subscription-1 '},
+      services: {getSseService: () => ({connect})},
+    };
+    const res = createResponse();
+
+    connectClientSubscription(req, res);
+
+    expect(connect).toHaveBeenCalledWith('subscription-1', req, res);
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ok: false, message: 'Subscription not found.'});
+  });
+
+  it('deletes an existing subscription and preserves the response contract', () => {
+    const deleteSubscription = jest.fn(() => true);
+    const req = {
+      params: {id: 'subscription-1'},
+      services: {getSseService: () => ({deleteSubscription})},
+    };
+    const res = createResponse();
+
+    deleteClientSubscription(req, res);
+
+    expect(deleteSubscription).toHaveBeenCalledWith('subscription-1');
+    expect(res.json).toHaveBeenCalledWith({ok: true});
   });
 });

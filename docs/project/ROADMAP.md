@@ -16,7 +16,7 @@ entraîner de renommage.
 
 | Priorité | Axe | Résultat visé | État actuel |
 | ---: | --- | --- | --- |
-| 1 | [01 — SEC — Sécurité](./axes/01-SEC-securite.md) | Accès authentifiés, autorisations cohérentes et révocables | En cours — SEC-010b |
+| 1 | [01 — SEC — Sécurité](./axes/01-SEC-securite.md) | Accès authentifiés, autorisations cohérentes et révocables | En cours — SEC-011 |
 | 2 | [05 — PLAT — Plateformes](./axes/05-PLAT-plateformes.md) | Contrôle fiable sur les systèmes officiellement pris en charge | En cours — Wayland et installation Linux |
 | 3 | [07 — OPS — Exploitation](./axes/07-OPS-exploitation.md) | Installation, mise à jour et diagnostic récupérables | En cours — journaux et messages techniques |
 | 4 | [02 — ARCH — Architecture](./axes/02-ARCH-architecture-modulaire.md) | Services métier indépendants des transports et adaptateurs | Planifié |
@@ -28,7 +28,8 @@ entraîner de renommage.
 
 ## Ordre de livraison actuel
 
-1. Terminer le reverrouillage explicite de l'administration dans `SEC-010b`.
+1. Uniformiser la durée de grâce documentée et configurée des jetons dans
+   `SEC-011`.
 2. Stabiliser l'entrée Wayland et l'installation Linux dans l'axe `PLAT`.
 3. Améliorer la consultation des journaux et uniformiser leurs messages dans
    l'axe `OPS`.
