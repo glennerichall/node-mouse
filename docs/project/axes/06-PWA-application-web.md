@@ -374,9 +374,8 @@ insuffisante.
 
 ### P1 — Cohérence et fiabilité
 
-- [ ] Aligner la durée de grâce documentée des anciens jetons avec le défaut du
-  code. La documentation indique actuellement 120 minutes tandis que le code
-  utilise une semaine.
+- [x] Aligner à 120 minutes la durée de grâce documentée, les modèles
+  d'installation et le défaut du code pour les anciens jetons.
 - [ ] Séparer le frontend statique des routes dynamiques du serveur on-premise.
 - [ ] Supprimer les hypothèses d'API same-origin dans le frontend.
 - [ ] Définir un protocole versionné entre PWA et serveur on-premise.

@@ -16,9 +16,9 @@ entraîner de renommage.
 
 | Priorité | Axe | Résultat visé | État actuel |
 | ---: | --- | --- | --- |
-| 1 | [01 — SEC — Sécurité](./axes/01-SEC-securite.md) | Accès authentifiés, autorisations cohérentes et révocables | En cours — SEC-011 |
-| 2 | [05 — PLAT — Plateformes](./axes/05-PLAT-plateformes.md) | Contrôle fiable sur les systèmes officiellement pris en charge | En cours — Wayland et installation Linux |
-| 3 | [07 — OPS — Exploitation](./axes/07-OPS-exploitation.md) | Installation, mise à jour et diagnostic récupérables | En cours — journaux et messages techniques |
+| 1 | [05 — PLAT — Plateformes](./axes/05-PLAT-plateformes.md) | Contrôle fiable sur les systèmes officiellement pris en charge | En cours — Wayland et installation Linux |
+| 2 | [07 — OPS — Exploitation](./axes/07-OPS-exploitation.md) | Installation, mise à jour et diagnostic récupérables | En cours — journaux et messages techniques |
+| 3 | [01 — SEC — Sécurité](./axes/01-SEC-securite.md) | Accès authentifiés, autorisations cohérentes et révocables | À jour — SEC-011 terminée |
 | 4 | [02 — ARCH — Architecture](./axes/02-ARCH-architecture-modulaire.md) | Services métier indépendants des transports et adaptateurs | Planifié |
 | 5 | [03 — REL — Fiabilité](./axes/03-REL-fiabilite.md) | Commandes et prévisualisation prévisibles sous charge | Planifié |
 | 6 | [04 — UX — Expérience utilisateur](./axes/04-UX-experience-utilisateur.md) | Association, contrôle et diagnostic compréhensibles | Planifié |
@@ -28,12 +28,10 @@ entraîner de renommage.
 
 ## Ordre de livraison actuel
 
-1. Uniformiser la durée de grâce documentée et configurée des jetons dans
-   `SEC-011`.
-2. Stabiliser l'entrée Wayland et l'installation Linux dans l'axe `PLAT`.
-3. Améliorer la consultation des journaux et uniformiser leurs messages dans
+1. Stabiliser l'entrée Wayland et l'installation Linux dans l'axe `PLAT`.
+2. Améliorer la consultation des journaux et uniformiser leurs messages dans
    l'axe `OPS`.
-4. Reprendre ensuite les travaux structurants des axes `ARCH`, `REL` et `UX`.
+3. Reprendre ensuite les travaux structurants des axes `ARCH`, `REL` et `UX`.
 
 Cet ordre n'est pas une seconde liste de tâches. Les documents d'axes restent
 les seules sources de vérité sur le contenu et l'avancement des itérations.

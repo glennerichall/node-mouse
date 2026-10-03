@@ -1,6 +1,6 @@
 # 01 — SEC — Sécurité et contrôle d'accès
 
-**État:** SEC-001 à SEC-010b terminés; prochaine tâche: SEC-011.
+**État:** SEC-001 à SEC-011 terminés; aucune tâche de sécurité planifiée.
 
 ## Résultat visé
 
@@ -40,8 +40,10 @@ considérer le LAN comme une frontière de confiance.
   ou la renouvelle et `DELETE /api/admin-auth/elevation` la supprime; retirer
   le chemin RPC `/unlock` et aligner les noms des handlers sans modifier le
   comportement de sécurité.
-- [ ] **SEC-011:** corriger l'écart de durée de grâce
-  documentée/configurée des jetons.
+- [x] **SEC-011:** fixer à 120 minutes la durée de grâce par défaut des anciens
+  jetons d'entrée dans le code, `.env.example` et les installateurs; conserver
+  la surcharge `ENTRY_PATH_GRACE_MIN`, documenter son effet et ajouter un test
+  anti-régression de la valeur canonique.
 
 ## Critères d'acceptation
 

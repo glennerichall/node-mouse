@@ -9,6 +9,7 @@ describe('getStartupSystemConfigSnapshot', () => {
     delete process.env.SESSION_COOKIE_SECRET;
     delete process.env.ENTRY_PATH_ENABLED;
     delete process.env.ENTRY_PATH_FIXED;
+    delete process.env.ENTRY_PATH_GRACE_MIN;
   });
 
   afterAll(() => {
@@ -19,6 +20,19 @@ describe('getStartupSystemConfigSnapshot', () => {
     const {getStartupSystemConfigSnapshot} = await import('../../server/services/config/index.js');
 
     expect(getStartupSystemConfigSnapshot().entryPath.enabled).toBe(true);
+  });
+
+  it('defaults previous entry tokens to the documented 120-minute grace period', async () => {
+    const {getStartupSystemConfigSnapshot} = await import('../../server/services/config/index.js');
+
+    expect(getStartupSystemConfigSnapshot().entryPath.graceMin).toBe(120);
+  });
+
+  it('preserves an explicit entry token grace period from the environment', async () => {
+    process.env.ENTRY_PATH_GRACE_MIN = '45';
+    const {getStartupSystemConfigSnapshot} = await import('../../server/services/config/index.js');
+
+    expect(getStartupSystemConfigSnapshot().entryPath.graceMin).toBe(45);
   });
 
   it('allows the test default session secret', async () => {

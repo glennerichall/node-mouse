@@ -48,7 +48,7 @@ export const DEFAULT_SYSTEM_CONFIG = {
         fixed: '',
         tokenLength: 24,
         rotateMin: 60,
-        graceMin: 60 * 24 * 7, // 1 semaine de grâce
+        graceMin: 120, // 2 heures de grâce
     },
     session: {
         cookieName: 'remote_mouse_session',

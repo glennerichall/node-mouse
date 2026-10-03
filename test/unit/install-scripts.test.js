@@ -31,6 +31,18 @@ async function writeExecutable(filePath, content) {
 }
 
 describe('install scripts', () => {
+  it('uses the canonical 120-minute entry token grace period in every template', async () => {
+    const templates = await Promise.all([
+      readFile(path.join(process.cwd(), '.env.example'), 'utf8'),
+      readFile(path.join(process.cwd(), 'scripts/install-linux.sh'), 'utf8'),
+      readFile(path.join(process.cwd(), 'scripts/install-windows.ps1'), 'utf8'),
+    ]);
+
+    for (const template of templates) {
+      expect(template).toMatch(/^ENTRY_PATH_GRACE_MIN=120$/m);
+    }
+  });
+
   it('limits Wayland input permissions to uinput instead of the input group', async () => {
     const script = await readFile(path.join(process.cwd(), 'scripts/configure-uinput-access.sh'), 'utf8');
     expect(script).toContain('GROUP="remote-mouse-uinput"');

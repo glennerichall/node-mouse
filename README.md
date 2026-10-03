@@ -443,6 +443,12 @@ The server exposes two main HTTP surfaces:
 
 - `GET /api/sessions/:token` validates an entry token, creates the signed session cookie, and redirects to `/`
 
+Random entry tokens rotate every 60 minutes by default. A previous token remains
+valid for a 120-minute grace period so an already displayed QR code does not
+expire immediately after rotation. Set `ENTRY_PATH_ROTATE_INTERVAL_MIN` and
+`ENTRY_PATH_GRACE_MIN` explicitly to change these values; existing `.env`
+values continue to take precedence over the defaults.
+
 #### Admin API Routes
 
 - `GET /api/admin/server-info/data` returns the current server snapshot:
