@@ -9,6 +9,18 @@ diagnostic/sauvegarde sans divulgation de secrets.
 
 - [x] OPS-001 — exposer `remote-mouse version` localement, sans dépendre du
   daemon, et documenter la commande dans l'aide et le README.
+- [ ] OPS-002 — améliorer la consultation des journaux dans la page web
+  d'information serveur : présentation lisible sur mobile et desktop, filtres
+  par niveau et source, recherche textuelle, pause/reprise du rafraîchissement,
+  défilement automatique désactivable, copie et export des entrées visibles,
+  indication claire lorsque l'historique est tronqué, volume rendu borné et
+  maintien de l'expurgation des secrets dans toutes les vues et exports.
+- [ ] OPS-003 — traduire en anglais tous les messages techniques écrits dans
+  les logs serveur, transports, adaptateurs système et commandes d'exploitation;
+  conserver les données structurées et les noms de `scope` stables, mettre à
+  jour les assertions de tests dépendantes du texte, et ne pas confondre cette
+  migration avec les messages destinés aux utilisateurs, qui restent localisés
+  par l'interface.
 - [ ] Rendre les installateurs idempotents et documenter le mode non interactif.
 - [ ] Générer les secrets à l'installation et valider les prérequis.
 - [ ] Vérifier l'origine des artefacts; séparer téléchargement et activation.

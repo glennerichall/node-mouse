@@ -1,7 +1,6 @@
 # Axe — Sécurité et contrôle d'accès
 
-**État:** SEC-001 à SEC-009 terminés; prochaine tâche: corriger l'écart de
-durée de grâce des jetons.
+**État:** SEC-001 à SEC-010a terminés; prochaine tâche: SEC-010b.
 
 ## Résultat visé
 
@@ -28,6 +27,14 @@ considérer le LAN comme une frontière de confiance.
   une expiration et une limitation stricte des tentatives.
 - [x] **SEC-010a:** rendre la longueur minimale du mot de passe administrateur
   configurable sans divergence entre l'API d'authentification et l'interface.
+- [ ] **SEC-010b:** permettre de reverrouiller explicitement l'administration
+  depuis le panneau latéral : lorsque la session courante est administrateur,
+  remplacer le formulaire et le bouton « Déverrouiller » par un bouton
+  « Verrouiller », révoquer immédiatement son élévation temporaire, puis
+  resynchroniser les autorisations HTTP et Socket.IO sans modifier les autres
+  sessions associées. Le champ doit aussi offrir un contrôle accessible
+  « Afficher/Masquer le mot de passe » : valeur masquée par défaut, affichable
+  en clair à la demande, sans persistance ni modification de la saisie.
 - [ ] Corriger l'écart de durée de grâce documentée/configurée des jetons.
 
 ## Critères d'acceptation
