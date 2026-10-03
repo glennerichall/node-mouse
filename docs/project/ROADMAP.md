@@ -23,7 +23,8 @@ entraîner de renommage.
 | 5 | [03 — REL — Fiabilité](./axes/03-REL-fiabilite.md) | Commandes et prévisualisation prévisibles sous charge | Planifié |
 | 6 | [04 — UX — Expérience utilisateur](./axes/04-UX-experience-utilisateur.md) | Association, contrôle et diagnostic compréhensibles | Planifié |
 | 7 | [06 — PWA — Application web](./axes/06-PWA-application-web.md) | Installation web et transports optionnels sécurisés | Planifié |
-| 8 | [08 — QUA — Qualité](./axes/08-QUA-qualite.md) | Changements vérifiés et versions reproductibles | Continu |
+| 8 | [09 — CODE — Qualité du code](./axes/09-CODE-qualite-et-uniformite.md) | Style cohérent, conventions explicites et dette mesurée | Planifié — CODE-001 |
+| 9 | [08 — QUA — Qualité](./axes/08-QUA-qualite.md) | Changements vérifiés et versions reproductibles | Continu |
 | 99 | [BACK — Backlog transversal](./axes/99-BACK-backlog-transversal.md) | Idées à promouvoir dans un axe avant implantation | Exploration |
 
 ## Ordre de livraison actuel
@@ -31,7 +32,9 @@ entraîner de renommage.
 1. Stabiliser l'entrée Wayland et l'installation Linux dans l'axe `PLAT`.
 2. Améliorer la consultation des journaux et uniformiser leurs messages dans
    l'axe `OPS`.
-3. Reprendre ensuite les travaux structurants des axes `ARCH`, `REL` et `UX`.
+3. Auditer la qualité et l'uniformité du style dans `CODE-001`, puis normaliser
+   les routeurs Express sans changement fonctionnel.
+4. Reprendre ensuite les travaux structurants des axes `ARCH`, `REL` et `UX`.
 
 Cet ordre n'est pas une seconde liste de tâches. Les documents d'axes restent
 les seules sources de vérité sur le contenu et l'avancement des itérations.

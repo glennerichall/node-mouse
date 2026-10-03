@@ -5,6 +5,9 @@
 Assurer des changements vérifiés, des releases reproductibles et une
 compatibilité client/serveur explicitement gérée.
 
+Cet axe couvre la validation et la livraison. Les conventions de programmation,
+leur audit et l'uniformisation du code appartiennent à l'[axe CODE](./09-CODE-qualite-et-uniformite.md).
+
 ## Plan de travail
 
 - [ ] CI pour tests unitaires et Playwright.
