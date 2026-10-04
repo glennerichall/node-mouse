@@ -19,5 +19,6 @@ export function createOsService() {
     app: adapter.app,
     window: adapter.window,
     url: adapter.url,
+    overlay: adapter.overlay,
   };
 }

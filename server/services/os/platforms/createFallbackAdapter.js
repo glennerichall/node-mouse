@@ -27,5 +27,6 @@ export function createFallbackAdapter() {
                 return false;
             },
         },
+        overlay: null,
     };
 }

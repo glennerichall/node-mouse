@@ -17,7 +17,7 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
 - [x] ARCH-008 — uniformiser les routeurs API client avec des handlers nommés
   et exportés, en laissant au routeur uniquement la composition des chemins et
   verbes; préserver les contrats HTTP et couvrir chaque handler directement.
-- [ ] ARCH-009 — séparer le service d'overlay QR de ses implantations système :
+- [x] ARCH-009 — séparer le service d'overlay QR de ses implantations système :
   conserver dans `server/services/overlay` le contrat, l'état et l'orchestration
   indépendants de la plateforme; déplacer sous `server/os/linux/overlay` et
   `server/os/win32/overlay` la création des fenêtres, les processus natifs ou

@@ -3,7 +3,7 @@ import {jest} from '@jest/globals';
 import {
   buildXWaylandOverlayArgs,
   createXWaylandOverlayClient,
-} from '../../server/os/linux/wayland/createXWaylandOverlayClient.js';
+} from '../../server/os/linux/overlay/createXWaylandOverlayClient.js';
 
 function createChild() {
   const child = new EventEmitter();

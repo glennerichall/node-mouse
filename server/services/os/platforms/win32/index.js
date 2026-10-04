@@ -1,6 +1,7 @@
 import {closeAppWindow, openOrFocusApp, resolveApp, toggleAppWindow} from './app.js';
 import {closeActiveWindow, toggleActiveWindow} from './window.js';
 import {openUrl} from './url.js';
+import {createWin32QrOverlayAdapter} from '../../../../os/win32/overlay/createWin32QrOverlayAdapter.js';
 
 export function createWin32OsAdapter() {
   return {
@@ -17,5 +18,6 @@ export function createWin32OsAdapter() {
     url: {
       open: openUrl,
     },
+    overlay: createWin32QrOverlayAdapter(),
   };
 }

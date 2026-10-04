@@ -30,6 +30,9 @@ l'itération et devient append-only dès sa clôture.
 
 - [Architecture — ARCH-008](./architecture-ARCH-008-2026-10-03.md): handlers
   nommés et exportés pour les routes de configuration et abonnements clients.
+- [Architecture — ARCH-009](./architecture-ARCH-009-2026-10-03.md): service
+  d'overlay commun et implantations Linux/Windows déplacées derrière la façade
+  OS.
 - [Exploitation — OPS-001](./operations-OPS-001-2026-10-02.md): commande CLI
   locale affichant la version du paquet installé.
 

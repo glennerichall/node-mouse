@@ -9,14 +9,7 @@ export function getXWaylandOverlayHelperPath() {
 }
 
 export function buildXWaylandOverlayArgs({qrPath, x, y, size, showDelayMs, autoHide}) {
-  return [
-    qrPath,
-    String(x),
-    String(y),
-    String(size),
-    String(showDelayMs),
-    autoHide ? '1' : '0',
-  ];
+  return [qrPath, String(x), String(y), String(size), String(showDelayMs), autoHide ? '1' : '0'];
 }
 
 export function createXWaylandOverlayClient(options, dependencies = {}) {
@@ -39,14 +32,12 @@ export function createXWaylandOverlayClient(options, dependencies = {}) {
       if (line.startsWith('STATE ')) state = line.slice(6).trim();
     }
   });
-  child.once?.('exit', () => {
+  const markClosed = () => {
     closed = true;
     state = 'closed';
-  });
-  child.once?.('error', () => {
-    closed = true;
-    state = 'closed';
-  });
+  };
+  child.once?.('exit', markClosed);
+  child.once?.('error', markClosed);
 
   function send(command) {
     if (closed || !child.stdin?.writable) return false;

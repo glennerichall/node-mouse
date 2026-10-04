@@ -1,6 +1,7 @@
 import {closeAppWindow, openOrFocusApp, resolveApp, toggleAppWindow} from './app.js';
 import {getActiveWindowId, toggleWindow, closeWindow} from './windows.js';
 import {openUrl} from './url.js';
+import {createLinuxQrOverlayAdapter} from '../../../../os/linux/overlay/createLinuxQrOverlayAdapter.js';
 
 export function createLinuxOsAdapter() {
   return {
@@ -29,5 +30,6 @@ export function createLinuxOsAdapter() {
     url: {
       open: openUrl,
     },
+    overlay: createLinuxQrOverlayAdapter(),
   };
 }
