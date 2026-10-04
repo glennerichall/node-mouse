@@ -1,0 +1,35 @@
+# frozen_string_literal: true
+
+require "yaml"
+
+laboratory_directory = __dir__
+config_path = File.join(laboratory_directory, "config.local.yml")
+
+abort "Missing #{config_path}; run dev/vm init from the repository root." unless File.file?(config_path)
+
+laboratory = YAML.safe_load(File.read(config_path), permitted_classes: [], aliases: false)
+machines = laboratory.fetch("machines", {})
+abort "No machine is configured in #{config_path}." if machines.empty?
+
+Vagrant.configure("2") do |config|
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  machines.each do |name, machine|
+    abort "Invalid machine name #{name.inspect}." unless name.match?(/\A[a-zA-Z0-9][a-zA-Z0-9_-]*\z/)
+
+    box = machine.fetch("box", "").strip
+    abort "Machine #{name.inspect} requires a non-empty box in #{config_path}." if box.empty?
+
+    config.vm.define name do |guest|
+      guest.vm.box = box
+      guest.vm.hostname = machine.fetch("hostname", "remote-mouse-#{name}")
+
+      guest.vm.provider :libvirt do |provider|
+        provider.driver = "kvm"
+        provider.cpus = Integer(machine.fetch("cpus", 2))
+        provider.memory = Integer(machine.fetch("memory_mb", 4096))
+        provider.storage_pool_name = machine.fetch("storage_pool", "default")
+      end
+    end
+  end
+end

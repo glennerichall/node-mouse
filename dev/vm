@@ -1,0 +1,179 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+readonly DEV_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+readonly LAB_DIRECTORY="${DEV_DIRECTORY}/vagrant"
+readonly LOCAL_CONFIG="${LAB_DIRECTORY}/config.local.yml"
+readonly EXAMPLE_CONFIG="${LAB_DIRECTORY}/config.example.yml"
+readonly PROVIDER="libvirt"
+
+usage() {
+    cat <<'EOF'
+Usage: dev/vm <command> [machine]
+
+Commands:
+  doctor              Check the Linux Vagrant/libvirt/QEMU toolchain
+  init                 Create config.local.yml from the example
+  status [machine]     Show one machine or the complete laboratory status
+  create <machine>     Create a machine without provisioning it
+  start <machine>      Start and provision a machine
+  stop <machine>       Gracefully stop a machine
+  ssh <machine>        Open an SSH session in a Linux machine
+  destroy <machine>    Interactively destroy one explicitly named machine
+
+Available machines are declared in config.local.yml. VM images, installation
+media, state and secrets are local and ignored by Git.
+EOF
+}
+
+fail() {
+    printf 'remote-mouse vm: %s\n' "$*" >&2
+    exit 1
+}
+
+require_linux() {
+    [[ "$(uname -s)" == "Linux" ]] || fail 'the VM laboratory requires a Linux host'
+}
+
+require_command() {
+    local command_name="$1"
+    local install_hint="$2"
+
+    if ! command -v "${command_name}" >/dev/null 2>&1; then
+        printf 'missing: %-22s %s\n' "${command_name}" "${install_hint}" >&2
+        return 1
+    fi
+}
+
+doctor() {
+    local failed=0
+
+    require_linux
+    printf 'Remote Mouse VM laboratory\n'
+    require_command vagrant 'install Vagrant' || failed=1
+    require_command virsh 'install libvirt clients' || failed=1
+    require_command qemu-system-x86_64 'install QEMU/KVM for x86_64' || failed=1
+
+    if (( failed != 0 )); then
+        return 1
+    fi
+
+    printf 'vagrant: %s\n' "$(vagrant --version)"
+    printf 'libvirt: %s\n' "$(virsh --version)"
+    printf 'qemu:    %s\n' "$(qemu-system-x86_64 --version | head -n 1)"
+
+    if ! vagrant plugin list | grep -Eq '^vagrant-libvirt \('; then
+        printf 'missing: vagrant-libvirt        run: vagrant plugin install vagrant-libvirt\n' >&2
+        failed=1
+    else
+        vagrant plugin list | grep -E '^vagrant-libvirt \('
+    fi
+
+    if [[ ! -e /dev/kvm ]]; then
+        printf 'missing: /dev/kvm               enable hardware virtualization and load kvm\n' >&2
+        failed=1
+    elif [[ ! -r /dev/kvm || ! -w /dev/kvm ]]; then
+        printf 'denied:  /dev/kvm               grant this user access to KVM\n' >&2
+        failed=1
+    else
+        printf 'kvm:     accessible\n'
+    fi
+
+    if ! virsh --connect qemu:///system list --all >/dev/null 2>&1; then
+        printf 'denied:  qemu:///system         start libvirt and grant this user access\n' >&2
+        failed=1
+    else
+        printf 'libvirt: qemu:///system reachable\n'
+    fi
+
+    (( failed == 0 )) || return 1
+    printf 'Toolchain ready. Run dev/vm init next.\n'
+}
+
+initialize() {
+    if [[ -e "${LOCAL_CONFIG}" ]]; then
+        printf '%s already exists; nothing changed.\n' "${LOCAL_CONFIG}"
+        return
+    fi
+
+    cp "${EXAMPLE_CONFIG}" "${LOCAL_CONFIG}"
+    printf 'Created %s. Configure a box before starting a machine.\n' "${LOCAL_CONFIG}"
+}
+
+require_config() {
+    [[ -f "${LOCAL_CONFIG}" ]] || fail 'missing dev/vagrant/config.local.yml; run dev/vm init'
+}
+
+run_vagrant() {
+    require_linux
+    require_config
+    VAGRANT_CWD="${LAB_DIRECTORY}" VAGRANT_DEFAULT_PROVIDER="${PROVIDER}" vagrant "$@"
+}
+
+require_machine() {
+    local machine="${1:-}"
+    [[ -n "${machine}" ]] || fail 'this command requires an explicit machine name'
+    [[ "${machine}" =~ ^[a-zA-Z0-9][a-zA-Z0-9_-]*$ ]] || fail 'invalid machine name'
+    printf '%s' "${machine}"
+}
+
+main() {
+    local command="${1:-}"
+    local machine
+
+    case "${command}" in
+        doctor)
+            [[ $# -eq 1 ]] || fail 'doctor does not accept a machine name'
+            doctor
+            ;;
+        init)
+            [[ $# -eq 1 ]] || fail 'init does not accept a machine name'
+            initialize
+            ;;
+        status)
+            [[ $# -le 2 ]] || fail 'status accepts at most one machine name'
+            if [[ $# -eq 2 ]]; then
+                machine="$(require_machine "$2")"
+                run_vagrant status "${machine}"
+            else
+                run_vagrant status
+            fi
+            ;;
+        create)
+            [[ $# -eq 2 ]] || fail 'create requires one machine name'
+            machine="$(require_machine "$2")"
+            run_vagrant up --provider="${PROVIDER}" --no-provision "${machine}"
+            ;;
+        start)
+            [[ $# -eq 2 ]] || fail 'start requires one machine name'
+            machine="$(require_machine "$2")"
+            run_vagrant up --provider="${PROVIDER}" "${machine}"
+            ;;
+        stop)
+            [[ $# -eq 2 ]] || fail 'stop requires one machine name'
+            machine="$(require_machine "$2")"
+            run_vagrant halt "${machine}"
+            ;;
+        ssh)
+            [[ $# -eq 2 ]] || fail 'ssh requires one machine name'
+            machine="$(require_machine "$2")"
+            run_vagrant ssh "${machine}"
+            ;;
+        destroy)
+            [[ $# -eq 2 ]] || fail 'destroy requires one machine name'
+            machine="$(require_machine "$2")"
+            run_vagrant destroy "${machine}"
+            ;;
+        help|-h|--help)
+            usage
+            ;;
+        *)
+            usage >&2
+            [[ -z "${command}" ]] || printf '\nUnknown command: %s\n' "${command}" >&2
+            return 2
+            ;;
+    esac
+}
+
+main "$@"

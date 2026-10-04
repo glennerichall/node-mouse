@@ -18,6 +18,7 @@ npm-debug.log*
 
 # Tests, coverage, and reports
 coverage/
+dev/
 playwright-report/
 test-results/
 test/

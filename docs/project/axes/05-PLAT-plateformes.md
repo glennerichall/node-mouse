@@ -63,10 +63,15 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   d'installation fourni localement par le développeur; automatiser le
   bootstrap nécessaire aux tests d'installation, de mise à jour et de
   désinstallation sans redistribuer d'image ni de licence Microsoft.
-- [ ] PLAT-005d — fournir des scénarios de validation relançables et un rapport
-  local distinguant clairement résultat automatisé, contrôle visuel et
-  validation sur machine physique; permettre de repartir d'un état propre sans
-  reconstruire les médias de base.
+- [ ] PLAT-005d — fournir des tests intégrés relançables dans les invités. Le
+  parcours d'installation doit couvrir installation neuve, démarrage du
+  service, santé HTTP et version CLI; le parcours de mise à jour doit vérifier
+  la conservation de la configuration, des secrets et des données; le parcours
+  d'utilisation doit vérifier chargement du client, connexion Socket.IO et
+  commandes souris/clavier jusqu'à l'observation des événements dans l'invité.
+  Produire un rapport local distinguant assertions automatisées, contrôles
+  visuels de l'overlay/aperçu et validations sur machine physique, puis permettre
+  de restaurer un état propre sans reconstruire les médias de base.
 - [ ] Renforcer diagnostics VLC, navigateurs et Samsung TV.
 - [ ] Définir un contrat d'adaptateur avant de multiplier les intégrations.
 
