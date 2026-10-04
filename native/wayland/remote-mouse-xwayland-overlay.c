@@ -1,0 +1,284 @@
+#define _POSIX_C_SOURCE 200809L
+
+#include <X11/Xatom.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <errno.h>
+#include <poll.h>
+#include <png.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
+
+typedef struct {
+    Display *display;
+    Window window;
+    GC gc;
+    XImage *image;
+    Atom opacity_atom;
+    int x;
+    int y;
+    unsigned int size;
+    bool requested_visible;
+    bool hover_hidden;
+    bool probing;
+    bool auto_hide;
+    long long hidden_at_ms;
+    unsigned int show_delay_ms;
+} Overlay;
+
+static long long monotonic_ms(void) {
+    struct timespec value;
+    clock_gettime(CLOCK_MONOTONIC, &value);
+    return ((long long)value.tv_sec * 1000LL) + (value.tv_nsec / 1000000LL);
+}
+
+static void emit_state(const char *state) {
+    printf("STATE %s\n", state);
+    fflush(stdout);
+}
+
+static unsigned long channel_to_mask(unsigned char channel, unsigned long mask) {
+    if (mask == 0) return 0;
+    unsigned int shift = 0;
+    while (((mask >> shift) & 1UL) == 0UL) shift++;
+    unsigned long maximum = mask >> shift;
+    return (((unsigned long)channel * maximum + 127UL) / 255UL) << shift;
+}
+
+static void destroy_image(Overlay *overlay) {
+    if (overlay->image != NULL) {
+        XDestroyImage(overlay->image);
+        overlay->image = NULL;
+    }
+}
+
+static bool load_png(Overlay *overlay, const char *path) {
+    png_image png = {0};
+    png.version = PNG_IMAGE_VERSION;
+    if (!png_image_begin_read_from_file(&png, path)) {
+        fprintf(stderr, "Cannot read QR PNG: %s\n", png.message);
+        return false;
+    }
+    png.format = PNG_FORMAT_RGBA;
+    unsigned char *rgba = malloc(PNG_IMAGE_SIZE(png));
+    if (rgba == NULL || !png_image_finish_read(&png, NULL, rgba, 0, NULL)) {
+        fprintf(stderr, "Cannot decode QR PNG: %s\n", png.message);
+        free(rgba);
+        png_image_free(&png);
+        return false;
+    }
+
+    Screen *screen = DefaultScreenOfDisplay(overlay->display);
+    Visual *visual = DefaultVisualOfScreen(screen);
+    int depth = DefaultDepthOfScreen(screen);
+    size_t bytes = (size_t)overlay->size * overlay->size * 4U;
+    char *pixels = calloc(1, bytes);
+    XImage *image = XCreateImage(overlay->display, visual, (unsigned int)depth,
+        ZPixmap, 0, pixels, overlay->size, overlay->size, 32, 0);
+    if (pixels == NULL || image == NULL) {
+        free(pixels);
+        free(rgba);
+        png_image_free(&png);
+        return false;
+    }
+
+    for (unsigned int y = 0; y < overlay->size; y++) {
+        unsigned int source_y = (unsigned int)(((unsigned long long)y * png.height) / overlay->size);
+        for (unsigned int x = 0; x < overlay->size; x++) {
+            unsigned int source_x = (unsigned int)(((unsigned long long)x * png.width) / overlay->size);
+            const unsigned char *source = rgba + (((size_t)source_y * png.width + source_x) * 4U);
+            unsigned long pixel = channel_to_mask(source[0], visual->red_mask)
+                | channel_to_mask(source[1], visual->green_mask)
+                | channel_to_mask(source[2], visual->blue_mask);
+            XPutPixel(image, (int)x, (int)y, pixel);
+        }
+    }
+
+    free(rgba);
+    png_image_free(&png);
+    destroy_image(overlay);
+    overlay->image = image;
+    return true;
+}
+
+static void set_opacity(Overlay *overlay, bool opaque) {
+    unsigned long opacity = opaque ? 0xffffffffUL : 0UL;
+    XChangeProperty(overlay->display, overlay->window, overlay->opacity_atom,
+        XA_CARDINAL, 32, PropModeReplace, (unsigned char *)&opacity, 1);
+}
+
+static void draw_overlay(Overlay *overlay) {
+    if (overlay->image != NULL && overlay->requested_visible && !overlay->hover_hidden) {
+        XPutImage(overlay->display, overlay->window, overlay->gc, overlay->image,
+            0, 0, 0, 0, overlay->size, overlay->size);
+    }
+}
+
+static void show_overlay(Overlay *overlay) {
+    overlay->requested_visible = true;
+    overlay->hover_hidden = false;
+    overlay->probing = false;
+    set_opacity(overlay, true);
+    XMapRaised(overlay->display, overlay->window);
+    draw_overlay(overlay);
+    XFlush(overlay->display);
+    emit_state("visible");
+}
+
+static void hide_overlay(Overlay *overlay, bool hovered) {
+    if (!hovered) overlay->requested_visible = false;
+    overlay->hover_hidden = hovered;
+    overlay->probing = false;
+    overlay->hidden_at_ms = monotonic_ms();
+    set_opacity(overlay, false);
+    XUnmapWindow(overlay->display, overlay->window);
+    XFlush(overlay->display);
+    emit_state(hovered ? "hover-hidden" : "hidden");
+}
+
+static bool pointer_inside(Overlay *overlay) {
+    Window root_returned, child_returned;
+    int root_x, root_y, window_x, window_y;
+    unsigned int mask;
+    if (!XQueryPointer(overlay->display, overlay->window, &root_returned,
+            &child_returned, &root_x, &root_y, &window_x, &window_y, &mask)) {
+        return false;
+    }
+    return window_x >= 0 && window_y >= 0
+        && window_x < (int)overlay->size && window_y < (int)overlay->size;
+}
+
+static void probe_hover(Overlay *overlay) {
+    if (!overlay->requested_visible || !overlay->hover_hidden) return;
+    overlay->probing = true;
+    set_opacity(overlay, false);
+    XMapRaised(overlay->display, overlay->window);
+    XSync(overlay->display, False);
+    bool inside = pointer_inside(overlay);
+    overlay->probing = false;
+    if (inside) {
+        XUnmapWindow(overlay->display, overlay->window);
+        XFlush(overlay->display);
+        return;
+    }
+    show_overlay(overlay);
+}
+
+static bool update_overlay(Overlay *overlay, const char *path, int x, int y,
+        unsigned int size, unsigned int show_delay_ms, bool auto_hide) {
+    bool was_visible = overlay->requested_visible;
+    XUnmapWindow(overlay->display, overlay->window);
+    overlay->x = x;
+    overlay->y = y;
+    overlay->size = size;
+    overlay->show_delay_ms = show_delay_ms;
+    overlay->auto_hide = auto_hide;
+    XMoveResizeWindow(overlay->display, overlay->window, x, y, size, size);
+    if (!load_png(overlay, path)) return false;
+    if (was_visible) show_overlay(overlay);
+    return true;
+}
+
+static bool handle_command(Overlay *overlay, char *line) {
+    if (strncmp(line, "SHOW", 4) == 0) {
+        show_overlay(overlay);
+    } else if (strncmp(line, "HIDE", 4) == 0) {
+        hide_overlay(overlay, false);
+    } else if (strncmp(line, "CLOSE", 5) == 0) {
+        return false;
+    } else if (strncmp(line, "UPDATE ", 7) == 0) {
+        char path[4096];
+        int x, y;
+        unsigned int size;
+        unsigned int show_delay_ms, auto_hide;
+        if (sscanf(line + 7, "%4095s %d %d %u %u %u", path, &x, &y,
+                &size, &show_delay_ms, &auto_hide) == 6 && size > 0) {
+            update_overlay(overlay, path, x, y, size, show_delay_ms, auto_hide != 0);
+        }
+    }
+    return true;
+}
+
+int main(int argc, char **argv) {
+    if (argc != 7) {
+        fprintf(stderr, "Usage: %s PNG X Y SIZE SHOW_DELAY_MS AUTO_HIDE\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+    Overlay overlay = {0};
+    overlay.x = atoi(argv[2]);
+    overlay.y = atoi(argv[3]);
+    overlay.size = (unsigned int)strtoul(argv[4], NULL, 10);
+    overlay.show_delay_ms = (unsigned int)strtoul(argv[5], NULL, 10);
+    overlay.auto_hide = strtoul(argv[6], NULL, 10) != 0;
+    if (overlay.size == 0) return EXIT_FAILURE;
+
+    overlay.display = XOpenDisplay(NULL);
+    if (overlay.display == NULL) {
+        fprintf(stderr, "Cannot open X11/XWayland display\n");
+        return EXIT_FAILURE;
+    }
+    int screen = DefaultScreen(overlay.display);
+    XSetWindowAttributes attributes = {0};
+    attributes.override_redirect = True;
+    attributes.event_mask = EnterWindowMask | LeaveWindowMask | ExposureMask | StructureNotifyMask;
+    overlay.window = XCreateWindow(overlay.display, RootWindow(overlay.display, screen),
+        overlay.x, overlay.y, overlay.size, overlay.size, 0, CopyFromParent, InputOutput,
+        CopyFromParent, CWOverrideRedirect | CWEventMask, &attributes);
+    overlay.gc = XCreateGC(overlay.display, overlay.window, 0, NULL);
+    overlay.opacity_atom = XInternAtom(overlay.display, "_NET_WM_WINDOW_OPACITY", False);
+    XStoreName(overlay.display, overlay.window, "Remote Mouse QR Overlay");
+    if (!load_png(&overlay, argv[1])) {
+        XDestroyWindow(overlay.display, overlay.window);
+        XCloseDisplay(overlay.display);
+        return EXIT_FAILURE;
+    }
+    show_overlay(&overlay);
+    emit_state("ready");
+
+    char *line = NULL;
+    size_t line_size = 0;
+    bool running = true;
+    while (running) {
+        while (XPending(overlay.display)) {
+            XEvent event;
+            XNextEvent(overlay.display, &event);
+            if (event.type == Expose) draw_overlay(&overlay);
+            if (event.type == EnterNotify && overlay.auto_hide && overlay.requested_visible
+                && !overlay.hover_hidden && !overlay.probing) {
+                hide_overlay(&overlay, true);
+            }
+        }
+
+        int timeout = 100;
+        if (overlay.hover_hidden) {
+            long long remaining = (overlay.hidden_at_ms + overlay.show_delay_ms) - monotonic_ms();
+            timeout = remaining > 0 ? (remaining > 100 ? 100 : (int)remaining) : 0;
+        }
+        struct pollfd fds[2] = {
+            {.fd = STDIN_FILENO, .events = POLLIN},
+            {.fd = ConnectionNumber(overlay.display), .events = POLLIN},
+        };
+        int result = poll(fds, 2, timeout);
+        if (result < 0 && errno != EINTR) break;
+        if (fds[0].revents & (POLLHUP | POLLERR)) break;
+        if (fds[0].revents & POLLIN) {
+            ssize_t length = getline(&line, &line_size, stdin);
+            if (length < 0 || !handle_command(&overlay, line)) running = false;
+        }
+        if (overlay.hover_hidden
+            && monotonic_ms() - overlay.hidden_at_ms >= overlay.show_delay_ms) {
+            probe_hover(&overlay);
+        }
+    }
+
+    free(line);
+    destroy_image(&overlay);
+    XFreeGC(overlay.display, overlay.gc);
+    XDestroyWindow(overlay.display, overlay.window);
+    XCloseDisplay(overlay.display);
+    return EXIT_SUCCESS;
+}

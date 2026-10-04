@@ -34,6 +34,10 @@ export function startQrOverlayHoverObserver(services) {
   const qrOverlay = services.getQrOverlay();
   let suppressedAt = 0;
 
+  if (qrOverlay?.managesHover) {
+    return () => {};
+  }
+
   if (!desktopController?.getMousePos || !qrOverlay?.getBounds || !qrOverlay?.setSuppressed) {
     return () => {};
   }

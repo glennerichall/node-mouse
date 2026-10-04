@@ -10,6 +10,20 @@ describe('QR overlay hover observer', () => {
     jest.setSystemTime(new Date('2026-10-03T12:00:00.000Z'));
   });
 
+  it('does not poll the desktop pointer when the overlay owns hover events', () => {
+    const getMousePos = jest.fn();
+    const services = {
+      getDesktopController: () => ({getMousePos}),
+      getQrOverlay: () => ({managesHover: true}),
+    };
+
+    const stop = startQrOverlayHoverObserver(services);
+    jest.advanceTimersByTime(200);
+    stop();
+
+    expect(getMousePos).not.toHaveBeenCalled();
+  });
+
   afterEach(() => {
     jest.useRealTimers();
   });

@@ -252,9 +252,8 @@ package_for_dependency() {
         build) echo "build-essential" ;;
         x11) echo "libx11-dev" ;;
         xtst) echo "libxtst-dev" ;;
-        png) echo "libpng++-dev" ;;
+        png) echo "libpng-dev" ;;
         wmctrl) echo "wmctrl" ;;
-        yad) echo "yad" ;;
         openssl) echo "openssl" ;;
         pkgconfig) echo "pkg-config" ;;
         ei) echo "libei-dev" ;;
@@ -270,7 +269,6 @@ package_for_dependency() {
         xtst) echo "libXtst-devel" ;;
         png) echo "libpng-devel" ;;
         wmctrl) echo "wmctrl" ;;
-        yad) echo "yad" ;;
         openssl) echo "openssl" ;;
         pkgconfig) echo "pkgconf-pkg-config" ;;
         ei) echo "libei-devel" ;;
@@ -286,7 +284,6 @@ package_for_dependency() {
         xtst) echo "libxtst" ;;
         png) echo "libpng" ;;
         wmctrl) echo "wmctrl" ;;
-        yad) echo "yad" ;;
         openssl) echo "openssl" ;;
         pkgconfig) echo "pkgconf" ;;
         ei) echo "libei" ;;
@@ -302,7 +299,6 @@ package_for_dependency() {
         xtst) echo "libXtst-devel" ;;
         png) echo "libpng16-devel" ;;
         wmctrl) echo "wmctrl" ;;
-        yad) echo "yad" ;;
         openssl) echo "openssl" ;;
         pkgconfig) echo "pkg-config" ;;
         ei) echo "libei-devel" ;;
@@ -405,7 +401,6 @@ check_functional_dependencies() {
   can_compile_header '#include <png.h>' || MISSING_DEPS+=("png")
 
   command -v wmctrl >/dev/null 2>&1 || MISSING_DEPS+=("wmctrl")
-  command -v yad >/dev/null 2>&1 || MISSING_DEPS+=("yad")
   command -v openssl >/dev/null 2>&1 || MISSING_DEPS+=("openssl")
 
   if [[ "$WAYLAND_INPUT" == "portal" && ( "$WAYLAND_CHOICE" == "true" || ( "$WAYLAND_CHOICE" == "auto" && "${XDG_SESSION_TYPE:-}" == "wayland" ) ) ]]; then

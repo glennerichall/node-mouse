@@ -10,6 +10,14 @@ const compiler = spawnSync('cc', ['--version']);
 if (compiler.status === 0) {
   execFileSync('bash', ['scripts/build-uinput-bridge.sh'], {stdio: 'inherit'});
   execFileSync('bash', ['scripts/build-xwayland-pointer-bridge.sh'], {stdio: 'inherit'});
+  const overlayDependencies = spawnSync('sh', ['-c', 'test -f /usr/include/X11/Xlib.h && test -f /usr/include/png.h']);
+  if (overlayDependencies.status === 0) {
+    execFileSync('bash', ['scripts/build-xwayland-overlay.sh'], {stdio: 'inherit'});
+  } else {
+    process.stderr.write(
+      'Native QR overlay not built: install the X11 and libpng development headers, then run npm run build:xwayland-overlay.\n',
+    );
+  }
 } else {
   process.stderr.write(
     'Native input bridges not built: install a C compiler, then run npm run build:uinput and npm run build:xwayland-pointer.\n',

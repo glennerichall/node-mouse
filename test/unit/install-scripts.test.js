@@ -84,7 +84,6 @@ if [[ "$1" == "--version" ]]; then echo 10.0.0; fi`,
       gcc: '#!/usr/bin/env bash\nexit 0',
       make: '#!/usr/bin/env bash\nexit 0',
       wmctrl: '#!/usr/bin/env bash\nexit 0',
-      yad: '#!/usr/bin/env bash\nexit 0',
       openssl: '#!/usr/bin/env bash\nexit 0',
       'remote-mouse': '#!/usr/bin/env bash\nexit 0',
       id: `#!/usr/bin/env bash
@@ -169,10 +168,6 @@ exit 0
 echo "wmctrl $*" >> "$REMOTE_MOUSE_TEST_LOG"
 exit 0
 `);
-    await writeExecutable(path.join(mockBin, 'yad'), `#!/usr/bin/env bash
-echo "yad $*" >> "$REMOTE_MOUSE_TEST_LOG"
-exit 0
-`);
     await writeExecutable(path.join(mockBin, 'openssl'), `#!/usr/bin/env bash
 echo "openssl $*" >> "$REMOTE_MOUSE_TEST_LOG"
 if [[ "$1" == "rand" ]]; then
@@ -240,7 +235,7 @@ exit 0
       fs.mkdir(prefix, {recursive: true}),
     ]));
 
-    for (const name of ['node', 'gcc', 'make', 'wmctrl', 'yad', 'remote-mouse']) {
+    for (const name of ['node', 'gcc', 'make', 'wmctrl', 'remote-mouse']) {
       await writeExecutable(path.join(mockBin, name), `#!/usr/bin/env bash
 echo "${name} $*" >> "$REMOTE_MOUSE_TEST_LOG"
 ${name === 'node' ? 'echo "v22.0.0"' : ''}
@@ -334,10 +329,6 @@ exit 0
 `);
     await writeExecutable(path.join(mockBin, 'wmctrl'), `#!/usr/bin/env bash
 echo "wmctrl $*" >> "$REMOTE_MOUSE_TEST_LOG"
-exit 0
-`);
-    await writeExecutable(path.join(mockBin, 'yad'), `#!/usr/bin/env bash
-echo "yad $*" >> "$REMOTE_MOUSE_TEST_LOG"
 exit 0
 `);
     await writeExecutable(path.join(mockBin, 'openssl'), `#!/usr/bin/env bash

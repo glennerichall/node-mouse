@@ -64,46 +64,6 @@ describe('window toggle platform helpers', () => {
     expect(script).not.toContain('$form.Width = 75');
   });
 
-  it('linux QR overlay uses picture mode without dialog text padding', async () => {
-    const {
-      buildQrOverlayYadArgs,
-      buildQrOverlayYadSpawnOptions,
-      parseYadWindowId,
-      shouldKeepQrOverlayProcessOnSuppression,
-    } = await import('../../server/services/overlay/createQrOverlayYad.js');
-
-    const args = buildQrOverlayYadArgs({
-      qrPath: '/tmp/remote-mouse-qr-overlay.png',
-      size: 75,
-      posX: 100,
-      posY: 20,
-      xidPath: '/tmp/remote-mouse-qr-overlay.xid',
-    });
-
-    expect(args).toEqual(expect.arrayContaining([
-      '--picture',
-      '--borders=0',
-      '--size=fit',
-      '--filename=/tmp/remote-mouse-qr-overlay.png',
-      '--print-xid=/tmp/remote-mouse-qr-overlay.xid',
-    ]));
-    expect(args).not.toContain('--size=orig');
-    expect(args).not.toContain('--text=');
-    expect(args.some((arg) => arg.startsWith('--image='))).toBe(false);
-
-    expect(buildQrOverlayYadSpawnOptions({
-      XDG_SESSION_TYPE: 'wayland',
-      WAYLAND_DISPLAY: 'wayland-0',
-      DISPLAY: ':0',
-    })).toEqual(expect.objectContaining({
-      env: expect.objectContaining({GDK_BACKEND: 'x11'}),
-      stdio: 'ignore',
-    }));
-    expect(parseYadWindowId('6291459\n')).toBe('0x600003');
-    expect(shouldKeepQrOverlayProcessOnSuppression({XDG_SESSION_TYPE: 'wayland'})).toBe(true);
-    expect(shouldKeepQrOverlayProcessOnSuppression({XDG_SESSION_TYPE: 'x11'})).toBe(false);
-  });
-
   it('darwin toggle scripts use the zoom button and do not minimize', async () => {
     const {buildActiveWindowScript, buildAppWindowScript} = await import('../../server/os/darwin/applescript.js');
 

@@ -71,6 +71,9 @@ l'itération et devient append-only dès sa clôture.
   Wayland via XWayland.
 - [Plateformes — PLAT-004i](./platforms-PLAT-004i-2026-10-02.md): correction du
   rognage inférieur du QR par le widget image de YAD.
+- [Plateformes — PLAT-004l](./platforms-PLAT-004l-2026-10-03.md): remplacement
+  implanté de YAD par un helper QR X11/XWayland; validation visuelle terrain
+  encore requise avant clôture.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

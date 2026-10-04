@@ -1,7 +1,7 @@
 import os from 'node:os';
 import {createLogger} from '../../application/logger.js';
 import {createNoopOverlay} from './createNoopOverlay.js';
-import {createQrOverlayYad} from './createQrOverlayYad.js';
+import {createQrOverlayXWayland} from './createQrOverlayXWayland.js';
 import {createQrOverlayWin32} from './createQrOverlayWin32.js';
 
 let log;
@@ -15,7 +15,7 @@ export async function createQrOverlay(services) {
   const platform = os.platform();
 
   if (platform === 'linux') {
-    return createQrOverlayYad(services);
+    return createQrOverlayXWayland(services);
   }
 
   if (platform === 'win32') {

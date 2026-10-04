@@ -173,7 +173,7 @@ Typical Debian or Ubuntu packages:
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y build-essential libx11-dev libxtst-dev libpng++-dev wmctrl yad
+sudo apt-get install -y build-essential libx11-dev libxtst-dev libpng-dev wmctrl
 ```
 
 For Wayland development, build the default uinput bridge and grant only the
@@ -191,9 +191,9 @@ set `REMOTE_MOUSE_WAYLAND_INPUT=portal`.
 
 Notes:
 
-- `libx11-dev`, `libxtst-dev`, and `libpng++-dev` are required for the native mouse and keyboard integration
+- `libx11-dev`, `libxtst-dev`, and `libpng-dev` are required for the native input and QR overlay integrations
 - `wmctrl` is used for browser focus and window activation on Linux
-- `yad` is used for the Linux QR overlay
+- the Linux QR overlay is built as an isolated native X11/XWayland helper
 - X11 uses RobotJS; Wayland uses uinput without a system consent dialog. Remote
   Mouse authentication remains responsible for authorizing remote commands
 - with `REMOTE_MOUSE_WAYLAND_INPUT=portal`, an interactive start opens the
