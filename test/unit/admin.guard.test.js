@@ -4,6 +4,7 @@ import {
   REMOTE_EVENT_ADMIN_SERVICE_RESTART,
   REMOTE_EVENT_ADMIN_UPDATE_CHECK,
   REMOTE_EVENT_MOUSE_MOVE,
+  REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN,
 } from '../../utils/remoteCommands.js';
 
 describe('createAdminEventGuardMiddleware', () => {
@@ -30,6 +31,25 @@ describe('createAdminEventGuardMiddleware', () => {
     });
 
     guard([REMOTE_EVENT_MOUSE_MOVE, {dx: 1, dy: 2}], next);
+
+    expect(next.calledOnceWithExactly()).toBe(true);
+    expect(warn.called).toBe(false);
+    expect(respondAdminAction.called).toBe(false);
+  });
+
+  it('does not classify QR and entry-token controls as admin events', () => {
+    const warn = sandbox.stub();
+    const respondAdminAction = sandbox.stub();
+    const next = sandbox.stub();
+    const guard = createAdminEventGuardMiddleware({
+      isAdminActionsEnabled: false,
+      isAdmin: false,
+      client: 'abc12345',
+      log: {warn},
+      respondAdminAction,
+    });
+
+    guard([REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN], next);
 
     expect(next.calledOnceWithExactly()).toBe(true);
     expect(warn.called).toBe(false);

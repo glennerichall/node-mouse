@@ -1,6 +1,6 @@
 # 01 — SEC — Sécurité et contrôle d'accès
 
-**État:** SEC-001 à SEC-011 terminés; aucune tâche de sécurité planifiée.
+**État:** SEC-001 à SEC-011 et SEC-010d terminés; aucune tâche de sécurité planifiée.
 
 ## Résultat visé
 
@@ -40,6 +40,16 @@ considérer le LAN comme une frontière de confiance.
   ou la renouvelle et `DELETE /api/admin-auth/elevation` la supprime; retirer
   le chemin RPC `/unlock` et aligner les noms des handlers sans modifier le
   comportement de sécurité.
+- [x] **SEC-010d:** corriger le panneau latéral pour n'afficher qu'une commande
+  d'élévation dont le libellé et l'action alternent entre « Déverrouiller » et
+  « Verrouiller » selon l'état courant; intégrer le contrôle d'affichage sous
+  forme d'icône œil dans le champ sans réduire sa zone de saisie; placer en haut
+  les commandes QR accessibles aux contrôleurs (`QR serveur`, `QR client`,
+  overlay et rotation du jeton), regrouper ensuite les actions réellement
+  administratives, puis conserver l'élévation tout en bas; utiliser des
+  événements sans préfixe `admin:` pour les commandes QR, accepter
+  temporairement les anciens événements protégés pour les clients déjà chargés
+  et couvrir état, ordre, accessibilité et autorisations par des tests.
 - [x] **SEC-011:** fixer à 120 minutes la durée de grâce par défaut des anciens
   jetons d'entrée dans le code, `.env.example` et les installateurs; conserver
   la surcharge `ENTRY_PATH_GRACE_MIN`, documenter son effet et ajouter un test

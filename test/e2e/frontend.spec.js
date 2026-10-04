@@ -37,6 +37,7 @@ test('main remote page loads and connects to the websocket', async ({page}) => {
 });
 
 test('admin drawer can reveal the password and relock an elevated session', async ({page}) => {
+  await page.setViewportSize({width: 390, height: 844});
   let systemConfig = {
     adminActionsEnabled: false,
     adminUnlocked: false,
@@ -65,9 +66,10 @@ test('admin drawer can reveal the password and relock an elevated session', asyn
   const form = page.locator('#admin-unlock-form');
   const password = page.locator('#admin-password');
   const visibility = page.locator('#btn-admin-password-visibility');
-  const lock = page.locator('#btn-admin-lock');
+  const accessButton = page.locator('#btn-admin-unlock');
+  await form.scrollIntoViewIfNeeded();
   await expect(form).not.toHaveClass(/hidden/);
-  await expect(lock).toHaveClass(/hidden/);
+  await expect(accessButton).toContainText(/Déverrouiller|Unlock/i);
 
   await password.evaluate((element) => {
     element.value = 'temporary-secret';
@@ -77,6 +79,11 @@ test('admin drawer can reveal the password and relock an elevated session', asyn
   await expect(password).toHaveAttribute('type', 'text');
   await expect(password).toHaveValue('temporary-secret');
   await expect(visibility).toHaveAttribute('aria-pressed', 'true');
+  await expect(visibility.locator('svg')).toHaveCount(1);
+  await expect(visibility).not.toContainText(/Afficher|Show/i);
+  const passwordBox = await password.boundingBox();
+  const visibilityBox = await visibility.boundingBox();
+  expect(passwordBox.width).toBeGreaterThan(visibilityBox.width * 3);
 
   systemConfig = {
     ...systemConfig,
@@ -89,16 +96,32 @@ test('admin drawer can reveal the password and relock an elevated session', asyn
     (await fetch('/api/client/config', {cache: 'no-store'})).json()
   )).then((payload) => payload.systemConfig?.adminRelockAvailable)).toBe(true);
   await page.locator('#app').evaluate((element) => element.classList.add('admin-drawer-open'));
-  await expect(form).toHaveClass(/hidden/);
-  await expect(lock).not.toHaveClass(/hidden/);
+  await expect(form).not.toHaveClass(/hidden/);
+  await expect(password.locator('..')).toHaveClass(/hidden/);
+  await expect(accessButton).toContainText(/Verrouiller|Lock/i);
 
   const lockRequest = page.waitForRequest((request) => (
     request.url().endsWith('/api/admin-auth/elevation') && request.method() === 'DELETE'
   ));
-  await lock.evaluate((element) => element.click());
+  await accessButton.evaluate((element) => element.click());
   await lockRequest;
   await expect(form).not.toHaveClass(/hidden/);
-  await expect(lock).toHaveClass(/hidden/);
+  await expect(accessButton).toContainText(/Déverrouiller|Unlock/i);
+});
+
+test('drawer orders controller QR controls before admin controls and access', async ({page}) => {
+  await page.goto('/');
+
+  const order = await page.locator('#left-menu > .admin-group').evaluateAll((groups) => (
+    groups.map((group) => group.className)
+  ));
+
+  expect(order).toEqual([
+    expect.stringContaining('admin-group-qr'),
+    expect.stringContaining('admin-group-updates'),
+    expect.stringContaining('admin-group-access'),
+  ]);
+  await expect(page.locator('#btn-admin-lock')).toHaveCount(0);
 });
 
 test('main remote accordion expands one visible panel at a time', async ({page}) => {

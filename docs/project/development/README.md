@@ -50,6 +50,9 @@ l'itération et devient append-only dès sa clôture.
   immédiat de la session administrateur et affichage contrôlé du mot de passe.
 - [Sécurité — SEC-010c](./security-SEC-010c-2026-10-03.md): modélisation REST
   de l'élévation temporaire de la session administrateur.
+- [Sécurité — SEC-010d](./security-SEC-010d-2026-10-04.md): panneau ordonné par
+  niveau d'accès, bouton d'élévation unique et œil intégré au champ du mot de
+  passe.
 - [Sécurité — SEC-011](./security-SEC-011-2026-10-03.md): durée de grâce des
   anciens jetons d'entrée uniformisée à 120 minutes.
 - [Sécurité — migration vers SEC-010](./security-SEC-010-migration-2026-10-02.md):

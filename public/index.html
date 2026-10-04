@@ -20,17 +20,20 @@
   <main id="app">
     <section id="workspace" data-i18n-aria-label="main.workspaceAria">
       <aside id="left-menu" data-i18n-aria-label="main.serverActionsAria">
-        <div class="admin-group admin-group-updates" data-i18n-aria-label="main.updatesAria">
-          <button id="btn-force-update-check" type="button" data-i18n="main.updateCheckButton" data-i18n-title="main.updateCheckButtonTitle" data-i18n-aria-label="main.updateCheckButtonTitle">Verifier MAJ</button>
-          <button id="btn-install-update" type="button" data-i18n="main.installUpdateButton" data-i18n-title="main.installUpdateButtonTitle" data-i18n-aria-label="main.installUpdateButtonTitle">Installer MAJ</button>
-          <button id="btn-restart-service" type="button" data-i18n="main.restartServiceButton" data-i18n-title="main.restartServiceButtonTitle" data-i18n-aria-label="main.restartServiceButtonTitle">Redemarrer service</button>
-        </div>
-        <hr class="admin-separator" aria-hidden="true" />
-        <div class="admin-group admin-group-display" data-i18n-aria-label="main.displayInfoAria">
+        <div class="admin-group admin-group-qr" data-i18n-aria-label="main.displayInfoAria">
           <div class="admin-split-row">
             <button id="btn-open-qr-browser-server" type="button" data-i18n="main.openQrServer" data-i18n-title="main.openQrServerTitle" data-i18n-aria-label="main.openQrServerTitle">QR serveur</button>
             <button id="btn-open-qr-browser-client" type="button" data-i18n="main.openQrClient" data-i18n-title="main.openQrClientTitle" data-i18n-aria-label="main.openQrClientTitle">QR client</button>
           </div>
+          <button id="btn-toggle-qr-overlay" type="button" data-i18n="main.toggleQrOverlay" data-i18n-title="main.toggleQrOverlayTitle" data-i18n-aria-label="main.toggleQrOverlayTitle">Afficher QR</button>
+          <button id="btn-rotate-entry-token" type="button" data-i18n="main.rotateEntryToken" data-i18n-title="main.rotateEntryTokenTitle" data-i18n-aria-label="main.rotateEntryTokenTitle">Changer le jeton d'entree</button>
+          <button id="btn-open-preferences-page" type="button" data-i18n="main.openPreferences" data-i18n-title="main.openPreferencesTitle" data-i18n-aria-label="main.openPreferencesTitle">Preferences</button>
+        </div>
+        <hr class="admin-separator" aria-hidden="true" />
+        <div class="admin-group admin-group-updates" data-i18n-aria-label="main.updatesAria">
+          <button id="btn-force-update-check" type="button" data-i18n="main.updateCheckButton" data-i18n-title="main.updateCheckButtonTitle" data-i18n-aria-label="main.updateCheckButtonTitle">Verifier MAJ</button>
+          <button id="btn-install-update" type="button" data-i18n="main.installUpdateButton" data-i18n-title="main.installUpdateButtonTitle" data-i18n-aria-label="main.installUpdateButtonTitle">Installer MAJ</button>
+          <button id="btn-restart-service" type="button" data-i18n="main.restartServiceButton" data-i18n-title="main.restartServiceButtonTitle" data-i18n-aria-label="main.restartServiceButtonTitle">Redemarrer service</button>
           <div class="admin-split-row">
             <button id="btn-open-server-info-browser-server" type="button" data-i18n="main.openServerInfoServer" data-i18n-title="main.openServerInfoServerTitle" data-i18n-aria-label="main.openServerInfoServerTitle">Info serveur</button>
             <button id="btn-open-server-info-browser-client" type="button" data-i18n="main.openServerInfoClient" data-i18n-title="main.openServerInfoClientTitle" data-i18n-aria-label="main.openServerInfoClientTitle">Info client</button>
@@ -42,17 +45,18 @@
           <form id="admin-unlock-form" class="admin-unlock-form">
             <div class="admin-password-row">
               <input id="admin-password" type="password" autocomplete="current-password" data-i18n-placeholder="main.adminPasswordPlaceholder" placeholder="Mot de passe administrateur" />
-              <button id="btn-admin-password-visibility" type="button" aria-controls="admin-password" aria-pressed="false" data-i18n="main.adminPasswordShow" data-i18n-aria-label="main.adminPasswordShow">Afficher</button>
+              <button id="btn-admin-password-visibility" type="button" aria-controls="admin-password" aria-pressed="false" data-i18n-aria-label="main.adminPasswordShow">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                  <path class="admin-password-eye-slash" d="M4 4l16 16"></path>
+                </svg>
+              </button>
             </div>
             <button id="btn-admin-unlock" type="submit" data-i18n="main.adminUnlock">Déverrouiller</button>
           </form>
-          <button id="btn-admin-lock" class="hidden" type="button" data-i18n="main.adminLock">Verrouiller</button>
           <p id="admin-unlock-status" class="admin-drawer-message" aria-live="polite"></p>
-          <button id="btn-toggle-qr-overlay" type="button" data-i18n="main.toggleQrOverlay" data-i18n-title="main.toggleQrOverlayTitle" data-i18n-aria-label="main.toggleQrOverlayTitle">Afficher QR</button>
-          <button id="btn-rotate-entry-token" type="button" data-i18n="main.rotateEntryToken" data-i18n-title="main.rotateEntryTokenTitle" data-i18n-aria-label="main.rotateEntryTokenTitle">Changer le jeton d'entree</button>
         </div>
-        <hr class="admin-separator" aria-hidden="true" />
-        <button id="btn-open-preferences-page" type="button" data-i18n="main.openPreferences" data-i18n-title="main.openPreferencesTitle" data-i18n-aria-label="main.openPreferencesTitle">Preferences</button>
         <div class="admin-drawer-footer">
           <p id="admin-actions-disabled-message" class="admin-drawer-message hidden" data-i18n="main.adminActionsDisabledMessage">Les actions admin sont desactivees sur ce serveur.</p>
           <div class="admin-version-row">

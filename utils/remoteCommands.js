@@ -32,6 +32,11 @@ export const REMOTE_EVENT_ADMIN_RESULT = 'admin:result';
 export const REMOTE_EVENT_ADMIN_UPDATE_CHECK = 'admin:update-check';
 export const REMOTE_EVENT_ADMIN_UPDATE_INSTALL = 'admin:update-install';
 export const REMOTE_EVENT_ADMIN_SERVICE_RESTART = 'admin:service-restart';
+export const REMOTE_EVENT_QR_OPEN_BROWSER_SERVER = 'qr:open-browser-server';
+export const REMOTE_EVENT_QR_OPEN_BROWSER_CLIENT = 'qr:open-browser-client';
+export const REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN = 'qr:rotate-entry-token';
+export const REMOTE_EVENT_QR_TOGGLE_OVERLAY = 'qr:toggle-overlay';
+// Legacy event names remain server-side aliases for clients loaded before 6.18.3.
 export const REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER = 'admin:open-qr-browser-server';
 export const REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT = 'admin:open-qr-browser-client';
 export const REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER = 'admin:open-server-info-browser-server';
