@@ -9,8 +9,19 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+/*
+ * Minimal Node-API bridge between DesktopController and Linux uinput.
+ *
+ * Keep pointer and keyboard capabilities on separate virtual devices. Besides
+ * matching their real roles, this prevents Linux input stacks from classifying
+ * one large hybrid device inconsistently. This bridge only writes synthetic
+ * events; it never opens or reads physical /dev/input/event* devices.
+ */
 static int pointer_fd = -1;
 static int keyboard_fd = -1;
+
+/* uinput accepts integer deltas. Preserve fractions between calls so repeated
+ * small movements are not silently discarded. */
 static double pointer_x_remainder, pointer_y_remainder;
 static double scroll_x_remainder, scroll_y_remainder;
 
@@ -23,6 +34,8 @@ static void close_fd(int *fd) {
 
 static void close_devices(void *data) {
     (void)data;
+    /* Destruction is idempotent and is shared by close(), partial-open rollback
+     * and the Node environment cleanup hook. */
     close_fd(&pointer_fd);
     close_fd(&keyboard_fd);
 }
@@ -55,12 +68,15 @@ static bool emit_event(int fd, unsigned short type, unsigned short code, int val
 }
 
 static napi_value sync_events(napi_env env, int fd) {
+    /* A SYN_REPORT commits the preceding logical operation as one input frame. */
     return emit_event(fd, EV_SYN, SYN_REPORT, 0)
         ? undefined_value(env)
         : throw_errno(env, "Cannot write to /dev/uinput");
 }
 
 static int enable_keyboard_keys(int fd) {
+    /* Linux reserves BTN_MISC and higher codes for buttons. Advertising only
+     * lower codes keeps the keyboard distinct from the pointer device. */
     for (int code = 0; code < BTN_MISC; code++) {
         if (ioctl(fd, UI_SET_KEYBIT, code) < 0) return -1;
     }
@@ -70,6 +86,9 @@ static int enable_keyboard_keys(int fd) {
 static int create_pointer_device(void) {
     int fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
     if (fd < 0) return -1;
+
+    /* Advertise only the relative axes and buttons supported by the JS adapter.
+     * Adding keyboard keys here would recreate the hybrid-device problem. */
     const unsigned short buttons[] = {
         BTN_LEFT, BTN_RIGHT, BTN_MIDDLE, BTN_SIDE, BTN_EXTRA, BTN_FORWARD, BTN_BACK, BTN_TASK,
     };
@@ -101,6 +120,8 @@ static int create_pointer_device(void) {
 static int create_keyboard_device(void) {
     int fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
     if (fd < 0) return -1;
+
+    /* The keyboard deliberately has no relative axes or pointer buttons. */
     if (ioctl(fd, UI_SET_EVBIT, EV_KEY) < 0 || enable_keyboard_keys(fd) < 0) {
         close(fd);
         return -1;
@@ -121,6 +142,9 @@ static int create_keyboard_device(void) {
 static napi_value open_bridge(napi_env env, napi_callback_info info) {
     (void)info;
     if (pointer_fd >= 0 && keyboard_fd >= 0) return undefined_value(env);
+
+    /* Opening is transactional: callers may emit events only when both devices
+     * exist. Roll back the pointer if keyboard creation fails. */
     pointer_fd = create_pointer_device();
     if (pointer_fd < 0) return throw_errno(env, "Cannot create uinput pointer");
     keyboard_fd = create_keyboard_device();
@@ -133,6 +157,8 @@ static napi_value open_bridge(napi_env env, napi_callback_info info) {
 }
 
 static bool read_pair(napi_env env, napi_callback_info info, double *first, double *second) {
+    /* Every event method intentionally exposes the same two-number JS contract:
+     * x/y deltas or Linux input code/pressed state. */
     size_t argc = 2;
     napi_value argv[2];
     if (napi_get_cb_info(env, info, &argc, argv, NULL, NULL) != napi_ok || argc != 2 ||
@@ -191,10 +217,12 @@ static napi_value emit_input_key(napi_env env, napi_callback_info info, int fd) 
 }
 
 static napi_value emit_button(napi_env env, napi_callback_info info) {
+    /* Buttons are EV_KEY events too, but belong to the pointer descriptor. */
     return emit_input_key(env, info, pointer_fd);
 }
 
 static napi_value emit_keyboard_key(napi_env env, napi_callback_info info) {
+    /* Keyboard codes must never be written to the pointer descriptor. */
     return emit_input_key(env, info, keyboard_fd);
 }
 
@@ -205,6 +233,7 @@ static napi_value close_bridge(napi_env env, napi_callback_info info) {
 }
 
 static napi_value initialize(napi_env env, napi_value exports) {
+    /* This is the complete synchronous API consumed by loadUInputBridge.js. */
     napi_property_descriptor properties[] = {
         {"open", NULL, open_bridge, NULL, NULL, NULL, napi_default, NULL},
         {"moveRelative", NULL, move_relative, NULL, NULL, NULL, napi_default, NULL},

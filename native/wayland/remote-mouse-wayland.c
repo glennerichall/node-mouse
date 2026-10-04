@@ -14,14 +14,27 @@
 #include <libei.h>
 #include <liboeffis.h>
 
+/*
+ * Portal/libei input helper.
+ *
+ * This executable is intentionally isolated from the Node.js process because a
+ * RemoteDesktop portal session has an asynchronous lifecycle and may be denied
+ * or revoked by the compositor. Commands arrive as line-oriented text on stdin;
+ * machine-readable status objects are emitted on stdout for the Node adapter.
+ */
 static volatile sig_atomic_t running = 1;
 static struct oeffis *portal = NULL;
 static struct ei *ei = NULL;
+
+/* A compositor may expose pointer and keyboard capabilities on either the same
+ * EIS device or two different devices, so both retained references are tracked. */
 static struct ei_device *pointer_device = NULL;
 static struct ei_device *keyboard_device = NULL;
 static uint32_t emulation_sequence = 1;
 
 static void emit_status(const char *status, const char *detail) {
+    /* Escape the small JSON envelope locally to keep stdout protocol-safe even
+     * when a library error contains quotes or line breaks. */
     printf("{\"type\":\"status\",\"status\":\"%s\"", status);
     if (detail && detail[0] != '\0') {
         printf(",\"detail\":\"");
@@ -47,6 +60,7 @@ static void handle_signal(int signal_number) {
 }
 
 static void replace_device(struct ei_device **target, struct ei_device *device) {
+    /* Event-owned devices must be retained before the event is unreferenced. */
     if (*target == device) {
         return;
     }
@@ -66,6 +80,7 @@ static void remove_device(struct ei_device *device) {
 }
 
 static void dispatch_ei(void) {
+    /* Drain all queued EIS events after poll() reports the libei fd readable. */
     ei_dispatch(ei);
     struct ei_event *event;
     while ((event = ei_get_event(ei)) != NULL) {
@@ -74,6 +89,8 @@ static void dispatch_ei(void) {
 
         switch (type) {
             case EI_EVENT_SEAT_ADDED: {
+                /* Binding declares the capabilities Remote Mouse wants; the
+                 * compositor remains free to grant only a subset. */
                 struct ei_seat *seat = ei_event_get_seat(event);
                 ei_seat_bind_capabilities(
                     seat,
@@ -97,6 +114,7 @@ static void dispatch_ei(void) {
                     selected = true;
                 }
                 if (selected) {
+                    /* Each resume starts a distinct libei emulation sequence. */
                     ei_device_start_emulating(device, emulation_sequence++);
                 }
                 if (pointer_device || keyboard_device) {
@@ -124,6 +142,7 @@ static void dispatch_ei(void) {
 }
 
 static bool setup_ei(void) {
+    /* liboeffis transfers the portal-provided EIS descriptor to libei. */
     int fd = oeffis_get_eis_fd(portal);
     if (fd < 0) {
         emit_status("portal-error", strerror(errno));
@@ -146,6 +165,7 @@ static bool setup_ei(void) {
 }
 
 static void dispatch_portal(void) {
+    /* Portal events govern consent and the lifetime of the EIS connection. */
     oeffis_dispatch(portal);
     enum oeffis_event_type event;
     while ((event = oeffis_get_event(portal)) != OEFFIS_EVENT_NONE) {
@@ -170,10 +190,14 @@ static void dispatch_portal(void) {
 }
 
 static void frame(struct ei_device *device) {
+    /* libei batches events until a timestamped frame closes the operation. */
     ei_device_frame(device, ei_now(ei));
 }
 
 static void handle_command(char *line) {
+    /* IPC grammar (one command per line):
+     * MOVE dx dy | BUTTON code pressed | SCROLL dx dy | KEY code pressed |
+     * PING | STOP. Unknown or unavailable-capability commands are ignored. */
     double x, y;
     unsigned int code, pressed;
 
@@ -215,6 +239,8 @@ static void handle_command(char *line) {
 }
 
 static void cleanup(void) {
+    /* A single EIS device may serve both roles. Stop it only once, but release
+     * both retained references acquired by replace_device(). */
     struct ei_device *shared_device = pointer_device && pointer_device == keyboard_device
         ? pointer_device
         : NULL;
@@ -250,6 +276,8 @@ int main(void) {
     emit_status("permission-required", NULL);
     oeffis_create_session(portal, OEFFIS_DEVICE_POINTER | OEFFIS_DEVICE_KEYBOARD);
 
+    /* One poll loop serializes stdin commands, portal state and libei events;
+     * no native worker thread touches the retained objects. */
     char *line = NULL;
     size_t line_capacity = 0;
     while (running) {

@@ -4,6 +4,15 @@
 typedef struct _XDisplay Display;
 typedef unsigned long Window;
 
+/*
+ * Legacy X11/XWayland pointer-position Node-API helper.
+ *
+ * Xlib is resolved dynamically so installing Remote Mouse does not create a
+ * hard link-time dependency on X11. Under XWayland this can only report the
+ * position visible to the X server; it is not a Wayland global-pointer API.
+ * The uinput adapter no longer loads this helper, but it remains available to
+ * older or explicitly X11-oriented integrations.
+ */
 static void *x11_library = NULL;
 static Display *display = NULL;
 static Display *(*x_open_display)(const char *) = NULL;
@@ -12,6 +21,8 @@ static int (*x_query_pointer)(Display *, Window, Window *, Window *, int *, int 
 static int (*x_close_display)(Display *) = NULL;
 
 static void close_display(void *data) {
+    /* Registered as an environment cleanup hook so Node never retains the X11
+     * connection or shared-library handle during teardown. */
     (void)data;
     if (display != NULL) {
         x_close_display(display);
@@ -32,6 +43,8 @@ static napi_value null_value(napi_env env) {
 static napi_value get_position(napi_env env, napi_callback_info info) {
     (void)info;
     if (x11_library == NULL) {
+        /* Resolve the minimal Xlib surface lazily. Missing X11 is represented by
+         * null rather than preventing the addon or server from loading. */
         x11_library = dlopen("libX11.so.6", RTLD_LAZY | RTLD_LOCAL);
         if (x11_library == NULL) return null_value(env);
         *(void **)(&x_open_display) = dlsym(x11_library, "XOpenDisplay");
@@ -48,6 +61,7 @@ static napi_value get_position(napi_env env, napi_callback_info info) {
     if (display == NULL) display = x_open_display(NULL);
     if (display == NULL) return null_value(env);
 
+    /* Query the root window so returned coordinates use the X11 desktop space. */
     Window root = x_default_root_window(display);
     Window returned_root, returned_child;
     int root_x, root_y, window_x, window_y;
