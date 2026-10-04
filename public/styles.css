@@ -61,12 +61,12 @@ body {
   z-index: 25;
   width: 188px;
   min-width: 188px;
-  padding: 8px 8px 10px;
+  padding: clamp(4px, 0.75vh, 8px) 8px;
   box-sizing: border-box;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: clamp(3px, 0.75vh, 8px);
   background: color-mix(in srgb, var(--bg-2) 85%, black);
   border-right: 1px solid rgba(255, 255, 255, 0.1);
   transform: translateX(-100%);
@@ -93,12 +93,12 @@ html[data-theme="light"] #left-menu {
 
 .admin-group {
   display: grid;
-  gap: 8px;
+  gap: clamp(3px, 0.75vh, 8px);
 }
 
 .admin-unlock-form {
   display: grid;
-  gap: 0.45rem;
+  gap: clamp(3px, 0.6vh, 0.45rem);
 }
 
 .admin-unlock-form.hidden,
@@ -109,10 +109,10 @@ html[data-theme="light"] #left-menu {
 .admin-unlock-form input {
   box-sizing: border-box;
   min-width: 0;
-  min-height: 46px;
+  min-height: clamp(34px, 4.8vh, 46px);
   width: 100%;
-  padding: 10px 2.75rem 10px 10px;
-  font-size: 1rem;
+  padding: clamp(6px, 0.9vh, 10px) 2.75rem clamp(6px, 0.9vh, 10px) 10px;
+  font-size: clamp(0.85rem, 1.8vh, 1rem);
 }
 
 .admin-password-row {
@@ -157,13 +157,13 @@ html[data-theme="light"] #left-menu {
 .admin-split-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: clamp(3px, 0.75vh, 8px);
 }
 
 .admin-separator {
   width: 100%;
   height: 1px;
-  margin: 2px 0;
+  margin: 0;
   border: none;
   background: rgba(240, 244, 247, 0.18);
 }
@@ -178,12 +178,12 @@ html[data-theme="light"] .admin-separator {
   border-radius: 8px;
   color: var(--fg);
   background: #2c3943;
-  font-size: 0.9rem;
+  font-size: clamp(0.76rem, 1.65vh, 0.9rem);
   font-weight: 650;
   width: 100%;
-  min-height: 42px;
+  min-height: clamp(30px, 4.35vh, 42px);
   height: auto;
-  padding: 8px 10px;
+  padding: clamp(4px, 0.75vh, 8px) 8px;
   text-align: center;
   line-height: 1.15;
   overflow-wrap: anywhere;

@@ -22,6 +22,8 @@ compréhensibles sur mobile et desktop.
 - [x] UX-006a — contenir tout le panneau latéral dans sa largeur utile, aligner
   à gauche la case d'accélération et borner la pression des mouvements souris
   côté serveur en fusionnant les deltas en attente sans exécutions concurrentes.
+- [x] UX-006b — adapter verticalement les contrôles du panneau latéral à la
+  hauteur disponible afin que son contenu complet reste dans le viewport.
 - [ ] Ajouter retour haptique et commandes configurables.
 - [ ] Tester navigation clavier, lecteurs d'écran, contrastes et traductions.
 

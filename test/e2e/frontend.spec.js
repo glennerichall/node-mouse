@@ -215,11 +215,15 @@ test('preferences persist pointer speed and acceleration locally', async ({page}
   await expect(page.locator('#pointer-speed')).toHaveValue('1.3');
 });
 
-test('drawer content stays inside its width and acceleration aligns left', async ({page}) => {
-  await page.setViewportSize({width: 390, height: 844});
+test('drawer content stays inside its viewport and acceleration aligns left', async ({page}) => {
+  await page.setViewportSize({width: 390, height: 667});
   await page.goto('/');
   await page.locator('#app').evaluate((element) => element.classList.add('admin-drawer-open'));
-  expect(await page.locator('#left-menu').evaluate((menu) => menu.scrollWidth <= menu.clientWidth)).toBe(true);
+  const contained = await page.locator('#left-menu').evaluate((menu) => ({
+    horizontal: menu.scrollWidth <= menu.clientWidth,
+    vertical: menu.scrollHeight <= menu.clientHeight,
+  }));
+  expect(contained).toEqual({horizontal: true, vertical: true});
 
   await page.goto('/ui/admin/preferences');
   const speed = await page.locator('#pointer-speed').boundingBox();

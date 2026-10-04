@@ -32,6 +32,8 @@ l'itération et devient append-only dès sa clôture.
   accélération du pointeur configurables localement par appareil.
 - [Expérience utilisateur — UX-006a](./ux-UX-006a-2026-10-04.md): mise en page
   contenue et fusion des mouvements en attente côté serveur.
+- [Expérience utilisateur — UX-006b](./ux-UX-006b-2026-10-04.md): adaptation
+  verticale du panneau latéral aux écrans mobiles courts.
 
 - [Architecture — ARCH-008](./architecture-ARCH-008-2026-10-03.md): handlers
   nommés et exportés pour les routes de configuration et abonnements clients.
