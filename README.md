@@ -196,6 +196,8 @@ Notes:
 - the Linux QR overlay is built as an isolated native X11/XWayland helper
 - X11 uses RobotJS; Wayland uses uinput without a system consent dialog. Remote
   Mouse authentication remains responsible for authorizing remote commands
+- the uinput bridge exposes separate virtual mouse and keyboard devices without
+  adding permissions beyond the existing restricted access to `/dev/uinput`
 - with `REMOTE_MOUSE_WAYLAND_INPUT=portal`, an interactive start opens the
   local Remote Desktop dialog; for a service, run `remote-mouse wayland authorize`
 - Wayland preview is not yet available; it remains disabled until the PipeWire

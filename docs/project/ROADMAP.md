@@ -17,11 +17,11 @@ entraîner de renommage.
 | Priorité | Axe | Résultat visé | État actuel |
 | ---: | --- | --- | --- |
 | 1 | [05 — PLAT — Plateformes](./axes/05-PLAT-plateformes.md) | Contrôle fiable sur les systèmes officiellement pris en charge | En cours — Wayland et installation Linux |
-| 2 | [07 — OPS — Exploitation](./axes/07-OPS-exploitation.md) | Installation, mise à jour et diagnostic récupérables | En cours — journaux et messages techniques |
-| 3 | [01 — SEC — Sécurité](./axes/01-SEC-securite.md) | Accès authentifiés, autorisations cohérentes et révocables | À jour — SEC-011 terminée |
-| 4 | [02 — ARCH — Architecture](./axes/02-ARCH-architecture-modulaire.md) | Services métier indépendants des transports et adaptateurs | ARCH-009 terminée |
-| 5 | [03 — REL — Fiabilité](./axes/03-REL-fiabilite.md) | Commandes et prévisualisation prévisibles sous charge | Planifié |
-| 6 | [04 — UX — Expérience utilisateur](./axes/04-UX-experience-utilisateur.md) | Association, contrôle et diagnostic compréhensibles | Planifié |
+| 2 | [04 — UX — Expérience utilisateur](./axes/04-UX-experience-utilisateur.md) | Association, contrôle et diagnostic compréhensibles | Planifié — UX-006 |
+| 3 | [07 — OPS — Exploitation](./axes/07-OPS-exploitation.md) | Installation, mise à jour et diagnostic récupérables | En cours — journaux et messages techniques |
+| 4 | [01 — SEC — Sécurité](./axes/01-SEC-securite.md) | Accès authentifiés, autorisations cohérentes et révocables | À jour — SEC-011 terminée |
+| 5 | [02 — ARCH — Architecture](./axes/02-ARCH-architecture-modulaire.md) | Services métier indépendants des transports et adaptateurs | ARCH-009 terminée |
+| 6 | [03 — REL — Fiabilité](./axes/03-REL-fiabilite.md) | Commandes et prévisualisation prévisibles sous charge | Planifié |
 | 7 | [06 — PWA — Application web](./axes/06-PWA-application-web.md) | Installation web et transports optionnels sécurisés | Planifié |
 | 8 | [09 — CODE — Qualité du code](./axes/09-CODE-qualite-et-uniformite.md) | Style cohérent, conventions explicites et dette mesurée | Planifié — CODE-001 |
 | 9 | [08 — QUA — Qualité](./axes/08-QUA-qualite.md) | Changements vérifiés et versions reproductibles | Continu |
@@ -29,12 +29,16 @@ entraîner de renommage.
 
 ## Ordre de livraison actuel
 
-1. Stabiliser l'entrée Wayland et l'installation Linux dans l'axe `PLAT`.
-2. Améliorer la consultation des journaux et uniformiser leurs messages dans
+1. Terminer la validation terrain de l'entrée et de l'overlay Wayland dans
+   l'axe `PLAT`.
+2. Personnaliser côté client la vitesse et l'accélération du pointeur avec
+   `UX-006`, sans correction déduite du système du serveur.
+3. Améliorer la consultation des journaux et uniformiser leurs messages dans
    l'axe `OPS`.
-3. Auditer la qualité et l'uniformité du style dans `CODE-001`, puis normaliser
+4. Auditer la qualité et l'uniformité du style dans `CODE-001`, puis normaliser
    les routeurs Express sans changement fonctionnel.
-4. Reprendre ensuite les travaux structurants des axes `ARCH`, `REL` et `UX`.
+5. Reprendre ensuite les travaux structurants des axes `ARCH` et `REL`, puis
+   les autres itérations UX.
 
 Cet ordre n'est pas une seconde liste de tâches. Les documents d'axes restent
 les seules sources de vérité sur le contenu et l'avancement des itérations.

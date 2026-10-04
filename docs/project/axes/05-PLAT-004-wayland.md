@@ -140,6 +140,22 @@ aucune boucle de dialogues de permission.
 Wayland indépendamment du backend portal, tandis que `portal` reste une
 stratégie configurable et non supprimée.
 
+### PLAT-004g2 — Classification des périphériques uinput
+
+- Créer deux périphériques virtuels distincts : une souris limitée aux axes
+  relatifs et boutons, et un clavier limité aux codes clavier.
+- Acheminer mouvement, défilement et boutons vers la souris, et les frappes vers
+  le clavier, sans changer le contrat `DesktopController`.
+- Conserver strictement l'accès existant à `/dev/uinput`; ne modifier ni règle
+  udev, ni groupe, ni cycle Polkit pour influencer la sensation du pointeur.
+- Retirer du chargement uinput le lecteur de position globale XWayland devenu
+  inutile avec l'overlay natif et conserver la position synthétique interne.
+- Compiler le bridge avec les avertissements traités comme erreurs et couvrir
+  la séparation des capacités ainsi que le routage Node-API par des tests.
+
+**Sortie:** Linux reçoit une souris et un clavier virtuels correctement séparés,
+sans élargissement des privilèges ni prétention de corriger la vitesse perçue.
+
 ### PLAT-004j — Masquage au survol de l'overlay QR
 
 - Reproduire la perte du masquage au survol lorsque YAD est exécuté par
@@ -192,26 +208,18 @@ comme sous X11.
 pointeur; il se masque et revient sans oscillation sous X11 et XWayland, libère
 la zone sous-jacente et reste isolé du serveur principal.
 
-### PLAT-004k — Vitesse et accélération de la souris uinput
+### PLAT-004k — Normalisation de la souris par système — abandonnée
 
-- Établir une référence X11 avec des gestes lents, moyens et rapides, à valeur
-  `input.mouseSpeed` identique, puis rejouer les mêmes deltas sous Wayland.
-- Mesurer séparément les deltas produits par le client, le multiplicateur du
-  contrôleur d'entrée, les valeurs envoyées au bridge uinput et le déplacement
-  observé à l'écran.
-- Vérifier l'effet de l'accumulation des fractions dans le bridge natif et de la
-  courbe d'accélération appliquée par le compositeur au périphérique virtuel.
-- Déterminer si la normalisation appartient à l'adaptateur uinput ou à une
-  configuration de périphérique; ne pas introduire un coefficient Wayland
-  arbitraire dans la logique métier partagée.
-- Préserver la précision des petits mouvements tout en rapprochant la distance
-  et l'accélération des gestes rapides de la référence X11.
-- Ajouter des tests de transformation des deltas et valider plusieurs valeurs
-  de `input.mouseSpeed` sur Ubuntu 26.04 Wayland réel.
+La sensation ne peut pas être déduite de façon fiable à partir de X11, Wayland
+ou Windows : elle dépend aussi du navigateur, de l'appareil tactile, de la
+densité, du compositeur et des préférences de la personne. Un coefficient dans
+l'adaptateur uinput aurait rendu `DesktopController` dépendant d'une hypothèse
+fragile et aurait pu appliquer deux accélérations.
 
-**Sortie:** à réglage identique, la souris Wayland offre une vitesse et une
-progression d'accélération comparables à X11, sans saut sur les petits gestes ni
-régression de la molette ou du glisser-déposer.
+La personnalisation est transférée à `UX-006` : chaque client conserve sur son
+propre appareil sa vitesse et sa courbe d'accélération. Le serveur continue de
+prendre en charge les anciens clients au moyen de `input.mouseSpeed`; aucune
+configuration udev ou élévation Polkit n'est ajoutée pour ce réglage.
 
 ## Sécurité et contraintes
 

@@ -1,5 +1,4 @@
 import {loadUInputBridge} from '../../../os/linux/wayland/loadUInputBridge.js';
-import {loadXWaylandPointerPosition} from '../../../os/linux/wayland/loadXWaylandPointerPosition.js';
 import {createWaylandDesktopController} from './createWaylandDesktopController.js';
 
 function statusFromOpenError(error) {
@@ -11,7 +10,6 @@ function statusFromOpenError(error) {
 
 export async function loadUInput({
     bridgeLoader = loadUInputBridge,
-    pointerPositionLoader = loadXWaylandPointerPosition,
 } = {}) {
     const bridge = bridgeLoader();
     let status = {status: 'ready'};
@@ -42,6 +40,5 @@ export async function loadUInput({
     };
     return createWaylandDesktopController(backend, {
         adapter: 'wayland-uinput',
-        getPointerPosition: pointerPositionLoader(),
     });
 }

@@ -23,6 +23,10 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
 - [ ] PLAT-004g — utiliser un périphérique virtuel `uinput` comme stratégie
   d'entrée Wayland par défaut, conserver RemoteDesktop/libei comme stratégie
   optionnelle et limiter la permission système au seul `/dev/uinput`.
+- [x] PLAT-004g2 — séparer la souris et le clavier virtuels uinput afin que la
+  pile Linux les classifie selon leur fonction, sans ajouter de permission ni
+  de configuration système; retirer du parcours uinput la lecture XWayland de
+  position globale devenue inutile.
 - [x] PLAT-004h — rendre l'overlay QR YAD utilisable sous Wayland en l'exécutant
   explicitement par XWayland lorsque le positionnement global est requis.
 - [x] PLAT-004i — empêcher YAD de rogner le QR lorsque la fenêtre a exactement
@@ -36,12 +40,10 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   globale par un helper natif X11/XWayland spécialisé, événementiel et isolé;
   conserver la génération du PNG dans Node.js, libérer la zone masquée pour les
   clics et valider affichage, survol et retour du QR sous X11 et GNOME Wayland.
-- [ ] PLAT-004k — corriger la vitesse plus faible et l'accélération moins
-  perceptible de la souris avec l'adaptateur Wayland uinput : comparer des
-  séquences de mouvements identiques sous X11 et Wayland, localiser l'écart
-  entre la sensibilité applicative, la conversion en événements relatifs et la
-  courbe du compositeur, puis normaliser le comportement sans modifier la
-  signification du réglage utilisateur `input.mouseSpeed`.
+- [x] PLAT-004k — abandonnée : ne pas déduire la sensation du pointeur à partir
+  du système d'exploitation ni imposer une correction propre à Wayland. La
+  vitesse et l'accélération deviennent des préférences locales du client dans
+  `UX-006`; `input.mouseSpeed` reste compatible avec les anciens clients.
 - [ ] Renforcer diagnostics VLC, navigateurs et Samsung TV.
 - [ ] Définir un contrat d'adaptateur avant de multiplier les intégrations.
 

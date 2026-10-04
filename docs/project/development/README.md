@@ -77,6 +77,12 @@ l'itération et devient append-only dès sa clôture.
 - [Plateformes — PLAT-004l](./platforms-PLAT-004l-2026-10-03.md): remplacement
   implanté de YAD par un helper QR X11/XWayland; validation visuelle terrain
   encore requise avant clôture.
+- [Plateformes — PLAT-004g2](./platforms-PLAT-004g2-2026-10-03.md): séparation
+  des périphériques uinput souris/clavier sans nouvelle permission système et
+  retrait du lecteur de position XWayland du parcours uinput.
+- [Plateformes — abandon de PLAT-004k](./platforms-PLAT-004k-abandon-2026-10-04.md):
+  remplacement d'une normalisation par OS par des préférences locales au client
+  planifiées dans `UX-006`.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.
