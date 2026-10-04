@@ -25,6 +25,28 @@ describe('Wayland desktop controller', () => {
     expect(desktop.getMousePos()).toEqual({x: 4.5, y: -2});
   });
 
+  it('uses the observed XWayland pointer instead of the synthetic uinput position', () => {
+    const backend = createBackend();
+    const getPointerPosition = jest.fn(() => ({x: 1870, y: 42}));
+    const desktop = createWaylandDesktopController(backend, {getPointerPosition});
+
+    expect(desktop.getHoverMousePos()).toBeNull();
+    desktop.moveMouseRelative(4, 3);
+
+    expect(desktop.getHoverMousePos()).toEqual({x: 1874, y: 45});
+    expect(getPointerPosition).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not invent a hover coordinate when XWayland cannot observe the pointer', () => {
+    const desktop = createWaylandDesktopController(createBackend(), {
+      getPointerPosition: () => null,
+    });
+
+    desktop.moveMouseRelative(1870, 42);
+
+    expect(desktop.getMousePos()).toBeNull();
+  });
+
   it('starts portal consent only after explicit authorization', () => {
     const backend = createBackend({status: 'permission-required'});
     const desktop = createWaylandDesktopController(backend);

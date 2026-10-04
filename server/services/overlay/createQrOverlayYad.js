@@ -1,11 +1,13 @@
 import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
+import {readFile, unlink} from 'node:fs/promises';
 import QRCode from 'qrcode';
 import {DEFAULT_PERSISTED_CONFIG} from '../config/defaultConfig.js';
 import {createLogger} from '../../application/logger.js';
 import {createNoopOverlay} from './createNoopOverlay.js';
 import {commandExists} from '../../os/linux/process.js';
+import {loadXWaylandWindowController} from '../../os/linux/wayland/loadXWaylandWindowController.js';
 
 let log;
 function getModuleLog() {
@@ -13,7 +15,12 @@ function getModuleLog() {
   return log;
 }
 
-export function buildQrOverlayYadArgs({qrPath, size, posX, posY}) {
+export function isWaylandSession(env = process.env) {
+  return String(env.XDG_SESSION_TYPE || '').toLowerCase() === 'wayland'
+    || Boolean(env.WAYLAND_DISPLAY);
+}
+
+export function buildQrOverlayYadArgs({qrPath, size, posX, posY, xidPath = ''}) {
   return [
     '--picture',
     '--class=remote-mouse-qr-overlay',
@@ -30,12 +37,12 @@ export function buildQrOverlayYadArgs({qrPath, size, posX, posY}) {
     `--posy=${posY}`,
     '--size=fit',
     `--filename=${qrPath}`,
+    ...(xidPath ? [`--print-xid=${xidPath}`] : []),
   ];
 }
 
 export function buildQrOverlayYadSpawnOptions(env = process.env) {
-  const isWayland = String(env.XDG_SESSION_TYPE || '').toLowerCase() === 'wayland'
-    || Boolean(env.WAYLAND_DISPLAY);
+  const isWayland = isWaylandSession(env);
 
   return {
     stdio: 'ignore',
@@ -43,6 +50,35 @@ export function buildQrOverlayYadSpawnOptions(env = process.env) {
       ? {...env, GDK_BACKEND: 'x11'}
       : env,
   };
+}
+
+export function parseYadWindowId(output) {
+  const match = String(output || '').match(/(?:0x)?([0-9a-f]+)/i);
+  if (!match) {
+    return '';
+  }
+  const base = /^0x/i.test(match[0]) ? 16 : 10;
+  const numericId = Number.parseInt(match[1], base);
+  return Number.isSafeInteger(numericId) && numericId > 0
+    ? `0x${numericId.toString(16)}`
+    : '';
+}
+
+export function shouldKeepQrOverlayProcessOnSuppression(env = process.env) {
+  return isWaylandSession(env);
+}
+
+async function waitForYadWindowId(xidPath, attempts = 20) {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      const windowId = parseYadWindowId(await readFile(xidPath, 'utf8'));
+      if (windowId) {
+        return windowId;
+      }
+    } catch (_error) {}
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  }
+  return '';
 }
 
 export async function createQrOverlayYad(services) {
@@ -78,17 +114,39 @@ export async function createQrOverlayYad(services) {
   }
 
   const qrPath = path.join(os.tmpdir(), 'remote-mouse-qr-overlay.png');
+  const xidPath = path.join(os.tmpdir(), `remote-mouse-qr-overlay-${process.pid}.xid`);
   let child = null;
   let refreshChain = Promise.resolve();
   let visible = getOverlayContext().startsVisible;
   let suppressed = false;
   let overlayBounds = null;
+  let childWindowId = '';
+  const useXWaylandWindowState = shouldKeepQrOverlayProcessOnSuppression();
+  const xWaylandWindow = useXWaylandWindowState
+    ? loadXWaylandWindowController()
+    : null;
 
   const close = () => {
     if (child && !child.killed) {
       child.kill('SIGTERM');
     }
     child = null;
+    childWindowId = '';
+    void unlink(xidPath).catch(() => {});
+  };
+
+  const setChildSuppressed = (nextSuppressed) => {
+    if (!childWindowId || !xWaylandWindow) {
+      return false;
+    }
+    const changed = xWaylandWindow.setVisible(
+      Number.parseInt(childWindowId, 16),
+      !nextSuppressed,
+    );
+    if (!changed) {
+      log.warn({windowId: childWindowId}, 'Impossible de changer la visibilité de l’overlay QR');
+    }
+    return changed;
   };
 
   async function spawnOverlay() {
@@ -112,9 +170,30 @@ export async function createQrOverlayYad(services) {
       height: size,
     };
 
-    const args = buildQrOverlayYadArgs({qrPath, size, posX, posY});
+    if (useXWaylandWindowState) {
+      await unlink(xidPath).catch(() => {});
+    }
+    const args = buildQrOverlayYadArgs({
+      qrPath,
+      size,
+      posX,
+      posY,
+      xidPath: useXWaylandWindowState ? xidPath : '',
+    });
 
     child = spawn('yad', args, buildQrOverlayYadSpawnOptions());
+    const spawnedChild = child;
+    if (useXWaylandWindowState) {
+      void waitForYadWindowId(xidPath).then((windowId) => {
+        if (child !== spawnedChild) {
+          return;
+        }
+        childWindowId = windowId;
+        if (childWindowId && suppressed) {
+          setChildSuppressed(true);
+        }
+      });
+    }
     child.once('error', (error) => {
       log.warn({err: error}, 'Impossible de lancer YAD pour l’overlay QR');
       child = null;
@@ -163,11 +242,19 @@ export async function createQrOverlayYad(services) {
 
     suppressed = normalized;
     if (suppressed) {
-      close();
+      if (useXWaylandWindowState) {
+        setChildSuppressed(true);
+      } else {
+        close();
+      }
       return suppressed;
     }
 
-    void update();
+    if (useXWaylandWindowState && child) {
+      setChildSuppressed(false);
+    } else {
+      void update();
+    }
     return suppressed;
   };
 

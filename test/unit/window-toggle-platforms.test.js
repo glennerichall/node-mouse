@@ -68,6 +68,8 @@ describe('window toggle platform helpers', () => {
     const {
       buildQrOverlayYadArgs,
       buildQrOverlayYadSpawnOptions,
+      parseYadWindowId,
+      shouldKeepQrOverlayProcessOnSuppression,
     } = await import('../../server/services/overlay/createQrOverlayYad.js');
 
     const args = buildQrOverlayYadArgs({
@@ -75,6 +77,7 @@ describe('window toggle platform helpers', () => {
       size: 75,
       posX: 100,
       posY: 20,
+      xidPath: '/tmp/remote-mouse-qr-overlay.xid',
     });
 
     expect(args).toEqual(expect.arrayContaining([
@@ -82,6 +85,7 @@ describe('window toggle platform helpers', () => {
       '--borders=0',
       '--size=fit',
       '--filename=/tmp/remote-mouse-qr-overlay.png',
+      '--print-xid=/tmp/remote-mouse-qr-overlay.xid',
     ]));
     expect(args).not.toContain('--size=orig');
     expect(args).not.toContain('--text=');
@@ -95,6 +99,9 @@ describe('window toggle platform helpers', () => {
       env: expect.objectContaining({GDK_BACKEND: 'x11'}),
       stdio: 'ignore',
     }));
+    expect(parseYadWindowId('6291459\n')).toBe('0x600003');
+    expect(shouldKeepQrOverlayProcessOnSuppression({XDG_SESSION_TYPE: 'wayland'})).toBe(true);
+    expect(shouldKeepQrOverlayProcessOnSuppression({XDG_SESSION_TYPE: 'x11'})).toBe(false);
   });
 
   it('darwin toggle scripts use the zoom button and do not minimize', async () => {

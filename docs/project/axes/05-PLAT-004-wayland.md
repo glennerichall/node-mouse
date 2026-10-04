@@ -159,6 +159,39 @@ stratégie configurable et non supprimée.
 et revient automatiquement lorsque le pointeur quitte cette zone sous Wayland
 comme sous X11.
 
+### PLAT-004l — Helper natif d’overlay QR X11/XWayland
+
+- Remplacer YAD par un petit processus natif consacré à l’overlay; ne pas
+  charger sa boucle graphique ni son cycle de vie dans le processus Node.js.
+- Conserver la génération du QR en PNG avec le module Node.js existant; le
+  helper reçoit le chemin de l’image, la géométrie et les commandes
+  `show`, `hide`, `update` et `close` par un protocole IPC minimal.
+- Couvrir X11 et GNOME Wayland avec un même adaptateur X11/XWayland capable de
+  positionner la fenêtre, afficher le PNG et traiter directement les événements
+  locaux `EnterNotify` et `LeaveNotify`.
+- Lorsque le contenu est masqué, sonder la présence du pointeur par remappage
+  transparent et borné de la fenêtre, sans dépendre d’une position globale
+  Wayland ni conserver une surface plein écran qui intercepte le bureau.
+- Garantir que la zone située sous le QR redevient cliquable pendant le
+  masquage; mesurer et borner toute interception transitoire causée par une
+  sonde de présence.
+- Supprimer de ce parcours YAD, `wmctrl`, le polling `XQueryPointer` global, le
+  worker de position et le suivi hybride des deltas `uinput`; conserver ces
+  dépendances seulement si un autre usage documenté les exige encore.
+- Charger et superviser le helper paresseusement, publier une erreur
+  actionnable lorsqu’il manque et laisser le serveur fonctionner sans overlay
+  en cas de panne ou de plateforme non prise en charge.
+- Tester le protocole, les transitions d’état, les redémarrages et les courses
+  de mapping; valider sur une vraie session X11 et sur Ubuntu 26.04 GNOME
+  Wayland/XWayland, avec souris distante et souris physique.
+- Traiter un futur overlay Wayland réellement natif comme un adaptateur séparé
+  par famille de compositeurs; ne pas présenter ce helper XWayland comme une
+  solution Wayland universelle.
+
+**Sortie:** l’overlay QR ne dépend plus de YAD ni d’une lecture globale du
+pointeur; il se masque et revient sans oscillation sous X11 et XWayland, libère
+la zone sous-jacente et reste isolé du serveur principal.
+
 ### PLAT-004k — Vitesse et accélération de la souris uinput
 
 - Établir une référence X11 avec des gestes lents, moyens et rapides, à valeur

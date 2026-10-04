@@ -1,6 +1,6 @@
 {
   "name": "@velor/remote-mouse",
-  "version": "6.17.3",
+  "version": "6.17.4",
   "type": "module",
   "description": "Remote mouse and keyboard with mobile client",
   "homepage": "https://github.com/glennerichall/node-mouse#readme",
@@ -19,6 +19,7 @@
     "start": "node index.js",
     "dev": "node index.js",
     "build:wayland": "bash scripts/build-wayland-helper.sh",
+    "build:xwayland-pointer": "bash scripts/build-xwayland-pointer-bridge.sh",
     "build:uinput": "bash scripts/build-uinput-bridge.sh",
     "postinstall": "node scripts/build-native-input-if-available.mjs",
     "check:version": "node scripts/check-package-version.mjs",

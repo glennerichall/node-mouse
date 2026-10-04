@@ -8,7 +8,10 @@ describe('loadUInput', () => {
       open: jest.fn(), close: jest.fn(), moveRelative: jest.fn(),
       button: jest.fn(), scroll: jest.fn(), key: jest.fn(),
     };
-    const desktop = await loadUInput({bridgeLoader: () => bridge});
+    const desktop = await loadUInput({
+      bridgeLoader: () => bridge,
+      pointerPositionLoader: () => () => ({x: 100, y: 50}),
+    });
     expect(bridge.open).toHaveBeenCalledTimes(1);
     expect(desktop.getCapabilities()).toEqual(expect.objectContaining({
       adapter: 'wayland-uinput', status: 'ready', pointer: true, keyboard: true,
@@ -19,12 +22,16 @@ describe('loadUInput', () => {
     expect(bridge.moveRelative).toHaveBeenCalledWith(2, -1);
     expect(bridge.button.mock.calls).toEqual([[273, 1], [273, 0]]);
     expect(bridge.key.mock.calls).toEqual([[28, 1], [28, 0]]);
+    expect(desktop.getMousePos()).toEqual({x: 100, y: 50});
   });
 
   it('keeps the server available when /dev/uinput cannot open', async () => {
     const error = Object.assign(new Error('denied'), {code: 'UINPUT_PERMISSION_DENIED'});
     const bridge = {open: jest.fn(() => { throw error; }), close: jest.fn()};
-    const desktop = await loadUInput({bridgeLoader: () => bridge});
+    const desktop = await loadUInput({
+      bridgeLoader: () => bridge,
+      pointerPositionLoader: () => () => null,
+    });
     expect(desktop.getCapabilities()).toEqual(expect.objectContaining({
       status: 'permission-denied', pointer: false, keyboard: false,
     }));

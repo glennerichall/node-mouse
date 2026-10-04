@@ -33,8 +33,13 @@ const MODIFIER_CODES = Object.freeze({
     command: KEY_CODES.command,
 });
 
-export function createWaylandDesktopController(backend, {adapter = 'wayland'} = {}) {
+export function createWaylandDesktopController(backend, {
+    adapter = 'wayland',
+    getPointerPosition = null,
+} = {}) {
     const pointer = {x: 0, y: 0};
+    let hoverPointerInitialized = !getPointerPosition;
+    let hasRemotePointerMotion = false;
 
     function key(code, pressed) {
         if (Number.isInteger(code)) {
@@ -72,7 +77,26 @@ export function createWaylandDesktopController(backend, {adapter = 'wayland'} = 
         const y = Number(dy) || 0;
         pointer.x += x;
         pointer.y += y;
+        hasRemotePointerMotion = true;
         backend.moveRelative(x, y);
+    }
+
+    function getMousePos() {
+        const observedPointer = getPointerPosition?.();
+        if (observedPointer && Number.isFinite(observedPointer.x) && Number.isFinite(observedPointer.y)) {
+            pointer.x = observedPointer.x;
+            pointer.y = observedPointer.y;
+            return {...pointer};
+        }
+        return getPointerPosition ? null : {...pointer};
+    }
+
+    function getHoverMousePos() {
+        if (!hoverPointerInitialized) {
+            hoverPointerInitialized = Boolean(getMousePos());
+            return null;
+        }
+        return hasRemotePointerMotion || !getPointerPosition ? {...pointer} : null;
     }
 
     function buttonCode(button) {
@@ -96,7 +120,8 @@ export function createWaylandDesktopController(backend, {adapter = 'wayland'} = 
                 reason: helperStatus.detail || null,
             };
         },
-        getMousePos: () => ({...pointer}),
+        getMousePos,
+        getHoverMousePos,
         moveMouseRelative,
         moveMouse(x, y) {
             moveMouseRelative(Number(x) - pointer.x, Number(y) - pointer.y);
@@ -123,6 +148,9 @@ export function createWaylandDesktopController(backend, {adapter = 'wayland'} = 
                 throw error;
             },
         },
-        close: () => backend.close(),
+        close() {
+            getPointerPosition?.close?.();
+            backend.close();
+        },
     };
 }

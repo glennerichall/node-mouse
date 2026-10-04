@@ -32,6 +32,10 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   sortie du pointeur, sans oscillation, perte permanente de la fenêtre ni
   régression du comportement X11; couvrir la logique de coordonnées par des
   tests et valider le résultat sur Ubuntu 26.04 Wayland réel.
+- [ ] PLAT-004l — remplacer l’overlay QR YAD et les contournements de position
+  globale par un helper natif X11/XWayland spécialisé, événementiel et isolé;
+  conserver la génération du PNG dans Node.js, libérer la zone masquée pour les
+  clics et valider affichage, survol et retour du QR sous X11 et GNOME Wayland.
 - [ ] PLAT-004k — corriger la vitesse plus faible et l'accélération moins
   perceptible de la souris avec l'adaptateur Wayland uinput : comparer des
   séquences de mouvements identiques sous X11 et Wayland, localiser l'écart

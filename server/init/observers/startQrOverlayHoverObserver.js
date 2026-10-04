@@ -56,11 +56,13 @@ export function startQrOverlayHoverObserver(services) {
       return;
     }
 
-    const cursor = desktopController.getMousePos();
+    const isSuppressed = qrOverlay.isSuppressed?.();
+    const cursor = desktopController.getHoverMousePos
+      ? desktopController.getHoverMousePos()
+      : desktopController.getMousePos();
     const entryMarginPx = Math.max(0, Number(overlayConfig.hoverEntryMarginPx) || 10);
     const exitMarginPx = Math.max(0, Number(overlayConfig.hoverExitMarginPx) || 18);
     const showDelayMs = Math.max(0, Number(overlayConfig.hoverShowDelayMs) || 1200);
-    const isSuppressed = qrOverlay.isSuppressed?.();
 
     let nextSuppressed = false;
     if (isSuppressed) {
