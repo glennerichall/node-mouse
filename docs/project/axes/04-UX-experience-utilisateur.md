@@ -19,6 +19,9 @@ compréhensibles sur mobile et desktop.
   l'envoi des deltas, puis signaler au serveur les deltas déjà ajustés afin
   d'éviter un second multiplicateur tout en conservant la compatibilité avec les
   anciens clients utilisant `input.mouseSpeed`.
+- [x] UX-006a — contenir tout le panneau latéral dans sa largeur utile, aligner
+  à gauche la case d'accélération et borner la pression des mouvements souris
+  côté serveur en fusionnant les deltas en attente sans exécutions concurrentes.
 - [ ] Ajouter retour haptique et commandes configurables.
 - [ ] Tester navigation clavier, lecteurs d'écran, contrastes et traductions.
 

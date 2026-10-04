@@ -82,6 +82,15 @@ html[data-theme="light"] #left-menu {
   transform: translateX(0);
 }
 
+#left-menu > *,
+#left-menu .admin-group,
+#left-menu .admin-split-row,
+#left-menu form {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+}
+
 .admin-group {
   display: grid;
   gap: 8px;
@@ -177,6 +186,7 @@ html[data-theme="light"] .admin-separator {
   padding: 8px 10px;
   text-align: center;
   line-height: 1.15;
+  overflow-wrap: anywhere;
   transition: opacity 180ms ease, transform 180ms ease;
 }
 

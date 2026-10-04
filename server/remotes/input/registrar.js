@@ -6,14 +6,11 @@ import {
   REMOTE_EVENT_MOUSE_MOVE,
   REMOTE_EVENT_MOUSE_SCROLL,
 } from '../../../utils/remoteCommands.js';
+import {createMouseMoveDispatcher} from '../../services/input/createMouseMoveDispatcher.js';
 
 export function createControlEventRegistrar({ mouse, keyboard }) {
     return function registerControlEvents(socket) {
-    socket.on(REMOTE_EVENT_MOUSE_MOVE, async (payload = {}) => {
-      const dx = Number(payload.dx) || 0;
-      const dy = Number(payload.dy) || 0;
-      await mouse.move(dx, dy, {adjusted: payload.adjusted === true});
-    });
+    socket.on(REMOTE_EVENT_MOUSE_MOVE, createMouseMoveDispatcher(mouse));
 
     socket.on(REMOTE_EVENT_MOUSE_CLICK, (payload = {}) => {
       mouse.click(payload.button);

@@ -215,6 +215,18 @@ test('preferences persist pointer speed and acceleration locally', async ({page}
   await expect(page.locator('#pointer-speed')).toHaveValue('1.3');
 });
 
+test('drawer content stays inside its width and acceleration aligns left', async ({page}) => {
+  await page.setViewportSize({width: 390, height: 844});
+  await page.goto('/');
+  await page.locator('#app').evaluate((element) => element.classList.add('admin-drawer-open'));
+  expect(await page.locator('#left-menu').evaluate((menu) => menu.scrollWidth <= menu.clientWidth)).toBe(true);
+
+  await page.goto('/ui/admin/preferences');
+  const speed = await page.locator('#pointer-speed').boundingBox();
+  const acceleration = await page.locator('#pointer-acceleration').boundingBox();
+  expect(Math.abs(speed.x - acceleration.x)).toBeLessThanOrEqual(2);
+});
+
 test('local remote visibility preference affects the main page', async ({page}) => {
   await page.goto('/ui/admin/preferences');
 

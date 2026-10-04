@@ -98,6 +98,11 @@ body {
   align-items: center !important;
 }
 
+.preferences-remote-row input[type="checkbox"] {
+  justify-self: start;
+  margin-inline: 0;
+}
+
 .preferences-remote-label {
   color: var(--muted);
   font-size: 12px;
