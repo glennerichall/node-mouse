@@ -44,11 +44,13 @@ retirée lorsque le pointeur demeure dans la zone.
 - Suite complète finale: 88 suites et 316 tests réussis.
 - Le paquet npm à sec contient le source natif, le script de compilation et les
   nouveaux modules serveur.
+- Validation opérateur réussie sous Ubuntu 26.04 Wayland/XWayland: l'overlay QR
+  s'affiche et son comportement de survol fonctionne avec le helper natif.
 
 ## Blocages / risques / suite
 
 La session d'exécution des outils ne transmet pas de `DISPLAY` X11/XWayland;
-le lancement réel s'arrête donc proprement avec `Cannot open X11/XWayland
-display`. Il reste à valider visuellement l'affichage, le survol, le retour et
-les clics sous-jacents sur la session Ubuntu 26.04 Wayland de l'opérateur, puis
-sur une vraie session X11. La case `PLAT-004l` demeure décochée jusque-là.
+son lancement direct s'arrête donc proprement avec `Cannot open X11/XWayland
+display`. La validation réelle Wayland/XWayland a ensuite été confirmée par
+l'opérateur. Il reste à rejouer le parcours sous une vraie session X11 avant de
+clôturer l'itération et de cocher `PLAT-004l`.
