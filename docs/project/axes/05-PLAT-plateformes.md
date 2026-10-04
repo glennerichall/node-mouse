@@ -48,7 +48,7 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   validation reproductible, exécuté depuis un hôte Linux avec Vagrant,
   `vagrant-libvirt` et QEMU/KVM, sans ajouter de dépendance ni d'artéfact de
   machine virtuelle au produit livré.
-- [ ] PLAT-005a — créer le socle Vagrant du laboratoire : `Vagrantfile`, commande
+- [x] PLAT-005a — créer le socle Vagrant du laboratoire : `Vagrantfile`, commande
   commune, vérification explicite et documentée des versions de Vagrant,
   `vagrant-libvirt`, libvirt et QEMU/KVM, configuration locale non versionnée,
   répertoires de cache et d'état ignorés, cycle de vie
@@ -59,6 +59,12 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   bootstrap idempotent qui installe le projet, ses prérequis de compilation et
   son service; permettre de vérifier séparément installation neuve, mise à
   jour, souris, clavier, aperçu et overlay QR.
+- [x] PLAT-005b1 — ajouter un profil Linux serveur Ubuntu 24.04 reproductible,
+  avec box libvirt et version épinglées, puis y exécuter un test intégré noir
+  couvrant installation depuis le dépôt, service utilisateur, version CLI,
+  santé HTTP, chargement du client et réinstallation sans perte de la
+  configuration. Ce profil valide l'installation commune mais ne vaut pas
+  validation X11 ou Wayland.
 - [ ] PLAT-005c — ajouter un profil Windows 11 avec UEFI, TPM virtuel et média
   d'installation fourni localement par le développeur; automatiser le
   bootstrap nécessaire aux tests d'installation, de mise à jour et de

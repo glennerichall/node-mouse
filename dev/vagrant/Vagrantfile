@@ -3,12 +3,17 @@
 require "yaml"
 
 laboratory_directory = __dir__
+repository_directory = File.expand_path("../..", laboratory_directory)
+profiles_path = File.join(laboratory_directory, "profiles.yml")
 config_path = File.join(laboratory_directory, "config.local.yml")
 
 abort "Missing #{config_path}; run dev/vm init from the repository root." unless File.file?(config_path)
 
-laboratory = YAML.safe_load(File.read(config_path), permitted_classes: [], aliases: false)
-machines = laboratory.fetch("machines", {})
+profiles = YAML.safe_load(File.read(profiles_path), permitted_classes: [], aliases: false)
+local_config = YAML.safe_load(File.read(config_path), permitted_classes: [], aliases: false) || {}
+machines = profiles.fetch("machines", {}).merge(local_config.fetch("machines", {})) do |_name, profile, overrides|
+  profile.merge(overrides)
+end
 abort "No machine is configured in #{config_path}." if machines.empty?
 
 Vagrant.configure("2") do |config|
@@ -22,13 +27,38 @@ Vagrant.configure("2") do |config|
 
     config.vm.define name do |guest|
       guest.vm.box = box
+      guest.vm.box_version = machine["box_version"] if machine["box_version"]
       guest.vm.hostname = machine.fetch("hostname", "remote-mouse-#{name}")
+
+      if machine.fetch("sync_repository", false)
+        guest.vm.synced_folder repository_directory, "/workspace/remote-mouse",
+          type: "rsync",
+          rsync__exclude: ["/.git/", "/node_modules/", "/build/", "/coverage/", "/.data/"]
+      end
+
+      if machine["forwarded_port"]
+        guest.vm.network "forwarded_port",
+          guest: Integer(machine.fetch("guest_port", 3987)),
+          host: Integer(machine.fetch("forwarded_port")),
+          host_ip: "127.0.0.1",
+          auto_correct: true
+      end
 
       guest.vm.provider :libvirt do |provider|
         provider.driver = "kvm"
         provider.cpus = Integer(machine.fetch("cpus", 2))
         provider.memory = Integer(machine.fetch("memory_mb", 4096))
         provider.storage_pool_name = machine.fetch("storage_pool", "default")
+      end
+
+      if machine["profile"] == "linux-install"
+        guest.vm.provision "shell",
+          name: "prepare-integration-test",
+          path: File.join(laboratory_directory, "provision/prepare-linux-install.sh")
+        guest.vm.provision "shell",
+          name: "integration-test",
+          privileged: false,
+          path: File.join(laboratory_directory, "guest-tests/linux-install-and-use.sh")
       end
     end
   end

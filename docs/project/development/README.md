@@ -98,6 +98,9 @@ l'itération et devient append-only dès sa clôture.
 - [Plateformes — abandon de PLAT-004k](./platforms-PLAT-004k-abandon-2026-10-04.md):
   remplacement d'une normalisation par OS par des préférences locales au client
   planifiées dans `UX-006`.
+- [Plateformes — PLAT-005a et PLAT-005b1](./platforms-PLAT-005a-PLAT-005b1-2026-10-04.md):
+  laboratoire Vagrant/QEMU opérationnel et premier test intégré Linux sur VM
+  propre.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

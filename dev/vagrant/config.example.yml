@@ -1,9 +1,7 @@
-# Copy this file with `dev/vm init`, then choose a libvirt-compatible box.
-# Concrete X11, Wayland and Windows 11 profiles are delivered by PLAT-005b/c.
-machines:
-  lab:
-    box: ""
-    hostname: remote-mouse-lab
-    cpus: 2
-    memory_mb: 4096
-    storage_pool: default
+# Local overrides for the committed machines in profiles.yml.
+# Example:
+# machines:
+#   linux-install:
+#     cpus: 4
+#     memory_mb: 6144
+machines: {}

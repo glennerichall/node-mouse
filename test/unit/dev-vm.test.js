@@ -19,6 +19,7 @@ describe('dev/vm', () => {
         expect(result.status).toBe(0);
         expect(result.stdout).toContain('doctor');
         expect(result.stdout).toContain('create <machine>');
+        expect(result.stdout).toContain('test <machine>');
         expect(result.stdout).toContain('destroy <machine>');
     });
 
@@ -58,5 +59,28 @@ describe('dev/vm', () => {
         expect(installer).toContain('sha256sum --check --strict');
         expect(installer).toContain('vagrant plugin install vagrant-libvirt');
         expect(installer).not.toContain('sudo vagrant plugin install');
+    });
+
+    test('pins the Linux installation box and its libvirt profile', () => {
+        const profiles = fs.readFileSync(
+            path.join(repositoryRoot, 'dev/vagrant/profiles.yml'),
+            'utf8'
+        );
+
+        expect(profiles).toContain('linux-install:');
+        expect(profiles).toContain('box: cloud-image/ubuntu-24.04');
+        expect(profiles).toMatch(/box_version: \d+\.\d+\.\d+/);
+        expect(profiles).toContain('profile: linux-install');
+    });
+
+    test('does not pipe curl into grep -q in the guest integration test', () => {
+        const guestTest = fs.readFileSync(
+            path.join(repositoryRoot, 'dev/vagrant/guest-tests/linux-install-and-use.sh'),
+            'utf8'
+        );
+
+        expect(guestTest).toContain('assert_http_contains()');
+        expect(guestTest).toContain('body="$(curl --fail --silent --show-error "${url}")"');
+        expect(guestTest).not.toMatch(/curl[^\n]*\|\s*grep\s+-[^\n]*q/);
     });
 });

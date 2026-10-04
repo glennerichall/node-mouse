@@ -48,10 +48,11 @@ Initialiser le fichier non versionné :
 dev/vm init
 ```
 
-Modifier ensuite `dev/vagrant/config.local.yml` et renseigner une box compatible
-avec le provider libvirt. Le socle ne choisit pas encore une distribution : les
-profils graphiques X11 et Wayland appartiennent à `PLAT-005b`, et Windows 11 à
-`PLAT-005c`.
+Les profils reproductibles sont déclarés dans `profiles.yml`. Le fichier local
+sert uniquement à surcharger leurs ressources ou paramètres sans modifier le
+dépôt. Le premier profil, `linux-install`, utilise une box Ubuntu 24.04 libvirt
+épinglée. Les profils graphiques X11 et Wayland et Windows 11 seront ajoutés
+séparément.
 
 Les répertoires `.vagrant`, `cache`, `images`, `iso`, `secrets` et le fichier de
 configuration locale sont ignorés par Git. Aucun média, disque ou secret ne
@@ -64,16 +65,37 @@ machine :
 
 ```bash
 dev/vm status
-dev/vm create lab
-dev/vm start lab
-dev/vm stop lab
-dev/vm ssh lab
-dev/vm destroy lab
+dev/vm create linux-install
+dev/vm start linux-install
+dev/vm stop linux-install
+dev/vm ssh linux-install
+dev/vm destroy linux-install
 ```
 
 `destroy` conserve la confirmation interactive de Vagrant et ne supprime ni la
 box source ni les médias locaux. `create` démarre la VM sans provisionnement;
 `start` applique le provisionnement déclaré par le futur profil.
+
+## Test intégré d'installation Linux
+
+La première exécution télécharge la box et peut prendre plusieurs minutes :
+
+```bash
+dev/vm start linux-install
+```
+
+Le provisionnement installe réellement le paquet depuis la copie synchronisée
+du dépôt, installe et démarre le service utilisateur, vérifie le CLI et le
+client HTTP, puis rejoue l'installation en vérifiant que configuration et
+secrets sont conservés. Pour relancer le test après une modification :
+
+```bash
+dev/vm test linux-install
+```
+
+Le port invité 3987 est publié sur `127.0.0.1:13987` par défaut. Ce profil sans
+bureau valide le parcours d'installation commun; il ne constitue pas une
+validation X11 ou Wayland.
 
 ## Dépannage
 

@@ -20,6 +20,7 @@ Commands:
   start <machine>      Start and provision a machine
   stop <machine>       Gracefully stop a machine
   ssh <machine>        Open an SSH session in a Linux machine
+  test <machine>       Resync the repository and run the integrated test
   destroy <machine>    Interactively destroy one explicitly named machine
 
 Available machines are declared in config.local.yml. VM images, installation
@@ -159,6 +160,13 @@ main() {
             [[ $# -eq 2 ]] || fail 'ssh requires one machine name'
             machine="$(require_machine "$2")"
             run_vagrant ssh "${machine}"
+            ;;
+        test)
+            [[ $# -eq 2 ]] || fail 'test requires one machine name'
+            machine="$(require_machine "$2")"
+            run_vagrant rsync "${machine}"
+            run_vagrant provision "${machine}" \
+                --provision-with prepare-integration-test,integration-test
             ;;
         destroy)
             [[ $# -eq 2 ]] || fail 'destroy requires one machine name'
