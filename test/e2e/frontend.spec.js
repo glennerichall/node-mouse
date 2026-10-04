@@ -202,6 +202,19 @@ test('preferences persist theme and locale through AppState', async ({page}) => 
   await expect(page.getByRole('heading', {name: 'Local preferences'})).toBeVisible();
 });
 
+test('preferences persist pointer speed and acceleration locally', async ({page}) => {
+  await page.goto('/ui/admin/preferences');
+  await page.locator('#pointer-speed').fill('2');
+  await page.locator('#pointer-acceleration').uncheck();
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('remote-mouse.pointer-speed'))).toBe('2');
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('remote-mouse.pointer-acceleration'))).toBe('false');
+  await page.reload();
+  await expect(page.locator('#pointer-speed')).toHaveValue('2');
+  await expect(page.locator('#pointer-acceleration')).not.toBeChecked();
+  await page.locator('#pointer-preferences-reset').click();
+  await expect(page.locator('#pointer-speed')).toHaveValue('1.3');
+});
+
 test('local remote visibility preference affects the main page', async ({page}) => {
   await page.goto('/ui/admin/preferences');
 

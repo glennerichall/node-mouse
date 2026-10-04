@@ -3,6 +3,9 @@ export const HANDEDNESS_STORAGE_KEY = 'remote-mouse.handedness';
 export const REMOTE_AUTO_HIDE_STORAGE_KEY = 'remote-mouse.remote-auto-hide';
 export const REMOTE_VISIBILITY_STORAGE_KEY = 'remote-mouse.remote-visibility';
 export const BROWSER_VISIBILITY_STORAGE_KEY = 'remote-mouse.browser-visibility';
+export const POINTER_SPEED_STORAGE_KEY = 'remote-mouse.pointer-speed';
+export const POINTER_ACCELERATION_STORAGE_KEY = 'remote-mouse.pointer-acceleration';
+export const POINTER_ACCELERATION_STRENGTH_STORAGE_KEY = 'remote-mouse.pointer-acceleration-strength';
 export const PREFERENCES_STORAGE_CHANGED_EVENT = 'preferences-storage:changed';
 
 export const THEME_CHANGED_EVENT = 'theme:changed';

@@ -273,6 +273,18 @@ describe('service builders resolve providers only in methods', () => {
     expect(desktopController.getMousePos).not.toHaveBeenCalled();
   });
 
+  it('does not apply the legacy server speed to client-adjusted motion', async () => {
+    const desktopController = {moveMouseRelative: jest.fn()};
+    const mouse = createMouseController({
+      getDesktopController: () => desktopController,
+      getConfig: () => ({input: {mouseSpeed: 2, scrollSpeed: 1}}),
+    });
+
+    await mouse.move(3, -4, {adjusted: true});
+
+    expect(desktopController.moveMouseRelative).toHaveBeenCalledWith(3, -4);
+  });
+
   it('mouse controller clamps stale coordinates after display size changes', async () => {
     const desktopController = {
       getScreenSize: jest.fn(() => ({width: 1280, height: 720})),

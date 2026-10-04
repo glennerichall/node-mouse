@@ -18,6 +18,15 @@ function getDragStillDistancePx(handler) {
   return Number.isFinite(value) && value > 0 ? value : 8;
 }
 
+function adjustPointer(handler, dx, dy, elapsed) {
+  const preferences = handler.getPointerPreferences?.() || {};
+  const speed = Number(preferences.speed) || 1.3;
+  const adjusted = preferences.acceleration === false
+    ? {dx, dy}
+    : applyNonLinearAcceleration(dx, dy, elapsed, preferences.accelerationStrength);
+  return {dx: adjusted.dx * speed, dy: adjusted.dy * speed};
+}
+
 function startDrag(state, handler) {
   if (state.dragActive) {
     return;
@@ -127,12 +136,12 @@ export function handleTouchMove(event, { state, handler }) {
       startDrag(state, handler);
       if (Math.abs(dx) + Math.abs(dy) > 0.5) {
         state.moved = true;
-        const adjusted = applyNonLinearAcceleration(dx, dy, elapsed);
+        const adjusted = adjustPointer(handler, dx, dy, elapsed);
         handler.move(adjusted.dx, adjusted.dy);
       }
     } else if (Math.abs(dx) + Math.abs(dy) > 0.5) {
       state.moved = true;
-      const adjusted = applyNonLinearAcceleration(dx, dy, elapsed);
+      const adjusted = adjustPointer(handler, dx, dy, elapsed);
       handler.move(adjusted.dx, adjusted.dy);
     }
 

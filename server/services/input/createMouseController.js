@@ -96,10 +96,10 @@ export function createMouseController(services) {
         rememberScreenSize(screenSizeOverride);
     }
 
-    async function move(dx, dy) {
+    async function move(dx, dy, {adjusted = false} = {}) {
         const desktopController = services.getDesktopController();
         const inputConfig = getInputConfig();
-        const mouseSpeed = Number(inputConfig.mouseSpeed) || DEFAULT_PERSISTED_CONFIG.input.mouseSpeed;
+        const mouseSpeed = adjusted ? 1 : (Number(inputConfig.mouseSpeed) || DEFAULT_PERSISTED_CONFIG.input.mouseSpeed);
         if (typeof desktopController.moveMouseRelative === 'function') {
             desktopController.moveMouseRelative(dx * mouseSpeed, dy * mouseSpeed);
             return;

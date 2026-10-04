@@ -12,7 +12,7 @@ compréhensibles sur mobile et desktop.
 - [ ] UX-003 — améliorer les diagnostics de connexion et afficher le transport.
 - [ ] UX-004 — sélection multi-écrans.
 - [ ] UX-005 — profils de contrôle.
-- [ ] UX-006 — permettre à chaque client de régler localement la vitesse et
+- [x] UX-006 — permettre à chaque client de régler localement la vitesse et
   l'accélération du pointeur sur son appareil, indépendamment du système du
   serveur; persister les préférences dans le navigateur, offrir des valeurs par
   défaut utilisables et une remise à zéro, appliquer vitesse et courbe avant

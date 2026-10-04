@@ -15,6 +15,9 @@ import {
     APP_STATE_HANDEDNESS,
     APP_STATE_PREVIEW_ACTIVITY_AT,
     APP_STATE_REMOTE_AUTO_HIDE,
+    APP_STATE_POINTER_SPEED,
+    APP_STATE_POINTER_ACCELERATION,
+    APP_STATE_POINTER_ACCELERATION_STRENGTH,
 } from '../services/app-state/createAppStateService.js';
 
 const REMOTE_HIDE_DELAY_MS = 300;
@@ -82,11 +85,13 @@ export function createSocketTouchHandler(socket, options = {}) {
     const getHandedness = typeof options.getHandedness === 'function'
         ? options.getHandedness
         : () => 'right';
+    const getPointerPreferences = typeof options.getPointerPreferences === 'function'
+        ? options.getPointerPreferences : () => ({speed: 1.3, acceleration: true, accelerationStrength: 1});
 
     const moveEmitter = createAccumulatedThrottle(
         (payload) => {
             onMouseMove(payload);
-            emitWithTimestamp(socket, REMOTE_EVENT_MOUSE_MOVE, payload);
+            emitWithTimestamp(socket, REMOTE_EVENT_MOUSE_MOVE, {...payload, adjusted: true});
         },
         16,
     );
@@ -118,6 +123,7 @@ export function createSocketTouchHandler(socket, options = {}) {
         },
         getInputConfig,
         getHandedness,
+        getPointerPreferences,
         flush: () => {
             moveEmitter.flushNow();
             scrollEmitter.flushNow();
@@ -224,6 +230,11 @@ export function bindTouchpad(services, dom) {
         onInteractionEnd: showRemotes,
         getInputConfig: () => services.getConfigView().getInputConfig(),
         getHandedness: () => appState.get(APP_STATE_HANDEDNESS),
+        getPointerPreferences: () => ({
+            speed: appState.get(APP_STATE_POINTER_SPEED),
+            acceleration: appState.get(APP_STATE_POINTER_ACCELERATION),
+            accelerationStrength: appState.get(APP_STATE_POINTER_ACCELERATION_STRENGTH),
+        }),
     });
 
     appState.subscribeProperty(APP_STATE_REMOTE_AUTO_HIDE, applyRemoteAutoHideState);

@@ -110,4 +110,19 @@ describe('touch handlers', () => {
     expect(handler.buttonState).not.toHaveBeenCalled();
     expect(handler.move).toHaveBeenCalled();
   });
+
+  it('applies local speed without acceleration when the client disables it', () => {
+    const nowSpy = jest.spyOn(Date, 'now');
+    const state = createState();
+    const handler = {
+      buttonState: jest.fn(), move: jest.fn(), scroll: jest.fn(), click: jest.fn(), flush: jest.fn(),
+      getPointerPreferences: () => ({speed: 2, acceleration: false, accelerationStrength: 1}),
+    };
+    const touchpad = {getBoundingClientRect: () => ({left: 0, top: 0, width: 300, height: 200})};
+    nowSpy.mockReturnValue(1000);
+    handleTouchStart(createTouchEvent({touches: [{clientX: 20, clientY: 20}]}), {touchpad, state, handler});
+    nowSpy.mockReturnValue(1016);
+    handleTouchMove(createTouchEvent({touches: [{clientX: 24, clientY: 17}]}), {state, handler});
+    expect(handler.move).toHaveBeenCalledWith(8, -6);
+  });
 });
