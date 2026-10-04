@@ -24,6 +24,9 @@ compréhensibles sur mobile et desktop.
   côté serveur en fusionnant les deltas en attente sans exécutions concurrentes.
 - [x] UX-006b — adapter verticalement les contrôles du panneau latéral à la
   hauteur disponible afin que son contenu complet reste dans le viewport.
+- [x] UX-006c — signaler visuellement l'élévation administrative par une
+  bordure orangée sur la commande de déverrouillage et, une fois déverrouillées,
+  sur les seules actions qui dépendent du rôle administrateur.
 - [ ] Ajouter retour haptique et commandes configurables.
 - [ ] Tester navigation clavier, lecteurs d'écran, contrastes et traductions.
 

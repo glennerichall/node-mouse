@@ -44,11 +44,53 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   du système d'exploitation ni imposer une correction propre à Wayland. La
   vitesse et l'accélération deviennent des préférences locales du client dans
   `UX-006`; `input.mouseSpeed` reste compatible avec les anciens clients.
+- [ ] PLAT-005 — fournir dans `dev/` un laboratoire de développement et de
+  validation reproductible, exécuté depuis un hôte Linux avec Vagrant,
+  `vagrant-libvirt` et QEMU/KVM, sans ajouter de dépendance ni d'artéfact de
+  machine virtuelle au produit livré.
+- [ ] PLAT-005a — créer le socle Vagrant du laboratoire : `Vagrantfile`, commande
+  commune, vérification explicite et documentée des versions de Vagrant,
+  `vagrant-libvirt`, libvirt et QEMU/KVM, configuration locale non versionnée,
+  répertoires de cache et d'état ignorés, cycle de vie
+  créer/démarrer/arrêter/détruire et documentation de dépannage. Les opérations
+  destructrices doivent exiger la désignation explicite d'une machine et ne
+  jamais supprimer une image source.
+- [ ] PLAT-005b — ajouter deux profils Linux distincts, X11 et Wayland, avec un
+  bootstrap idempotent qui installe le projet, ses prérequis de compilation et
+  son service; permettre de vérifier séparément installation neuve, mise à
+  jour, souris, clavier, aperçu et overlay QR.
+- [ ] PLAT-005c — ajouter un profil Windows 11 avec UEFI, TPM virtuel et média
+  d'installation fourni localement par le développeur; automatiser le
+  bootstrap nécessaire aux tests d'installation, de mise à jour et de
+  désinstallation sans redistribuer d'image ni de licence Microsoft.
+- [ ] PLAT-005d — fournir des scénarios de validation relançables et un rapport
+  local distinguant clairement résultat automatisé, contrôle visuel et
+  validation sur machine physique; permettre de repartir d'un état propre sans
+  reconstruire les médias de base.
 - [ ] Renforcer diagnostics VLC, navigateurs et Samsung TV.
 - [ ] Définir un contrat d'adaptateur avant de multiplier les intégrations.
 
 Pour chaque tâche, lister les versions OS testées, prérequis et limitations
 observées; distinguer capacités simulées et vérifiées sur machine réelle.
+
+## Laboratoire de développement
+
+Le laboratoire `PLAT-005` est un outil de développement de l'axe, pas une
+nouvelle dépendance d'exécution. Le poste hôte officiellement retenu est Linux.
+Vagrant décrit les machines et leur provisionnement, le provider communautaire
+`vagrant-libvirt` gère leur cycle de vie par libvirt, et QEMU/KVM demeure le
+backend de virtualisation. Les versions compatibles de cette chaîne doivent
+être contrôlées avant le démarrage plutôt que laissées implicites. Les images,
+instantanés, ISO, clés et secrets restent hors du dépôt.
+
+Les profils Linux doivent couvrir une vraie session X11 et une vraie session
+Wayland plutôt que de considérer XWayland comme une validation des deux. Le
+profil Windows cible Windows 11 et accepte un média obtenu par le développeur.
+
+macOS demeure une plateforme visée par `PLAT-003`, mais ne fait pas partie du
+laboratoire QEMU exécuté sur un hôte Linux. Sa validation exigera du matériel
+Apple ou un service de CI Apple autorisé; elle ne doit pas bloquer la mise en
+place des profils Linux et Windows.
 
 ## Compatibilité Linux transitoire
 

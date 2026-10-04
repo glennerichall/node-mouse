@@ -60,6 +60,7 @@ export function bindAdminRemoteButtons(services, dom) {
             }
             button.disabled = !adminActionsEnabled;
             button.setAttribute('aria-disabled', adminActionsEnabled ? 'false' : 'true');
+            button.classList.toggle('admin-elevation-active', adminUnlocked);
         }
 
         if (adminActionsDisabledMessage) {

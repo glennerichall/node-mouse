@@ -228,6 +228,16 @@ html[data-theme="light"] #left-menu button:active {
   background: #7e3240;
 }
 
+#left-menu #btn-admin-unlock,
+#left-menu button.admin-elevation-active {
+  border: 2px solid rgba(255, 207, 127, 0.92);
+}
+
+html[data-theme="light"] #left-menu #btn-admin-unlock,
+html[data-theme="light"] #left-menu button.admin-elevation-active {
+  border-color: #a96500;
+}
+
 #admin-app-version {
   margin: 0;
   padding: 0;

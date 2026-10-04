@@ -71,6 +71,8 @@ test('admin drawer can reveal the password and relock an elevated session', asyn
   await form.scrollIntoViewIfNeeded();
   await expect(form).not.toHaveClass(/hidden/);
   await expect(accessButton).toContainText(/Déverrouiller|Unlock/i);
+  await expect(accessButton).toHaveCSS('border-top-width', '2px');
+  await expect(page.locator('#btn-force-update-check')).not.toHaveClass(/admin-elevation-active/);
   await expect(page.locator('#admin-actions-disabled-message')).toContainText(/verrouill|locked/i);
 
   await password.evaluate((element) => {
@@ -102,6 +104,8 @@ test('admin drawer can reveal the password and relock an elevated session', asyn
   await expect(form).not.toHaveClass(/hidden/);
   await expect(password.locator('..')).toHaveClass(/hidden/);
   await expect(accessButton).toContainText(/Verrouiller|Lock/i);
+  await expect(page.locator('#btn-force-update-check')).toHaveClass(/admin-elevation-active/);
+  await expect(page.locator('#btn-open-qr-browser-server')).not.toHaveClass(/admin-elevation-active/);
 
   const lockRequest = page.waitForRequest((request) => (
     request.url().endsWith('/api/admin-auth/elevation') && request.method() === 'DELETE'
