@@ -12,10 +12,6 @@ import {
   REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY,
   REMOTE_EVENT_ADMIN_UPDATE_CHECK,
   REMOTE_EVENT_ADMIN_UPDATE_INSTALL,
-  REMOTE_EVENT_QR_OPEN_BROWSER_CLIENT,
-  REMOTE_EVENT_QR_OPEN_BROWSER_SERVER,
-  REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN,
-  REMOTE_EVENT_QR_TOGGLE_OVERLAY,
 } from '../../../utils/remoteCommands.js';
 
 let log;
@@ -24,7 +20,7 @@ function getModuleLog() {
   return log;
 }
 
-export function createAdminEventRegistrar({ adminActions, getSystemConfig, getAuthorization }) {
+export function createAdminEventRegistrar({adminActions, legacyQrActions, getSystemConfig, getAuthorization}) {
   const log = getModuleLog();
   return function registerAdminEvents(socket) {
     const config = getSystemConfig();
@@ -61,21 +57,17 @@ export function createAdminEventRegistrar({ adminActions, getSystemConfig, getAu
       respondAdminAction('service-restart', result);
     });
 
-    const openQrBrowserServer = async () => {
-      log.info({ client }, `Demande ${REMOTE_EVENT_QR_OPEN_BROWSER_SERVER}`);
-      const result = await adminActions.openQrBrowserServer({ clientId: socket.id });
+    socket.on(REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER, async () => {
+      log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER}`);
+      const result = await legacyQrActions.openQrBrowserServer({ clientId: socket.id });
       respondAdminAction('open-qr-browser-server', result);
-    };
-    socket.on(REMOTE_EVENT_QR_OPEN_BROWSER_SERVER, openQrBrowserServer);
-    socket.on(REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER, openQrBrowserServer);
+    });
 
-    const openQrBrowserClient = async () => {
-      log.info({ client }, `Demande ${REMOTE_EVENT_QR_OPEN_BROWSER_CLIENT}`);
-      const result = await adminActions.openQrBrowserClient({ clientId: socket.id });
+    socket.on(REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT, async () => {
+      log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT}`);
+      const result = await legacyQrActions.openQrBrowserClient({ clientId: socket.id });
       respondAdminAction('open-qr-browser-client', result);
-    };
-    socket.on(REMOTE_EVENT_QR_OPEN_BROWSER_CLIENT, openQrBrowserClient);
-    socket.on(REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT, openQrBrowserClient);
+    });
 
     socket.on(REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER, async () => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER}`);
@@ -89,20 +81,16 @@ export function createAdminEventRegistrar({ adminActions, getSystemConfig, getAu
       respondAdminAction('open-server-info-browser-client', result);
     });
 
-    const rotateEntryToken = async () => {
-      log.info({ client }, `Demande ${REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN}`);
-      const result = await adminActions.rotateEntryToken({ clientId: socket.id });
+    socket.on(REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN, async () => {
+      log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN}`);
+      const result = await legacyQrActions.rotateEntryToken({ clientId: socket.id });
       respondAdminAction('rotate-entry-token', result);
-    };
-    socket.on(REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN, rotateEntryToken);
-    socket.on(REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN, rotateEntryToken);
+    });
 
-    const toggleQrOverlay = async () => {
-      log.info({ client }, `Demande ${REMOTE_EVENT_QR_TOGGLE_OVERLAY}`);
-      const result = await adminActions.toggleQrOverlay({ clientId: socket.id });
+    socket.on(REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY, async () => {
+      log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY}`);
+      const result = await legacyQrActions.toggleQrOverlay({ clientId: socket.id });
       respondAdminAction('toggle-qr-overlay', result);
-    };
-    socket.on(REMOTE_EVENT_QR_TOGGLE_OVERLAY, toggleQrOverlay);
-    socket.on(REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY, toggleQrOverlay);
+    });
   };
 }

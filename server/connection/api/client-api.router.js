@@ -16,6 +16,7 @@ export async function getClientConfig(req, res) {
   res.json({
     config,
     systemConfig: {
+      adminActionsConfigured: Boolean(req.services.getSystemConfig().adminActionsEnabled),
       adminActionsEnabled: req.securityContext?.role === 'admin'
         && Boolean(req.services.getSystemConfig().adminActionsEnabled),
       adminUnlocked: req.securityContext?.role === 'admin',

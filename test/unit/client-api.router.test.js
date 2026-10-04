@@ -38,6 +38,7 @@ describe('client API router', () => {
 
     const payload = json.mock.calls[0][0];
     expect(payload.systemConfig).toEqual({
+      adminActionsConfigured: true,
       adminActionsEnabled: false,
       adminUnlocked: false,
       adminRelockAvailable: false,
@@ -68,6 +69,7 @@ describe('client API router', () => {
 
     expect(json).toHaveBeenCalledWith(expect.objectContaining({
       systemConfig: {
+        adminActionsConfigured: true,
         adminActionsEnabled: true,
         adminUnlocked: true,
         adminRelockAvailable: false,

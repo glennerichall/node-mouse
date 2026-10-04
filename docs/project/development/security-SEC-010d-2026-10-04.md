@@ -51,3 +51,10 @@ Les noms internes historiques `adminActions` et les événements de notification
 pub/sub conservent encore leur vocabulaire administratif. Ils pourront être
 renommés dans une itération d'architecture sans modifier à nouveau le contrat
 Socket.IO public.
+
+## Complément du 2026-10-04
+
+La séparation du registrar et de la façade d'actions QR, initialement laissée en
+suite, a été réalisée immédiatement dans `SEC-010e`. Les noms pub/sub historiques
+restent inchangés puisqu'ils décrivent des notifications internes persistées et
+ne constituent pas le contrat d'autorisation Socket.IO.

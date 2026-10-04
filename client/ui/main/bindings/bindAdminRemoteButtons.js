@@ -48,6 +48,7 @@ export function bindAdminRemoteButtons(services, dom) {
 
     const syncAdminButtonsState = () => {
         const {
+            adminActionsConfigured = true,
             adminActionsEnabled = true,
             adminUnlocked = false,
             adminRelockAvailable = false,
@@ -61,7 +62,13 @@ export function bindAdminRemoteButtons(services, dom) {
             button.setAttribute('aria-disabled', adminActionsEnabled ? 'false' : 'true');
         }
 
-        adminActionsDisabledMessage?.classList.toggle('hidden', adminActionsEnabled);
+        if (adminActionsDisabledMessage) {
+            const messageKey = adminActionsConfigured
+                ? 'main.adminActionsLockedMessage'
+                : 'main.adminActionsDisabledMessage';
+            adminActionsDisabledMessage.textContent = i18n.t(messageKey);
+            adminActionsDisabledMessage.classList.toggle('hidden', adminActionsConfigured && adminUnlocked);
+        }
         relockAvailable = adminRelockAvailable;
         adminUnlockForm?.classList.toggle('hidden', !adminUnlockAvailable && !adminRelockAvailable);
         adminPassword?.parentElement?.classList.toggle('hidden', adminUnlocked);

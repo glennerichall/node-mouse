@@ -72,6 +72,7 @@ export const ja = {
   'main.toggleQrOverlayTitle': 'QR オーバーレイを表示または非表示',
   'main.rotateEntryTokenTitle': '入場トークンのローテーションを強制する',
   'main.adminActionsDisabledMessage': 'サーバーの管理アクションは無効です。',
+  'main.adminActionsLockedMessage': '管理機能はロックされています。',
   'main.adminPasswordPlaceholder': '管理者パスワード',
   'main.adminUnlock': 'ロック解除',
   'main.adminLock': 'ロック',

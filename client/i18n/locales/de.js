@@ -74,6 +74,7 @@ export const de = {
   'main.toggleQrOverlayTitle': 'QR-Overlay ein- oder ausblenden',
   'main.rotateEntryTokenTitle': 'Zugangstoken-Rotation erzwingen',
   'main.adminActionsDisabledMessage': 'Server-Admin-Aktionen sind deaktiviert.',
+  'main.adminActionsLockedMessage': 'Die Administration ist gesperrt.',
   'main.adminPasswordPlaceholder': 'Administratorpasswort',
   'main.adminUnlock': 'Entsperren',
   'main.adminLock': 'Sperren',

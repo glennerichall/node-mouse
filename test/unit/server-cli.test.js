@@ -11,7 +11,7 @@ describe('server cli', () => {
     jest.useRealTimers();
   });
 
-  it('executes the QR command through admin actions', async () => {
+  it('executes the QR command through QR actions', async () => {
     const openQrBrowserServer = jest.fn(async () => ({
       ok: true,
       message: 'Page QR ouverte sur le serveur.',
@@ -19,7 +19,7 @@ describe('server cli', () => {
 
     const result = await executeCliCommand({
       getRemotes: () => ({
-        adminActions: {
+        qrActions: {
           openQrBrowserServer,
         },
       }),

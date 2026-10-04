@@ -72,6 +72,7 @@ export const pt = {
   'main.toggleQrOverlayTitle': 'Mostrar ou ocultar o overlay QR',
   'main.rotateEntryTokenTitle': 'Forcar rotacao do token de entrada',
   'main.adminActionsDisabledMessage': 'As acoes admin do servidor estao desativadas.',
+  'main.adminActionsLockedMessage': 'A administracao esta bloqueada.',
   'main.adminPasswordPlaceholder': 'Senha de administrador',
   'main.adminUnlock': 'Desbloquear',
   'main.adminLock': 'Bloquear',

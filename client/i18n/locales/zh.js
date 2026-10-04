@@ -72,6 +72,7 @@ export const zh = {
   'main.toggleQrOverlayTitle': '显示或隐藏二维码覆盖层',
   'main.rotateEntryTokenTitle': '强制轮换入口令牌',
   'main.adminActionsDisabledMessage': '服务器管理操作已禁用。',
+  'main.adminActionsLockedMessage': '管理功能已锁定。',
   'main.adminPasswordPlaceholder': '管理员密码',
   'main.adminUnlock': '解锁',
   'main.adminLock': '锁定',

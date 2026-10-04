@@ -81,6 +81,7 @@ export const en = {
   'main.rotateEntryToken': 'Rotate entry token',
   'main.rotateEntryTokenTitle': 'Force entry token rotation',
   'main.adminActionsDisabledMessage': 'Server admin actions are disabled.',
+  'main.adminActionsLockedMessage': 'Administration is locked.',
   'main.adminPasswordPlaceholder': 'Administrator password',
   'main.adminUnlock': 'Unlock',
   'main.adminLock': 'Lock',

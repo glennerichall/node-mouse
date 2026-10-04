@@ -53,6 +53,9 @@ l'itération et devient append-only dès sa clôture.
 - [Sécurité — SEC-010d](./security-SEC-010d-2026-10-04.md): panneau ordonné par
   niveau d'accès, bouton d'élévation unique et œil intégré au champ du mot de
   passe.
+- [Sécurité — SEC-010e](./security-SEC-010e-2026-10-04.md): états désactivé et
+  verrouillé distincts, champ agrandi et commandes QR sorties du registrar
+  administrateur.
 - [Sécurité — SEC-011](./security-SEC-011-2026-10-03.md): durée de grâce des
   anciens jetons d'entrée uniformisée à 120 minutes.
 - [Sécurité — migration vers SEC-010](./security-SEC-010-migration-2026-10-02.md):

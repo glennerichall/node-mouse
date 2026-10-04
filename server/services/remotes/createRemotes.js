@@ -4,6 +4,7 @@ import {createPreviewStreamer} from "../../remotes/preview/createPreviewStreamer
 import {createAdminActions} from "../../remotes/admin/index.js";
 import {createVlc} from "../../remotes/vlc/index.js";
 import {createWindowActions} from "../../remotes/window/index.js";
+import {createQrActions} from '../../remotes/qr/index.js';
 
 export function createRemotes(services) {
     const osService = services.getOs();
@@ -11,6 +12,7 @@ export function createRemotes(services) {
     const samsung = createSamsungRemote(services);
     const preview = createPreviewStreamer(services);
     const adminActions = createAdminActions(services);
+    const qrActions = createQrActions(services);
     const vlc = createVlc(services);
     const windowActions = createWindowActions(osService);
 
@@ -19,6 +21,7 @@ export function createRemotes(services) {
         samsung,
         preview,
         adminActions,
+        qrActions,
         vlc,
         windowActions,
     };

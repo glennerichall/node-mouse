@@ -39,6 +39,7 @@ test('main remote page loads and connects to the websocket', async ({page}) => {
 test('admin drawer can reveal the password and relock an elevated session', async ({page}) => {
   await page.setViewportSize({width: 390, height: 844});
   let systemConfig = {
+    adminActionsConfigured: true,
     adminActionsEnabled: false,
     adminUnlocked: false,
     adminRelockAvailable: false,
@@ -70,6 +71,7 @@ test('admin drawer can reveal the password and relock an elevated session', asyn
   await form.scrollIntoViewIfNeeded();
   await expect(form).not.toHaveClass(/hidden/);
   await expect(accessButton).toContainText(/Déverrouiller|Unlock/i);
+  await expect(page.locator('#admin-actions-disabled-message')).toContainText(/verrouill|locked/i);
 
   await password.evaluate((element) => {
     element.value = 'temporary-secret';
@@ -87,6 +89,7 @@ test('admin drawer can reveal the password and relock an elevated session', asyn
 
   systemConfig = {
     ...systemConfig,
+    adminActionsConfigured: true,
     adminActionsEnabled: true,
     adminUnlocked: true,
     adminRelockAvailable: true,
@@ -122,6 +125,27 @@ test('drawer orders controller QR controls before admin controls and access', as
     expect.stringContaining('admin-group-access'),
   ]);
   await expect(page.locator('#btn-admin-lock')).toHaveCount(0);
+});
+
+test('drawer distinguishes disabled admin actions from a locked administration', async ({page}) => {
+  await page.setViewportSize({width: 390, height: 844});
+  await page.route('**/api/client/config', (route) => route.fulfill({
+    contentType: 'application/json',
+    body: JSON.stringify({
+      config: {},
+      systemConfig: {
+        adminActionsConfigured: false,
+        adminActionsEnabled: false,
+        adminUnlocked: false,
+        adminRelockAvailable: false,
+        adminUnlockAvailable: true,
+      },
+    }),
+  }));
+
+  await page.goto('/');
+  await page.locator('#app').evaluate((element) => element.classList.add('admin-drawer-open'));
+  await expect(page.locator('#admin-actions-disabled-message')).toContainText(/désactiv|disabled/i);
 });
 
 test('main remote accordion expands one visible panel at a time', async ({page}) => {

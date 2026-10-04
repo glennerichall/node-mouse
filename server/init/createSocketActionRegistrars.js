@@ -6,6 +6,7 @@ import {createBrowserRegistrar} from '../remotes/browser/registrar.js';
 import {createSamsungRegistrar} from '../remotes/samsung/registrar.js';
 import {createVlcRegistrar} from '../remotes/vlc/registrar.js';
 import {createWindowRegistrar} from '../remotes/window/registrar.js';
+import {createQrEventRegistrar} from '../remotes/qr/registrar.js';
 
 export function createSocketActionRegistrars(services) {
     return [
@@ -23,9 +24,14 @@ export function createSocketActionRegistrars(services) {
             return createBrowserRegistrar({browser, getConfig: services.getConfig})(socket);
         },
         (socket) => {
-            const {adminActions} = services.getRemotes();
+            const {qrActions} = services.getRemotes();
+            return createQrEventRegistrar({qrActions})(socket);
+        },
+        (socket) => {
+            const {adminActions, qrActions} = services.getRemotes();
             return createAdminEventRegistrar({
                 adminActions,
+                legacyQrActions: qrActions,
                 getSystemConfig: services.getSystemConfig,
                 getAuthorization: services.getAuthorization,
             })(socket);

@@ -77,6 +77,7 @@ export const es = {
   'main.toggleQrOverlayTitle': 'Mostrar u ocultar la superposicion QR',
   'main.rotateEntryTokenTitle': 'Forzar la rotacion del token de acceso',
   'main.adminActionsDisabledMessage': 'Las acciones de administracion del servidor estan desactivadas.',
+  'main.adminActionsLockedMessage': 'La administracion esta bloqueada.',
   'main.adminPasswordPlaceholder': 'Contrasena de administrador',
   'main.adminUnlock': 'Desbloquear',
   'main.adminLock': 'Bloquear',

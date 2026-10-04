@@ -100,15 +100,14 @@ html[data-theme="light"] #left-menu {
 .admin-unlock-form input {
   box-sizing: border-box;
   min-width: 0;
+  min-height: 46px;
   width: 100%;
+  padding: 10px 2.75rem 10px 10px;
+  font-size: 1rem;
 }
 
 .admin-password-row {
   position: relative;
-}
-
-.admin-password-row input {
-  padding-right: 2.75rem;
 }
 
 #left-menu .admin-password-row #btn-admin-password-visibility {

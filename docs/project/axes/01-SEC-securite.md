@@ -50,6 +50,11 @@ considérer le LAN comme une frontière de confiance.
   événements sans préfixe `admin:` pour les commandes QR, accepter
   temporairement les anciens événements protégés pour les clients déjà chargés
   et couvrir état, ordre, accessibilité et autorisations par des tests.
+- [x] **SEC-010e:** distinguer dans l'API et le panneau une administration
+  verrouillée d'actions administratives désactivées par configuration; rendre le
+  champ du mot de passe plus haut; sortir les événements `qr:*`, leur registrar,
+  leur façade d'actions et la commande CLI du parcours admin, tout en conservant
+  les anciens événements `admin:*` comme alias protégés de compatibilité.
 - [x] **SEC-011:** fixer à 120 minutes la durée de grâce par défaut des anciens
   jetons d'entrée dans le code, `.env.example` et les installateurs; conserver
   la surcharge `ENTRY_PATH_GRACE_MIN`, documenter son effet et ajouter un test
