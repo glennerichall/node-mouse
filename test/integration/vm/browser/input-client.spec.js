@@ -1,9 +1,6 @@
 import {expect, test} from '@playwright/test';
 
 test('sends mouse and keyboard commands through the shipped Socket.IO client', async ({page}) => {
-  if (process.env.REMOTE_MOUSE_VM_TOGGLE_QR === 'true') {
-    await page.addInitScript(() => { globalThis.__REMOTE_MOUSE_TOGGLE_QR__ = true; });
-  }
   if (process.env.REMOTE_MOUSE_VM_ASSERT_PREVIEW === 'true') {
     await page.addInitScript(() => { globalThis.__REMOTE_MOUSE_ASSERT_PREVIEW__ = true; });
   }
@@ -30,9 +27,6 @@ test('sends mouse and keyboard commands through the shipped Socket.IO client', a
     socket.emit('keyboard:text', {text: 'a', ts: Date.now()});
     socket.emit('keyboard:key', {key: 'enter', ts: Date.now()});
     socket.emit('mouse:click', {button: 'left', ts: Date.now()});
-    if (globalThis.__REMOTE_MOUSE_TOGGLE_QR__) {
-      socket.emit('qr:toggle-overlay', {ts: Date.now()});
-    }
     const receivedPreview = await previewFrame;
     socket.close();
     return {receivedPreview};

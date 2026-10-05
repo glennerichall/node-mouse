@@ -71,7 +71,7 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   produisent les événements attendus sur les périphériques virtuels uinput.
   `npm run test:all` doit agréger les suites unitaires, navigateur et VM, tandis
   que les validations visuelles Wayland restent explicitement séparées.
-- [ ] PLAT-005b3 — provisionner une VM Ubuntu 24.04 avec une vraie session
+- [x] PLAT-005b3 — provisionner une VM Ubuntu 24.04 avec une vraie session
   Xfce/Xorg ouverte pour l'utilisateur de test; installer Remote Mouse en mode
   X11 et automatiser avec Jest/Playwright la souris, le clavier et la capture.
   L'overlay QR doit produire un contrôle visuel conservé comme artefact sans
@@ -80,9 +80,11 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   les mouvements RobotJS, les événements clavier et une trame d'aperçu au
   moyen du client Playwright réel; conserver une capture du bureau comme
   artefact du contrôle visuel.
-- [ ] PLAT-005b3b — corriger puis valider visuellement l'overlay QR dans la VM
-  X11 : le helper natif reste actif et annonce l'état visible, mais la capture
-  du bureau du 5 octobre 2026 ne contient pas le QR.
+- [x] PLAT-005b3b — rendre la validation de l'overlay X11 déterministe : ne
+  pas basculer sa visibilité dans le test de saisie, vérifier que la fenêtre
+  reste mappée et qu'elle revient après un survol, puis conserver une capture
+  visuelle où le QR apparaît. Le test précédent masquait le QR en envoyant une
+  commande de bascule avant la capture.
 - [ ] PLAT-005c — ajouter un profil Windows 11 avec UEFI, TPM virtuel et média
   d'installation fourni localement par le développeur; automatiser le
   bootstrap nécessaire aux tests d'installation, de mise à jour et de

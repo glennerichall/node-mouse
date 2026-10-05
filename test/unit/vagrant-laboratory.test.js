@@ -33,6 +33,18 @@ describe('Vagrant laboratory', () => {
     expect(browser).toContain("socket.emit('keyboard:text'");
   });
 
+  test('checks the X11 QR window and hover restoration without toggling it off', async () => {
+    const integration = await readFile('test/integration/vm-x11/linux-x11.test.js', 'utf8');
+    const browser = await readFile('test/integration/vm/browser/input-client.spec.js', 'utf8');
+
+    expect(integration).toContain("waitForOverlayState('IsViewable')");
+    expect(integration).toContain('4294967295');
+    expect(integration).toContain("Map State: IsUnMapped");
+    expect(integration).toContain('QR overlay did not reappear after the pointer left.');
+    expect(browser).not.toContain('REMOTE_MOUSE_VM_TOGGLE_QR');
+    expect(browser).not.toContain("socket.emit('qr:toggle-overlay'");
+  });
+
   test('aggregates unit, browser and VM integration suites', async () => {
     const packageJson = JSON.parse(await readFile('package.json', 'utf8'));
 

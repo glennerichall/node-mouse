@@ -62,9 +62,9 @@ de la configuration. Playwright charge le vrai client Socket.IO dans Chromium;
 uinput de l'invité.
 
 Ce profil sans bureau vérifie la chaîne client → serveur → uinput, mais pas le
-rendu d'un bureau. L'overlay QR, l'aperçu et le comportement visuel sous une
-vraie session X11 ou Wayland restent des validations distinctes jusqu'à l'ajout
-des profils graphiques de `PLAT-005b`.
+rendu d'un bureau. Le profil X11 ci-dessous couvre l'aperçu et l'overlay sous
+Xorg. Les validations visuelles Wayland restent distinctes et ne sont pas
+remplacées par XWayland.
 
 ## Profil Linux X11
 
@@ -78,13 +78,12 @@ npm run test:vm:x11
 
 Jest vérifie qu'il s'agit réellement d'une session Xorg, que le service est
 actif et que les commandes du client Playwright déplacent le pointeur et
-produisent les touches attendues. Le même parcours exige une trame d'aperçu et
-conserve une capture du bureau dans `test-results/vm-x11/overlay-root.xwd` pour
-le contrôle visuel de l'overlay QR.
+produisent les touches attendues. Le même parcours exige une trame d'aperçu,
+vérifie que la fenêtre QR apparaît puis revient après un survol et conserve une
+capture visuelle dans `test-results/vm-x11/overlay.png`.
 
-La saisie et l'aperçu X11 sont validés. La capture du 5 octobre 2026 a cependant
-montré que le helper d'overlay se déclarait visible sans afficher le QR : cette
-anomalie reste suivie dans `PLAT-005b3b` et empêche de déclarer l'overlay validé.
+Le client de test ne bascule plus la visibilité du QR. Il laissait auparavant
+le helper masqué selon l'état initial, puis capturait à tort un bureau sans QR.
 
 ## Profil Windows 11
 
