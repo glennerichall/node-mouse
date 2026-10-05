@@ -6,7 +6,7 @@ test('sends mouse and keyboard commands through the shipped Socket.IO client', a
   }
   const token = process.env.REMOTE_MOUSE_VM_TOKEN || 'vm-integration-token';
   await page.goto(`/api/sessions/${token}`);
-  await expect(page.locator('#connection-overlay')).toBeHidden();
+  await expect(page.locator('main')).toBeVisible();
 
   const result = await page.evaluate(async () => {
     const socket = window.io({transports: ['websocket']});

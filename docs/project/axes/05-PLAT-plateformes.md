@@ -85,6 +85,13 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   reste mappée et qu'elle revient après un survol, puis conserver une capture
   visuelle où le QR apparaît. Le test précédent masquait le QR en envoyant une
   commande de bascule avant la capture.
+- [ ] PLAT-005b4 — provisionner une VM Ubuntu 24.04 GNOME avec une vraie
+  session Wayland, puis valider avec le client réel que souris et clavier sont
+  injectés par `uinput` et reçus par une fenêtre Wayland native. Vérifier aussi
+  l'affichage du QR par XWayland, le masquage au survol et le réaffichage après
+  sortie; conserver une capture de la console QEMU. Exclure l'aperçu PipeWire
+  tant que PLAT-004d n'est pas implantée, et ne pas présenter cette VM comme
+  validation Wayland multi-compositeur ou matérielle.
 - [ ] PLAT-005c — ajouter un profil Windows 11 avec UEFI, TPM virtuel et média
   d'installation fourni localement par le développeur; automatiser le
   bootstrap nécessaire aux tests d'installation, de mise à jour et de

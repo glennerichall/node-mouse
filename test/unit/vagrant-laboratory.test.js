@@ -23,6 +23,17 @@ describe('Vagrant laboratory', () => {
     expect(vagrantfile).toContain('provider.loader = ENV.fetch("REMOTE_MOUSE_UEFI_LOADER"');
   });
 
+  test('declares a GNOME Wayland target and dedicated test suite', async () => {
+    const vagrantfile = await readFile('dev/vagrant/Vagrantfile', 'utf8');
+    const packageJson = JSON.parse(await readFile('package.json', 'utf8'));
+
+    expect(vagrantfile).toContain('config.vm.define "linux-wayland"');
+    expect(vagrantfile).toContain('prepare-linux-wayland.sh');
+    expect(vagrantfile).toContain('install-remote-mouse-wayland.sh');
+    expect(packageJson.scripts['test:vm:wayland']).toContain('linux-wayland');
+    expect(packageJson.scripts['test:vm:wayland']).toContain('jest.wayland.config.js');
+  });
+
   test('keeps VM assertions in Jest and browser behavior in Playwright', async () => {
     const integration = await readFile('test/integration/vm/linux-install.test.js', 'utf8');
     const browser = await readFile('test/integration/vm/browser/input-client.spec.js', 'utf8');

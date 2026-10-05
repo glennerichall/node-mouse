@@ -51,6 +51,29 @@ Vagrant.configure("2") do |config|
       path: File.join(laboratory_directory, "provision/install-remote-mouse-x11.sh")
   end
 
+  config.vm.define "linux-wayland" do |guest|
+    guest.vm.box = "cloud-image/ubuntu-24.04"
+    guest.vm.box_version = "20260926.0.0"
+    guest.vm.hostname = "remote-mouse-wayland"
+    guest.vm.synced_folder repository_directory, "/workspace/remote-mouse",
+      type: "rsync",
+      rsync__exclude: ["/.git/", "/node_modules/", "/build/", "/coverage/", "/.data/"]
+
+    guest.vm.provider :libvirt do |provider|
+      provider.driver = "kvm"
+      provider.cpus = 4
+      provider.memory = 6144
+      provider.video_type = "virtio"
+      provider.graphics_type = "spice"
+      provider.storage_pool_name = "default"
+    end
+
+    guest.vm.provision "shell", name: "prepare-wayland",
+      path: File.join(laboratory_directory, "provision/prepare-linux-wayland.sh")
+    guest.vm.provision "shell", name: "install-remote-mouse-wayland", privileged: false,
+      path: File.join(laboratory_directory, "provision/install-remote-mouse-wayland.sh")
+  end
+
   config.vm.define "windows-11", autostart: false do |guest|
     guest.vm.box = ENV.fetch("REMOTE_MOUSE_WINDOWS_BOX", "remote-mouse/windows-11")
     guest.vm.hostname = "remote-mouse-win11"

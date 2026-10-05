@@ -85,6 +85,16 @@ capture visuelle dans `test-results/vm-x11/overlay.png`.
 Le client de test ne bascule plus la visibilité du QR. Il laissait auparavant
 le helper masqué selon l'état initial, puis capturait à tort un bureau sans QR.
 
+## Profil GNOME Wayland
+
+`linux-wayland` démarre Ubuntu 24.04 avec une vraie session GNOME Wayland et
+installe Remote Mouse en mode `uinput`. La suite `npm run test:vm:wayland`
+vérifie le type de session, l'injection souris/clavier dans les périphériques
+virtuels et la présence de la fenêtre QR sur XWayland; elle conserve une capture
+dans `test-results/vm-wayland/desktop.png`. Cela valide le chemin d'intégration
+sur GNOME dans QEMU, pas les autres compositeurs, le matériel réel ni l'aperçu
+PipeWire.
+
 ## Profil Windows 11
 
 Le dépôt ne fournit ni Windows ni licence. La box locale doit déjà contenir
