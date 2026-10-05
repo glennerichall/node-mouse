@@ -10,12 +10,15 @@ Le laboratoire [`vagrant/`](./vagrant/) est piloté depuis un hôte Linux avec
 Vagrant et le provider `vagrant-libvirt`. Libvirt gère les machines et
 QEMU/KVM les exécute.
 
-Commencer par :
+Après avoir installé les prérequis de l'hôte, utiliser directement Vagrant :
 
 ```bash
-dev/vm doctor
-dev/vm init
+cd dev/vagrant
+vagrant up linux-install
 ```
+
+Les suites complètes se lancent depuis la racine avec `npm run test:vm` ou
+`npm run test:all`.
 
 Les profils Linux X11, Linux Wayland et Windows 11 seront ajoutés dans les
 itérations suivantes de `PLAT-005`.

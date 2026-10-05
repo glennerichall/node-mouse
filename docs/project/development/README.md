@@ -101,6 +101,9 @@ l'itération et devient append-only dès sa clôture.
 - [Plateformes — PLAT-005a et PLAT-005b1](./platforms-PLAT-005a-PLAT-005b1-2026-10-04.md):
   laboratoire Vagrant/QEMU opérationnel et premier test intégré Linux sur VM
   propre.
+- [Plateformes — PLAT-005b2](./platforms-PLAT-005b2-2026-10-04.md): cycle
+  Vagrant natif et parcours automatisé navigateur, Socket.IO et uinput avec
+  Jest et Playwright.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

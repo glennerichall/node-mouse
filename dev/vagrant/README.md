@@ -1,112 +1,74 @@
 # Laboratoire Vagrant/libvirt/QEMU
 
-Ce laboratoire est conçu pour un poste de développement Linux. Vagrant décrit
-et provisionne les machines, `vagrant-libvirt` les gère par libvirt et QEMU/KVM
-les exécute avec l'accélération matérielle.
+Ce laboratoire cible un hôte Linux. Vagrant décrit et provisionne directement
+les machines; `vagrant-libvirt` utilise libvirt et QEMU/KVM. Il n'y a ni
+surcouche de cycle de vie ni configuration YAML propre au projet.
 
-## Prérequis
+## Prérequis de l'hôte
 
-- Vagrant;
-- le plugin communautaire `vagrant-libvirt`;
-- libvirt et son service système;
-- QEMU/KVM pour invités x86_64;
-- un utilisateur autorisé à accéder à `/dev/kvm` et à `qemu:///system`.
+- Vagrant et le plugin `vagrant-libvirt`;
+- libvirt et une connexion accessible à `qemu:///system`;
+- QEMU/KVM et un accès utilisateur à `/dev/kvm`.
 
-Sur Ubuntu x86_64, le bootstrap installe ces prérequis ainsi que la version de
-Vagrant indiquée dans le script :
+Sur Ubuntu x86_64, le bootstrap optionnel installe et vérifie ces prérequis :
 
 ```bash
 dev/vagrant/install-host-ubuntu.sh
 ```
 
-Le script affiche les opérations, utilise `sudo` uniquement pour les paquets et
-les groupes système, vérifie le SHA-256 du paquet officiel Vagrant avant son
-installation et installe `vagrant-libvirt` dans le compte courant. Il faut
-fermer puis rouvrir la session après une première addition aux groupes `kvm` ou
-`libvirt`.
+Il vérifie le SHA-256 du paquet officiel Vagrant avant l'installation. Après
+une première addition aux groupes `kvm` ou `libvirt`, rouvrir la session.
 
-La commande suivante vérifie ces capacités et affiche les versions réellement
-utilisées :
+## Cycle de vie Vagrant
+
+Les commandes sont celles de Vagrant :
 
 ```bash
-dev/vm doctor
+cd dev/vagrant
+vagrant status
+vagrant up linux-install
+vagrant ssh linux-install
+vagrant halt linux-install
+vagrant destroy linux-install
 ```
 
-Elle ne modifie pas le système. Sur une autre distribution, l'installation des
-paquets et l'ajout éventuel de l'utilisateur aux groupes de virtualisation
-restent des opérations explicites. Le plugin s'installe séparément avec :
+`destroy` conserve la confirmation interactive de Vagrant et ne supprime pas
+la box source. La machine `linux-install` utilise la box libvirt Ubuntu 24.04
+épinglée dans le `Vagrantfile` et synchronise le dépôt par rsync. Les tests
+obtiennent son adresse privée depuis `vagrant ssh-config`; aucun port fixe de
+l'hôte n'est réservé.
+
+Les disques, ISO, secrets, caches et états Vagrant restent ignorés par Git et
+ne sont jamais inclus dans le paquet npm.
+
+## Suites automatisées
+
+Depuis la racine du dépôt :
 
 ```bash
-vagrant plugin install vagrant-libvirt
+npm test                  # unités et contrats statiques
+npm run test:e2e          # interface locale avec Playwright
+npm run test:integration  # VM, installation, mise à jour et uinput
+npm run test:all          # les trois suites précédentes
 ```
 
-## Configuration locale
+La suite VM laisse la machine démarrée pour faciliter le diagnostic; utiliser
+`vagrant halt linux-install` ensuite, ou `vagrant destroy linux-install` pour
+repartir d'un disque propre. Vagrant assure le démarrage, la synchronisation et
+le provisionnement. Jest vérifie le service, la version, HTTP et la conservation
+de la configuration. Playwright charge le vrai client Socket.IO dans Chromium;
+`evtest` confirme que ses commandes atteignent les périphériques virtuels
+uinput de l'invité.
 
-Initialiser le fichier non versionné :
-
-```bash
-dev/vm init
-```
-
-Les profils reproductibles sont déclarés dans `profiles.yml`. Le fichier local
-sert uniquement à surcharger leurs ressources ou paramètres sans modifier le
-dépôt. Le premier profil, `linux-install`, utilise une box Ubuntu 24.04 libvirt
-épinglée. Les profils graphiques X11 et Wayland et Windows 11 seront ajoutés
-séparément.
-
-Les répertoires `.vagrant`, `cache`, `images`, `iso`, `secrets` et le fichier de
-configuration locale sont ignorés par Git. Aucun média, disque ou secret ne
-doit être ajouté au dépôt.
-
-## Cycle de vie
-
-Chaque commande destructive ou modificatrice exige le nom explicite de la
-machine :
-
-```bash
-dev/vm status
-dev/vm create linux-install
-dev/vm start linux-install
-dev/vm stop linux-install
-dev/vm ssh linux-install
-dev/vm destroy linux-install
-```
-
-`destroy` conserve la confirmation interactive de Vagrant et ne supprime ni la
-box source ni les médias locaux. `create` démarre la VM sans provisionnement;
-`start` applique le provisionnement déclaré par le futur profil.
-
-## Test intégré d'installation Linux
-
-La première exécution télécharge la box et peut prendre plusieurs minutes :
-
-```bash
-dev/vm start linux-install
-```
-
-Le provisionnement installe réellement le paquet depuis la copie synchronisée
-du dépôt, installe et démarre le service utilisateur, vérifie le CLI et le
-client HTTP, puis rejoue l'installation en vérifiant que configuration et
-secrets sont conservés. Pour relancer le test après une modification :
-
-```bash
-dev/vm test linux-install
-```
-
-Le port invité 3987 est publié sur `127.0.0.1:13987` par défaut. Ce profil sans
-bureau valide le parcours d'installation commun; il ne constitue pas une
-validation X11 ou Wayland.
+Ce profil sans bureau vérifie la chaîne client → serveur → uinput, mais pas le
+rendu d'un bureau. L'overlay QR, l'aperçu et le comportement visuel sous une
+vraie session X11 ou Wayland restent des validations distinctes jusqu'à l'ajout
+des profils graphiques de `PLAT-005b`.
 
 ## Dépannage
 
-- `/dev/kvm` absent : activer la virtualisation matérielle dans le firmware et
-  charger le module KVM correspondant au processeur.
-- `/dev/kvm` inaccessible : corriger les groupes et règles de la distribution,
-  puis rouvrir la session utilisateur.
-- `qemu:///system` inaccessible : vérifier que libvirt est démarré et que
-  l'utilisateur est autorisé à ouvrir la connexion système.
-- provider absent : exécuter `vagrant plugin install vagrant-libvirt`, puis
-  relancer `dev/vm doctor`.
-- conflit de gems Ruby : utiliser un ensemble Vagrant/provider fourni et testé
-  par la même distribution, ou l'installation Vagrant officiellement prise en
-  charge par le provider.
+- `/dev/kvm` absent ou inaccessible : activer la virtualisation matérielle,
+  charger KVM et vérifier les groupes de l'utilisateur;
+- `qemu:///system` inaccessible : démarrer libvirt et vérifier les droits;
+- provider absent : `vagrant plugin install vagrant-libvirt`;
+- état douteux : `vagrant destroy linux-install`, puis relancer la suite.

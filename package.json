@@ -27,7 +27,9 @@
     "test": "npm run check:version && NODE_OPTIONS=--experimental-vm-modules jest --runInBand --coverage",
     "test:install": "NODE_OPTIONS=--experimental-vm-modules jest test/unit/install-scripts.test.js --runInBand",
     "test:install:integration": "node test/integration/install/run-linux-install.mjs",
-    "test:all": "npm test && npm run test:e2e",
+    "test:integration": "npm run test:vm",
+    "test:vm": "VAGRANT_CWD=dev/vagrant VAGRANT_DEFAULT_PROVIDER=libvirt vagrant up --no-provision linux-install && VAGRANT_CWD=dev/vagrant vagrant rsync linux-install && VAGRANT_CWD=dev/vagrant vagrant provision linux-install && NODE_OPTIONS=--experimental-vm-modules jest --config jest.vm.config.js --runInBand",
+    "test:all": "npm test && npm run test:e2e && npm run test:integration",
     "test:e2e": "playwright test",
     "screenshots:mobile": "node scripts/generate-mobile-screenshots.mjs",
     "commit:codex": "bash scripts/codex-commit.sh"

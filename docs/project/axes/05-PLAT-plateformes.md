@@ -65,6 +65,12 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   santé HTTP, chargement du client et réinstallation sans perte de la
   configuration. Ce profil valide l'installation commune mais ne vaut pas
   validation X11 ou Wayland.
+- [x] PLAT-005b2 — remplacer l'orchestrateur VM Bash par le cycle de vie Vagrant
+  natif, exécuter les assertions d'installation avec Jest et le client réel
+  avec Playwright, puis vérifier que les commandes Socket.IO souris/clavier
+  produisent les événements attendus sur les périphériques virtuels uinput.
+  `npm run test:all` doit agréger les suites unitaires, navigateur et VM, tandis
+  que les validations visuelles Wayland restent explicitement séparées.
 - [ ] PLAT-005c — ajouter un profil Windows 11 avec UEFI, TPM virtuel et média
   d'installation fourni localement par le développeur; automatiser le
   bootstrap nécessaire aux tests d'installation, de mise à jour et de

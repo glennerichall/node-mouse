@@ -1,7 +1,0 @@
-# Local overrides for the committed machines in profiles.yml.
-# Example:
-# machines:
-#   linux-install:
-#     cpus: 4
-#     memory_mb: 6144
-machines: {}

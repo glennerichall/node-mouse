@@ -8,7 +8,7 @@ readonly TEST_UID="$(id -u "${TEST_USER}")"
 export DEBIAN_FRONTEND=noninteractive
 
 apt-get update
-apt-get install -y ca-certificates curl rsync
+apt-get install -y ca-certificates curl evtest rsync
 
 # A persistent user manager is required because Remote Mouse installs a user
 # service. SSH provisioning does not otherwise guarantee that this manager is

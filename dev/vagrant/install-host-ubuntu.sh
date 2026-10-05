@@ -73,4 +73,4 @@ else
     sudo --user "${INSTALL_USER}" --set-home vagrant plugin install vagrant-libvirt
 fi
 
-printf '\nHost setup complete. Open a new login session, then run: dev/vm doctor\n'
+printf '\nHost setup complete. Open a new login session, then run: cd dev/vagrant && vagrant validate\n'
