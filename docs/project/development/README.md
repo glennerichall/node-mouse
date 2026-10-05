@@ -104,6 +104,9 @@ l'itération et devient append-only dès sa clôture.
 - [Plateformes — PLAT-005b2](./platforms-PLAT-005b2-2026-10-04.md): cycle
   Vagrant natif et parcours automatisé navigateur, Socket.IO et uinput avec
   Jest et Playwright.
+- [Plateformes — PLAT-005b3a et PLAT-005c1a](./platforms-PLAT-005b3a-PLAT-005c1a-2026-10-05.md):
+  validation automatisée de la saisie et de l'aperçu X11, puis préparation du
+  profil Windows 11 local avec WinRM, UEFI et TPM 2.0.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

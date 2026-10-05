@@ -71,10 +71,30 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   produisent les événements attendus sur les périphériques virtuels uinput.
   `npm run test:all` doit agréger les suites unitaires, navigateur et VM, tandis
   que les validations visuelles Wayland restent explicitement séparées.
+- [ ] PLAT-005b3 — provisionner une VM Ubuntu 24.04 avec une vraie session
+  Xfce/Xorg ouverte pour l'utilisateur de test; installer Remote Mouse en mode
+  X11 et automatiser avec Jest/Playwright la souris, le clavier et la capture.
+  L'overlay QR doit produire un contrôle visuel conservé comme artefact sans
+  confondre cette vérification avec Wayland/XWayland.
+- [x] PLAT-005b3a — valider dans la VM Xfce/Xorg l'installation, le service,
+  les mouvements RobotJS, les événements clavier et une trame d'aperçu au
+  moyen du client Playwright réel; conserver une capture du bureau comme
+  artefact du contrôle visuel.
+- [ ] PLAT-005b3b — corriger puis valider visuellement l'overlay QR dans la VM
+  X11 : le helper natif reste actif et annonce l'état visible, mais la capture
+  du bureau du 5 octobre 2026 ne contient pas le QR.
 - [ ] PLAT-005c — ajouter un profil Windows 11 avec UEFI, TPM virtuel et média
   d'installation fourni localement par le développeur; automatiser le
   bootstrap nécessaire aux tests d'installation, de mise à jour et de
   désinstallation sans redistribuer d'image ni de licence Microsoft.
+- [ ] PLAT-005c1 — définir et provisionner depuis une box Windows 11 locale le
+  contrat Vagrant WinRM, les ressources QEMU UEFI/TPM et l'installation du
+  paquet courant; fournir les commandes de test séparées et refuser clairement
+  l'exécution lorsque la box ou l'artefact npm local manque.
+- [x] PLAT-005c1a — déclarer le profil Windows 11 optionnel, son contrat WinRM,
+  ses ressources QEMU UEFI/TPM 2.0, son paquet npm local ignoré par Git et son
+  provisionnement PowerShell; conserver `PLAT-005c1` ouverte jusqu'à une
+  exécution avec une box Windows locale et licenciée.
 - [ ] PLAT-005d — fournir des tests intégrés relançables dans les invités. Le
   parcours d'installation doit couvrir installation neuve, démarrage du
   service, santé HTTP et version CLI; le parcours de mise à jour doit vérifier

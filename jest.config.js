@@ -5,6 +5,7 @@ export default {
     '/node_modules/',
     '<rootDir>/test/e2e/',
     '<rootDir>/test/integration/vm/',
+    '<rootDir>/test/integration/vm-x11/',
   ],
   collectCoverageFrom: [
     'server/**/*.js',

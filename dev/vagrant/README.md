@@ -27,6 +27,7 @@ Les commandes sont celles de Vagrant :
 cd dev/vagrant
 vagrant status
 vagrant up linux-install
+vagrant up linux-x11
 vagrant ssh linux-install
 vagrant halt linux-install
 vagrant destroy linux-install
@@ -64,6 +65,44 @@ Ce profil sans bureau vérifie la chaîne client → serveur → uinput, mais pa
 rendu d'un bureau. L'overlay QR, l'aperçu et le comportement visuel sous une
 vraie session X11 ou Wayland restent des validations distinctes jusqu'à l'ajout
 des profils graphiques de `PLAT-005b`.
+
+## Profil Linux X11
+
+`linux-x11` installe Xfce, LightDM et Xorg, ouvre automatiquement une vraie
+session X11 pour `vagrant`, puis installe Remote Mouse avec RobotJS. La console
+graphique SPICE permet les contrôles visuels. Son provisionnement se lance avec :
+
+```bash
+npm run test:vm:x11
+```
+
+Jest vérifie qu'il s'agit réellement d'une session Xorg, que le service est
+actif et que les commandes du client Playwright déplacent le pointeur et
+produisent les touches attendues. Le même parcours exige une trame d'aperçu et
+conserve une capture du bureau dans `test-results/vm-x11/overlay-root.xwd` pour
+le contrôle visuel de l'overlay QR.
+
+La saisie et l'aperçu X11 sont validés. La capture du 5 octobre 2026 a cependant
+montré que le helper d'overlay se déclarait visible sans afficher le QR : cette
+anomalie reste suivie dans `PLAT-005b3b` et empêche de déclarer l'overlay validé.
+
+## Profil Windows 11
+
+Le dépôt ne fournit ni Windows ni licence. La box locale doit déjà contenir
+Windows 11, les pilotes VirtIO et WinRM. Le profil ajoute explicitement UEFI et
+un TPM 2.0 émulé. Indiquer la box, construire l'archive npm courante, puis
+provisionner :
+
+```bash
+export REMOTE_MOUSE_WINDOWS_BOX=organisation/windows-11
+export REMOTE_MOUSE_UEFI_LOADER=/usr/share/OVMF/OVMF_CODE_4M.ms.fd
+npm run vm:pack:windows
+npm run test:vm:windows
+```
+
+L'archive est créée dans `dev/vagrant/artifacts/`, ignoré par Git. Sans box
+locale ou sans archive, le profil échoue explicitement; il ne télécharge aucun
+média Windows. `PLAT-005c1` restera ouverte jusqu'à une exécution réelle.
 
 ## Dépannage
 

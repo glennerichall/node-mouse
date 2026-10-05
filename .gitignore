@@ -14,6 +14,7 @@ build/
 dev/vagrant/.vagrant/
 dev/vagrant/config.local.yml
 dev/vagrant/cache/
+dev/vagrant/artifacts/
 dev/vagrant/images/
 dev/vagrant/iso/
 dev/vagrant/secrets/

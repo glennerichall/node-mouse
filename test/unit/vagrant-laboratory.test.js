@@ -12,6 +12,17 @@ describe('Vagrant laboratory', () => {
     expect(vagrantfile).not.toContain('profiles.yml');
   });
 
+  test('declares X11 and opt-in Windows 11 targets', async () => {
+    const vagrantfile = await readFile('dev/vagrant/Vagrantfile', 'utf8');
+
+    expect(vagrantfile).toContain('config.vm.define "linux-x11"');
+    expect(vagrantfile).toContain('prepare-linux-x11.sh');
+    expect(vagrantfile).toContain('config.vm.define "windows-11", autostart: false');
+    expect(vagrantfile).toContain('ENV.fetch("REMOTE_MOUSE_WINDOWS_BOX"');
+    expect(vagrantfile).toContain('provider.tpm_version = "2.0"');
+    expect(vagrantfile).toContain('provider.loader = ENV.fetch("REMOTE_MOUSE_UEFI_LOADER"');
+  });
+
   test('keeps VM assertions in Jest and browser behavior in Playwright', async () => {
     const integration = await readFile('test/integration/vm/linux-install.test.js', 'utf8');
     const browser = await readFile('test/integration/vm/browser/input-client.spec.js', 'utf8');
@@ -39,6 +50,7 @@ describe('Vagrant laboratory', () => {
     expect(gitignore).toContain('dev/vagrant/.vagrant/');
     expect(gitignore).toContain('dev/vagrant/images/');
     expect(gitignore).toContain('dev/vagrant/iso/');
+    expect(gitignore).toContain('dev/vagrant/artifacts/');
     expect(npmignore).toMatch(/^dev\/$/m);
   });
 });
