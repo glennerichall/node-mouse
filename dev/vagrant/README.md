@@ -53,13 +53,22 @@ npm run test:integration  # VM, installation, mise à jour et uinput
 npm run test:all          # les trois suites précédentes
 ```
 
-La suite VM laisse la machine démarrée pour faciliter le diagnostic; utiliser
-`vagrant halt linux-install` ensuite, ou `vagrant destroy linux-install` pour
-repartir d'un disque propre. Vagrant assure le démarrage, la synchronisation et
-le provisionnement. Jest vérifie le service, la version, HTTP et la conservation
-de la configuration. Playwright charge le vrai client Socket.IO dans Chromium;
-`evtest` confirme que ses commandes atteignent les périphériques virtuels
-uinput de l'invité.
+Les commandes `test:vm*` passent par le lanceur commun
+`test/integration/run-vagrant.mjs`: il démarre, synchronise et provisionne la
+cible, puis lance Jest avec une configuration d'intégration partagée. Le
+`DesktopProbe` centralise la sélection du profil, l'accès SSH et l'adresse du
+service; le lancement du vrai client Playwright est également partagé. La
+machine reste démarrée pour faciliter le diagnostic; utiliser `vagrant halt`
+ou `vagrant destroy <machine>` pour repartir d'un disque propre.
+
+Cette factorisation est en cours : les assertions de scénario demeurent encore
+dans les fichiers de profil, et le provider Windows ainsi que l'exécution native
+ou GitHub Actions ne sont pas encore raccordés.
+
+Pour l'installation, Jest vérifie le service, la version, HTTP et la
+conservation de la configuration. Playwright charge le vrai client Socket.IO
+dans Chromium; `evtest` confirme que ses commandes atteignent les périphériques
+virtuels uinput de l'invité.
 
 Ce profil sans bureau vérifie la chaîne client → serveur → uinput, mais pas le
 rendu d'un bureau. Le profil X11 ci-dessous couvre l'aperçu et l'overlay sous

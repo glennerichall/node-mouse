@@ -23,26 +23,35 @@ describe('Vagrant laboratory', () => {
     expect(vagrantfile).toContain('provider.loader = ENV.fetch("REMOTE_MOUSE_UEFI_LOADER"');
   });
 
-  test('declares a GNOME Wayland target and dedicated test suite', async () => {
+  test('routes Linux profiles through the shared integration runner', async () => {
     const vagrantfile = await readFile('dev/vagrant/Vagrantfile', 'utf8');
     const packageJson = JSON.parse(await readFile('package.json', 'utf8'));
+    const runner = await readFile('test/integration/run-vagrant.mjs', 'utf8');
+    const probe = await readFile('test/integration/desktop-probe/index.js', 'utf8');
 
     expect(vagrantfile).toContain('config.vm.define "linux-wayland"');
     expect(vagrantfile).toContain('prepare-linux-wayland.sh');
     expect(vagrantfile).toContain('install-remote-mouse-wayland.sh');
     expect(packageJson.scripts['test:vm:wayland']).toContain('linux-wayland');
-    expect(packageJson.scripts['test:vm:wayland']).toContain('jest.wayland.config.js');
+    expect(packageJson.scripts['test:vm:wayland']).toContain('run-vagrant.mjs');
+    expect(runner).toContain("['up', '--no-provision', profile]");
+    expect(runner).toContain("'jest.integration.config.js'");
+    expect(probe).toContain("'linux-x11'");
+    expect(probe).toContain("'linux-wayland'");
   });
 
   test('keeps VM assertions in Jest and browser behavior in Playwright', async () => {
     const integration = await readFile('test/integration/vm/linux-install.test.js', 'utf8');
     const browser = await readFile('test/integration/vm/browser/input-client.spec.js', 'utf8');
+    const sharedBrowser = await readFile('test/integration/desktop-probe/run-browser-client.js', 'utf8');
 
     expect(integration).toContain("describe('Ubuntu installation guest'");
     expect(integration).toContain('evtest');
     expect(browser).toContain("socket.emit('mouse:move'");
     expect(browser).toContain("socket.emit('keyboard:text'");
     expect(browser).toContain("page.waitForURL((url) => url.pathname === '/')");
+    expect(sharedBrowser).toContain("'playwright', 'test'");
+    expect(integration).toContain('runBrowserClient(probe)');
   });
 
   test('checks the X11 QR window and hover restoration without toggling it off', async () => {
@@ -63,8 +72,7 @@ describe('Vagrant laboratory', () => {
     expect(packageJson.scripts['test:all'])
       .toBe('npm test && npm run test:e2e && npm run test:integration');
     expect(packageJson.scripts['test:integration']).toBe('npm run test:vm');
-    expect(packageJson.scripts['test:vm']).toContain('vagrant up --no-provision linux-install');
-    expect(packageJson.scripts['test:vm']).toContain('jest --config jest.vm.config.js');
+    expect(packageJson.scripts['test:vm']).toBe('node test/integration/run-vagrant.mjs linux-install');
   });
 
   test('keeps local VM state and media out of packages and Git', async () => {

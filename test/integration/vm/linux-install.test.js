@@ -1,31 +1,11 @@
 import {spawn, spawnSync} from 'node:child_process';
 import {readFile} from 'node:fs/promises';
-import path from 'node:path';
+import {createDesktopProbe} from '../desktop-probe/index.js';
+import {runBrowserClient} from '../desktop-probe/run-browser-client.js';
 
-const repositoryRoot = path.resolve(import.meta.dirname, '../../..');
-const vagrantDirectory = path.join(repositoryRoot, 'dev/vagrant');
-const guestEnvironment = 'XDG_RUNTIME_DIR=/run/user/$(id -u) DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus';
-
-function vagrant(...args) {
-  const result = spawnSync('vagrant', args, {cwd: vagrantDirectory, encoding: 'utf8'});
-  if (result.status !== 0) {
-    throw new Error(`vagrant ${args.join(' ')} failed\n${result.stdout}\n${result.stderr}`);
-  }
-  return result.stdout.trim();
-}
-
-function guest(command) {
-  return vagrant('ssh', 'linux-install', '-c', `${guestEnvironment} ${command}`);
-}
-
-function guestBaseUrl() {
-  const sshConfig = vagrant('ssh-config', 'linux-install');
-  const host = sshConfig.match(/^\s*HostName\s+(\S+)/m)?.[1];
-  if (!host) {
-    throw new Error('Vagrant did not report the linux-install guest address');
-  }
-  return `http://${host}:3987`;
-}
+const probe = createDesktopProbe();
+const {repositoryRoot} = probe;
+const guest = (command) => probe.runGuest(command);
 
 function delay(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -39,8 +19,8 @@ async function captureInputDuring(browserAction) {
     'keyboard=/dev/input/$(basename "$(dirname "$(dirname "$keyboard")")")',
     'sudo timeout 8s evtest "$mouse" & sudo timeout 8s evtest "$keyboard" & wait',
   ].join('; ');
-  const capture = spawn('vagrant', ['ssh', 'linux-install', '-c', captureCommand], {
-    cwd: vagrantDirectory,
+  const capture = spawn('vagrant', ['ssh', probe.machine, '-c', captureCommand], {
+    cwd: new URL('../../../dev/vagrant', import.meta.url),
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let output = '';
@@ -81,15 +61,7 @@ describe('Ubuntu installation guest', () => {
 
   test('carries browser commands through Socket.IO to Linux uinput devices', async () => {
     const output = await captureInputDuring(async () => {
-      const {JEST_WORKER_ID: _jestWorkerId, ...childEnvironment} = process.env;
-      childEnvironment.REMOTE_MOUSE_VM_URL = guestBaseUrl();
-      const result = spawnSync('npx', ['playwright', 'test', '--config=playwright.vm.config.js'], {
-        cwd: repositoryRoot,
-        encoding: 'utf8',
-        env: childEnvironment,
-      });
-      expect(`${result.stdout}\n${result.stderr}`).toContain('1 passed');
-      expect(result.status).toBe(0);
+      runBrowserClient(probe);
     });
 
     expect(output).toContain('REL_X');

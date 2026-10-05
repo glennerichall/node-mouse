@@ -90,12 +90,20 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   visuelle où le QR apparaît. Le test précédent masquait le QR en envoyant une
   commande de bascule avant la capture.
 - [ ] PLAT-005b4 — provisionner une VM Ubuntu 24.04 GNOME avec une vraie
-  session Wayland, puis valider avec le client réel que souris et clavier sont
-  injectés par `uinput` et reçus par une fenêtre Wayland native. Vérifier aussi
-  l'affichage du QR par XWayland, le masquage au survol et le réaffichage après
-  sortie; conserver une capture de la console QEMU. Exclure l'aperçu PipeWire
-  tant que PLAT-004d n'est pas implantée, et ne pas présenter cette VM comme
-  validation Wayland multi-compositeur ou matérielle.
+  session Wayland, puis valider la suite d'exécution commune au moyen du
+  provider Wayland du `DesktopProbe` : souris/clavier vers une fenêtre native,
+  QR XWayland visible, masqué au survol et réaffiché après sortie. Conserver
+  une capture QEMU. Exclure l'aperçu PipeWire tant que PLAT-004d n'est pas
+  implantée; ne pas présenter cette VM comme validation multi-compositeur ou
+  matérielle.
+- [ ] PLAT-005b5 — remplacer les suites d'intégration propres aux profils VM
+  par deux suites canoniques, installation et exécution, pilotées par un
+  `DesktopProbe` qui sélectionne par configuration les providers X11,
+  Wayland et Windows. La même commande doit pouvoir s'exécuter sur le poste
+  natif, dans un invité Vagrant et sur un runner GitHub Actions; les scénarios
+  et assertions métier restent communs, seuls les observateurs système
+  diffèrent. Réduire Vagrant à la préparation de la cible et au lancement de
+  cette commande, sans dupliquer les tests ni leur orchestration.
 - [ ] PLAT-005c — ajouter un profil Windows 11 avec UEFI, TPM virtuel et média
   d'installation fourni localement par le développeur; automatiser le
   bootstrap nécessaire aux tests d'installation, de mise à jour et de

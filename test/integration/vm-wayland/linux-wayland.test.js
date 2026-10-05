@@ -1,39 +1,11 @@
 import {spawnSync} from 'node:child_process';
 import {mkdir} from 'node:fs/promises';
-import path from 'node:path';
+import {createDesktopProbe} from '../desktop-probe/index.js';
+import {runBrowserClient} from '../desktop-probe/run-browser-client.js';
 
-const repositoryRoot = path.resolve(import.meta.dirname, '../../..');
-const vagrantDirectory = path.join(repositoryRoot, 'dev/vagrant');
-
-function vagrant(...args) {
-  const result = spawnSync('vagrant', args, {
-    cwd: vagrantDirectory,
-    encoding: 'utf8',
-    maxBuffer: 20 * 1024 * 1024,
-  });
-  if (result.status !== 0) {
-    throw new Error(`vagrant ${args.join(' ')} failed\n${result.stdout}\n${result.stderr}`);
-  }
-  return result.stdout.trim();
-}
-
-function guest(command) {
-  const desktopEnvironment = [
-    'export XDG_RUNTIME_DIR=/run/user/$(id -u)',
-    'export DISPLAY=$(systemctl --user show-environment | sed -n "s/^DISPLAY=//p" | tail -n 1)',
-    'export DISPLAY=${DISPLAY:-:0}',
-    'export XAUTHORITY=$(systemctl --user show-environment | sed -n "s/^XAUTHORITY=//p" | tail -n 1)',
-    'export DBUS_SESSION_BUS_ADDRESS=unix:path=${XDG_RUNTIME_DIR}/bus;',
-  ].join(' ');
-  return vagrant('ssh', 'linux-wayland', '-c', `${desktopEnvironment} ${command}`);
-}
-
-function guestBaseUrl() {
-  const sshConfig = vagrant('ssh-config', 'linux-wayland');
-  const host = sshConfig.match(/^\s*HostName\s+(\S+)/m)?.[1];
-  if (!host) throw new Error('Vagrant did not report the linux-wayland guest address');
-  return `http://${host}:3987`;
-}
+const probe = createDesktopProbe();
+const {repositoryRoot} = probe;
+const guest = (command) => probe.runGuest(command);
 
 describe('Ubuntu GNOME Wayland desktop guest', () => {
   test('runs a real Wayland session and receives client input through uinput', async () => {
@@ -57,18 +29,7 @@ describe('Ubuntu GNOME Wayland desktop guest', () => {
       sudo timeout 30s evtest "$keyboard_device" >/tmp/remote-mouse-wayland-keyboard.log 2>&1 &
       sleep 1`);
 
-    const {JEST_WORKER_ID: _jestWorkerId, ...childEnvironment} = process.env;
-    Object.assign(childEnvironment, {
-      REMOTE_MOUSE_VM_URL: guestBaseUrl(),
-      REMOTE_MOUSE_VM_TOKEN: 'vm-wayland-integration-token',
-    });
-    const browser = spawnSync('npx', ['playwright', 'test', '--config=playwright.vm.config.js'], {
-      cwd: repositoryRoot,
-      encoding: 'utf8',
-      env: childEnvironment,
-    });
-    expect(`${browser.stdout}\n${browser.stderr}`).toContain('1 passed');
-    expect(browser.status).toBe(0);
+    runBrowserClient(probe, {token: 'vm-wayland-integration-token'});
 
     guest('sleep 1');
     const mouse = guest('cat /tmp/remote-mouse-wayland-mouse.log');

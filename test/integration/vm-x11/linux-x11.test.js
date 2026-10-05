@@ -1,38 +1,11 @@
 import {spawnSync} from 'node:child_process';
 import {mkdir} from 'node:fs/promises';
-import path from 'node:path';
+import {createDesktopProbe} from '../desktop-probe/index.js';
+import {runBrowserClient} from '../desktop-probe/run-browser-client.js';
 
-const repositoryRoot = path.resolve(import.meta.dirname, '../../..');
-const vagrantDirectory = path.join(repositoryRoot, 'dev/vagrant');
-const guestEnvironment = [
-  'export DISPLAY=:0',
-  'XAUTHORITY=$HOME/.Xauthority',
-  'XDG_RUNTIME_DIR=/run/user/$(id -u)',
-  'DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/$(id -u)/bus;',
-].join(' ');
-
-function vagrant(...args) {
-  const result = spawnSync('vagrant', args, {
-    cwd: vagrantDirectory,
-    encoding: 'utf8',
-    maxBuffer: 20 * 1024 * 1024,
-  });
-  if (result.status !== 0) {
-    throw new Error(`vagrant ${args.join(' ')} failed\n${result.stdout}\n${result.stderr}`);
-  }
-  return result.stdout.trim();
-}
-
-function guest(command) {
-  return vagrant('ssh', 'linux-x11', '-c', `${guestEnvironment} ${command}`);
-}
-
-function guestBaseUrl() {
-  const sshConfig = vagrant('ssh-config', 'linux-x11');
-  const host = sshConfig.match(/^\s*HostName\s+(\S+)/m)?.[1];
-  if (!host) throw new Error('Vagrant did not report the linux-x11 guest address');
-  return `http://${host}:3987`;
-}
+const probe = createDesktopProbe();
+const {repositoryRoot} = probe;
+const guest = (command) => probe.runGuest(command);
 
 function pointerPosition() {
   const output = guest('xdotool getmouselocation --shell');
@@ -72,19 +45,7 @@ describe('Ubuntu X11 desktop guest', () => {
     guest('xdotool mousemove 300 300; systemctl --user restart remote-mouse.service; rm -f /tmp/remote-mouse-xinput.log; nohup timeout 20s xinput test-xi2 --root >/tmp/remote-mouse-xinput.log 2>&1 </dev/null & sleep 1');
     waitForOverlayState('IsViewable');
     const before = pointerPosition();
-    const {JEST_WORKER_ID: _jestWorkerId, ...childEnvironment} = process.env;
-    Object.assign(childEnvironment, {
-      REMOTE_MOUSE_VM_URL: guestBaseUrl(),
-      REMOTE_MOUSE_VM_TOKEN: 'vm-x11-integration-token',
-      REMOTE_MOUSE_VM_ASSERT_PREVIEW: 'true',
-    });
-    const browser = spawnSync('npx', ['playwright', 'test', '--config=playwright.vm.config.js'], {
-      cwd: repositoryRoot,
-      encoding: 'utf8',
-      env: childEnvironment,
-    });
-    expect(`${browser.stdout}\n${browser.stderr}`).toContain('1 passed');
-    expect(browser.status).toBe(0);
+    runBrowserClient(probe, {token: 'vm-x11-integration-token', assertPreview: true});
 
     const after = pointerPosition();
     expect(after.x).toBeGreaterThan(before.x);
