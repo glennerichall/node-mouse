@@ -110,6 +110,9 @@ l'itération et devient append-only dès sa clôture.
 - [Plateformes — PLAT-005b3b](./platforms-PLAT-005b3b-2026-10-05.md): correction
   du test qui masquait le QR, validation du retour après survol et capture
   visuelle de la console X11.
+- [Plateformes — PLAT-005b2a](./platforms-PLAT-005b2a-2026-10-05.md): attente
+  explicite de la redirection du lien de session avant d'exécuter le client
+  Socket.IO dans les tests intégrés Linux et Wayland.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

@@ -6,6 +6,7 @@ test('sends mouse and keyboard commands through the shipped Socket.IO client', a
   }
   const token = process.env.REMOTE_MOUSE_VM_TOKEN || 'vm-integration-token';
   await page.goto(`/api/sessions/${token}`);
+  await page.waitForURL((url) => url.pathname === '/');
   await expect(page.locator('main')).toBeVisible();
 
   const result = await page.evaluate(async () => {

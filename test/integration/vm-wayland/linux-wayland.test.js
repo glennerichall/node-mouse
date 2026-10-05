@@ -18,7 +18,14 @@ function vagrant(...args) {
 }
 
 function guest(command) {
-  return vagrant('ssh', 'linux-wayland', '-c', command);
+  const desktopEnvironment = [
+    'export XDG_RUNTIME_DIR=/run/user/$(id -u)',
+    'export DISPLAY=$(systemctl --user show-environment | sed -n "s/^DISPLAY=//p" | tail -n 1)',
+    'export DISPLAY=${DISPLAY:-:0}',
+    'export XAUTHORITY=$(systemctl --user show-environment | sed -n "s/^XAUTHORITY=//p" | tail -n 1)',
+    'export DBUS_SESSION_BUS_ADDRESS=unix:path=${XDG_RUNTIME_DIR}/bus;',
+  ].join(' ');
+  return vagrant('ssh', 'linux-wayland', '-c', `${desktopEnvironment} ${command}`);
 }
 
 function guestBaseUrl() {

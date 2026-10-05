@@ -71,6 +71,10 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   produisent les événements attendus sur les périphériques virtuels uinput.
   `npm run test:all` doit agréger les suites unitaires, navigateur et VM, tandis
   que les validations visuelles Wayland restent explicitement séparées.
+- [x] PLAT-005b2a — stabiliser la navigation du test Playwright partagé après
+  l'ouverture d'un lien de session à jeton : attendre la fin de la redirection
+  avant d'accéder au contexte JavaScript, puis vérifier que le parcours passe
+  dans les invités d'installation et Wayland.
 - [x] PLAT-005b3 — provisionner une VM Ubuntu 24.04 avec une vraie session
   Xfce/Xorg ouverte pour l'utilisateur de test; installer Remote Mouse en mode
   X11 et automatiser avec Jest/Playwright la souris, le clavier et la capture.

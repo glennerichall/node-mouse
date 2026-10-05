@@ -42,6 +42,7 @@ describe('Vagrant laboratory', () => {
     expect(integration).toContain('evtest');
     expect(browser).toContain("socket.emit('mouse:move'");
     expect(browser).toContain("socket.emit('keyboard:text'");
+    expect(browser).toContain("page.waitForURL((url) => url.pathname === '/')");
   });
 
   test('checks the X11 QR window and hover restoration without toggling it off', async () => {
