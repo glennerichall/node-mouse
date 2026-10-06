@@ -29,6 +29,9 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
 - [x] ARCH-011 — formaliser le contrat de canal (`id`, `on`, `emit`) et exposer
   une orchestration nommée des souscriptions (`subscribeInput`,
   `subscribeBrowser`, etc.) sans dispatcher métier central.
+- [x] ARCH-012 — externaliser les composants d'orchestration de
+  `bootstrapSocket` et tester séparément les guards, notifications et
+  souscriptions Socket.IO.
 - [ ] Séparer configuration système et fonctionnelle; valider au démarrage.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de

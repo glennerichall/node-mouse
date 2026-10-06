@@ -125,6 +125,8 @@ l'itération et devient append-only dès sa clôture.
   de la souscription des événements administratifs Socket.IO.
 - [ARCH-011](./arch-ARCH-011-2026-10-06.md): contrat minimal de canal et
   orchestration nommée des souscriptions.
+- [ARCH-012](./arch-ARCH-012-2026-10-06.md): externalisation et tests des
+  composants d'orchestration Socket.IO.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.
