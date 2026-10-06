@@ -71,23 +71,30 @@ function createActionHandlers(services) {
     };
 }
 
+function createGuards(services) {
+    const systemConfig = services.getSystemConfig();
+    return [
+        createSocketOriginGuard({
+            protocol: systemConfig.protocol,
+            getAllowedOrigins: () => systemConfig.allowedOrigins,
+        }),
+        createSocketSessionAuthMiddleware(services),
+        createSocketInputGuard(),
+        createSocketGuardMiddleware(services)
+    ];
+}
+
 export function bootstrapSocket(services) {
     const {getServer} = services;
     const log = createLogger('socket:bootstrap');
 
     const {io, cookieParser} = getServer();
-    const systemConfig = services.getSystemConfig();
     log.debug('Initializing Socket.IO');
 
     io.engine.use((...args) => cookieParser(...args));
-    
-    io.use(createSocketOriginGuard({
-        protocol: systemConfig.protocol,
-        getAllowedOrigins: () => systemConfig.allowedOrigins,
-    }));
-    io.use(createSocketSessionAuthMiddleware(services));
-    io.use(createSocketInputGuard());
-    io.use(createSocketGuardMiddleware(services));
+
+    createGuards(services).forEach(guard => {io.use(guard)});
+
     log.trace('Socket.IO middlewares registered');
 
     io.on('connection', broadcast(
