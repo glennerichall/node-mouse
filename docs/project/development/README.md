@@ -117,6 +117,8 @@ l'itération et devient append-only dès sa clôture.
   Vagrant/Packer et déploiement des tests sur les VM fournies par le développeur.
 - [OPS-003](./ops-OPS-003-2026-10-06.md): uniformisation en anglais des messages
   techniques des journaux.
+- [UX-003](./ux-UX-003-2026-10-06.md): diagnostic visible du transport et des
+  erreurs de connexion client.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

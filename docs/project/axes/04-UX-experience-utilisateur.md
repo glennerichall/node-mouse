@@ -9,7 +9,7 @@ compréhensibles sur mobile et desktop.
 
 - [ ] UX-001 — afficher les appareils associés, rôle et dernière activité.
 - [ ] UX-002 — permettre révocation et réassociation dans l'interface.
-- [ ] UX-003 — améliorer les diagnostics de connexion et afficher le transport.
+- [x] UX-003 — améliorer les diagnostics de connexion et afficher le transport.
 - [ ] UX-004 — sélection multi-écrans.
 - [ ] UX-005 — profils de contrôle.
 - [x] UX-006 — permettre à chaque client de régler localement la vitesse et

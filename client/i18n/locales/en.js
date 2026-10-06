@@ -167,6 +167,8 @@ export const en = {
   'main.enter': 'Enter',
   'main.connectionUnavailableTitle': 'Server unavailable',
   'main.connectionWaiting': 'Waiting for connection...',
+  'main.connectionDiagnostic': 'Transport: {transport}',
+  'main.connectionDiagnosticError': 'Transport: {transport} · Error: {message}',
   'main.orientationLockTitle': 'Landscape is not supported',
   'main.orientationLockMessage': 'Rotate the device back to portrait to use the remote.',
   'main.connectionExpiredTitle': 'Connection expired',

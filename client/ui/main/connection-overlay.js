@@ -9,6 +9,15 @@ export function bindConnectionOverlay(services, dom) {
 
   const titleEl = overlay.querySelector('[data-connection-title]');
   const messageEl = overlay.querySelector('[data-connection-message]');
+  const detailEl = overlay.querySelector('[data-connection-detail]');
+
+  function transportName() {
+    return socket?.io?.engine?.transport?.name || socket?.io?.engine?.transport?.query?.transport || 'unknown';
+  }
+
+  function setDetail(value) {
+    if (detailEl) detailEl.textContent = value || '';
+  }
 
   function setContent(title, message) {
     if (titleEl) {
@@ -24,6 +33,9 @@ export function bindConnectionOverlay(services, dom) {
     const connected = socket.connected;
     if (!connected) {
       setContent(t('main.connectionUnavailableTitle'), t('main.connectionWaiting'));
+      setDetail(t('main.connectionDiagnostic', {transport: transportName()}));
+    } else {
+      setDetail(t('main.connectionDiagnostic', {transport: transportName()}));
     }
     overlay.classList.toggle('hidden', connected);
   }
@@ -38,11 +50,13 @@ export function bindConnectionOverlay(services, dom) {
         t('main.connectionExpiredTitle'),
         t('main.connectionExpiredMessage')
       );
+      setDetail(t('main.connectionDiagnosticError', {message: error?.message || 'unauthorized', transport: transportName()}));
       overlay.classList.remove('hidden');
       return;
     }
 
     update();
+    setDetail(t('main.connectionDiagnosticError', {message: error?.message || 'connection failed', transport: transportName()}));
   }
 
   socket.on('connect', update);
