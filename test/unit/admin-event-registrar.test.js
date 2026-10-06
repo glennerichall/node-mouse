@@ -12,13 +12,14 @@ describe('createAdminEventRegistrar', () => {
     const channel = {
       id: 'channel-123456789',
       on: sinon.spy((eventName, handler) => handlers.set(eventName, handler)),
+      emit,
     };
     const adminActions = {
       forceUpdateCheck: sinon.stub().resolves({ok: true, message: 'done'}),
     };
     const legacyQrActions = {};
 
-    createAdminEventRegistrar({adminActions, legacyQrActions})(channel, {emit});
+    createAdminEventRegistrar({adminActions, legacyQrActions})(channel);
     await handlers.get(REMOTE_EVENT_ADMIN_UPDATE_CHECK)();
 
     expect(channel.on.callCount).toBeGreaterThan(0);

@@ -1,10 +1,11 @@
 import {createLogger} from '../../application/logger.js';
+import {createSocketActionResponder} from '../../connection/socket/socket-action-responder.js';
+import {getClientId, getClientLabel} from '../../connection/client-channel.js';
 import {
   REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT,
   REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER,
   REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_CLIENT,
   REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER,
-  REMOTE_EVENT_ADMIN_RESULT,
   REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN,
   REMOTE_EVENT_ADMIN_SERVICE_RESTART,
   REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY,
@@ -20,14 +21,10 @@ function getModuleLog() {
 
 export function createAdminEventRegistrar({adminActions, legacyQrActions}) {
   const log = getModuleLog();
-  return function subscribeAdminEvents(channel, {clientId = channel.id, emit = channel.emit.bind(channel)} = {}) {
-    const client = String(clientId).slice(0, 8);
-    const respondAdminAction = (action, result = {}) => emit(REMOTE_EVENT_ADMIN_RESULT, {
-      action,
-      ok: Boolean(result.ok),
-      message: result.message,
-      openUrl: result.openUrl,
-    });
+  return function subscribeAdmin(channel) {
+    const clientId = getClientId(channel);
+    const client = getClientLabel(channel);
+    const respondAdminAction = createSocketActionResponder({socket: channel});
 
     channel.on(REMOTE_EVENT_ADMIN_UPDATE_CHECK, async () => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_UPDATE_CHECK}`);

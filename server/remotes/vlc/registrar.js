@@ -5,6 +5,7 @@ import {
   REMOTE_EVENT_VLC_WINDOW_CLOSE,
   REMOTE_EVENT_VLC_WINDOW_TOGGLE,
 } from '../../../utils/remoteCommands.js';
+import {getClientLabel} from '../../connection/client-channel.js';
 
 let log;
 function getModuleLog() {
@@ -30,8 +31,8 @@ function isVlcEnabled(config) {
 
 export function createVlcRegistrar({ vlc, keyboard, getConfig = () => ({}) }) {
   const log = getModuleLog();
-  return (socket) => {
-    const client = socket.id.slice(0, 8);
+  return function subscribeVlc(channel) {
+    const client = getClientLabel(channel);
 
     async function ensureUsable() {
       if (!(await vlc.isAvailable())) {
@@ -45,7 +46,7 @@ export function createVlcRegistrar({ vlc, keyboard, getConfig = () => ({}) }) {
       return true;
     }
 
-    socket.on(REMOTE_EVENT_VLC_OPEN, async () => {
+    channel.on(REMOTE_EVENT_VLC_OPEN, async () => {
       if (!(await ensureUsable())) {
         return;
       }
@@ -54,7 +55,7 @@ export function createVlcRegistrar({ vlc, keyboard, getConfig = () => ({}) }) {
       await vlc.focusOrLaunch();
     });
 
-    socket.on(REMOTE_EVENT_VLC_COMMAND, async (payload = {}) => {
+    channel.on(REMOTE_EVENT_VLC_COMMAND, async (payload = {}) => {
       if (!(await ensureUsable())) {
         return;
       }
@@ -73,7 +74,7 @@ export function createVlcRegistrar({ vlc, keyboard, getConfig = () => ({}) }) {
       await keyboard.pressSpecialKey(command.key, command.modifiers);
     });
 
-    socket.on(REMOTE_EVENT_VLC_WINDOW_TOGGLE, async () => {
+    channel.on(REMOTE_EVENT_VLC_WINDOW_TOGGLE, async () => {
       if (!(await ensureUsable())) {
         return;
       }
@@ -82,7 +83,7 @@ export function createVlcRegistrar({ vlc, keyboard, getConfig = () => ({}) }) {
       await vlc.toggleWindow();
     });
 
-    socket.on(REMOTE_EVENT_VLC_WINDOW_CLOSE, async () => {
+    channel.on(REMOTE_EVENT_VLC_WINDOW_CLOSE, async () => {
       if (!(await ensureUsable())) {
         return;
       }

@@ -4,7 +4,7 @@ import {
 } from '../../../utils/remoteCommands.js';
 
 export function createPreviewEventRegistrar({ preview, getConfig = () => ({}) }) {
-  return function registerPreviewEvents(socket) {
+  return function subscribePreview(channel) {
     let previewSession = null;
 
     function startPreview() {
@@ -16,7 +16,7 @@ export function createPreviewEventRegistrar({ preview, getConfig = () => ({}) })
       if (previewSession) {
         return;
       }
-      previewSession = preview.startForSocket(socket);
+      previewSession = preview.startForSocket(channel);
     }
 
     function stopPreview() {
@@ -27,8 +27,8 @@ export function createPreviewEventRegistrar({ preview, getConfig = () => ({}) })
       previewSession = null;
     }
 
-    socket.on(REMOTE_EVENT_PREVIEW_START, startPreview);
-    socket.on(REMOTE_EVENT_PREVIEW_STOP, stopPreview);
-    socket.on('disconnect', stopPreview);
+    channel.on(REMOTE_EVENT_PREVIEW_START, startPreview);
+    channel.on(REMOTE_EVENT_PREVIEW_STOP, stopPreview);
+    channel.on('disconnect', stopPreview);
   };
 }

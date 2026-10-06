@@ -1,5 +1,5 @@
 import {createSocketSessionAuthMiddleware} from '../connection/socket/createSocketSessionAuthMiddleware.js';
-import {createSocketActionRegistrars} from './createSocketActionRegistrars.js';
+import {createEventSubscriptions} from './createEventSubscriptions.js';
 import {socketTimestampGuardMiddleware} from "../connection/socket/socket.timestamp-middleware.js";
 import { hasRecentRestart } from '../remotes/admin/notifyIfRestarted.js';
 import {
@@ -63,10 +63,10 @@ function createSocketGuardMiddleware(services) {
 }
 
 function createActionHandlers(services) {
-    const socketActionRegistrars = createSocketActionRegistrars(services);
-    return socket => {
-        for (let register of socketActionRegistrars) {
-            register(socket);
+    const subscriptions = createEventSubscriptions(services);
+    return channel => {
+        for (const subscribe of Object.values(subscriptions)) {
+            subscribe(channel);
         }
     };
 }

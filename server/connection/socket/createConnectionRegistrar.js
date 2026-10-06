@@ -12,11 +12,11 @@ function getModuleLog() {
 
 export function createConnectionRegistrar({events}) {
     const log = getModuleLog();
-    return (socket) => {
-        socket.on('disconnect', () => {
-            log.info({socketId: socket.id}, 'Client disconnected');
+    return function subscribeConnection(channel) {
+        channel.on('disconnect', () => {
+            log.info({socketId: channel.id}, 'Client disconnected');
             events.publishEvent(PUBSUB_SERVICE_SOCKET, PUBSUB_EVENT_SOCKET_CLIENT_DISCONNECTED, {
-                clientId: socket.id,
+                clientId: channel.id,
             });
         })
     }

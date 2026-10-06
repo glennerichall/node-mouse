@@ -1,5 +1,6 @@
 import {createLogger} from "../../application/logger.js";
 import { REMOTE_EVENT_BROWSER_OPEN } from '../../../utils/remoteCommands.js';
+import {getClientLabel} from '../../connection/client-channel.js';
 
 let log;
 function getModuleLog() {
@@ -13,10 +14,10 @@ function isBrowserEnabled(config, browserId) {
 
 export const createBrowserRegistrar = ({browser, getConfig = () => ({})}) => {
     const log = getModuleLog();
-    return socket => {
-        const client = socket.id.slice(0, 8);
+    return function subscribeBrowser(channel) {
+        const client = getClientLabel(channel);
 
-        socket.on(REMOTE_EVENT_BROWSER_OPEN, async (payload = {}) => {
+        channel.on(REMOTE_EVENT_BROWSER_OPEN, async (payload = {}) => {
             const browserId = typeof payload?.browserId === 'string' ? payload.browserId : 'brave';
             if (!isBrowserEnabled(getConfig(), browserId)) {
                 log.info({client, browserId}, 'Browser ignored: disabled by configuration.');

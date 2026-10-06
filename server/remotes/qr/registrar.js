@@ -6,6 +6,7 @@ import {
   REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN,
   REMOTE_EVENT_QR_TOGGLE_OVERLAY,
 } from '../../../utils/remoteCommands.js';
+import {getClientId, getClientLabel} from '../../connection/client-channel.js';
 
 let log;
 function getModuleLog() {
@@ -15,13 +16,13 @@ function getModuleLog() {
 
 export function createQrEventRegistrar({qrActions}) {
   const eventLog = getModuleLog();
-  return function registerQrEvents(socket) {
-    const client = socket.id.slice(0, 8);
-    const respond = createSocketActionResponder({socket});
+  return function subscribeQr(channel) {
+    const client = getClientLabel(channel);
+    const respond = createSocketActionResponder({socket: channel});
     const register = (eventName, actionName, action) => {
-      socket.on(eventName, async () => {
+      channel.on(eventName, async () => {
         eventLog.info({client}, `Demande ${eventName}`);
-        respond(actionName, await action({clientId: socket.id}));
+        respond(actionName, await action({clientId: getClientId(channel)}));
       });
     };
 

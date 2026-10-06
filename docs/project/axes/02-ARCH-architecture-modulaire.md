@@ -26,6 +26,9 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
 - [x] ARCH-010 — séparer la garde des actions administratives de la souscription
   des événements : le contexte d'autorisation est évalué au bootstrap Socket.IO,
   tandis que le registrar admin reçoit un canal et un émetteur de réponses.
+- [x] ARCH-011 — formaliser le contrat de canal (`id`, `on`, `emit`) et exposer
+  une orchestration nommée des souscriptions (`subscribeInput`,
+  `subscribeBrowser`, etc.) sans dispatcher métier central.
 - [ ] Séparer configuration système et fonctionnelle; valider au démarrage.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de
