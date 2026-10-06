@@ -23,6 +23,9 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
   `server/os/win32/overlay` la création des fenêtres, les processus natifs ou
   PowerShell et leurs protocoles; fournir l'adaptateur par le service OS sans
   appel direct à `os.platform()` depuis le service métier.
+- [x] ARCH-010 — séparer la garde des actions administratives de la souscription
+  des événements : le contexte d'autorisation est évalué au bootstrap Socket.IO,
+  tandis que le registrar admin reçoit un canal et un émetteur de réponses.
 - [ ] Séparer configuration système et fonctionnelle; valider au démarrage.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de

@@ -9,6 +9,8 @@ import {
 import { REMOTE_EVENT_SYSTEM_RELOAD } from '../../utils/remoteCommands.js';
 import {createLogger} from '../application/logger.js';
 import {createSocketInputGuard, createSocketOriginGuard} from '../connection/socket/socket-input-guard.middleware.js';
+import {createAdminEventGuardMiddleware} from '../remotes/admin/createAdminEventGuardMiddleware.js';
+import {createSocketActionResponder} from '../connection/socket/socket-action-responder.js';
 
 function broadcast(...functions) {
     return (...args) => functions.flatMap(f => f).map(f => f(...args));
@@ -43,8 +45,18 @@ function createSocketGuardMiddleware(services) {
             maxEventAgeMs,
             socketId: socket.id,
         }));
-        
-        // ... other guards here
+
+        const authorization = services.getAuthorization().authorize(
+            socket.securityContext,
+            'admin:manage',
+        );
+        socket.use(createAdminEventGuardMiddleware({
+            isAdminActionsEnabled: getSystemConfig().adminActionsEnabled,
+            isAdmin: authorization.allowed,
+            client: socket.id.slice(0, 8),
+            log: createLogger('events:admin-guard'),
+            respondAdminAction: createSocketActionResponder({socket}),
+        }));
         
         next();
     }

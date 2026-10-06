@@ -32,9 +32,10 @@ export function createSocketActionRegistrars(services) {
             return createAdminEventRegistrar({
                 adminActions,
                 legacyQrActions: qrActions,
-                getSystemConfig: services.getSystemConfig,
-                getAuthorization: services.getAuthorization,
-            })(socket);
+            })(socket, {
+                clientId: socket.id,
+                emit: socket.emit.bind(socket),
+            });
         },
         (socket) => {
             const {preview} = services.getRemotes();

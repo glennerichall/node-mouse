@@ -1,6 +1,4 @@
 import {createLogger} from '../../application/logger.js';
-import {createSocketActionResponder} from '../../connection/socket/socket-action-responder.js';
-import {createAdminEventGuardMiddleware} from './createAdminEventGuardMiddleware.js';
 import {
   REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT,
   REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER,
@@ -20,76 +18,68 @@ function getModuleLog() {
   return log;
 }
 
-export function createAdminEventRegistrar({adminActions, legacyQrActions, getSystemConfig, getAuthorization}) {
+export function createAdminEventRegistrar({adminActions, legacyQrActions}) {
   const log = getModuleLog();
-  return function registerAdminEvents(socket) {
-    const config = getSystemConfig();
-    const respondAdminAction = createSocketActionResponder({
-      socket,
-      eventName: REMOTE_EVENT_ADMIN_RESULT,
+  return function subscribeAdminEvents(channel, {clientId = channel.id, emit = channel.emit.bind(channel)} = {}) {
+    const client = String(clientId).slice(0, 8);
+    const respondAdminAction = (action, result = {}) => emit(REMOTE_EVENT_ADMIN_RESULT, {
+      action,
+      ok: Boolean(result.ok),
+      message: result.message,
+      openUrl: result.openUrl,
     });
-    const client = socket.id.slice(0, 8);
-    const authorization = getAuthorization().authorize(socket.securityContext, 'admin:manage');
 
-    socket.use(createAdminEventGuardMiddleware({
-      isAdminActionsEnabled: config.adminActionsEnabled,
-      isAdmin: authorization.allowed,
-      client,
-      log,
-      respondAdminAction,
-    }));
-
-    socket.on(REMOTE_EVENT_ADMIN_UPDATE_CHECK, async () => {
+    channel.on(REMOTE_EVENT_ADMIN_UPDATE_CHECK, async () => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_UPDATE_CHECK}`);
-      const result = await adminActions.forceUpdateCheck({ clientId: socket.id });
+      const result = await adminActions.forceUpdateCheck({ clientId });
       respondAdminAction('update-check', result);
     });
 
-    socket.on(REMOTE_EVENT_ADMIN_UPDATE_INSTALL, async () => {
+    channel.on(REMOTE_EVENT_ADMIN_UPDATE_INSTALL, async () => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_UPDATE_INSTALL}`);
-      const result = await adminActions.installUpdate({ clientId: socket.id });
+      const result = await adminActions.installUpdate({ clientId });
       respondAdminAction('update-install', result);
     });
 
-    socket.on(REMOTE_EVENT_ADMIN_SERVICE_RESTART, async () => {
+    channel.on(REMOTE_EVENT_ADMIN_SERVICE_RESTART, async () => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_SERVICE_RESTART}`);
-      const result = await adminActions.restartService({ clientId: socket.id });
+      const result = await adminActions.restartService({ clientId });
       respondAdminAction('service-restart', result);
     });
 
-    socket.on(REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER, async () => {
+    channel.on(REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER, async () => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER}`);
-      const result = await legacyQrActions.openQrBrowserServer({ clientId: socket.id });
+      const result = await legacyQrActions.openQrBrowserServer({ clientId });
       respondAdminAction('open-qr-browser-server', result);
     });
 
-    socket.on(REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT, async () => {
+    channel.on(REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT, async () => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT}`);
-      const result = await legacyQrActions.openQrBrowserClient({ clientId: socket.id });
+      const result = await legacyQrActions.openQrBrowserClient({ clientId });
       respondAdminAction('open-qr-browser-client', result);
     });
 
-    socket.on(REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER, async () => {
+    channel.on(REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER, async () => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER}`);
-      const result = await adminActions.openServerInfoBrowserServer({ clientId: socket.id });
+      const result = await adminActions.openServerInfoBrowserServer({ clientId });
       respondAdminAction('open-server-info-browser-server', result);
     });
 
-    socket.on(REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_CLIENT, async () => {
+    channel.on(REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_CLIENT, async () => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_CLIENT}`);
-      const result = await adminActions.openServerInfoBrowserClient({ clientId: socket.id });
+      const result = await adminActions.openServerInfoBrowserClient({ clientId });
       respondAdminAction('open-server-info-browser-client', result);
     });
 
-    socket.on(REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN, async () => {
+    channel.on(REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN, async () => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN}`);
-      const result = await legacyQrActions.rotateEntryToken({ clientId: socket.id });
+      const result = await legacyQrActions.rotateEntryToken({ clientId });
       respondAdminAction('rotate-entry-token', result);
     });
 
-    socket.on(REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY, async () => {
+    channel.on(REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY, async () => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY}`);
-      const result = await legacyQrActions.toggleQrOverlay({ clientId: socket.id });
+      const result = await legacyQrActions.toggleQrOverlay({ clientId });
       respondAdminAction('toggle-qr-overlay', result);
     });
   };

@@ -121,6 +121,8 @@ l'itération et devient append-only dès sa clôture.
   erreurs de connexion client.
 - [ARCH-007](./arch-ARCH-007-2026-10-06.md): séparation et validation de
   l'adresse d'écoute, de l'URL publique et de la confiance proxy.
+- [ARCH-010](./arch-ARCH-010-2026-10-06.md): séparation de la garde admin et
+  de la souscription des événements administratifs Socket.IO.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.
