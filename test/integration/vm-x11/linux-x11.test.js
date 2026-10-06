@@ -1,5 +1,3 @@
-import {spawnSync} from 'node:child_process';
-import {mkdir} from 'node:fs/promises';
 import {createDesktopProbe} from '../desktop-probe/index.js';
 import {runBrowserClient} from '../desktop-probe/run-browser-client.js';
 
@@ -33,7 +31,7 @@ function waitForOverlayState(expected) {
 describe('Ubuntu X11 desktop guest', () => {
   test('runs a real Xorg desktop and the Remote Mouse user service', () => {
     expect(guest('xdpyinfo | sed -n "s/^vendor string: *//p"')).toBe('The X.Org Foundation');
-    expect(guest(`for session in $(loginctl show-user vagrant -p Sessions --value); do
+    expect(guest(`for session in $(loginctl show-user "$USER" -p Sessions --value); do
       session_type=$(loginctl show-session "$session" -p Type --value 2>/dev/null || true)
       if [ "$session_type" = x11 ]; then echo x11; exit 0; fi
     done
@@ -71,14 +69,5 @@ describe('Ubuntu X11 desktop guest', () => {
       exit 1`);
     waitForOverlayState('IsViewable');
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    const artifactDirectory = path.join(repositoryRoot, 'test-results/vm-x11');
-    await mkdir(artifactDirectory, {recursive: true});
-    const screenshot = spawnSync('virsh', [
-      '--connect', 'qemu:///system',
-      'screenshot', 'vagrant_linux-x11',
-      path.join(artifactDirectory, 'overlay.png'),
-    ], {encoding: 'utf8'});
-    expect(`${screenshot.stdout}\n${screenshot.stderr}`).toContain('Screenshot saved');
-    expect(screenshot.status).toBe(0);
   });
 });

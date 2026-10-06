@@ -10,11 +10,7 @@ test-results/
 test/.tmp/
 build/
 
-# Local virtual-machine laboratory state and licensed installation media.
-dev/vagrant/.vagrant/
-dev/vagrant/config.local.yml
-dev/vagrant/cache/
-dev/vagrant/artifacts/
-dev/vagrant/images/
-dev/vagrant/iso/
-dev/vagrant/secrets/
+# Local deployment state and licensed installation media.
+dev/deploy/cache/
+dev/deploy/artifacts/
+dev/deploy/secrets/

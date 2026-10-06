@@ -29,9 +29,8 @@ entraîner de renommage.
 
 ## Ordre de livraison actuel
 
-1. Construire dans `dev/` le laboratoire Vagrant pilotant QEMU/KVM par libvirt
-   depuis Linux, afin de rendre reproductibles les validations d'installation
-   et de plateforme de l'axe `PLAT`.
+1. Déployer vers les machines de test fournies par les développeurs au moyen
+   des scripts SSH/rsync de `dev/deploy/`.
 2. Terminer avec ce laboratoire la validation de l'installation Linux et de
    l'entrée et de l'overlay sous X11 et Wayland, puis valider le cycle
    d'installation Windows 11.

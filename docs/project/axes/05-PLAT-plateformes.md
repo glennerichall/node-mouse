@@ -116,6 +116,15 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   ses ressources QEMU UEFI/TPM 2.0, son paquet npm local ignoré par Git et son
   provisionnement PowerShell; conserver `PLAT-005c1` ouverte jusqu'à une
   exécution avec une box Windows locale et licenciée.
+- [ ] PLAT-005c2 — fournir un script de création local de la box Vagrant
+  `libvirt` Windows 11 à partir des chemins fournis par le développeur pour
+  l'ISO Windows et l'ISO VirtIO; séparer le DVD IDE du disque VirtIO, charger
+  automatiquement le pilote de stockage VirtIO pendant l'installation, puis
+  automatiser le bootstrap avec WinRM, UEFI et TPM 2.0. Créer et enregistrer
+  l'artéfact sous `dev/vagrant/` ignoré par Git, sans modifier ni supprimer les
+  ISO sources ni une box existante. Documenter les prérequis et vérifier la
+  configuration Packer ainsi que l'ajout de la box; garder l'itération ouverte
+  jusqu'à un build et un démarrage réels avec les médias locaux.
 - [ ] PLAT-005d — fournir des tests intégrés relançables dans les invités. Le
   parcours d'installation doit couvrir installation neuve, démarrage du
   service, santé HTTP et version CLI; le parcours de mise à jour doit vérifier
@@ -125,6 +134,9 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   Produire un rapport local distinguant assertions automatisées, contrôles
   visuels de l'overlay/aperçu et validations sur machine physique, puis permettre
   de restaurer un état propre sans reconstruire les médias de base.
+- [x] PLAT-005e — abandonner l'orchestration Vagrant/Packer des machines de
+  développement; les développeurs fournissent leurs VM et les scripts de
+  `dev/deploy/` déploient le dépôt par SSH/rsync avant les tests intégrés.
 - [ ] Renforcer diagnostics VLC, navigateurs et Samsung TV.
 - [ ] Définir un contrat d'adaptateur avant de multiplier les intégrations.
 

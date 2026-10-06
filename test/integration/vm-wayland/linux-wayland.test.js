@@ -1,5 +1,3 @@
-import {spawnSync} from 'node:child_process';
-import {mkdir} from 'node:fs/promises';
 import {createDesktopProbe} from '../desktop-probe/index.js';
 import {runBrowserClient} from '../desktop-probe/run-browser-client.js';
 
@@ -9,7 +7,7 @@ const guest = (command) => probe.runGuest(command);
 
 describe('Ubuntu GNOME Wayland desktop guest', () => {
   test('runs a real Wayland session and receives client input through uinput', async () => {
-    expect(guest(`for session in $(loginctl show-user vagrant -p Sessions --value); do
+    expect(guest(`for session in $(loginctl show-user "$USER" -p Sessions --value); do
       if [ "$(loginctl show-session "$session" -p Type --value 2>/dev/null || true)" = wayland ]; then
         echo wayland; exit 0
       fi
@@ -47,13 +45,5 @@ describe('Ubuntu GNOME Wayland desktop guest', () => {
     echo 'QR overlay did not appear on the XWayland desktop.' >&2
     exit 1`);
 
-    const artifactDirectory = path.join(repositoryRoot, 'test-results/vm-wayland');
-    await mkdir(artifactDirectory, {recursive: true});
-    const screenshot = spawnSync('virsh', [
-      '--connect', 'qemu:///system', 'screenshot', 'vagrant_linux-wayland',
-      path.join(artifactDirectory, 'desktop.png'),
-    ], {encoding: 'utf8'});
-    expect(`${screenshot.stdout}\n${screenshot.stderr}`).toContain('Screenshot saved');
-    expect(screenshot.status).toBe(0);
   });
 });

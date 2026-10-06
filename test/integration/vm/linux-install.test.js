@@ -1,4 +1,5 @@
-import {spawn, spawnSync} from 'node:child_process';
+import {spawnSync} from 'node:child_process';
+import path from 'node:path';
 import {readFile} from 'node:fs/promises';
 import {createDesktopProbe} from '../desktop-probe/index.js';
 import {runBrowserClient} from '../desktop-probe/run-browser-client.js';
@@ -19,8 +20,7 @@ async function captureInputDuring(browserAction) {
     'keyboard=/dev/input/$(basename "$(dirname "$(dirname "$keyboard")")")',
     'sudo timeout 8s evtest "$mouse" & sudo timeout 8s evtest "$keyboard" & wait',
   ].join('; ');
-  const capture = spawn('vagrant', ['ssh', probe.machine, '-c', captureCommand], {
-    cwd: new URL('../../../dev/vagrant', import.meta.url),
+  const capture = probe.runGuestProcess(captureCommand, {
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let output = '';

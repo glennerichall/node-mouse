@@ -113,6 +113,8 @@ l'itération et devient append-only dès sa clôture.
 - [Plateformes — PLAT-005b2a](./platforms-PLAT-005b2a-2026-10-05.md): attente
   explicite de la redirection du lien de session avant d'exécuter le client
   Socket.IO dans les tests intégrés Linux et Wayland.
+- [Plateformes — PLAT-005e](./platforms-PLAT-005e-2026-10-06.md): suppression de
+  Vagrant/Packer et déploiement des tests sur les VM fournies par le développeur.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

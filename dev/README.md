@@ -1,24 +1,17 @@
 # Outils de développement
 
-Ce répertoire contient exclusivement l'outillage utilisé pour développer et
-valider Remote Mouse. Son contenu ne fait pas partie de l'installation du
-produit.
-
-## Laboratoire de machines virtuelles
-
-Le laboratoire [`vagrant/`](./vagrant/) est piloté depuis un hôte Linux avec
-Vagrant et le provider `vagrant-libvirt`. Libvirt gère les machines et
-QEMU/KVM les exécute.
-
-Après avoir installé les prérequis de l'hôte, utiliser directement Vagrant :
+Les machines de test sont fournies et administrées par le développeur. Le
+projet ne crée ni ne détruit de VM et ne dépend plus de Vagrant, libvirt ou
+Packer.
 
 ```bash
-cd dev/vagrant
-vagrant up linux-install
+export REMOTE_MOUSE_TEST_HOST=192.0.2.20
+export REMOTE_MOUSE_TEST_USER=developer
+export REMOTE_MOUSE_TEST_KEY="$HOME/.ssh/id_ed25519"
+npm run deploy:linux:x11
+npm run test:remote:x11
 ```
 
-Les suites complètes se lancent depuis la racine avec `npm run test:vm` ou
-`npm run test:all`.
-
-Les profils Linux X11, Linux Wayland et Windows 11 seront ajoutés dans les
-itérations suivantes de `PLAT-005`.
+Les scripts de `dev/deploy/` copient le dépôt par SSH/rsync, installent les
+prérequis et exécutent le bootstrap Linux sur la machine cible. Les images,
+hyperviseurs, licences et états des VM restent hors du dépôt.
