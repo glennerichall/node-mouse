@@ -9,5 +9,11 @@ describe('server-info page', () => {
     expect(html).not.toContain('new EventSource(');
     expect(html).not.toContain('/api/admin/subs/configs');
     expect(html).not.toContain('unsubscribeFromConfigEvents');
+    expect(html).toContain('logs-search');
+    expect(html).toContain('logs-level');
+    expect(html).toContain('logs-pause');
+    expect(html).toContain('logs-copy');
+    expect(html).toContain('logs-export');
+    expect(html).toContain('logsTruncated');
   });
 });

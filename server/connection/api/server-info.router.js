@@ -123,7 +123,8 @@ serverInfoRouter.get('/data', async (req, res) => {
     const rawConfig = services.getConfig();
     const rawSystemConfig = services.getSystemConfig();
     const {config, sysConfig} = buildConfigSnapshots(rawConfig, rawSystemConfig);
-    const logs = getRecentLogs(250);
+    const recentLogWindow = getRecentLogs(251);
+    const logs = recentLogWindow.slice(-250);
     const version = readPackageVersion(packageJsonPath);
     const tasks = services.getTaskManager().getTasksSnapshot();
     const tokenEntries = services.getPersistence().entryTokenDao.loadEntryTokens();
@@ -155,6 +156,7 @@ serverInfoRouter.get('/data', async (req, res) => {
       config,
       sysConfig,
       logs,
+      logsTruncated: recentLogWindow.length > logs.length,
     });
   });
 

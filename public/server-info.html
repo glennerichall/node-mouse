@@ -53,6 +53,10 @@
       overflow: auto;
     }
     #logs { max-height: 440px; }
+    .log-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; align-items: center; }
+    .log-toolbar input, .log-toolbar select, .log-toolbar button { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--text); }
+    .log-toolbar input { flex: 1 1 180px; min-width: 140px; }
+    .log-status { color: var(--muted); font-size: .82rem; }
     @media (max-width: 720px) {
       main { padding: 12px; }
       section { padding: 10px; }
@@ -189,6 +193,19 @@
 
     <section>
       <h2 data-i18n="serverInfo.section.logs">Logs recents</h2>
+      <div class="log-toolbar" aria-label="Log controls">
+        <input id="logs-search" type="search" placeholder="Search logs" aria-label="Search logs">
+        <select id="logs-level" aria-label="Log level">
+          <option value="">All levels</option><option value="trace">Trace</option><option value="debug">Debug</option>
+          <option value="info">Info</option><option value="warn">Warn</option><option value="error">Error</option><option value="fatal">Fatal</option>
+        </select>
+        <input id="logs-source" type="search" placeholder="Source" aria-label="Log source">
+        <button id="logs-pause" type="button">Pause</button>
+        <button id="logs-copy" type="button">Copy visible</button>
+        <button id="logs-export" type="button">Export visible</button>
+        <label><input id="logs-autoscroll" type="checkbox" checked> Auto-scroll</label>
+      </div>
+      <div id="logs-status" class="log-status" role="status"></div>
       <pre id="logs"></pre>
     </section>
   </main>
@@ -219,12 +236,22 @@
     const configEl = document.getElementById('config');
     const sysConfigEl = document.getElementById('sys-config');
     const logsEl = document.getElementById('logs');
+    const logsSearchEl = document.getElementById('logs-search');
+    const logsLevelEl = document.getElementById('logs-level');
+    const logsSourceEl = document.getElementById('logs-source');
+    const logsPauseEl = document.getElementById('logs-pause');
+    const logsCopyEl = document.getElementById('logs-copy');
+    const logsExportEl = document.getElementById('logs-export');
+    const logsAutoScrollEl = document.getElementById('logs-autoscroll');
+    const logsStatusEl = document.getElementById('logs-status');
     const LOG_BOTTOM_THRESHOLD_PX = 8;
     const dateTimeFormatter = new Intl.DateTimeFormat(undefined, {
       dateStyle: 'medium',
       timeStyle: 'medium',
     });
     let logsAutoScroll = true;
+    let logsPaused = false;
+    let currentLogs = [];
 
     function t(key, params) {
       return i18n.t(key, params);
@@ -395,11 +422,31 @@
       }
     }
 
-    function renderLogs(logs) {
-      const previousScrollTop = logsEl.scrollTop;
-      const shouldAutoScroll = logsAutoScroll;
+    function visibleLogs() {
+      const search = logsSearchEl.value.trim().toLowerCase();
+      const level = logsLevelEl.value;
+      const source = logsSourceEl.value.trim().toLowerCase();
+      return currentLogs.filter((entry) => {
+        const text = `${entry.message || ''} ${JSON.stringify(entry.data || {})}`.toLowerCase();
+        return (!level || entry.level === level) && (!source || String(entry.scope || '').toLowerCase().includes(source)) && (!search || text.includes(search));
+      });
+    }
 
-      if (!Array.isArray(logs) || logs.length === 0) {
+    function formatLogEntries(logs) {
+      return logs.map((entry) => {
+        const prefix = `[${entry.at}] [${entry.level}] [${entry.scope}]`;
+        const data = entry.data ? ` ${JSON.stringify(entry.data)}` : '';
+        return `${prefix} ${entry.message || ''}${data}`;
+      }).join('\n');
+    }
+
+    function renderLogs(logs, truncated = false) {
+      currentLogs = Array.isArray(logs) ? logs : [];
+      const filteredLogs = visibleLogs();
+      const previousScrollTop = logsEl.scrollTop;
+      const shouldAutoScroll = logsAutoScroll && logsAutoScrollEl.checked;
+
+      if (filteredLogs.length === 0) {
         logsEl.textContent = t('serverInfo.empty.logs');
         if (shouldAutoScroll) {
           logsEl.scrollTop = logsEl.scrollHeight;
@@ -408,12 +455,8 @@
         }
         return;
       }
-      logsEl.textContent = logs.map((entry) => {
-        const prefix = `[${entry.at}] [${entry.level}] [${entry.scope}]`;
-        const msg = entry.message || '';
-        const data = entry.data ? ` ${JSON.stringify(entry.data)}` : '';
-        return `${prefix} ${msg}${data}`;
-      }).join('\n');
+      logsEl.textContent = formatLogEntries(filteredLogs);
+      logsStatusEl.textContent = `${filteredLogs.length}/${currentLogs.length} entries${truncated ? ' — history truncated to the latest 250 entries' : ''}${logsPaused ? ' — refresh paused' : ''}`;
       if (shouldAutoScroll) {
         logsEl.scrollTop = logsEl.scrollHeight;
       } else {
@@ -521,7 +564,7 @@
         renderCapabilities(data.system || null);
         renderConfigSnapshot(data.config);
         renderSystemConfigSnapshot(data.sysConfig);
-        renderLogs(data.logs || []);
+        if (!logsPaused) renderLogs(data.logs || [], data.logsTruncated);
       } catch (error) {
         logsEl.textContent = t('serverInfo.loadError', {message: error?.message || error});
       }
@@ -530,6 +573,17 @@
     logsEl.addEventListener('scroll', () => {
       logsAutoScroll = isLogScrollAtBottom();
     }, { passive: true });
+    [logsSearchEl, logsLevelEl, logsSourceEl].forEach((element) => element.addEventListener('input', () => renderLogs(currentLogs)));
+    logsPauseEl.addEventListener('click', () => {
+      logsPaused = !logsPaused;
+      logsPauseEl.textContent = logsPaused ? 'Resume' : 'Pause';
+      renderLogs(currentLogs);
+    });
+    logsCopyEl.addEventListener('click', async () => { await navigator.clipboard?.writeText(formatLogEntries(visibleLogs())); });
+    logsExportEl.addEventListener('click', () => {
+      const blob = new Blob([formatLogEntries(visibleLogs())], {type: 'text/plain;charset=utf-8'});
+      const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'remote-mouse-logs.txt'; link.click(); URL.revokeObjectURL(link.href);
+    });
 
     refresh();
     setInterval(refresh, 2000);
