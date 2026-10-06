@@ -117,16 +117,16 @@ export function createSystemService(services) {
   const log = getModuleLog();
   return {
     listBrowsers() {
-      log.debug('Detection des navigateurs disponibles');
+      log.debug('Detecting available browsers');
       return services.getRemotes().browser.listBrowsers();
     },
     isVlcAvailable() {
-      log.debug('Detection disponibilite VLC');
+      log.debug('Detecting VLC availability');
       return services.getRemotes().vlc.isAvailable();
     },
     async getScreenInfo() {
       const screen = await getScreenInfo(services);
-      log.debug({screen}, 'Detection resolution ecran');
+      log.debug({screen}, 'Detecting screen resolution');
       return screen;
     },
     getNetworkInfo() {
@@ -135,11 +135,11 @@ export function createSystemService(services) {
         lanIp: network.lanIp,
         publicBaseUrl: network.publicBaseUrl,
         interfaceCount: network.interfaces.length,
-      }, 'Detection reseau');
+      }, 'Detecting network');
       return network;
     },
     async getInfo() {
-      log.debug('Collecte des capacites serveur');
+      log.debug('Collecting server capabilities');
       const browsers = await this.listBrowsers();
       const vlcAvailable = await this.isVlcAvailable();
       const applications = buildApplications({browsers, vlcAvailable});
@@ -159,7 +159,7 @@ export function createSystemService(services) {
         remoteCount: allRemotes.filter((remote) => remote.available).length,
         screen,
         lanIp: network.lanIp,
-      }, 'Capacites serveur collectees');
+      }, 'Server capabilities collected');
 
       return {
         platform: services.getOs().platform,

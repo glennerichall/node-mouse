@@ -19,7 +19,7 @@ function createNotificationHandler(services) {
     const log = createLogger('socket:timestamp');
 
     return socket => {
-        log.info({socketId: socket.id}, 'Client connecté');
+        log.info({socketId: socket.id}, 'Client connected');
         events.publishEvent(PUBSUB_SERVICE_SOCKET, PUBSUB_EVENT_SOCKET_CLIENT_CONNECTED, {
             clientId: socket.id,
         });
@@ -65,7 +65,7 @@ export function bootstrapSocket(services) {
 
     const {io, cookieParser} = getServer();
     const systemConfig = services.getSystemConfig();
-    log.debug('Initialisation Socket.IO');
+    log.debug('Initializing Socket.IO');
 
     io.engine.use((...args) => cookieParser(...args));
     
@@ -76,11 +76,11 @@ export function bootstrapSocket(services) {
     io.use(createSocketSessionAuthMiddleware(services));
     io.use(createSocketInputGuard());
     io.use(createSocketGuardMiddleware(services));
-    log.trace('Middlewares Socket.IO enregistres');
+    log.trace('Socket.IO middlewares registered');
 
     io.on('connection', broadcast(
         createNotificationHandler(services),
         createActionHandlers(services)
     ));
-    log.debug('Handlers Socket.IO enregistres');
+    log.debug('Socket.IO handlers registered');
 }

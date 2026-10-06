@@ -34,7 +34,7 @@ export function createRotateEntryTokenAction(services) {
       return { ok: false, message: 'Token non change (mode fixe ou rotation indisponible).' };
     }
 
-    log.info('Token d entree force en rotation');
+    log.info('Entry token rotation forced');
     events.publishEvent(PUBSUB_SERVICE_ADMIN_ROTATE_ENTRY_TOKEN, PUBSUB_EVENT_ADMIN_ROTATED, {
       clientId,
     });

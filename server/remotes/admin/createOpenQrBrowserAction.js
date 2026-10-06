@@ -36,7 +36,7 @@ export function createOpenQrBrowserAction(services, options = {}) {
     const clientQrUrl = '/qr';
 
     if (isClientTarget) {
-      log.info({ clientId, clientQrUrl }, 'Ouverture de la page QR sur le client');
+      log.info({ clientId, clientQrUrl }, 'Opening QR page on client');
       events.publishEvent(PUBSUB_SERVICE_ADMIN_OPEN_QR_BROWSER, PUBSUB_EVENT_ADMIN_CLIENT_OPENED, {
         clientId,
       });
@@ -49,7 +49,7 @@ export function createOpenQrBrowserAction(services, options = {}) {
 
     const config = services.getSystemConfig();
     const localQrUrl = `${config.protocol}://127.0.0.1:${config.port}/qr`;
-    log.info({ localQrUrl }, 'Ouverture de la page QR sur le serveur');
+      log.info({ localQrUrl }, 'Opening QR page on server');
 
     const ok = await browser.openUrlOnHost(localQrUrl);
     if (!ok) {

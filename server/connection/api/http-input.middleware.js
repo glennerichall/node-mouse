@@ -10,7 +10,7 @@ export function createHttpErrorMiddleware({log}) {
       : error?.type === 'entity.parse.failed'
         ? 400
         : 500;
-    log.warn({requestId: req.requestId, status}, 'Requête HTTP rejetée');
+    log.warn({requestId: req.requestId, status}, 'HTTP request rejected');
     res.status(status).json({
       ok: false,
       message: status === 413

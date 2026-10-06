@@ -69,7 +69,7 @@ export async function startCliServer(services) {
     let input = '';
     let handled = false;
     socket.setEncoding('utf8');
-    log.trace('Connexion CLI ouverte');
+    log.trace('CLI connection opened');
 
     async function handleCommand() {
       if (handled) {
@@ -96,7 +96,7 @@ export async function startCliServer(services) {
         }, 'Commande CLI terminee');
         writeResult(socket, result, request.options);
       } catch (error) {
-        log.error({err: error}, 'Erreur execution commande CLI');
+        log.error({err: error}, 'CLI command execution failed');
         writeResponse(socket, {
           ok: false,
           message: `Erreur CLI: ${error.message}`,
@@ -112,7 +112,7 @@ export async function startCliServer(services) {
       void handleCommand();
     });
     socket.on('close', () => {
-      log.trace('Connexion CLI fermee');
+    log.trace('CLI connection closed');
     });
   });
 
@@ -130,7 +130,7 @@ export async function startCliServer(services) {
 
   cliSocket.secureCliServerSocket(socketPath);
 
-  log.info({socketPath}, 'Interface CLI locale prête');
+  log.info({socketPath}, 'Local CLI interface ready');
 
   return {
     close() {

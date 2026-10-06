@@ -41,14 +41,14 @@ export function createServer(services) {
         protocol: config.protocol,
         port: config.port,
         httpsEnabled: Boolean(config.https.enabled),
-    }, 'Serveur HTTP initialise');
+    }, 'HTTP server initialized');
 
     server.on('connection', (socket) => {
         sockets.add(socket);
-        log.trace({socketCount: sockets.size}, 'Connexion HTTP ouverte');
+        log.trace({socketCount: sockets.size}, 'HTTP connection opened');
         socket.on('close', () => {
             sockets.delete(socket);
-            log.trace({socketCount: sockets.size}, 'Connexion HTTP fermee');
+        log.trace({socketCount: sockets.size}, 'HTTP connection closed');
         });
     });
 
@@ -65,11 +65,11 @@ export function createServer(services) {
         serverStartedAt,
         cookieParser: cookies,
         closeIdleConnections: () => {
-            log.debug('Fermeture connexions HTTP inactives');
+        log.debug('Closing idle HTTP connections');
             server.closeIdleConnections?.();
         },
         destroyConnections: () => {
-            log.debug({socketCount: sockets.size}, 'Destruction connexions HTTP restantes');
+        log.debug({socketCount: sockets.size}, 'Destroying remaining HTTP connections');
             for (const socket of sockets) {
                 socket.destroy();
             }

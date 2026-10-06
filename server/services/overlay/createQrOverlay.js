@@ -43,7 +43,7 @@ export async function createQrOverlay(services, dependencies = {}) {
       size,
       showDelayMs: config.hoverShowDelayMs,
       autoHide: config.autoHideOnHover,
-      onError: (error) => log.warn({err: error}, 'Impossible de lancer l’overlay QR'),
+      onError: (error) => log.warn({err: error}, 'Failed to start QR overlay'),
     };
   }
 

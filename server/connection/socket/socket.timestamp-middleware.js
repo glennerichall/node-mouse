@@ -21,7 +21,7 @@ export function socketTimestampGuardMiddleware({
       : NaN;
 
     if (!Number.isFinite(ts)) {
-      log.warn({ socketId, event: packet[0] }, 'Message socket sans timestamp');
+      log.warn({ socketId, event: packet[0] }, 'Socket message has no timestamp');
       next(new Error('missing_timestamp'));
       return;
     }
@@ -29,7 +29,7 @@ export function socketTimestampGuardMiddleware({
     const rawDeltaMs = Date.now() - ts;
     if (observedClockOffsetMs == null && Math.abs(rawDeltaMs) <= maxClockSkewMs) {
       observedClockOffsetMs = rawDeltaMs;
-      log.info({ socketId, event: packet[0], observedClockOffsetMs }, 'Calibration horloge socket');
+      log.info({ socketId, event: packet[0], observedClockOffsetMs }, 'Socket clock calibrated');
     }
 
     const ageMs = rawDeltaMs - (observedClockOffsetMs || 0);
@@ -41,7 +41,7 @@ export function socketTimestampGuardMiddleware({
         rawDeltaMs,
         observedClockOffsetMs,
         maxEventAgeMs,
-      }, 'Message socket expiré');
+      }, 'Socket message expired');
       next(new Error('stale_event'));
       return;
     }

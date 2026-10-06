@@ -41,7 +41,7 @@ export function createSamsungCommandService({getConfig, discoverDevices, getSams
             const samsungTv = await getSamsungTv();
             return samsungTv.getPowerState();
         } catch (error) {
-            getLogger().warn({err: error?.message || String(error)}, 'Etat Samsung indisponible');
+            getLogger().warn({err: error?.message || String(error)}, 'Samsung state unavailable');
             return 'unknown';
         }
     }
@@ -86,11 +86,11 @@ export function createSamsungCommandService({getConfig, discoverDevices, getSams
             const samsungTv = await getSamsungTv();
             await samsungTv.sendKey(key);
             invalidatePowerState();
-            getLogger().info({key}, 'Commande Samsung envoyee');
+            getLogger().info({key}, 'Samsung command sent');
             return createSamsungResult(successMessage);
         } catch (error) {
             const message = toSamsungErrorMessage(error);
-            getLogger().warn({key, err: message}, 'Echec commande Samsung');
+            getLogger().warn({key, err: message}, 'Samsung command failed');
             return {
                 ok: false,
                 message: `TV Samsung indisponible: ${message}`,
@@ -107,11 +107,11 @@ export function createSamsungCommandService({getConfig, discoverDevices, getSams
             const samsungTv = await getSamsungTv();
             await samsungTv.sendKeys(keys);
             invalidatePowerState();
-            getLogger().info({keys}, 'Sequence Samsung envoyee');
+            getLogger().info({keys}, 'Samsung sequence sent');
             return createSamsungResult(successMessage);
         } catch (error) {
             const message = toSamsungErrorMessage(error);
-            getLogger().warn({keys, err: message}, 'Echec sequence Samsung');
+            getLogger().warn({keys, err: message}, 'Samsung sequence failed');
             return {
                 ok: false,
                 message: `TV Samsung indisponible: ${message}`,
@@ -139,11 +139,11 @@ export function createSamsungCommandService({getConfig, discoverDevices, getSams
                 const samsungTv = await getSamsungTv();
                 await samsungTv.wakeTV();
                 invalidatePowerState();
-                getLogger().info('Wake-on-LAN Samsung envoye');
+                getLogger().info('Samsung Wake-on-LAN packet sent');
                 return createSamsungResult("Demande d'allumage envoyee a la TV Samsung.");
             } catch (error) {
                 const message = toSamsungErrorMessage(error);
-                getLogger().warn({err: message}, 'Echec allumage Samsung');
+                getLogger().warn({err: message}, 'Samsung power-on failed');
                 return {
                     ok: false,
                     message: `Impossible d'allumer la TV Samsung: ${message}`,

@@ -21,7 +21,7 @@ function getVerbosityLogLevel(verbosity) {
 export async function withCliVerbosity(options = {}, callback, onLog = null) {
   const log = getModuleLog();
   const verbosity = normalizeVerbosity(options);
-  log.trace({verbosity}, 'Application verbosite CLI');
+  log.trace({verbosity}, 'CLI verbosity applied');
 
   return verbosity > 0
     ? withCliLogStream(getVerbosityLogLevel(verbosity), onLog, callback)

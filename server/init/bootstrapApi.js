@@ -44,7 +44,7 @@ export function bootstrapApi(services) {
     }, 'Initialisation API Express');
 
     if (!systemConfig.https.enabled) {
-        log.warn('HTTPS=false: cookie session envoyé sans attribut Secure (moins sécuritaire).');
+        log.warn('HTTPS=false: session cookie sent without the Secure attribute (less secure).');
     }
     app.set('trust proxy', createProxyTrust(systemConfig.trustProxy));
 
@@ -63,7 +63,7 @@ export function bootstrapApi(services) {
     app.use('/api/remotes', remotesRouter);
     app.use('/api/admin', adminApiRouter);
     app.use('/ui/admin', adminUiRouter);
-    log.trace('Routes API enregistrees');
+    log.trace('API routes registered');
 
     app.get('/health', (_req, res) => {
         res.json({

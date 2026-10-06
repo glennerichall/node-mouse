@@ -238,8 +238,8 @@ describe('createUpdateManager', () => {
     expect(chooseUpdateInstallSource).toHaveBeenCalledTimes(1);
     expect(logger.info).toHaveBeenNthCalledWith(1, {
       installCommand: 'npm update -g remote-mouse --force',
-    }, 'Exécution commande install update');
-    expect(logger.info).toHaveBeenNthCalledWith(2, 'Install update terminée avec succès');
+      }, 'Executing update install command');
+    expect(logger.info).toHaveBeenNthCalledWith(2, 'Update install completed successfully');
   });
 });
 

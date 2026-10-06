@@ -103,15 +103,15 @@ export function createUpdateManager(services) {
         const install = chooseUpdateInstallSource(services);
         lastInstallCommand = String(install.command || '');
         log.debug({ installCommand: lastInstallCommand }, 'Install update: source resolved');
-        log.info({installCommand: lastInstallCommand}, 'Exécution commande install update');
+        log.info({installCommand: lastInstallCommand}, 'Executing update install command');
         const result = await install();
         log.debug({ result }, 'Install update: source returned');
         if (result.ok) {
-            log.info('Install update terminée avec succès');
+            log.info('Update install completed successfully');
             return result;
         }
         if (result?.status === 'failed') {
-            log.error({details: result.details}, 'Install update en échec');
+            log.error({details: result.details}, 'Update install failed');
         }
         return result;
     }

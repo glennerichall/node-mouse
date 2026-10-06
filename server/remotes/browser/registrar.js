@@ -19,7 +19,7 @@ export const createBrowserRegistrar = ({browser, getConfig = () => ({})}) => {
         socket.on(REMOTE_EVENT_BROWSER_OPEN, async (payload = {}) => {
             const browserId = typeof payload?.browserId === 'string' ? payload.browserId : 'brave';
             if (!isBrowserEnabled(getConfig(), browserId)) {
-                log.info({client, browserId}, 'Browser ignore: desactive par configuration.');
+                log.info({client, browserId}, 'Browser ignored: disabled by configuration.');
                 return;
             }
             log.info({client, browserId}, `Demande ${REMOTE_EVENT_BROWSER_OPEN}`);

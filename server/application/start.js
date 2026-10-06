@@ -69,9 +69,9 @@ export function createApplicationStart(services) {
           config,
         });
 
-        log.info({url: urls.entryUrl, qrUrl: urls.qrUrl}, 'Remote Mouse server démarré');
+        log.info({url: urls.entryUrl, qrUrl: urls.qrUrl}, 'Remote Mouse server started');
         logStartupUrls(urls);
-        log.info('Scanner ce QR avec le mobile');
+        log.info('Scan this QR code with your mobile device');
 
         if (services.getConfig().qrOverlay?.enabled) {
           await qrOverlay.show();
@@ -82,7 +82,7 @@ export function createApplicationStart(services) {
         try {
           state.cliServer = await startCliServer(services);
         } catch (error) {
-          log.error({err: error}, 'Erreur au démarrage de l interface CLI locale');
+          log.error({err: error}, 'Failed to start the local CLI interface');
         }
 
         qrcodeTerminal.generate(urls.entryUrl, {small: true});

@@ -88,13 +88,13 @@ export async function createServicesContainer({
 
     };
 
-    log.debug('Initialisation du controleur de bureau');
+    log.debug('Initializing desktop controller');
     desktopControllerInstance = await createDesktopController();
-    log.debug('Controleur de bureau initialise');
+    log.debug('Desktop controller initialized');
 
-    log.debug('Initialisation service QR overlay');
+    log.debug('Initializing QR overlay service');
     qrOverlayInstance = await createQrOverlay(container);
-    log.debug('Service QR overlay initialise');
+    log.debug('QR overlay service initialized');
 
     return container;
 }

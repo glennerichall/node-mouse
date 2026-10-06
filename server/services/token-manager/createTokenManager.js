@@ -45,7 +45,7 @@ export function createTokenManager(services) {
             hasCurrentToken: Boolean(getCurrentToken()),
             tokenCount: loadTokens(),
             nextRotationDelayMs,
-        }, 'Publication etat token manager');
+        }, 'Token manager state published');
 
         services.getEvents().publishState(PUBSUB_SERVICE_TOKEN_MANAGER, {
             enabled: isEffectivelyEnabled(),
@@ -133,12 +133,12 @@ export function createTokenManager(services) {
                 persist,
                 gateEnabled: isGateEnabled(),
                 fixedPathEnabled: Boolean(normalizedFixedPath),
-            }, 'Nettoyage tokens expire ignores');
+            }, 'Expired token cleanup skipped');
             return;
         }
         if (persist) {
             const graceTtlMs = computeTokenTtlMs(getEntryPathConfig().graceMin);
-            log.debug({graceTtlMs}, 'Nettoyage tokens expires');
+        log.debug({graceTtlMs}, 'Expired token cleanup');
             persistence.deleteExpiredTokens({
                 olderThan: Date.now() - graceTtlMs,
                 keepToken: getCurrentToken(),
@@ -154,13 +154,13 @@ export function createTokenManager(services) {
                 enabled: isEffectivelyEnabled(),
                 fixedPathEnabled: Boolean(normalizedFixedPath),
                 hasCurrentToken: Boolean(currentToken),
-            }, 'Creation token ignoree');
+            }, 'Token creation skipped');
             return currentToken;
         }
         const createdAt = Date.now();
         const token = createRandomToken(getEntryPathConfig().tokenLength);
 
-        log.debug({tokenLength: token.length}, 'Creation nouveau token entree');
+        log.debug({tokenLength: token.length}, 'Created new entry token');
         persistence.createToken(token, createdAt);
         cleanupExpired({persist: true});
         if (token !== currentToken) {
@@ -177,7 +177,7 @@ export function createTokenManager(services) {
             log.trace({
                 mode: 'fixed',
                 hasInputToken: Boolean(normalized),
-            }, 'Validation token entree');
+            }, 'Entry token validated');
             if (!normalized) {
                 return false;
             }
@@ -188,7 +188,7 @@ export function createTokenManager(services) {
                 mode: 'disabled',
                 hasCurrentToken: Boolean(currentToken),
                 hasInputToken: Boolean(normalized),
-            }, 'Validation token entree');
+            }, 'Entry token validated');
             if (!currentToken) {
                 return true;
             }
@@ -198,38 +198,38 @@ export function createTokenManager(services) {
             return normalized === currentToken;
         }
         if (!normalized) {
-            log.trace('Validation token entree rejetee: token vide');
+        log.trace('Entry token validation rejected: empty token');
             return false;
         }
         cleanupExpired({persist: true});
         if (!isPersistenceEnabled()) {
-            log.trace('Validation token entree rejetee: persistence inactive');
+        log.trace('Entry token validation rejected: persistence inactive');
             return false;
         }
-        log.trace('Validation token entree via persistence');
+        log.trace('Entry token validation through persistence');
         return Boolean(persistence.hasToken(normalized));
     }
 
     function rotateIfNeeded() {
         if (!isPersistenceEnabled()) {
-            log.trace('Rotation token ignoree: persistence inactive');
+        log.trace('Token rotation skipped: persistence inactive');
             return getCurrentToken();
         }
 
         const latestToken = getLatestTokenRecord();
         if (!latestToken) {
-            log.debug('Rotation token: aucun token existant');
+        log.debug('Token rotation: no existing token');
             return createToken();
         }
 
         if (!Number.isFinite(latestToken.createdAt) || Date.now() < latestToken.createdAt + getRotateTtlMs()) {
             log.trace({
                 hasCreatedAt: Number.isFinite(latestToken.createdAt),
-            }, 'Rotation token non requise');
+            }, 'Token rotation not required');
             return latestToken.token;
         }
 
-        log.debug('Rotation token requise');
+        log.debug('Token rotation required');
         return createToken();
     }
     

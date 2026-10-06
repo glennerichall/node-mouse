@@ -94,7 +94,7 @@ describe('createAdminEventGuardMiddleware', () => {
     expect(respondAdminAction.firstCall.args[0]).toBe('service-restart');
     expect(respondAdminAction.firstCall.args[1]).toEqual({
       ok: false,
-      message: 'Actions admin desactivees.',
+      message: 'Admin actions disabled.',
     });
     expect(next.calledOnce).toBe(true);
     expect(next.firstCall.args[0]).toBeInstanceOf(Error);

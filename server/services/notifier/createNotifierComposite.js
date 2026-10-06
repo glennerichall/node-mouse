@@ -105,7 +105,7 @@ export function createNotifierComposite({clientNotifier, serverNotifier, getNoti
                 }
 
                 if (!NOTIFIER_TARGETS.includes(resolvedTarget)) {
-                    log.warn({target: resolvedTarget}, 'Target de notification inconnu');
+                    log.warn({target: resolvedTarget}, 'Unknown notification target');
                 }
             },
         };

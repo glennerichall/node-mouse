@@ -40,6 +40,6 @@ export function createLinuxQrOverlayAdapter(dependencies = {}) {
     hide: (handle) => handle?.hide(),
     close: (handle) => handle?.close(),
     isSuppressed: (handle) => handle?.getState() === 'hover-hidden',
-    unavailableMessage: 'Overlay QR natif indisponible; exécutez npm run build:xwayland-overlay',
+    unavailableMessage: 'Native QR overlay unavailable; run npm run build:xwayland-overlay',
   };
 }

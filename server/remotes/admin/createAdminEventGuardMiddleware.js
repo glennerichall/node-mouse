@@ -16,7 +16,7 @@ export function createAdminEventGuardMiddleware({
 
     if (!isAdmin) {
       const action = eventName.replace(REMOTE_EVENT_ADMIN_PREFIX, '');
-      log.warn({client, action}, 'Action admin refusée: rôle insuffisant');
+      log.warn({client, action}, 'Admin action rejected: insufficient role');
       respondAdminAction(action, {
         ok: false,
         message: 'Permission administrateur requise.',
@@ -31,10 +31,10 @@ export function createAdminEventGuardMiddleware({
     }
 
     const action = eventName.replace(REMOTE_EVENT_ADMIN_PREFIX, '');
-    log.warn({ client, action }, 'Action admin refusée: ADMIN_ACTIONS_ENABLED=false');
+      log.warn({ client, action }, 'Admin action rejected: ADMIN_ACTIONS_ENABLED=false');
     respondAdminAction(action, {
       ok: false,
-      message: 'Actions admin desactivees.',
+      message: 'Admin actions disabled.',
     });
     next(new Error('admin_actions_disabled'));
   };

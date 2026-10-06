@@ -26,7 +26,7 @@ export function createApplicationShutdown(services) {
     }
 
     state.shuttingDown = true;
-    log.info({signal}, 'Arret du serveur');
+      log.info({signal}, 'Server shutdown requested');
     services.getPersistence().restartLogDao?.createLifecycleEvent({
       eventAt: Date.now(),
       eventType: 'stop',
@@ -41,18 +41,18 @@ export function createApplicationShutdown(services) {
     });
 
     await Promise.allSettled([
-      runShutdownStep('Erreur a l arret du task manager', () => taskManager.stop()),
-      runShutdownStep('Erreur a l arret de l observateur de configuration', () => state.stopConfigObserver()),
-      runShutdownStep('Erreur a l arret de l observateur de notifications', () => state.stopNotificationObserver()),
-      runShutdownStep('Erreur a l arret de l observateur des evenements update-manager', () => state.stopUpdateManagerLogObserver()),
-      runShutdownStep('Erreur a l arret de l observateur de resolution ecran', () => state.stopDisplaySizeObserver()),
-      runShutdownStep('Erreur a l arret de l observateur du QR overlay', () => state.stopQrOverlayRefreshObserver()),
-      runShutdownStep('Erreur a l arret de l observateur du survol QR overlay', () => state.stopQrOverlayHoverObserver()),
-      runShutdownStep('Erreur a la fermeture du socket CLI', () => state.cliServer?.close()),
-      runShutdownStep('Erreur a la fermeture du QR overlay', () => qrOverlay.close()),
-      runShutdownStep('Erreur a la fermeture du controleur de bureau', () => services.getDesktopController()?.close?.()),
-      runShutdownStep('Erreur a la fermeture des connexions SSE', () => sseService?.closeAll?.()),
-      runShutdownStep('Erreur a la fermeture de Socket.IO', () => new Promise((resolve) => {
+      runShutdownStep('Failed to stop task manager', () => taskManager.stop()),
+      runShutdownStep('Failed to stop configuration observer', () => state.stopConfigObserver()),
+      runShutdownStep('Failed to stop notification observer', () => state.stopNotificationObserver()),
+      runShutdownStep('Failed to stop update-manager observer', () => state.stopUpdateManagerLogObserver()),
+      runShutdownStep('Failed to stop screen resolution observer', () => state.stopDisplaySizeObserver()),
+      runShutdownStep('Failed to stop QR overlay observer', () => state.stopQrOverlayRefreshObserver()),
+      runShutdownStep('Failed to stop QR hover observer', () => state.stopQrOverlayHoverObserver()),
+      runShutdownStep('Failed to close CLI socket', () => state.cliServer?.close()),
+      runShutdownStep('Failed to close QR overlay', () => qrOverlay.close()),
+      runShutdownStep('Failed to close desktop controller', () => services.getDesktopController()?.close?.()),
+      runShutdownStep('Failed to close SSE connections', () => sseService?.closeAll?.()),
+      runShutdownStep('Failed to close Socket.IO', () => new Promise((resolve) => {
         io?.close?.(() => resolve());
       })),
     ]);
@@ -60,7 +60,7 @@ export function createApplicationShutdown(services) {
     try {
       serverBundle.closeIdleConnections?.();
     } catch (error) {
-      log.error({err: error}, 'Erreur a la fermeture des connexions HTTP inactives');
+      log.error({err: error}, 'Failed to close idle HTTP connections');
     }
 
     await new Promise((resolve) => {
@@ -68,7 +68,7 @@ export function createApplicationShutdown(services) {
         try {
           serverBundle.destroyConnections?.();
         } catch (error) {
-          log.error({err: error}, 'Erreur a la destruction forcee des connexions HTTP');
+      log.error({err: error}, 'Failed to force-close remaining HTTP connections');
         }
       }, 1_500);
 

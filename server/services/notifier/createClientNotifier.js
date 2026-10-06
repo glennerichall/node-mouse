@@ -10,7 +10,7 @@ export function createClientNotifier(services) {
 
       if (scope === NOTIFIER_TARGET_CLIENT) {
         if (!clientId) {
-          log.warn('Notification ciblée client ignorée: clientId manquant');
+          log.warn('Targeted client notification ignored: missing clientId');
           return;
         }
         services.getServer().io.to(clientId).emit('notification', payload);

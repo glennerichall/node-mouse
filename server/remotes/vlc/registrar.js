@@ -35,11 +35,11 @@ export function createVlcRegistrar({ vlc, keyboard, getConfig = () => ({}) }) {
 
     async function ensureUsable() {
       if (!(await vlc.isAvailable())) {
-        log.info({ client }, 'VLC ignore: non disponible sur le host.');
+        log.info({ client }, 'VLC ignored: unavailable on host.');
         return false;
       }
       if (!isVlcEnabled(getConfig())) {
-        log.info({ client }, 'VLC ignore: desactive par configuration.');
+        log.info({ client }, 'VLC ignored: disabled by configuration.');
         return false;
       }
       return true;
@@ -50,7 +50,7 @@ export function createVlcRegistrar({ vlc, keyboard, getConfig = () => ({}) }) {
         return;
       }
 
-      log.info({ client }, `Demande ${REMOTE_EVENT_VLC_OPEN}`);
+        log.info({ client }, `Request ${REMOTE_EVENT_VLC_OPEN}`);
       await vlc.focusOrLaunch();
     });
 
@@ -65,7 +65,7 @@ export function createVlcRegistrar({ vlc, keyboard, getConfig = () => ({}) }) {
         return;
       }
 
-      log.info({ client, action }, `Demande ${REMOTE_EVENT_VLC_COMMAND}`);
+        log.info({ client, action }, `Request ${REMOTE_EVENT_VLC_COMMAND}`);
       const focused = await vlc.focusOrLaunch();
       if (!focused) {
         return;
@@ -78,7 +78,7 @@ export function createVlcRegistrar({ vlc, keyboard, getConfig = () => ({}) }) {
         return;
       }
 
-      log.info({ client }, `Demande ${REMOTE_EVENT_VLC_WINDOW_TOGGLE}`);
+        log.info({ client }, `Request ${REMOTE_EVENT_VLC_WINDOW_TOGGLE}`);
       await vlc.toggleWindow();
     });
 
@@ -87,7 +87,7 @@ export function createVlcRegistrar({ vlc, keyboard, getConfig = () => ({}) }) {
         return;
       }
 
-      log.info({ client }, `Demande ${REMOTE_EVENT_VLC_WINDOW_CLOSE}`);
+        log.info({ client }, `Request ${REMOTE_EVENT_VLC_WINDOW_CLOSE}`);
       await vlc.closeWindow();
     });
   };
