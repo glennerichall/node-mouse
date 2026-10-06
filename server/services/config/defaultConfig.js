@@ -41,6 +41,8 @@ const DEFAULT_BROWSER_CONFIG = Object.fromEntries(
 export const DEFAULT_SYSTEM_CONFIG = {
     port: 3000,
     serverHost: '',
+    listenHost: '',
+    publicBaseUrl: '',
     trustProxy: '',
     allowedOrigins: [],
     entryPath: {

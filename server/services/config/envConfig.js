@@ -8,6 +8,8 @@ export function getEnvConfig() {
     return {
         port: readOptionalNumber('PORT'),
         serverHost: readOptionalString('SERVER_HOST'),
+        listenHost: readOptionalString('LISTEN_HOST'),
+        publicBaseUrl: readOptionalString('PUBLIC_BASE_URL'),
         trustProxy: readOptionalString('TRUST_PROXY'),
         allowedOrigins: readOptionalString('ALLOWED_ORIGINS')
             ?.split(',')

@@ -14,6 +14,8 @@ export function logStartupConfig(logger, config) {
     emitConfigLine(logger, 'config.network', {
         protocol: systemConfig.protocol,
         port: systemConfig.port,
+        listenHost: systemConfig.listenHost,
+        publicBaseUrl: systemConfig.publicBaseUrl,
         serverHost: systemConfig.serverHost || '(auto LAN detection)',
     });
     emitConfigLine(logger, 'config.entryPath', {

@@ -1,7 +1,7 @@
 import http from 'node:http';
 import express from 'express';
 import {Server} from 'socket.io';
-import {getPublicUrl} from '../../utils/network.js';
+import {getPublicUrl, normalizeBaseUrl} from '../../utils/network.js';
 import cookieParser from "cookie-parser";
 import {createHttpsServer} from "./createHttpsServer.js";
 import {createLogger} from '../../application/logger.js';
@@ -52,7 +52,7 @@ export function createServer(services) {
         });
     });
 
-    const basePublicUrl = getPublicUrl(
+    const basePublicUrl = normalizeBaseUrl(config.publicBaseUrl) || getPublicUrl(
         config.port,
         config.protocol,
         config.serverHost);
@@ -62,6 +62,7 @@ export function createServer(services) {
         io,
         app,
         basePublicUrl,
+        listenHost: config.listenHost,
         serverStartedAt,
         cookieParser: cookies,
         closeIdleConnections: () => {

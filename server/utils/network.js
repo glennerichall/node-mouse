@@ -29,6 +29,21 @@ export function getPublicUrl(port, protocol = 'http', forcedHost = '') {
   return `${protocol}://${getLanIp(forcedHost)}:${port}`;
 }
 
+export function normalizeBaseUrl(value) {
+  const normalized = String(value || '').trim();
+  if (!normalized) return '';
+  let parsed;
+  try {
+    parsed = new URL(normalized);
+  } catch (_error) {
+    throw new Error('PUBLIC_BASE_URL must be an absolute HTTP(S) URL');
+  }
+  if (!['http:', 'https:'].includes(parsed.protocol) || parsed.username || parsed.password || parsed.search || parsed.hash) {
+    throw new Error('PUBLIC_BASE_URL must be an absolute HTTP(S) URL without credentials or query parameters');
+  }
+  return parsed.toString().replace(/\/$/, '');
+}
+
 export async function pingHost(host, timeoutMs = 2000) {
   const normalizedHost = String(host || '').trim();
   if (!normalizedHost) {

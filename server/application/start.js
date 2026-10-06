@@ -61,7 +61,7 @@ export function createApplicationStart(services) {
     });
 
     await new Promise((resolve) => {
-      httpServer.listen(systemConfig.port, async () => {
+      const onListening = async () => {
         const urls = services.getUrls();
 
         logStartupConfig(log, {
@@ -87,7 +87,12 @@ export function createApplicationStart(services) {
 
         qrcodeTerminal.generate(urls.entryUrl, {small: true});
         resolve();
-      });
+      };
+      if (systemConfig.listenHost) {
+        httpServer.listen(systemConfig.port, systemConfig.listenHost, onListening);
+      } else {
+        httpServer.listen(systemConfig.port, onListening);
+      }
     });
 
     return {

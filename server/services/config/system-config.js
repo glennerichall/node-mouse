@@ -9,6 +9,19 @@ import {getEnvConfig as readEnvConfig} from './envConfig.js';
 
 export function normalizeSystemConfig(defaultSystemConfig) {
   const httpsEnabled = Boolean(defaultSystemConfig?.https?.enabled);
+  const publicBaseUrl = String(defaultSystemConfig?.publicBaseUrl || '').trim();
+  if (publicBaseUrl) {
+    let parsed;
+    try {
+      parsed = new URL(publicBaseUrl);
+    } catch (_error) {
+      throw new Error('PUBLIC_BASE_URL must be an absolute HTTP(S) URL');
+    }
+    const expectedProtocol = httpsEnabled ? 'https:' : 'http:';
+    if (parsed.protocol !== expectedProtocol || parsed.username || parsed.password || parsed.search || parsed.hash) {
+      throw new Error(`PUBLIC_BASE_URL must use ${expectedProtocol.slice(0, -1)} without credentials or query parameters`);
+    }
+  }
 
   return {
     ...defaultSystemConfig,

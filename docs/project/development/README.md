@@ -119,6 +119,8 @@ l'itération et devient append-only dès sa clôture.
   techniques des journaux.
 - [UX-003](./ux-UX-003-2026-10-06.md): diagnostic visible du transport et des
   erreurs de connexion client.
+- [ARCH-007](./arch-ARCH-007-2026-10-06.md): séparation et validation de
+  l'adresse d'écoute, de l'URL publique et de la confiance proxy.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

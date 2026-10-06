@@ -13,7 +13,7 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
 - [ ] ARCH-004 — introduire un contrat de transport client.
 - [ ] ARCH-005 — adapter Socket.IO sans régression.
 - [ ] ARCH-006 — tests de contrat pour chaque transport.
-- [ ] ARCH-007 — clarifier LISTEN_HOST, PUBLIC_BASE_URL et proxies fiables.
+- [x] ARCH-007 — clarifier LISTEN_HOST, PUBLIC_BASE_URL et proxies fiables.
 - [x] ARCH-008 — uniformiser les routeurs API client avec des handlers nommés
   et exportés, en laissant au routeur uniquement la composition des chemins et
   verbes; préserver les contrats HTTP et couvrir chaque handler directement.
