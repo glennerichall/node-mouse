@@ -6,8 +6,8 @@
  *
  * @typedef {Object} ClientChannel
  * @property {string} id Identifiant stable du client connecté.
- * @property {(eventName: string, handler: Function) => void} on
- * @property {(eventName: string, payload: unknown) => void} emit
+ * @property {(eventName: string, callback: Function, ...callbacks: Function[]) => ClientChannel} on
+ * @property {(eventName: string, payload: unknown) => ClientChannel} emit
  */
 
 export function getClientId(channel) {

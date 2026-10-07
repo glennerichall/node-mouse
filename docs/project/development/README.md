@@ -169,6 +169,10 @@ l'itération et devient append-only dès sa clôture.
   transport et subscribers sans dispatcher central.
 - [ARCH-033](./arch-ARCH-033-2026-10-07.md): retrait des alias legacy des
   événements et actions QR.
+- [ARCH-034](./arch-ARCH-034-2026-10-07.md): adaptation Socket.IO vers le
+  contrat de canal Express-like des subscribers.
+- [ARCH-035](./arch-ARCH-035-2026-10-07.md): extraction du chaînage de
+  callbacks dans un composant indépendant du transport.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

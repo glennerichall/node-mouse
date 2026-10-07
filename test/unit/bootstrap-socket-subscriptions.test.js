@@ -25,9 +25,14 @@ describe('bootstrapSocket event subscriptions', () => {
     };
 
     bootstrapSocket(services);
-    const socket = {id: 'client-123', emit: jest.fn()};
+    const socket = {id: 'client-123', on: jest.fn(), emit: jest.fn()};
     connectionHandlers[0](socket);
 
-    expect(subscribe).toHaveBeenCalledWith(socket);
+    expect(subscribe).toHaveBeenCalledWith(expect.objectContaining({
+      id: socket.id,
+      on: expect.any(Function),
+      emit: expect.any(Function),
+    }));
+    expect(subscribe.mock.calls[0][0]).not.toBe(socket);
   });
 });

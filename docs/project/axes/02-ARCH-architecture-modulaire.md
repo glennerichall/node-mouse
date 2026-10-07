@@ -78,6 +78,10 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
   subscribers, sans introduire de dispatcher central.
 - [x] ARCH-033 — supprimer les alias et références legacy des événements et
   actions QR avant toute validation locale des payloads.
+- [x] ARCH-034 — adapter les transports vers un canal subscriber Express-like
+  avec payload, réponse et chaîne de callbacks.
+- [x] ARCH-035 — extraire le chaînage de callbacks dans un composant neutre
+  réutilisable par les adapters Socket.IO et WebRTC.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de
 transport et déploiement.
@@ -260,6 +264,43 @@ et les tests avant son implémentation.
 - le subscriber admin reçoit `qrActions` sous son nom fonctionnel;
 - aucun alias `legacyQrActions` ne subsiste dans le code ou les tests;
 - les événements QR continuent d'utiliser les mêmes actions partagées;
+- la suite complète reste verte et la version patch est incrémentée.
+
+## ARCH-034 — Adapter de canal transport pour les subscribers
+
+**Modules concernés:**
+
+- `server/connection/socket/createSocketChannelAdapter.js` pour l'adaptation
+  Socket.IO;
+- `server/services/transport/event-channel.js` pour le contrat commun;
+- `server/init/bootstrapSocket.js` et les tests du bootstrap;
+- tests de chaîne de callbacks et de réponse d'événement.
+
+**Critères d'acceptation:**
+
+- le canal expose `id`, `on(event, callback, ...callbacks)` et `emit`;
+- les callbacks reçoivent `(payload, response?, next?)`;
+- `next()` enchaîne les callbacks comme un middleware Express;
+- le service de souscriptions reçoit un adapter et non le socket brut;
+- les guards peuvent être ajoutés à la chaîne sans modifier les subscribers;
+- la suite complète reste verte et la version patch est incrémentée.
+
+## ARCH-035 — Chaînage de callbacks indépendant du transport
+
+**Modules concernés:**
+
+- `server/services/transport/createEventCallbackChain.js` pour la sémantique
+  Express-like commune;
+- `server/connection/socket/createSocketChannelAdapter.js` pour l'adaptation
+  Socket.IO;
+- tests du chaînage et des erreurs de callback.
+
+**Critères d'acceptation:**
+
+- le chaînage `(payload, response?, next?)` ne dépend d'aucun transport;
+- Socket.IO conserve la traduction de son acknowledgement vers `response`;
+- les erreurs sont déléguées à l'adapter qui choisit sa réponse transport;
+- un futur adapter WebRTC peut réutiliser le même composant;
 - la suite complète reste verte et la version patch est incrémentée.
 
 ## ARCH-023 — Handlers d'actions administrateur

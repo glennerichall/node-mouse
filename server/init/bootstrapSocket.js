@@ -2,6 +2,7 @@ import {createLogger} from '../application/logger.js';
 import {broadcast} from '../connection/socket/broadcast.js';
 import {createSocketGuards} from '../connection/socket/createSocketGuards.js';
 import {createSocketNotificationHandler} from '../connection/socket/createSocketNotificationHandler.js';
+import {createSocketChannelAdapter} from '../connection/socket/createSocketChannelAdapter.js';
 
 export function bootstrapSocket(services) {
     const {getServer} = services;
@@ -21,7 +22,7 @@ export function bootstrapSocket(services) {
 
     io.on('connection', broadcast(
         createSocketNotificationHandler(services),
-        (socket) => subscriber.subscribe(socket)
+        (socket) => subscriber.subscribe(createSocketChannelAdapter(socket))
     ));
     log.debug('Socket.IO handlers registered');
 }
