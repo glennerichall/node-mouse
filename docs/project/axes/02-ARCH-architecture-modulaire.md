@@ -60,6 +60,8 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
   routeur à la composition HTTP.
 - [x] ARCH-024 — extraire les handlers du catalogue des remotes et réduire le
   routeur à la composition HTTP.
+- [x] ARCH-025 — extraire les handlers d'authentification administrateur et
+  réduire le routeur au rate limiter et aux routes.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de
 transport et déploiement.
@@ -213,6 +215,25 @@ ce refactoring ne doit pas modifier son comportement ni réintroduire YAD.
 - le routeur est exporté directement sous `adminRemotesRouter`, sans alias;
 - la disponibilité VLC et les préférences d'activation sont conservées;
 - les handlers sont testés indépendamment et la suite complète reste verte.
+
+## ARCH-025 — Handlers d'authentification administrateur
+
+**Modules concernés:**
+
+- `server/connection/api/admin-auth.handlers.js` pour l'élévation et la
+  révocation;
+- `server/connection/api/admin-auth.router.js` pour le rate limiter et les
+  routes;
+- tests unitaires des handlers cryptographiques et de session.
+
+**Critères d'acceptation:**
+
+- la comparaison du mot de passe et les opérations de session sont hors du
+  routeur;
+- le rate limiter reste monté au niveau de la route;
+- les exports de handlers nécessaires restent compatibles;
+- les cas de succès, refus et déconnexion de sockets sont testés;
+- la suite complète reste verte.
 
 ## ARCH-020 — Guards de validation autonomes
 
