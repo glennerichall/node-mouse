@@ -133,6 +133,8 @@ l'itération et devient append-only dès sa clôture.
   souscriptions de `server/init`.
 - [ARCH-015](./arch-ARCH-015-2026-10-07.md): service réutilisable de subscribers
   et souscription globale par canal.
+- [ARCH-016](./arch-ARCH-016-2026-10-07.md): correction du bootstrap Socket.IO
+  après suppression du handler d'actions.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

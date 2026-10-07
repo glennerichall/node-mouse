@@ -39,6 +39,8 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
   `server/remotes` et la regrouper avec l'adaptation de canal Socket.IO.
 - [x] ARCH-015 — transformer `createEventSubscriptions` en service d'orchestration
   réutilisable, construisant les subscribers une fois et exposant `subscribeAll`.
+- [x] ARCH-016 — corriger le bootstrap Socket.IO pour consommer le service de
+  souscriptions enregistré, sans importer un handler supprimé.
 - [ ] Séparer configuration système et fonctionnelle; valider au démarrage.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de
