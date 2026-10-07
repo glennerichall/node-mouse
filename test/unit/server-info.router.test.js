@@ -83,7 +83,7 @@ describe('server info router token entries', () => {
     });
   });
 
-  it('merges persisted and system update-check fields for the config snapshot', () => {
+  it('keeps persisted and system update-check fields in separate snapshots', () => {
     expect(__testables.buildConfigSnapshots({
       preview: {
         enabled: true,
@@ -109,9 +109,6 @@ describe('server info router token entries', () => {
         updateCheck: {
           enabled: true,
           intervalMin: 60,
-          packageName: '@velor/remote-mouse',
-          currentVersion: '6.4.10',
-          checkCommand: '',
         },
       },
       sysConfig: {

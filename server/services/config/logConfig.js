@@ -37,9 +37,9 @@ export function logStartupConfig(logger, config) {
         ...persistedConfig.samsungTv,
         mac: persistedConfig.samsungTv.mac ? '(set)' : '(unset)',
     });
-    emitConfigLine(logger, 'config.update', {
+    emitConfigLine(logger, 'config.updateCheck', persistedConfig.updateCheck);
+    emitConfigLine(logger, 'config.systemUpdateCheck', {
         ...systemConfig.updateCheck,
-        ...persistedConfig.updateCheck,
         packageName: systemConfig.updateCheck.packageName || '(none)',
         currentVersion: systemConfig.updateCheck.currentVersion || '(none)',
         installCommand: systemConfig.updateCheck.installCommand || '(unset)',

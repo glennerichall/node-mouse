@@ -44,12 +44,37 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
 - [x] ARCH-017 — aligner le nom et l'injection du service de souscriptions,
   supprimer les derniers anciens points d'entrée et vérifier les imports de
   production.
-- [ ] Séparer configuration système et fonctionnelle; valider au démarrage.
+- [x] ARCH-018 — séparer les snapshots et la journalisation de configuration
+  système et fonctionnelle; conserver des contrats distincts pour les
+  préférences persistées et les paramètres techniques validés au démarrage.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de
 transport et déploiement.
 Chaque tâche doit préciser les modules concernés, la stratégie de compatibilité
 et les tests avant son implémentation.
+
+## ARCH-018 — Contrats de configuration système et fonctionnelle
+
+**Modules concernés:**
+
+- `server/connection/api/server-info.router.js` pour les snapshots exposés à
+  l'interface d'administration;
+- `server/services/config/logConfig.js` pour les journaux de démarrage;
+- les tests unitaires des snapshots et de la journalisation.
+
+**Critères d'acceptation:**
+
+- le snapshot `config` contient uniquement la configuration fonctionnelle
+  persistée, notamment `updateCheck.enabled` et `updateCheck.intervalMin`;
+- le snapshot `sysConfig` contient uniquement les paramètres système validés
+  au démarrage, notamment les commandes, délais et métadonnées techniques de
+  mise à jour;
+- les journaux de démarrage nomment séparément les deux espaces de
+  configuration et ne fusionnent plus leurs champs homonymes;
+- les contrats existants des services de mise à jour et de tâche restent
+  compatibles;
+- les tests unitaires couvrent l'absence de mélange et la suite complète reste
+  verte.
 
 ## ARCH-009 — Frontière du service d'overlay
 

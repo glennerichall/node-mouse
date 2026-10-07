@@ -137,6 +137,8 @@ l'itération et devient append-only dès sa clôture.
   après suppression du handler d'actions.
 - [ARCH-017](./arch-ARCH-017-2026-10-07.md): nommage et injection directe du
   service de souscriptions.
+- [ARCH-018](./arch-ARCH-018-2026-10-07.md): séparation des snapshots et des
+  journaux de configuration système et fonctionnelle.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

@@ -34,13 +34,9 @@ function buildConfigSnapshots(rawConfig, rawSystemConfig) {
   const sysConfig = redactSecrets(rawSystemConfig);
 
   return {
-    config: {
-      ...config,
-      updateCheck: {
-        ...sysConfig?.updateCheck,
-        ...config?.updateCheck,
-      },
-    },
+    // `config` is the persisted functional configuration.  Technical update
+    // commands and timeouts belong exclusively to the system snapshot.
+    config,
     sysConfig,
   };
 }
