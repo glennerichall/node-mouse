@@ -1,5 +1,5 @@
 import {jest} from '@jest/globals';
-import {createEventSubscriptions} from '../../server/services/transport/createEventSubscriptions.js';
+import {createEventSubscriptionService} from '../../server/services/transport/createEventSubscriptionService.js';
 
 describe('createEventSubscriptions', () => {
   it('exposes named subscriptions over the client channel contract', () => {
@@ -25,7 +25,7 @@ describe('createEventSubscriptions', () => {
       emit: jest.fn(),
     };
 
-    const subscriptions = createEventSubscriptions(services);
+    const subscriptions = createEventSubscriptionService(services);
     subscriptions.subscribe(channel);
     const secondChannel = {
       id: 'client-5678',

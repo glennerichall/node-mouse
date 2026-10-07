@@ -54,7 +54,7 @@ export async function createServicesContainer({
                                                   createServer,
                                                   createInputController,
                                                   createRemotes,
-                                                  createEventSubscriptions,
+                                                  createEventSubscriptionService,
                                               }) {
     let desktopControllerInstance;
     let qrOverlayInstance;
@@ -86,7 +86,7 @@ export async function createServicesContainer({
         getInputController: createLazy(() => createInputController(container)),
         getRemotes: createLazy(() => createRemotes(container)),
         getDesktopController: () => desktopControllerInstance,
-        getEventSubscriptions: createLazy(() => createEventSubscriptions(container))
+        getEventSubscriptions: createLazy(() => createEventSubscriptionService(container))
     };
 
     log.debug('Initializing desktop controller');

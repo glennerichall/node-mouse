@@ -41,6 +41,9 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
   réutilisable, construisant les subscribers une fois et exposant `subscribeAll`.
 - [x] ARCH-016 — corriger le bootstrap Socket.IO pour consommer le service de
   souscriptions enregistré, sans importer un handler supprimé.
+- [x] ARCH-017 — aligner le nom et l'injection du service de souscriptions,
+  supprimer les derniers anciens points d'entrée et vérifier les imports de
+  production.
 - [ ] Séparer configuration système et fonctionnelle; valider au démarrage.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de
