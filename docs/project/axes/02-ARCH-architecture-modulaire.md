@@ -37,6 +37,8 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
   explicites; supprimer le module fourre-tout `socketBootstrapComponents`.
 - [x] ARCH-014 — retirer l'orchestration `createEventSubscriptions` de
   `server/remotes` et la regrouper avec l'adaptation de canal Socket.IO.
+- [x] ARCH-015 — transformer `createEventSubscriptions` en service d'orchestration
+  réutilisable, construisant les subscribers une fois et exposant `subscribeAll`.
 - [ ] Séparer configuration système et fonctionnelle; valider au démarrage.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de

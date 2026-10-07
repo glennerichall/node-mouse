@@ -1,5 +1,5 @@
 import {jest} from '@jest/globals';
-import {createEventSubscriptions} from '../../server/connection/socket/createEventSubscriptions.js';
+import {createEventSubscriptions} from '../../server/services/transport/createEventSubscriptions.js';
 
 describe('createEventSubscriptions', () => {
   it('exposes named subscriptions over the client channel contract', () => {
@@ -26,21 +26,19 @@ describe('createEventSubscriptions', () => {
     };
 
     const subscriptions = createEventSubscriptions(services);
-    Object.values(subscriptions).forEach(subscribe => subscribe(channel));
+    subscriptions.subscribe(channel);
+    const secondChannel = {
+      id: 'client-5678',
+      on: jest.fn(),
+      emit: jest.fn(),
+    };
+    subscriptions.subscribe(secondChannel);
 
-    expect(Object.keys(subscriptions)).toEqual([
-      'subscribeInput',
-      'subscribeBrowser',
-      'subscribeQr',
-      'subscribeAdmin',
-      'subscribePreview',
-      'subscribeSamsung',
-      'subscribeVlc',
-      'subscribeWindow',
-      'subscribeConnection',
-    ]);
+    expect(Object.keys(subscriptions)).toEqual(['subscribe']);
     expect(updateConfig).toHaveBeenCalledTimes(1);
     expect(handlers.has('mouse:move')).toBe(true);
     expect(handlers.has('disconnect')).toBe(true);
+    expect(secondChannel.on).toHaveBeenCalled();
+    expect(updateConfig).toHaveBeenCalledTimes(1);
   });
 });

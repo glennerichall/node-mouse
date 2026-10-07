@@ -22,6 +22,7 @@ import {createSystemService} from './system/createSystemService.js';
 import {createSecurityService} from './security/createSecurityService.js';
 import {createAuthorizationService} from './security/createAuthorizationService.js';
 import {createDeviceSessionService} from './security/createDeviceSessionService.js';
+import {createEventSubscriptions} from "./transport/createEventSubscriptions.js";
 
 
 export function createServicesRegistry() {
@@ -49,6 +50,7 @@ export function createServicesRegistry() {
         createApplicationDaemonService,
         createServer,
         createInputController,
-        createRemotes
+        createRemotes,
+        createEventSubscriptions
     });
 }
