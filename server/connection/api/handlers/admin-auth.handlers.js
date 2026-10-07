@@ -2,7 +2,7 @@ import {createHash, timingSafeEqual} from 'node:crypto';
 import {
   getAdminPasswordMinLength,
   isAdminPasswordConfigured,
-} from '../../services/security/adminPasswordPolicy.js';
+} from '../../../services/security/adminPasswordPolicy.js';
 
 function passwordMatches(actual, expected) {
   const actualHash = createHash('sha256').update(String(actual || '')).digest();

@@ -64,6 +64,10 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
   réduire le routeur au rate limiter et aux routes.
 - [x] ARCH-026 — extraire les handlers des informations serveur et réduire le
   routeur à la composition HTTP.
+- [x] ARCH-027 — découpler le catalogue des remotes du routeur administrateur
+  et le monter sous un nom de transport neutre.
+- [x] ARCH-028 — organiser `connection/api` par responsabilité (`routers`,
+  `handlers`, `guards`, `middlewares`) et harmoniser les suffixes de fichiers.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de
 transport et déploiement.
@@ -115,6 +119,45 @@ et les tests avant son implémentation.
 - les valeurs valides continuent d'être converties et les valeurs `null`
   conservent le contrat de réinitialisation;
 - la suite complète reste verte.
+
+## ARCH-027 — Routeur neutre du catalogue des remotes
+
+**Modules concernés:**
+
+- `server/connection/api/remotes-catalog.router.js` pour le routeur partagé;
+- `server/init/routers/createAdminApiRouter.js` et
+  `server/connection/api/client-api.router.js` pour les montages;
+- tests de composition client et administrateur.
+
+**Critères d'acceptation:**
+
+- le catalogue est exporté sous un nom neutre, sans référence au rôle admin;
+- les API client et admin montent la même instance de routeur;
+- l'ancien fichier et les alias historiques ne sont plus importés;
+- les contrats JSON existants sont conservés et la suite complète reste verte.
+
+## ARCH-028 — Organisation des composants HTTP par responsabilité
+
+**Modules concernés:**
+
+- `server/connection/api/routers/` pour la composition des routes Express;
+- `server/connection/api/handlers/` pour les traitements de requêtes et
+  projections de réponse;
+- `server/connection/api/guards/` pour les contrôles d'accès et validations;
+- `server/connection/api/middlewares/` pour les middlewares transversaux;
+- les points de bootstrap et les tests unitaires qui importent ces composants.
+
+**Critères d'acceptation:**
+
+- les routeurs, handlers, guards et middlewares sont regroupés dans leurs
+  répertoires dédiés;
+- les noms de fichiers suivent les suffixes `.router.js`, `.handler(s).js`,
+  `.guard.js` et `.middleware.js` selon le contrat exposé;
+- les imports de production et de tests utilisent les nouveaux chemins, sans
+  fichier d'API déplacé laissé à la racine;
+- le comportement HTTP, les exports publics et les contrats JSON sont
+  conservés;
+- la suite complète reste verte et la version patch est incrémentée.
 
 ## ARCH-023 — Handlers d'actions administrateur
 

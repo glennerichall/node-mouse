@@ -1,12 +1,12 @@
 import express from 'express';
 
-import {validateConfigPatch} from './config-validation.middleware.js';
+import {validateConfigPatch} from '../guards/config-validation.guard.js';
 import {
     getConfig,
     listConfigs,
     patchConfig,
     resetConfig,
-} from './admin-config.handlers.js';
+} from '../handlers/admin-config.handlers.js';
 
 export const adminConfigsRouter = express.Router()
     .get('/', listConfigs)

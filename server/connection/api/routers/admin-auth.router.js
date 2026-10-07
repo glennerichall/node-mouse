@@ -1,7 +1,7 @@
 import express from 'express';
-import {createRateLimitMiddleware} from '../security/createRateLimiter.js';
-export {createAdminElevation, deleteAdminElevation} from './admin-auth.handlers.js';
-import {createAdminElevation, deleteAdminElevation} from './admin-auth.handlers.js';
+import {createRateLimitMiddleware} from '../../security/createRateLimiter.js';
+export {createAdminElevation, deleteAdminElevation} from '../handlers/admin-auth.handlers.js';
+import {createAdminElevation, deleteAdminElevation} from '../handlers/admin-auth.handlers.js';
 
 export const adminAuthRouter = express.Router()
   .use(createRateLimitMiddleware({

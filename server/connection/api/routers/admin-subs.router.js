@@ -1,5 +1,5 @@
 import express from 'express';
-import {PUBSUB_SERVICE_CONFIG} from '../../services/pubsub/serviceEventConstants.js';
+import {PUBSUB_SERVICE_CONFIG} from '../../../services/pubsub/serviceEventConstants.js';
 
 export const adminSubsRouter = express.Router();
 

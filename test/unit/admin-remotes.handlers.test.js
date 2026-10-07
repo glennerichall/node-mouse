@@ -3,7 +3,7 @@ import {
   isBrowserEnabled,
   listBrowsers,
   listRemotes,
-} from '../../server/connection/api/admin-remotes.handlers.js';
+} from '../../server/connection/api/handlers/admin-remotes.handlers.js';
 
 function response() {
   return {json: jest.fn()};

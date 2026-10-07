@@ -1,5 +1,5 @@
-import {buildConfigEntry} from './configs.js';
-import {getManagedConfigContext} from './getManagedConfigContext.js';
+import {buildConfigEntry} from '../configs.js';
+import {getManagedConfigContext} from '../getManagedConfigContext.js';
 
 function getPath(req) {
   return String(req.params.configId || '').trim();

@@ -2,7 +2,7 @@ import {jest} from '@jest/globals';
 import {
   createAdminElevation,
   deleteAdminElevation,
-} from '../../server/connection/api/admin-auth.handlers.js';
+} from '../../server/connection/api/handlers/admin-auth.handlers.js';
 
 function createResponse() {
   const response = {status: jest.fn(), json: jest.fn()};

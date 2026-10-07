@@ -3,7 +3,7 @@ import {
   sessionManagementRouter,
   sessionRouter,
   sessionGuardMiddleware,
-} from '../../server/connection/api/session.middleware.js';
+} from '../../server/connection/api/middlewares/session.middleware.js';
 import {createSecurityService} from '../../server/services/security/createSecurityService.js';
 
 function withSecurity(services, request) {

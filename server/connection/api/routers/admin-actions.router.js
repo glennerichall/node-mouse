@@ -3,12 +3,12 @@ import express from 'express';
 import {
     discoverSamsung,
     restartService,
-} from './admin-action.handlers.js';
+} from '../handlers/admin-action.handlers.js';
 
 export {
     buildManagedConfigPayload,
     coerceConfigValue,
-} from './configs.js';
+} from '../configs.js';
 
 export const adminConfigActionsRouter = express.Router()
     .post('/configs/samsung/discover', discoverSamsung)

@@ -155,6 +155,10 @@ l'itération et devient append-only dès sa clôture.
   d'authentification administrateur hors du routeur Express.
 - [ARCH-026](./arch-ARCH-026-2026-10-07.md): extraction des handlers des
   informations serveur hors du routeur Express.
+- [ARCH-027](./arch-ARCH-027-2026-10-07.md): découplage du catalogue des
+  remotes du routeur administrateur.
+- [ARCH-028](./arch-ARCH-028-2026-10-07.md): organisation des composants HTTP
+  par routeurs, handlers, guards et middlewares.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

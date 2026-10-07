@@ -1,9 +1,9 @@
 import express from 'express';
-import {sendUnauthorizedResponse} from './unauthorized-response.js';
+import {sendUnauthorizedResponse} from '../unauthorized-response.js';
 import {
     PUBSUB_EVENT_SESSION_CREATED,
     PUBSUB_SERVICE_SESSION
-} from '../../services/pubsub/serviceEventConstants.js';
+} from '../../../services/pubsub/serviceEventConstants.js';
 
 export function sessionGuardMiddleware(req, res, next) {
     const decision = req.services.getSecurity().authenticate();

@@ -1,10 +1,10 @@
 import Joi from 'joi';
-import {CONFIG_PATHS} from '../../services/config/configPaths.js';
+import {CONFIG_PATHS} from '../../../services/config/configPaths.js';
 import {
   adminConfigSchema,
   getConfigValueSchema,
   getFieldDefinition,
-} from './configs.js';
+} from '../configs.js';
 
 function reject(res, status, message) {
   res.status(status).json({ok: false, message});

@@ -3,7 +3,7 @@ import {
   getSamsungDeviceMac,
   normalizeMac,
   pickSamsungDevice,
-} from '../../remotes/samsung/device-config.js';
+} from '../../../remotes/samsung/device-config.js';
 
 export async function discoverSamsung(req, res) {
   const {services} = req;

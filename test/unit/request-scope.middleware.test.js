@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import {createRequestScopeMiddleware} from '../../server/connection/api/request-scope.middleware.js';
+import {createRequestScopeMiddleware} from '../../server/connection/api/middlewares/request-scope.middleware.js';
 
 describe('createRequestScopeMiddleware', () => {
   it('creates an isolated request facade and lazily binds shared providers', () => {

@@ -7,7 +7,7 @@ import {createDeviceSessionDao} from '../../server/services/persistence/createDe
 import {createEntryTokenDao} from '../../server/services/persistence/createEntryTokenDao.js';
 import {createDeviceSessionService} from '../../server/services/security/createDeviceSessionService.js';
 import {createSecurityService} from '../../server/services/security/createSecurityService.js';
-import {sessionRouter} from '../../server/connection/api/session.middleware.js';
+import {sessionRouter} from '../../server/connection/api/middlewares/session.middleware.js';
 
 describe('device session flow', () => {
   let tempDir;

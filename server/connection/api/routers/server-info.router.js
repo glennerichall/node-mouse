@@ -5,7 +5,7 @@ import {
   getServerInfoData,
   getServerInfoPage,
   redactSecrets,
-} from './server-info.handlers.js';
+} from '../handlers/server-info.handlers.js';
 
 export const serverInfoRouter = express.Router()
   .get('/', getServerInfoPage)

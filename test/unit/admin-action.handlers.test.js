@@ -12,7 +12,7 @@ jest.unstable_mockModule('../../server/remotes/samsung/device-config.js', () => 
   pickSamsungDevice,
 }));
 
-const {discoverSamsung, restartService} = await import('../../server/connection/api/admin-action.handlers.js');
+const {discoverSamsung, restartService} = await import('../../server/connection/api/handlers/admin-action.handlers.js');
 
 function response() {
   return {status: jest.fn().mockReturnThis(), json: jest.fn()};

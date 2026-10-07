@@ -1,6 +1,6 @@
 import {randomUUID} from 'node:crypto';
-import {createLogger} from '../../application/logger.js';
-import {createLazy} from '../../../utils/createLazy.js';
+import {createLogger} from '../../../application/logger.js';
+import {createLazy} from '../../../../utils/createLazy.js';
 
 // Attache une façade de services propre à la requête, tout en déléguant les
 // services applicatifs partagés. Logger et sécurité sont créés à la demande.

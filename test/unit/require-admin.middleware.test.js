@@ -1,5 +1,5 @@
 import {jest} from '@jest/globals';
-import {guardAdmin} from '../../server/connection/api/guard.admin.js';
+import {guardAdmin} from '../../server/connection/api/guards/admin.guard.js';
 
 describe('guardAdmin', () => {
   it('rejects a controller with HTTP 403', () => {

@@ -1,5 +1,5 @@
 import {jest} from '@jest/globals';
-import {getServerInfoData, getServerInfoPage} from '../../server/connection/api/server-info.handlers.js';
+import {getServerInfoData, getServerInfoPage} from '../../server/connection/api/handlers/server-info.handlers.js';
 
 function response() {
   return {json: jest.fn(), sendFile: jest.fn()};

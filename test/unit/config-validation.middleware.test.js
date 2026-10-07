@@ -1,5 +1,5 @@
 import {jest} from '@jest/globals';
-import {validateConfigPatch} from '../../server/connection/api/config-validation.middleware.js';
+import {validateConfigPatch} from '../../server/connection/api/guards/config-validation.guard.js';
 
 function createResponse() {
   return {

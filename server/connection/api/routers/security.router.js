@@ -1,11 +1,11 @@
 import express from 'express';
-import {sessionGuardMiddleware} from './session.middleware.js';
-import {createRateLimitMiddleware} from '../security/createRateLimiter.js';
+import {sessionGuardMiddleware} from '../middlewares/session.middleware.js';
+import {createRateLimitMiddleware} from '../../security/createRateLimiter.js';
 import {
     httpOriginGuard,
     sessionCsrfGuard
-} from '../security/origin.js';
-import {httpJsonBodyParser} from './http-input.middleware.js';
+} from '../../security/origin.js';
+import {httpJsonBodyParser} from '../middlewares/http-input.middleware.js';
 
 export const securityIngressRouter = express.Router()
     .use(httpJsonBodyParser)

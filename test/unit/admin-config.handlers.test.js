@@ -4,7 +4,7 @@ import {
   listConfigs,
   patchConfig,
   resetConfig,
-} from '../../server/connection/api/admin-config.handlers.js';
+} from '../../server/connection/api/handlers/admin-config.handlers.js';
 
 function response() {
   return {status: jest.fn().mockReturnThis(), json: jest.fn()};

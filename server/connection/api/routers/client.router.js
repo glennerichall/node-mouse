@@ -1,5 +1,5 @@
 import express from 'express';
-import {clientDir, publicDir, sharedUtilsDir} from '../../utils/paths.js';
+import {clientDir, publicDir, sharedUtilsDir} from '../../../utils/paths.js';
 
 export const staticShareRouter = express.Router();
 

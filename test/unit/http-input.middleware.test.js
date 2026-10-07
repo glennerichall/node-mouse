@@ -2,7 +2,7 @@ import {jest} from '@jest/globals';
 import {
   createHttpErrorMiddleware,
   HTTP_JSON_BODY_LIMIT_BYTES,
-} from '../../server/connection/api/http-input.middleware.js';
+} from '../../server/connection/api/middlewares/http-input.middleware.js';
 
 describe('HTTP input middleware', () => {
   it('sets a bounded JSON body limit', () => {

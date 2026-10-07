@@ -1,4 +1,4 @@
-import {PERMISSION_ADMIN_MANAGE} from '../../services/security/createAuthorizationService.js';
+import {PERMISSION_ADMIN_MANAGE} from '../../../services/security/createAuthorizationService.js';
 
 export function guardAdmin(req, res, next) {
   const decision = req.services.getAuthorization().authorize(req.securityContext, PERMISSION_ADMIN_MANAGE);
