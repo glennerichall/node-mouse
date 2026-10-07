@@ -1,59 +1,12 @@
 import express from 'express';
 
-import {CLIENT_CONFIG_PATHS} from '../../../services/config/configPaths.js';
-import {PUBSUB_SERVICE_CLIENT_CONFIG} from '../../../services/pubsub/serviceEventConstants.js';
-import {getManagedConfigSnapshot} from '../configs.js';
+import {
+  connectClientSubscription,
+  createClientConfigSubscription,
+  deleteClientSubscription,
+  getClientConfig,
+} from '../handlers/client-api.handlers.js';
 import {remotesCatalogRouter} from './remotes-catalog.router.js';
-import {isAdminPasswordConfigured} from '../../../services/security/adminPasswordPolicy.js';
-
-export async function getClientConfig(req, res) {
-  const config = getManagedConfigSnapshot(req.services.getConfig(), CLIENT_CONFIG_PATHS);
-  const vlcAvailable = await req.services.getRemotes().vlc.isAvailable();
-  const previewAvailable = req.services.getRemotes().preview.isAvailable();
-  config.vlc.enabled = vlcAvailable && config.vlc.enabled !== false;
-  config.preview.enabled = previewAvailable && config.preview.enabled !== false;
-
-  res.json({
-    config,
-    systemConfig: {
-      adminActionsConfigured: Boolean(req.services.getSystemConfig().adminActionsEnabled),
-      adminActionsEnabled: req.securityContext?.role === 'admin'
-        && Boolean(req.services.getSystemConfig().adminActionsEnabled),
-      adminUnlocked: req.securityContext?.role === 'admin',
-      adminRelockAvailable: req.securityContext?.role === 'admin'
-        && req.securityContext?.authenticationMethod === 'session',
-      adminUnlockAvailable: isAdminPasswordConfigured(req.services.getSystemConfig().admin),
-    },
-  });
-}
-
-export function createClientConfigSubscription(req, res) {
-  const id = req.services.getSseService().createSubscription({
-    filters: {service: PUBSUB_SERVICE_CLIENT_CONFIG},
-  });
-
-  res.json({
-    ok: true,
-    id,
-    eventsUrl: `/api/client/subs/${id}`,
-  });
-}
-
-export function connectClientSubscription(req, res) {
-  const connected = req.services.getSseService().connect(String(req.params.id || '').trim(), req, res);
-  if (!connected) {
-    res.status(404).json({ok: false, message: 'Subscription not found.'});
-  }
-}
-
-export function deleteClientSubscription(req, res) {
-  const removed = req.services.getSseService().deleteSubscription(String(req.params.id || '').trim());
-  if (!removed) {
-    res.status(404).json({ok: false, message: 'Subscription not found.'});
-    return;
-  }
-  res.json({ok: true});
-}
 
 export const clientSubsRouter = express.Router()
   .post('/configs', createClientConfigSubscription)

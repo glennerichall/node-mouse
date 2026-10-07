@@ -68,6 +68,8 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
   et le monter sous un nom de transport neutre.
 - [x] ARCH-028 — organiser `connection/api` par responsabilité (`routers`,
   `handlers`, `guards`, `middlewares`) et harmoniser les suffixes de fichiers.
+- [x] ARCH-029 — extraire les derniers handlers inline des routeurs HTTP et
+  réduire les routeurs à la composition Express.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de
 transport et déploiement.
@@ -158,6 +160,24 @@ et les tests avant son implémentation.
 - le comportement HTTP, les exports publics et les contrats JSON sont
   conservés;
 - la suite complète reste verte et la version patch est incrémentée.
+
+## ARCH-029 — Routeurs HTTP réduits à la composition
+
+**Modules concernés:**
+
+- `server/connection/api/handlers/` pour les sessions, souscriptions, remotes
+  et API client;
+- `server/connection/api/routers/` pour les montages Express;
+- tests unitaires directs des nouveaux handlers.
+
+**Critères d'acceptation:**
+
+- les routeurs sessions, souscriptions, remotes et client ne contiennent plus
+  de traitement de requête inline;
+- chaque traitement est importé depuis un handler testable indépendamment;
+- les chemins, statuts et payloads HTTP restent inchangés;
+- les tests ciblés et la suite complète restent verts;
+- la version patch est incrémentée.
 
 ## ARCH-023 — Handlers d'actions administrateur
 

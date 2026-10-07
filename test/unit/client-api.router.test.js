@@ -4,7 +4,7 @@ import {
   createClientConfigSubscription,
   deleteClientSubscription,
   getClientConfig,
-} from '../../server/connection/api/routers/client-api.router.js';
+} from '../../server/connection/api/handlers/client-api.handlers.js';
 
 function createResponse() {
   const response = {status: jest.fn(), json: jest.fn()};

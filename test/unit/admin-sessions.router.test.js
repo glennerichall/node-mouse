@@ -3,7 +3,7 @@ import {
   listDeviceSessions,
   revokeAllDeviceSessions,
   revokeDeviceSession,
-} from '../../server/connection/api/routers/admin-sessions.router.js';
+} from '../../server/connection/api/handlers/admin-sessions.handlers.js';
 
 function createResponse() {
   return {
