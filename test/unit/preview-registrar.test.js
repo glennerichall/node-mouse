@@ -1,5 +1,5 @@
 import {jest} from '@jest/globals';
-import {createPreviewEventRegistrar} from '../../server/remotes/preview/registrar.js';
+import {createPreviewEventSubscriber} from '../../server/remotes/preview/subscriber.js';
 import {REMOTE_EVENT_PREVIEW_START} from '../../utils/remoteCommands.js';
 
 describe('preview event registrar', () => {
@@ -13,7 +13,7 @@ describe('preview event registrar', () => {
       startForSocket: jest.fn(),
     };
 
-    createPreviewEventRegistrar({
+    createPreviewEventSubscriber({
       preview,
       getConfig: () => ({preview: {enabled: true}}),
     })(socket);

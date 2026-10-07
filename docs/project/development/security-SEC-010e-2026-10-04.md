@@ -26,7 +26,7 @@ client déjà chargé pendant une mise à jour.
 - Messages distincts « administration verrouillée » et « actions admin
   désactivées » dans les neuf langues.
 - Champ du mot de passe porté à 46 px avec une taille de texte de 1 rem.
-- Ajout de `server/remotes/qr/registrar.js` et de la façade `qrActions`.
+- Ajout de `../../../server/remotes/qr/subscriber.js` et de la façade `qrActions`.
 - Raccordement de la commande CLI QR à `qrActions`.
 - Test unitaire du registrar QR et scénarios visuels des deux messages.
 - Passage correctif de la version `6.18.3` à `6.18.4`.

@@ -11,7 +11,7 @@ function getModuleLog() {
   return log;
 }
 
-export function createWindowRegistrar({ windowActions }) {
+export function createWindowSubscriber({ windowActions }) {
   const log = getModuleLog();
   return function subscribeWindow(channel) {
     const client = getClientLabel(channel);

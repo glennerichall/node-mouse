@@ -1,11 +1,8 @@
 import {jest} from '@jest/globals';
-import {
-  broadcast,
-  createActionHandlers,
-  createNotificationHandler,
-  createSocketGuardMiddleware,
-  createGuards,
-} from '../../server/init/socketBootstrapComponents.js';
+import {broadcast} from '../../server/connection/socket/broadcast.js';
+import {createSocketActionHandlers} from '../../server/connection/socket/createSocketActionHandlers.js';
+import {createSocketNotificationHandler} from '../../server/connection/socket/createSocketNotificationHandler.js';
+import {createSocketGuardMiddleware, createSocketGuards} from '../../server/connection/socket/createSocketGuards.js';
 import {
   PUBSUB_EVENT_SOCKET_CLIENT_CONNECTED,
   PUBSUB_SERVICE_SOCKET,
@@ -27,7 +24,7 @@ describe('socket bootstrap components', () => {
     const services = {getEvents: () => ({publishEvent})};
     const socket = {id: 'client-123', emit: jest.fn()};
 
-    createNotificationHandler(services)(socket);
+    createSocketNotificationHandler(services)(socket);
 
     expect(publishEvent).toHaveBeenCalledWith(
       PUBSUB_SERVICE_SOCKET,
@@ -68,7 +65,7 @@ describe('socket bootstrap components', () => {
       getEvents: () => ({publishEvent: jest.fn()}),
     };
     const channel = {id: 'client-123', on: jest.fn(), emit: jest.fn()};
-    const handler = createActionHandlers(services);
+    const handler = createSocketActionHandlers(services);
 
     handler(channel);
 
@@ -83,6 +80,6 @@ describe('socket bootstrap components', () => {
       getSecurity: () => ({authenticateSocket: jest.fn()}),
     };
 
-    expect(createGuards(services)).toHaveLength(4);
+    expect(createSocketGuards(services)).toHaveLength(4);
   });
 });

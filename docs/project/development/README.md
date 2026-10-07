@@ -127,6 +127,10 @@ l'itération et devient append-only dès sa clôture.
   orchestration nommée des souscriptions.
 - [ARCH-012](./arch-ARCH-012-2026-10-06.md): externalisation et tests des
   composants d'orchestration Socket.IO.
+- [ARCH-013](./arch-ARCH-013-2026-10-06.md): regroupement thématique des
+  composants Socket.IO et des souscriptions métier.
+- [ARCH-014](./arch-ARCH-014-2026-10-06.md): retrait de l'orchestration des
+  souscriptions de `server/init`.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

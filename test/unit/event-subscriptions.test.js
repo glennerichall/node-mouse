@@ -1,5 +1,5 @@
 import {jest} from '@jest/globals';
-import {createEventSubscriptions} from '../../server/init/createEventSubscriptions.js';
+import {createEventSubscriptions} from '../../server/connection/socket/createEventSubscriptions.js';
 
 describe('createEventSubscriptions', () => {
   it('exposes named subscriptions over the client channel contract', () => {

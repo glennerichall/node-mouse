@@ -29,7 +29,7 @@ function isVlcEnabled(config) {
   return config?.vlc?.enabled !== false;
 }
 
-export function createVlcRegistrar({ vlc, keyboard, getConfig = () => ({}) }) {
+export function createVlcSubscriber({ vlc, keyboard, getConfig = () => ({}) }) {
   const log = getModuleLog();
   return function subscribeVlc(channel) {
     const client = getClientLabel(channel);

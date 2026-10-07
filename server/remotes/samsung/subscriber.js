@@ -13,7 +13,7 @@ import {getClientLabel} from '../../connection/client-channel.js';
 
 let log = createLogger('samsung:remote');
 
-export function createSamsungRegistrar({samsung}) {
+export function createSamsungSubscriber({samsung}) {
     return function subscribeSamsung(channel) {
         const client = getClientLabel(channel);
 

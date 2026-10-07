@@ -32,6 +32,11 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
 - [x] ARCH-012 — externaliser les composants d'orchestration de
   `bootstrapSocket` et tester séparément les guards, notifications et
   souscriptions Socket.IO.
+- [x] ARCH-013 — regrouper les composants Socket.IO et les souscriptions métier
+  par responsabilité, avec un fichier par orchestration ou guard et des noms
+  explicites; supprimer le module fourre-tout `socketBootstrapComponents`.
+- [x] ARCH-014 — retirer l'orchestration `createEventSubscriptions` de
+  `server/remotes` et la regrouper avec l'adaptation de canal Socket.IO.
 - [ ] Séparer configuration système et fonctionnelle; valider au démarrage.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de

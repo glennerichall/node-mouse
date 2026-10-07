@@ -8,7 +8,7 @@ import {
 } from '../../../utils/remoteCommands.js';
 import {createMouseMoveDispatcher} from '../../services/input/createMouseMoveDispatcher.js';
 
-export function createControlEventRegistrar({ mouse, keyboard }) {
+export function createControlEventSubscriber({ mouse, keyboard }) {
     return function subscribeInput(channel) {
     channel.on(REMOTE_EVENT_MOUSE_MOVE, createMouseMoveDispatcher(mouse));
 

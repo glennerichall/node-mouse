@@ -1,6 +1,6 @@
 import express from "express";
 import path from "node:path";
-import {publicDir} from "../utils/paths.js";
+import {publicDir} from "../../utils/paths.js";
 
 export const adminUiRouter = express.Router();
 

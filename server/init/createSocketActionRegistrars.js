@@ -1,6 +1,1 @@
-import {createEventSubscriptions} from './createEventSubscriptions.js';
-
-export function createSocketActionRegistrars(services) {
-    return Object.values(createEventSubscriptions(services));
-
-}
+export {createSocketActionRegistrars} from '../connection/socket/createSocketActionRegistrars.js';

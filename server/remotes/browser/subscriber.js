@@ -12,7 +12,7 @@ function isBrowserEnabled(config, browserId) {
     return config?.browser?.enabled !== false && config?.browser?.[browserId] !== false;
 }
 
-export const createBrowserRegistrar = ({browser, getConfig = () => ({})}) => {
+export const createBrowserSubscriber = ({browser, getConfig = () => ({})}) => {
     const log = getModuleLog();
     return function subscribeBrowser(channel) {
         const client = getClientLabel(channel);

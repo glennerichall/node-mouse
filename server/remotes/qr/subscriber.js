@@ -14,7 +14,7 @@ function getModuleLog() {
   return log;
 }
 
-export function createQrEventRegistrar({qrActions}) {
+export function createQrEventSubscriber({qrActions}) {
   const eventLog = getModuleLog();
   return function subscribeQr(channel) {
     const client = getClientLabel(channel);

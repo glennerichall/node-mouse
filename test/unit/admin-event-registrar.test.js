@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import {createAdminEventRegistrar} from '../../server/remotes/admin/registrar.js';
+import {createAdminEventSubscriber} from '../../server/remotes/admin/subscriber.js';
 import {
   REMOTE_EVENT_ADMIN_RESULT,
   REMOTE_EVENT_ADMIN_UPDATE_CHECK,
@@ -19,7 +19,7 @@ describe('createAdminEventRegistrar', () => {
     };
     const legacyQrActions = {};
 
-    createAdminEventRegistrar({adminActions, legacyQrActions})(channel);
+    createAdminEventSubscriber({adminActions, legacyQrActions})(channel);
     await handlers.get(REMOTE_EVENT_ADMIN_UPDATE_CHECK)();
 
     expect(channel.on.callCount).toBeGreaterThan(0);

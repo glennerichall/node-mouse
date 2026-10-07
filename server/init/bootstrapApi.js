@@ -6,8 +6,8 @@ import {
     sessionRouter,
 } from '../connection/api/session.middleware.js';
 import {qrPageHandler} from '../connection/api/qr-page.handler.js';
-import {adminUiRouter} from "./createAdminUiRouter.js";
-import {adminApiRouter} from "./createAdminApiRouter.js";
+import {adminUiRouter} from "./routers/createAdminUiRouter.js";
+import {adminApiRouter} from "./routers/createAdminApiRouter.js";
 import {remotesRouter} from '../connection/api/remotes.router.js';
 import {readPackageVersion} from '../utils/env.js';
 import {createLogger} from '../application/logger.js';

@@ -1,10 +1,8 @@
 import {createLogger} from '../application/logger.js';
-import {
-    broadcast,
-    createActionHandlers,
-    createGuards,
-    createNotificationHandler,
-} from './socketBootstrapComponents.js';
+import {broadcast} from '../connection/socket/broadcast.js';
+import {createSocketActionHandlers} from '../connection/socket/createSocketActionHandlers.js';
+import {createSocketGuards} from '../connection/socket/createSocketGuards.js';
+import {createSocketNotificationHandler} from '../connection/socket/createSocketNotificationHandler.js';
 
 export function bootstrapSocket(services) {
     const {getServer} = services;
@@ -15,13 +13,13 @@ export function bootstrapSocket(services) {
 
     io.engine.use((...args) => cookieParser(...args));
 
-    createGuards(services).forEach(guard => {io.use(guard)});
+    createSocketGuards(services).forEach(guard => {io.use(guard)});
 
     log.trace('Socket.IO middlewares registered');
 
     io.on('connection', broadcast(
-        createNotificationHandler(services),
-        createActionHandlers(services)
+        createSocketNotificationHandler(services),
+        createSocketActionHandlers(services)
     ));
     log.debug('Socket.IO handlers registered');
 }

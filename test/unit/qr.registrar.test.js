@@ -1,5 +1,5 @@
 import {jest} from '@jest/globals';
-import {createQrEventRegistrar} from '../../server/remotes/qr/registrar.js';
+import {createQrEventSubscriber} from '../../server/remotes/qr/subscriber.js';
 import {
   REMOTE_EVENT_QR_OPEN_BROWSER_CLIENT,
   REMOTE_EVENT_QR_OPEN_BROWSER_SERVER,
@@ -22,7 +22,7 @@ describe('QR event registrar', () => {
       toggleQrOverlay: jest.fn(async () => ({ok: true})),
     };
 
-    createQrEventRegistrar({qrActions})(socket);
+    createQrEventSubscriber({qrActions})(socket);
 
     expect([...handlers.keys()]).toEqual([
       REMOTE_EVENT_QR_OPEN_BROWSER_SERVER,

@@ -19,7 +19,7 @@ function getModuleLog() {
   return log;
 }
 
-export function createAdminEventRegistrar({adminActions, legacyQrActions}) {
+export function createAdminEventSubscriber({adminActions, legacyQrActions}) {
   const log = getModuleLog();
   return function subscribeAdmin(channel) {
     const clientId = getClientId(channel);

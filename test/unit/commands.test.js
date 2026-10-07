@@ -1,6 +1,6 @@
 import sinon from 'sinon';
-import { createSamsungRegistrar } from '../../server/remotes/samsung/registrar.js';
-import { createBrowserRegistrar } from '../../server/remotes/browser/registrar.js';
+import { createSamsungSubscriber } from '../../server/remotes/samsung/subscriber.js';
+import { createBrowserSubscriber } from '../../server/remotes/browser/subscriber.js';
 import {
   REMOTE_EVENT_BROWSER_OPEN,
   REMOTE_EVENT_SAMSUNG_ON,
@@ -30,7 +30,7 @@ describe('remote command registrars', () => {
       switchToPcInput: sandbox.stub().resolves(),
     };
 
-    const register = createSamsungRegistrar({ samsung });
+    const register = createSamsungSubscriber({ samsung });
     register({
       id: 'abcdef123456',
       on(eventName, handler) {
@@ -51,7 +51,7 @@ describe('remote command registrars', () => {
       focusOrLaunchBrowser: sandbox.stub().resolves(),
     };
 
-    const register = createBrowserRegistrar({ browser });
+    const register = createBrowserSubscriber({ browser });
 
     register({
       id: 'abcdef123456',

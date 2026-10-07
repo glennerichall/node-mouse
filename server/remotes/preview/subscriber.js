@@ -3,7 +3,7 @@ import {
   REMOTE_EVENT_PREVIEW_STOP,
 } from '../../../utils/remoteCommands.js';
 
-export function createPreviewEventRegistrar({ preview, getConfig = () => ({}) }) {
+export function createPreviewEventSubscriber({ preview, getConfig = () => ({}) }) {
   return function subscribePreview(channel) {
     let previewSession = null;
 

@@ -10,7 +10,7 @@ function getModuleLog() {
     return log;
 }
 
-export function createConnectionRegistrar({events}) {
+export function createConnectionSubscriber({events}) {
     const log = getModuleLog();
     return function subscribeConnection(channel) {
         channel.on('disconnect', () => {
