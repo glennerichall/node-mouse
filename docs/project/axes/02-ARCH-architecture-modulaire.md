@@ -72,6 +72,8 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
   réduire les routeurs à la composition Express.
 - [x] ARCH-030 — regrouper les montages HTTP publics et protégés dans quelques
   routeurs de frontière, sans fusionner les handlers métier.
+- [x] ARCH-031 — verrouiller les frontières de montage HTTP par des tests de
+  composition et clôturer la consolidation du routage.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de
 transport et déploiement.
@@ -204,6 +206,23 @@ et les tests avant son implémentation.
 - les handlers métier et les routeurs de domaine restent séparés;
 - les contrats `/health`, `/qr`, sessions, client, remotes et administration
   sont conservés;
+- la suite complète reste verte et la version patch est incrémentée.
+
+## ARCH-031 — Contrats des frontières de montage HTTP
+
+**Modules concernés:**
+
+- `server/init/routers/public.router.js` et `protected.router.js`;
+- `server/init/bootstrapApi.js` pour l'ordre des montages;
+- tests de composition des préfixes publics et protégés.
+
+**Critères d'acceptation:**
+
+- les préfixes `/api/sessions`, `/api/client`, `/api/remotes`,
+  `/api/admin-auth`, `/api/admin`, `/ui/admin`, `/qr` et `/health` sont
+  vérifiés par des tests de composition;
+- les frontières publiques et protégées restent distinctes;
+- aucun changement de handler métier ou de payload HTTP n'est introduit;
 - la suite complète reste verte et la version patch est incrémentée.
 
 ## ARCH-023 — Handlers d'actions administrateur
