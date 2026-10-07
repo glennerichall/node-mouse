@@ -3,7 +3,7 @@ import express from 'express';
 import {CLIENT_CONFIG_PATHS} from '../../services/config/configPaths.js';
 import {PUBSUB_SERVICE_CLIENT_CONFIG} from '../../services/pubsub/serviceEventConstants.js';
 import {getManagedConfigSnapshot} from './configs.js';
-import {remotesCatalogRouter} from './admin-remotes.router.js';
+import {adminRemotesRouter} from './admin-remotes.router.js';
 import {isAdminPasswordConfigured} from '../../services/security/adminPasswordPolicy.js';
 
 export async function getClientConfig(req, res) {
@@ -63,4 +63,4 @@ export const clientSubsRouter = express.Router()
 export const clientApiRouter = express.Router()
   .get('/config', getClientConfig)
   .use('/subs', clientSubsRouter)
-  .use('/remotes', remotesCatalogRouter);
+  .use('/remotes', adminRemotesRouter);

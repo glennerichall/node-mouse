@@ -58,6 +58,8 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
   réduire le routeur à la composition HTTP, guards et handlers.
 - [x] ARCH-023 — extraire les handlers d'actions administrateur et réduire le
   routeur à la composition HTTP.
+- [x] ARCH-024 — extraire les handlers du catalogue des remotes et réduire le
+  routeur à la composition HTTP.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de
 transport et déploiement.
@@ -194,6 +196,23 @@ ce refactoring ne doit pas modifier son comportement ni réintroduire YAD.
   les tests spécifiques Linux et Windows restent verts;
 - aucun changement n'est apporté au protocole client, à la configuration
   persistée ou au cycle de jumelage QR.
+
+## ARCH-024 — Handlers du catalogue des remotes
+
+**Modules concernés:**
+
+- `server/connection/api/admin-remotes.handlers.js` pour le catalogue métier;
+- `server/connection/api/admin-remotes.router.js` pour la composition HTTP;
+- tests unitaires des catalogues navigateur et remotes.
+
+**Critères d'acceptation:**
+
+- `listBrowsers`, `listRemotes` et `isBrowserEnabled` sont exportés hors du
+  routeur;
+- le routeur ne contient plus de construction de réponse;
+- le routeur est exporté directement sous `adminRemotesRouter`, sans alias;
+- la disponibilité VLC et les préférences d'activation sont conservées;
+- les handlers sont testés indépendamment et la suite complète reste verte.
 
 ## ARCH-020 — Guards de validation autonomes
 
