@@ -1,11 +1,9 @@
 import express from 'express';
 
 import {
-    discoverSamsungDevices,
-    getSamsungDeviceMac,
-    normalizeMac,
-    pickSamsungDevice
-} from '../../remotes/samsung/device-config.js';
+    discoverSamsung,
+    restartService,
+} from './admin-action.handlers.js';
 
 export {
     buildManagedConfigPayload,
@@ -13,42 +11,5 @@ export {
 } from './configs.js';
 
 export const adminConfigActionsRouter = express.Router()
-
-    .post('/configs/samsung/discover', async (req, res) => {
-        const {services} = req;
-        try {
-            const discoverDevices = discoverSamsungDevices({
-                getConfig: () => services.getConfig().samsungTv,
-            });
-            const samsungConfig = services.getConfig().samsungTv;
-            const devices = await discoverDevices();
-            const selected = pickSamsungDevice(devices, samsungConfig.alwaysAutoResolve ? {
-                ...samsungConfig,
-                host: '',
-                mac: ''
-            } : samsungConfig,);
-
-            res.json({
-                ok: true, devices: devices.map((device) => ({
-                    name: String(device?.name || '').trim(),
-                    model: String(device?.model || '').trim(),
-                    host: String(device?.ip || '').trim(),
-                    mac: getSamsungDeviceMac(device),
-                    isSelected: Boolean(selected && String(selected.ip || '').trim() === String(device?.ip || '').trim() && normalizeMac(getSamsungDeviceMac(selected)) === normalizeMac(getSamsungDeviceMac(device)),),
-                })),
-            });
-        } catch (error) {
-            res.status(500).json({
-                ok: false, message: 'Erreur lors de la découverte Samsung.',
-            });
-        }
-    })
-
-    .post('/restart-service', async (req, res) => {
-        const {services} = req;
-        const result = await services.getApplicationDaemonService().restart({
-            cause: 'user', source: 'admin-http',
-        });
-
-        res.status(result?.ok ? 200 : 500).json(result);
-    });
+    .post('/configs/samsung/discover', discoverSamsung)
+    .post('/restart-service', restartService);

@@ -20,7 +20,7 @@ entraîner de renommage.
 | 2 | [04 — UX — Expérience utilisateur](./axes/04-UX-experience-utilisateur.md) | Association, contrôle et diagnostic compréhensibles | À jour — UX-006c terminée |
 | 3 | [07 — OPS — Exploitation](./axes/07-OPS-exploitation.md) | Installation, mise à jour et diagnostic récupérables | En cours — journaux et messages techniques |
 | 4 | [01 — SEC — Sécurité](./axes/01-SEC-securite.md) | Accès authentifiés, autorisations cohérentes et révocables | À jour — SEC-011 terminée |
-| 5 | [02 — ARCH — Architecture](./axes/02-ARCH-architecture-modulaire.md) | Services métier indépendants des transports et adaptateurs | ARCH-022 terminée |
+| 5 | [02 — ARCH — Architecture](./axes/02-ARCH-architecture-modulaire.md) | Services métier indépendants des transports et adaptateurs | ARCH-023 terminée |
 | 6 | [03 — REL — Fiabilité](./axes/03-REL-fiabilite.md) | Commandes et prévisualisation prévisibles sous charge | Planifié |
 | 7 | [06 — PWA — Application web](./axes/06-PWA-application-web.md) | Installation web et transports optionnels sécurisés | Planifié |
 | 8 | [09 — CODE — Qualité du code](./axes/09-CODE-qualite-et-uniformite.md) | Style cohérent, conventions explicites et dette mesurée | Planifié — CODE-001 |

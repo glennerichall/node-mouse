@@ -56,6 +56,8 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
   testable indépendamment des routeurs Express.
 - [x] ARCH-022 — extraire les handlers de configuration administrateur et
   réduire le routeur à la composition HTTP, guards et handlers.
+- [x] ARCH-023 — extraire les handlers d'actions administrateur et réduire le
+  routeur à la composition HTTP.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de
 transport et déploiement.
@@ -107,6 +109,24 @@ et les tests avant son implémentation.
 - les valeurs valides continuent d'être converties et les valeurs `null`
   conservent le contrat de réinitialisation;
 - la suite complète reste verte.
+
+## ARCH-023 — Handlers d'actions administrateur
+
+**Modules concernés:**
+
+- `server/connection/api/admin-action.handlers.js` pour les actions métier;
+- `server/connection/api/admin-actions.router.js` pour la composition des
+  routes;
+- tests unitaires des handlers avec les intégrations Samsung et service
+  simulées.
+
+**Critères d'acceptation:**
+
+- la découverte Samsung et le redémarrage du service sont exportés comme
+  handlers autonomes;
+- le routeur ne contient plus de logique métier ou de mapping de réponse;
+- les erreurs et codes HTTP existants sont conservés;
+- chaque handler est testé indépendamment et la suite complète reste verte.
 
 ## ARCH-022 — Handlers de configuration administrateur
 
