@@ -12,9 +12,9 @@ export {
     coerceConfigValue,
 } from './configs.js';
 
-export const adminConfigActionsRouter = express.Router();
+export const adminConfigActionsRouter = express.Router()
 
-    adminConfigActionsRouter.post('/configs/samsung/discover', async (req, res) => {
+    .post('/configs/samsung/discover', async (req, res) => {
         const {services} = req;
         try {
             const discoverDevices = discoverSamsungDevices({
@@ -22,40 +22,32 @@ export const adminConfigActionsRouter = express.Router();
             });
             const samsungConfig = services.getConfig().samsungTv;
             const devices = await discoverDevices();
-            const selected = pickSamsungDevice(
-                devices,
-                samsungConfig.alwaysAutoResolve
-                    ? {...samsungConfig, host: '', mac: ''}
-                    : samsungConfig,
-            );
+            const selected = pickSamsungDevice(devices, samsungConfig.alwaysAutoResolve ? {
+                ...samsungConfig,
+                host: '',
+                mac: ''
+            } : samsungConfig,);
 
             res.json({
-                ok: true,
-                devices: devices.map((device) => ({
+                ok: true, devices: devices.map((device) => ({
                     name: String(device?.name || '').trim(),
                     model: String(device?.model || '').trim(),
                     host: String(device?.ip || '').trim(),
                     mac: getSamsungDeviceMac(device),
-                    isSelected: Boolean(
-                        selected
-                        && String(selected.ip || '').trim() === String(device?.ip || '').trim()
-                        && normalizeMac(getSamsungDeviceMac(selected)) === normalizeMac(getSamsungDeviceMac(device)),
-                    ),
+                    isSelected: Boolean(selected && String(selected.ip || '').trim() === String(device?.ip || '').trim() && normalizeMac(getSamsungDeviceMac(selected)) === normalizeMac(getSamsungDeviceMac(device)),),
                 })),
             });
         } catch (error) {
             res.status(500).json({
-                ok: false,
-                message: 'Erreur lors de la découverte Samsung.',
+                ok: false, message: 'Erreur lors de la découverte Samsung.',
             });
         }
-    });
+    })
 
-    adminConfigActionsRouter.post('/restart-service', async (req, res) => {
+    .post('/restart-service', async (req, res) => {
         const {services} = req;
         const result = await services.getApplicationDaemonService().restart({
-            cause: 'user',
-            source: 'admin-http',
+            cause: 'user', source: 'admin-http',
         });
 
         res.status(result?.ok ? 200 : 500).json(result);

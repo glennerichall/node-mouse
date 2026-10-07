@@ -54,6 +54,8 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
   routes d'écriture.
 - [x] ARCH-021 — extraire le contexte de configuration géré dans un module
   testable indépendamment des routeurs Express.
+- [x] ARCH-022 — extraire les handlers de configuration administrateur et
+  réduire le routeur à la composition HTTP, guards et handlers.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de
 transport et déploiement.
@@ -105,6 +107,25 @@ et les tests avant son implémentation.
 - les valeurs valides continuent d'être converties et les valeurs `null`
   conservent le contrat de réinitialisation;
 - la suite complète reste verte.
+
+## ARCH-022 — Handlers de configuration administrateur
+
+**Modules concernés:**
+
+- `server/connection/api/admin-config.handlers.js` pour les opérations HTTP;
+- `server/connection/api/admin-configs.router.js` pour la composition des
+  routes et du middleware;
+- tests unitaires des handlers avec services simulés.
+
+**Critères d'acceptation:**
+
+- les quatre opérations de configuration sont exportées comme handlers
+  autonomes;
+- le routeur ne contient plus de logique de réponse ou de persistance;
+- les guards restent montés explicitement sur les routes d'écriture;
+- les réponses et codes HTTP existants sont conservés;
+- chaque handler est testé sans démarrer Express et la suite complète reste
+  verte.
 
 ## ARCH-021 — Contexte de configuration testable
 
