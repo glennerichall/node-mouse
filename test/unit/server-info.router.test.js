@@ -1,4 +1,4 @@
-import {__testables} from '../../server/connection/api/routers/server-info.router.js';
+import {__testables} from '../../server/connection/api/routers/admin.router.js';
 
 describe('server info router token entries', () => {
   it('masks token values and computes expiration dates', () => {

@@ -161,6 +161,8 @@ l'itération et devient append-only dès sa clôture.
   par routeurs, handlers, guards et middlewares.
 - [ARCH-029](./arch-ARCH-029-2026-10-07.md): extraction des derniers handlers
   inline des routeurs HTTP.
+- [ARCH-030](./arch-ARCH-030-2026-10-07.md): regroupement des frontières de
+  montage HTTP publiques et protégées.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

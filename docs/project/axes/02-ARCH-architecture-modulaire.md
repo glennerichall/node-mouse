@@ -70,6 +70,8 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
   `handlers`, `guards`, `middlewares`) et harmoniser les suffixes de fichiers.
 - [x] ARCH-029 — extraire les derniers handlers inline des routeurs HTTP et
   réduire les routeurs à la composition Express.
+- [x] ARCH-030 — regrouper les montages HTTP publics et protégés dans quelques
+  routeurs de frontière, sans fusionner les handlers métier.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de
 transport et déploiement.
@@ -178,6 +180,31 @@ et les tests avant son implémentation.
 - les chemins, statuts et payloads HTTP restent inchangés;
 - les tests ciblés et la suite complète restent verts;
 - la version patch est incrémentée.
+
+## ARCH-030 — Frontières de montage HTTP regroupées
+
+**Modules concernés:**
+
+- `server/connection/api/routers/admin.router.js` pour la composition de toute
+  l'API administrateur;
+- `server/connection/api/routers/client.router.js` pour les surfaces statiques,
+  client et remotes;
+- `server/init/routers/public.router.js` et `protected.router.js` pour les
+  frontières d'ordre des middlewares;
+- `server/init/bootstrapApi.js` et `server/init/handlers/health.handler.js`.
+
+**Critères d'acceptation:**
+
+- les petits fichiers de composition de `connection/api/routers` sont regroupés
+  dans `admin.router.js` et `client.router.js`;
+- `bootstrapApi` monte quelques routeurs de frontière au lieu de déclarer tous
+  les préfixes individuellement;
+- l'ordre reste inchangé : entrée publique avant le guard de session, routes
+  protégées après `securityRouter`, puis gestionnaire d'erreurs;
+- les handlers métier et les routeurs de domaine restent séparés;
+- les contrats `/health`, `/qr`, sessions, client, remotes et administration
+  sont conservés;
+- la suite complète reste verte et la version patch est incrémentée.
 
 ## ARCH-023 — Handlers d'actions administrateur
 
