@@ -1,6 +1,6 @@
 {
   "name": "@velor/remote-mouse",
-  "version": "6.19.17",
+  "version": "6.19.20",
   "type": "module",
   "description": "Remote mouse and keyboard with mobile client",
   "homepage": "https://github.com/glennerichall/node-mouse#readme",
@@ -46,6 +46,7 @@
     "dotenv": "^17.3.1",
     "express": "^4.21.2",
     "express-rate-limit": "^8.7.0",
+    "joi": "^18.2.9",
     "node-notifier": "^10.0.1",
     "pino": "^9.5.0",
     "pino-pretty": "^13.0.0",

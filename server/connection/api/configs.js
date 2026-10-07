@@ -2,6 +2,7 @@ import {CONFIG_PATHS} from '../../services/config/configPaths.js';
 import {getConfigFieldDefinition, getManagedConfigSchema} from '../../services/config/configSchema.js';
 import {DEFAULT_PERSISTED_CONFIG} from '../../services/config/defaultConfig.js';
 import {setNestedValue} from '../../../utils/object.utils.js';
+import Joi from 'joi';
 
 export const adminConfigSchema = getManagedConfigSchema(CONFIG_PATHS);
 
@@ -53,6 +54,36 @@ export function coerceConfigValue(rawValue, field) {
   }
 
   return value;
+}
+
+export function getConfigValueSchema(pathKey, schema = adminConfigSchema) {
+  const field = getFieldDefinition(schema, pathKey);
+  if (!field) {
+    return null;
+  }
+
+  let valueSchema;
+  if (field.type === 'boolean') {
+    valueSchema = Joi.boolean().truthy('true', '1', 'yes', 'on').falsy('false', '0', 'no', 'off');
+  } else if (field.type === 'integer') {
+    valueSchema = Joi.number().integer();
+  } else if (field.type === 'number') {
+    valueSchema = Joi.number();
+  } else {
+    valueSchema = Joi.string().trim();
+  }
+
+  if (Number.isFinite(field.min)) {
+    valueSchema = valueSchema.min(field.min);
+  }
+  if (Number.isFinite(field.max)) {
+    valueSchema = valueSchema.max(field.max);
+  }
+  if (Array.isArray(field.options) && field.options.length > 0) {
+    valueSchema = valueSchema.valid(...field.options);
+  }
+
+  return valueSchema;
 }
 
 export function buildManagedConfigPayload(rawValues, schema = adminConfigSchema) {

@@ -6,6 +6,7 @@ import {deepMerge} from '../../../utils/object.utils.js';
 import {CONFIG_DIR} from './bootstrapConfig.js';
 import {DEFAULT_SYSTEM_CONFIG} from './defaultConfig.js';
 import {getEnvConfig as readEnvConfig} from './envConfig.js';
+import {validateSystemConfig} from './systemConfigSchema.js';
 
 export function normalizeSystemConfig(defaultSystemConfig) {
   const httpsEnabled = Boolean(defaultSystemConfig?.https?.enabled);
@@ -50,6 +51,8 @@ export function normalizeSystemConfig(defaultSystemConfig) {
 
 export function getStartupSystemConfigSnapshot() {
   const config = deepMerge(DEFAULT_SYSTEM_CONFIG, readEnvConfig());
+
+  validateSystemConfig(config);
 
   if (process.env.NODE_ENV === 'production') {
     const secret = String(config.session?.cookieSecret || '');

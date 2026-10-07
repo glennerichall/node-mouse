@@ -1,163 +1,102 @@
 import express from 'express';
 
-import {CONFIG_PATHS} from '../../services/config/configPaths.js';
 import {
-  adminConfigDefaults,
-  adminConfigSchema,
-  buildConfigEntry,
-  coerceConfigValue,
-  getFieldDefinition,
-  getManagedConfigSnapshot,
+    buildConfigEntry,
 } from './configs.js';
+import {validateConfigPatch} from './config-validation.middleware.js';
+import {getManagedConfigContext} from './getManagedConfigContext.js';
 
-export const adminConfigsRouter = express.Router();
+export const adminConfigsRouter = express.Router()
+    .get('/', async (req, res) => {
+        const {services} = req;
+        const {
+            managedPaths,
+            schema,
+            defaults,
+            config,
+        } = await getManagedConfigContext(services);
 
-async function getManagedContext(services) {
-  const vlcAvailable = await services.getRemotes().vlc.isAvailable();
-  const managedPaths = CONFIG_PATHS;
-  const schema = adminConfigSchema;
-  const defaults = getManagedConfigSnapshot({
-    ...adminConfigDefaults,
-    vlc: {
-      enabled: false,
-    },
-  }, managedPaths);
-  const config = getManagedConfigSnapshot({
-    ...services.getConfig(),
-    vlc: {
-      enabled: vlcAvailable ? services.getConfig()?.vlc?.enabled : false,
-    },
-  }, managedPaths);
+        res.json({
+            configs: managedPaths.map((pathKey) => buildConfigEntry(pathKey, schema, config, defaults)),
+            defaults,
+            schema,
+            managedPaths,
+            systemConfig: {
+                adminActionsEnabled: Boolean(services.getSystemConfig().adminActionsEnabled),
+            },
+        });
+    })
 
-  return {
-    managedPaths,
-    schema,
-    defaults,
-    config,
-  };
-}
+    .get('/:configId', async (req, res) => {
+        const {services} = req;
+        const pathKey = String(req.params.configId || '').trim();
+        const {
+            managedPaths,
+            schema,
+            defaults,
+            config,
+        } = await getManagedConfigContext(services);
 
-  adminConfigsRouter.get('/', async (req, res) => {
-    const {services} = req;
-    const {
-      managedPaths,
-      schema,
-      defaults,
-      config,
-    } = await getManagedContext(services);
+        if (!managedPaths.includes(pathKey)) {
+            res.status(404).json({
+                ok: false,
+                message: 'Invalid config path.',
+            });
+            return;
+        }
 
-    res.json({
-      configs: managedPaths.map((pathKey) => buildConfigEntry(pathKey, schema, config, defaults)),
-      defaults,
-      schema,
-      managedPaths,
-      systemConfig: {
-        adminActionsEnabled: Boolean(services.getSystemConfig().adminActionsEnabled),
-      },
-    });
-  });
+        res.json({
+            config: buildConfigEntry(pathKey, schema, config, defaults),
+        });
+    })
 
-  adminConfigsRouter.get('/:configId', async (req, res) => {
-    const {services} = req;
-    const pathKey = String(req.params.configId || '').trim();
-    const {
-      managedPaths,
-      schema,
-      defaults,
-      config,
-    } = await getManagedContext(services);
+    .patch('/:configId', validateConfigPatch, async (req, res) => {
+        const {services} = req;
+        const {pathKey, value} = req.configPatch;
 
-    if (!managedPaths.includes(pathKey)) {
-      res.status(404).json({
-        ok: false,
-        message: 'Invalid config path.',
-      });
-      return;
-    }
+        try {
+            if (value === null) {
+                services.getConfigService().resetConfig(pathKey);
+            } else {
+                services.getConfigService().setConfig(pathKey, value);
+            }
 
-    res.json({
-      config: buildConfigEntry(pathKey, schema, config, defaults),
-    });
-  });
+            const nextContext = await getManagedConfigContext(services);
+            res.json({
+                ok: true,
+                message: 'Configuration updated.',
+                config: buildConfigEntry(pathKey, nextContext.schema, nextContext.config, nextContext.defaults),
+            });
+        } catch (error) {
+            res.status(400).json({
+                ok: false,
+                message: 'Configuration invalide.',
+            });
+        }
+    })
 
-  adminConfigsRouter.patch('/:configId', async (req, res) => {
-    const {services} = req;
-    const pathKey = String(req.params.configId || '').trim();
-    const {
-      managedPaths,
-      schema,
-      defaults,
-    } = await getManagedContext(services);
+    .delete('/:configId', async (req, res) => {
+        const {services} = req;
+        const pathKey = String(req.params.configId || '').trim();
+        const {
+            managedPaths,
+            schema,
+            defaults,
+        } = await getManagedConfigContext(services);
 
-    if (!managedPaths.includes(pathKey)) {
-      res.status(404).json({
-        ok: false,
-        message: 'Invalid config path.',
-      });
-      return;
-    }
+        if (!managedPaths.includes(pathKey)) {
+            res.status(404).json({
+                ok: false,
+                message: 'Invalid config path.',
+            });
+            return;
+        }
 
-    const field = getFieldDefinition(schema, pathKey);
-    if (!field) {
-      res.status(404).json({
-        ok: false,
-        message: 'Unknown config field.',
-      });
-      return;
-    }
-
-    if (!req.body || !Object.hasOwn(req.body, 'value')) {
-      res.status(400).json({
-        ok: false,
-        message: 'Invalid payload: value expected.',
-      });
-      return;
-    }
-
-    try {
-      if (req.body.value === null) {
         services.getConfigService().resetConfig(pathKey);
-      } else {
-        const nextValue = coerceConfigValue(req.body.value, field);
-        services.getConfigService().setConfig(pathKey, nextValue);
-      }
-
-      const nextContext = await getManagedContext(services);
-      res.json({
-        ok: true,
-        message: 'Configuration updated.',
-        config: buildConfigEntry(pathKey, nextContext.schema, nextContext.config, nextContext.defaults),
-      });
-    } catch (error) {
-      res.status(400).json({
-        ok: false,
-        message: 'Configuration invalide.',
-      });
-    }
-  });
-
-  adminConfigsRouter.delete('/:configId', async (req, res) => {
-    const {services} = req;
-    const pathKey = String(req.params.configId || '').trim();
-    const {
-      managedPaths,
-      schema,
-      defaults,
-    } = await getManagedContext(services);
-
-    if (!managedPaths.includes(pathKey)) {
-      res.status(404).json({
-        ok: false,
-        message: 'Invalid config path.',
-      });
-      return;
-    }
-
-    services.getConfigService().resetConfig(pathKey);
-    const nextContext = await getManagedContext(services);
-    res.json({
-      ok: true,
-      message: `${pathKey} reset to default.`,
-      config: buildConfigEntry(pathKey, schema, nextContext.config, defaults),
+        const nextContext = await getManagedConfigContext(services);
+        res.json({
+            ok: true,
+            message: `${pathKey} reset to default.`,
+            config: buildConfigEntry(pathKey, schema, nextContext.config, defaults),
+        });
     });
-  });

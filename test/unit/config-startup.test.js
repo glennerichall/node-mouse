@@ -72,4 +72,11 @@ describe('getStartupSystemConfigSnapshot', () => {
 
     expect(getStartupSystemConfigSnapshot().session.cookieSecret).toBe('a'.repeat(64));
   });
+
+  it('rejects invalid system values before startup continues', async () => {
+    process.env.PORT = '0';
+    const {getStartupSystemConfigSnapshot} = await import('../../server/services/config/index.js');
+
+    expect(() => getStartupSystemConfigSnapshot()).toThrow(/Invalid system configuration/);
+  });
 });

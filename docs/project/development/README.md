@@ -139,6 +139,12 @@ l'itération et devient append-only dès sa clôture.
   service de souscriptions.
 - [ARCH-018](./arch-ARCH-018-2026-10-07.md): séparation des snapshots et des
   journaux de configuration système et fonctionnelle.
+- [ARCH-019](./arch-ARCH-019-2026-10-07.md): validation Joi de la configuration
+  système au démarrage et des écritures de configuration API.
+- [ARCH-020](./arch-ARCH-020-2026-10-07.md): extraction des guards de
+  configuration dans un middleware autonome et testable.
+- [ARCH-021](./arch-ARCH-021-2026-10-07.md): extraction du contexte de
+  configuration géré dans un module testable.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

@@ -1,6 +1,7 @@
 import {
   buildManagedConfigPayload,
   coerceConfigValue,
+  getConfigValueSchema,
 } from '../../server/connection/api/configs.js';
 import {DEFAULT_PERSISTED_CONFIG} from '../../server/services/config/defaultConfig.js';
 
@@ -60,5 +61,13 @@ describe('admin config router helpers', () => {
 
   it('treats null as a delete signal at the API contract level', () => {
     expect(null).toBeNull();
+  });
+
+  it('validates API values with the field range and type', () => {
+    const schema = getConfigValueSchema('preview.fps');
+
+    expect(schema.validate('12').value).toBe(12);
+    expect(schema.validate('0').error).toBeTruthy();
+    expect(schema.validate('not-a-number').error).toBeTruthy();
   });
 });
