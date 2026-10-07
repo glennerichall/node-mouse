@@ -18,7 +18,7 @@ export function createEventSubscriptionService(services) {
     createControlEventSubscriber({mouse, keyboard}),
     createBrowserSubscriber({browser, getConfig: services.getConfig}),
     createQrEventSubscriber({qrActions}),
-    createAdminEventSubscriber({adminActions, legacyQrActions: qrActions}),
+    createAdminEventSubscriber({adminActions, qrActions}),
     createPreviewEventSubscriber({preview, getConfig: services.getConfig}),
     createSamsungSubscriber({samsung}),
     createVlcSubscriber({vlc, keyboard, getConfig: services.getConfig}),

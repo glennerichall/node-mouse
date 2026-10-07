@@ -19,7 +19,7 @@ function getModuleLog() {
   return log;
 }
 
-export function createAdminEventSubscriber({adminActions, legacyQrActions}) {
+export function createAdminEventSubscriber({adminActions, qrActions}) {
   const log = getModuleLog();
   return function subscribeAdmin(channel) {
     const clientId = getClientId(channel);
@@ -46,13 +46,13 @@ export function createAdminEventSubscriber({adminActions, legacyQrActions}) {
 
     channel.on(REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER, async () => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER}`);
-      const result = await legacyQrActions.openQrBrowserServer({ clientId });
+      const result = await qrActions.openQrBrowserServer({ clientId });
       respondAdminAction('open-qr-browser-server', result);
     });
 
     channel.on(REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT, async () => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT}`);
-      const result = await legacyQrActions.openQrBrowserClient({ clientId });
+      const result = await qrActions.openQrBrowserClient({ clientId });
       respondAdminAction('open-qr-browser-client', result);
     });
 
@@ -70,13 +70,13 @@ export function createAdminEventSubscriber({adminActions, legacyQrActions}) {
 
     channel.on(REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN, async () => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN}`);
-      const result = await legacyQrActions.rotateEntryToken({ clientId });
+      const result = await qrActions.rotateEntryToken({ clientId });
       respondAdminAction('rotate-entry-token', result);
     });
 
     channel.on(REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY, async () => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY}`);
-      const result = await legacyQrActions.toggleQrOverlay({ clientId });
+      const result = await qrActions.toggleQrOverlay({ clientId });
       respondAdminAction('toggle-qr-overlay', result);
     });
   };

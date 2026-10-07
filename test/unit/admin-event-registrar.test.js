@@ -17,9 +17,9 @@ describe('createAdminEventRegistrar', () => {
     const adminActions = {
       forceUpdateCheck: sinon.stub().resolves({ok: true, message: 'done'}),
     };
-    const legacyQrActions = {};
+    const qrActions = {};
 
-    createAdminEventSubscriber({adminActions, legacyQrActions})(channel);
+    createAdminEventSubscriber({adminActions, qrActions})(channel);
     await handlers.get(REMOTE_EVENT_ADMIN_UPDATE_CHECK)();
 
     expect(channel.on.callCount).toBeGreaterThan(0);

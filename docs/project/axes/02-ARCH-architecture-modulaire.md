@@ -76,6 +76,8 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
   composition et clôturer la consolidation du routage.
 - [x] ARCH-032 — formaliser le contrat du canal d'événements entre transport et
   subscribers, sans introduire de dispatcher central.
+- [x] ARCH-033 — supprimer les alias et références legacy des événements et
+  actions QR avant toute validation locale des payloads.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de
 transport et déploiement.
@@ -243,6 +245,21 @@ et les tests avant son implémentation.
 - aucun dispatcher métier central n'est ajouté;
 - plusieurs transports peuvent satisfaire le même contrat sans modifier les
   subscribers;
+- la suite complète reste verte et la version patch est incrémentée.
+
+## ARCH-033 — Retrait des alias legacy des actions QR
+
+**Modules concernés:**
+
+- `server/remotes/admin/subscriber.js`;
+- `server/services/transport/createEventSubscriptionService.js`;
+- tests du subscriber administrateur et recherche des références obsolètes.
+
+**Critères d'acceptation:**
+
+- le subscriber admin reçoit `qrActions` sous son nom fonctionnel;
+- aucun alias `legacyQrActions` ne subsiste dans le code ou les tests;
+- les événements QR continuent d'utiliser les mêmes actions partagées;
 - la suite complète reste verte et la version patch est incrémentée.
 
 ## ARCH-023 — Handlers d'actions administrateur

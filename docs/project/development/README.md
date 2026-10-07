@@ -167,6 +167,8 @@ l'itération et devient append-only dès sa clôture.
   HTTP et clôture de la consolidation du routage.
 - [ARCH-032](./arch-ARCH-032-2026-10-07.md): formalisation du contrat entre
   transport et subscribers sans dispatcher central.
+- [ARCH-033](./arch-ARCH-033-2026-10-07.md): retrait des alias legacy des
+  événements et actions QR.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.
