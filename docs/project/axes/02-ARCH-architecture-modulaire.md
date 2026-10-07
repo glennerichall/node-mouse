@@ -74,6 +74,8 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
   routeurs de frontière, sans fusionner les handlers métier.
 - [x] ARCH-031 — verrouiller les frontières de montage HTTP par des tests de
   composition et clôturer la consolidation du routage.
+- [x] ARCH-032 — formaliser le contrat du canal d'événements entre transport et
+  subscribers, sans introduire de dispatcher central.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de
 transport et déploiement.
@@ -223,6 +225,24 @@ et les tests avant son implémentation.
   vérifiés par des tests de composition;
 - les frontières publiques et protégées restent distinctes;
 - aucun changement de handler métier ou de payload HTTP n'est introduit;
+- la suite complète reste verte et la version patch est incrémentée.
+
+## ARCH-032 — Contrat transport-subscriber
+
+**Modules concernés:**
+
+- `server/services/transport/event-channel.js` pour le contrat `on`/`emit`;
+- `server/services/transport/createEventSubscriptionService.js` pour la
+  validation à la frontière transport;
+- tests du service de souscriptions et des adapters de canal.
+
+**Critères d'acceptation:**
+
+- le service de souscriptions valide qu'un canal expose `on` et `emit`;
+- les subscribers restent responsables du routage vers leurs outils métier;
+- aucun dispatcher métier central n'est ajouté;
+- plusieurs transports peuvent satisfaire le même contrat sans modifier les
+  subscribers;
 - la suite complète reste verte et la version patch est incrémentée.
 
 ## ARCH-023 — Handlers d'actions administrateur

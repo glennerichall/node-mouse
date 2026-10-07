@@ -7,6 +7,7 @@ import {createSamsungSubscriber} from '../../remotes/samsung/subscriber.js';
 import {createVlcSubscriber} from '../../remotes/vlc/subscriber.js';
 import {createWindowSubscriber} from '../../remotes/window/subscriber.js';
 import {createQrEventSubscriber} from '../../remotes/qr/subscriber.js';
+import {assertEventChannel} from './event-channel.js';
 
 export function createEventSubscriptionService(services) {
   const {mouse, keyboard, updateConfig} = services.getInputController();
@@ -25,9 +26,10 @@ export function createEventSubscriptionService(services) {
     createConnectionSubscriber({events: services.getEvents()}),
   ];
 
-  return {
-    subscribe(channel) {
-      subscribers.forEach(subscriber => subscriber(channel));
-    },
+    return {
+      subscribe(channel) {
+        assertEventChannel(channel);
+        subscribers.forEach(subscriber => subscriber(channel));
+      },
   };
 }
