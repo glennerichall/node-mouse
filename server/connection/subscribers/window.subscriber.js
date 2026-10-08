@@ -3,7 +3,7 @@ import {
   REMOTE_EVENT_WINDOW_CLOSE,
   REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE,
 } from '../../../utils/remoteCommands.js';
-import {getClientLabel} from '../../connection/client-channel.js';
+import {getClientLabel} from '../client-channel.js';
 
 let log;
 function getModuleLog() {

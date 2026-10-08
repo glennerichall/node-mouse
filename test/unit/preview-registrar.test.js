@@ -1,5 +1,5 @@
 import {jest} from '@jest/globals';
-import {createPreviewEventSubscriber} from '../../server/remotes/preview/subscriber.js';
+import {createPreviewEventSubscriber} from '../../server/connection/subscribers/preview.subscriber.js';
 import {REMOTE_EVENT_PREVIEW_START} from '../../utils/remoteCommands.js';
 
 describe('preview event registrar', () => {

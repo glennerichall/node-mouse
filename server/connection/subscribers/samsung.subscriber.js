@@ -9,7 +9,7 @@ import {
     REMOTE_EVENT_SAMSUNG_VOL_DOWN,
     REMOTE_EVENT_SAMSUNG_VOL_UP,
 } from '../../../utils/remoteCommands.js';
-import {getClientLabel} from '../../connection/client-channel.js';
+import {getClientLabel} from '../client-channel.js';
 
 let log = createLogger('samsung:remote');
 

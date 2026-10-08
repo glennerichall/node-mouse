@@ -1,12 +1,12 @@
 import {createLogger} from '../../application/logger.js';
-import {createSocketActionResponder} from '../../connection/socket/socket-action-responder.js';
+import {createSocketActionResponder} from '../socket/socket-action-responder.js';
 import {
   REMOTE_EVENT_QR_OPEN_BROWSER_CLIENT,
   REMOTE_EVENT_QR_OPEN_BROWSER_SERVER,
   REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN,
   REMOTE_EVENT_QR_TOGGLE_OVERLAY,
 } from '../../../utils/remoteCommands.js';
-import {getClientId, getClientLabel} from '../../connection/client-channel.js';
+import {getClientId, getClientLabel} from '../client-channel.js';
 
 let log;
 function getModuleLog() {

@@ -303,6 +303,28 @@ et les tests avant son implémentation.
 - un futur adapter WebRTC peut réutiliser le même composant;
 - la suite complète reste verte et la version patch est incrémentée.
 
+## ARCH-036 — Subscribers regroupés par responsabilité de connexion
+
+**Modules concernés:**
+
+- `server/connection/subscribers/` pour l'ensemble des adapters de souscription
+  aux événements de transport;
+- `server/services/transport/createEventSubscriptionService.js` pour la
+  composition des subscribers;
+- tests unitaires des subscribers et du service de souscriptions.
+
+**Critères d'acceptation:**
+
+- les subscribers d'entrée, de remotes et de connexion sont regroupés sous
+  `server/connection/subscribers/`;
+- les actions métier restent dans `server/remotes/` et ne sont pas déplacées
+  dans cette consolidation;
+- les imports du service et des tests utilisent les nouveaux chemins sans
+  alias de compatibilité obsolète;
+- chaque subscriber conserve son contrat de canal et son routage vers l'outil
+  métier correspondant;
+- la suite complète reste verte et la version patch est incrémentée.
+
 ## ARCH-023 — Handlers d'actions administrateur
 
 **Modules concernés:**

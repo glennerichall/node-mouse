@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import {createAdminEventSubscriber} from '../../server/remotes/admin/subscriber.js';
+import {createAdminEventSubscriber} from '../../server/connection/subscribers/admin.subscriber.js';
 import {
   REMOTE_EVENT_ADMIN_RESULT,
   REMOTE_EVENT_ADMIN_UPDATE_CHECK,

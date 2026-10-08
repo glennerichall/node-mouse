@@ -1,6 +1,6 @@
 import {createLogger} from '../../application/logger.js';
-import {createSocketActionResponder} from '../../connection/socket/socket-action-responder.js';
-import {getClientId, getClientLabel} from '../../connection/client-channel.js';
+import {createSocketActionResponder} from '../socket/socket-action-responder.js';
+import {getClientId, getClientLabel} from '../client-channel.js';
 import {
   REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT,
   REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER,

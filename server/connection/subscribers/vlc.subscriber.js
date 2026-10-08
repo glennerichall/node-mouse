@@ -5,7 +5,7 @@ import {
   REMOTE_EVENT_VLC_WINDOW_CLOSE,
   REMOTE_EVENT_VLC_WINDOW_TOGGLE,
 } from '../../../utils/remoteCommands.js';
-import {getClientLabel} from '../../connection/client-channel.js';
+import {getClientLabel} from '../client-channel.js';
 
 let log;
 function getModuleLog() {

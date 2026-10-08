@@ -1,6 +1,6 @@
 import {createLogger} from "../../application/logger.js";
 import { REMOTE_EVENT_BROWSER_OPEN } from '../../../utils/remoteCommands.js';
-import {getClientLabel} from '../../connection/client-channel.js';
+import {getClientLabel} from '../client-channel.js';
 
 let log;
 function getModuleLog() {

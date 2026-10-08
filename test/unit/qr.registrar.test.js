@@ -1,5 +1,5 @@
 import {jest} from '@jest/globals';
-import {createQrEventSubscriber} from '../../server/remotes/qr/subscriber.js';
+import {createQrEventSubscriber} from '../../server/connection/subscribers/qr.subscriber.js';
 import {
   REMOTE_EVENT_QR_OPEN_BROWSER_CLIENT,
   REMOTE_EVENT_QR_OPEN_BROWSER_SERVER,

@@ -1,6 +1,6 @@
 import sinon from 'sinon';
-import { createSamsungSubscriber } from '../../server/remotes/samsung/subscriber.js';
-import { createBrowserSubscriber } from '../../server/remotes/browser/subscriber.js';
+import { createSamsungSubscriber } from '../../server/connection/subscribers/samsung.subscriber.js';
+import { createBrowserSubscriber } from '../../server/connection/subscribers/browser.subscriber.js';
 import {
   REMOTE_EVENT_BROWSER_OPEN,
   REMOTE_EVENT_SAMSUNG_ON,
