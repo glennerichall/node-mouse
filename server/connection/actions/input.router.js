@@ -12,29 +12,29 @@ const getMove = (request, mouse) => {
     return move;
 };
 export const mouseRouter = Router()
-    .post(`/movements`, async (request, response) => {
+    .post('/movements', async (request, response) => {
         const {mouse} = getInput(request);
         getMove(request, mouse)(request.body);
         response.send({ok: true});
     })
-    .post(`/clicks`, (request, response) => {
+    .post('/clicks', (request, response) => {
         getInput(request).mouse.click(request.body.button);
         response.send({ok: true});
     })
-    .post(`/buttons`, (request, response) => {
+    .post('/buttons', (request, response) => {
         getInput(request).mouse.setButtonState(request.body.button, request.body.state);
         response.send({ok: true});
     })
-    .post(`/scrolls`, (request, response) => {
+    .post('/scrolls', (request, response) => {
         getInput(request).mouse.scroll(Number(request.body.dy) || 0);
         response.send({ok: true});
     })
 export const keyboardRouter = Router()
-    .post(`/texts`, (request, response) => {
+    .post('/texts', (request, response) => {
         getInput(request).keyboard.typeText(request.body.text);
         response.send({ok: true});
     })
-    .post(`/keys`, (request, response) => {
+    .post('/keys', (request, response) => {
         getInput(request).keyboard.pressSpecialKey(request.body.key, request.body.modifiers);
         response.send({ok: true});
     });

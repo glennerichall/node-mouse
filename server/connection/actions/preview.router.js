@@ -9,7 +9,7 @@ const stop = (socket) => {
     }
 };
 export const previewRouter = Router()
-    .post(`/sessions`, (request, response) => {
+    .post('/sessions', (request, response) => {
         const socket = request.socket;
         const preview = request.services.getRemotes().preview;
         const getConfig = request.services.getConfig;
@@ -21,7 +21,7 @@ export const previewRouter = Router()
         if (created) response.status(201).send({ok: true});
         else response.status(204).end();
     })
-    .delete(`/sessions`, (request, response) => {
+    .delete('/sessions', (request, response) => {
         stop(request.socket);
         response.status(204).end();
     });

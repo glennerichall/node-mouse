@@ -232,7 +232,7 @@ export function createTokenManager(services) {
         log.debug('Token rotation required');
         return createToken();
     }
-    
+
     return {
         isValid,
         createToken,

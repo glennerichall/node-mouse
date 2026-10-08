@@ -1,7 +1,7 @@
 /** Express-style admin authorization middleware for socket routes. */
 export function adminGuard(request, response, next) {
     const client = String(request.socket?.id ?? 'unknown').slice(0, 8);
-   
+
     const authorization = request.services.getAuthorization()
         .authorize(request.socket?.securityContext, 'admin:manage');
 

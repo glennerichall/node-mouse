@@ -30,7 +30,7 @@ export function bootstrapApi(services) {
         app,
         cookieParser
     } = getServer();
-    
+
     const log = createLogger('createApp');
 
     app.use(createRequestScopeMiddleware(services));
