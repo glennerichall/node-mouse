@@ -1,7 +1,3 @@
-import {
-    REMOTE_EVENT_PREVIEW_START,
-    REMOTE_EVENT_PREVIEW_STOP
-} from '../../../utils/remoteCommands.js';
 import Router from 'router';
 
 const sessions = new WeakMap();
@@ -13,7 +9,7 @@ const stop = (socket) => {
     }
 };
 export const previewRouter = Router()
-    .post(`/${REMOTE_EVENT_PREVIEW_START}`, (request, _response, next) => {
+    .post(`/start`, (request, _response, next) => {
         const socket = request.socket;
         const preview = request.services.getRemotes().preview;
         const getConfig = request.services.getConfig;
@@ -22,7 +18,7 @@ export const previewRouter = Router()
         }
         next();
     })
-    .post(`/${REMOTE_EVENT_PREVIEW_STOP}`, (request, _response, next) => {
+    .post(`/stop`, (request, _response, next) => {
         stop(request.socket);
         next();
     });

@@ -19,7 +19,7 @@ describe('QR event registrar', () => {
     const response = jest.fn();
     const socket = {id: 'controller-1'};
     const next = jest.fn();
-    await qrRouter({method: 'POST', url: `/${REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN}`, originalUrl: `/${REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN}`, socket, services: {getRemotes: () => ({qrActions})}, body: {}},
+    await qrRouter({method: 'POST', url: '/rotate-entry-token', originalUrl: '/rotate-entry-token', socket, services: {getRemotes: () => ({qrActions})}, body: {}},
       {response},
       next,
     );

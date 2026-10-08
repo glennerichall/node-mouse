@@ -1,5 +1,5 @@
 import Router from 'router';
-import {inputRouter} from '../../connection/actions/input.router.js';
+import {mouseRouter, keyboardRouter} from '../../connection/actions/input.router.js';
 import {adminRouter} from '../../connection/actions/admin.router.js';
 import {previewRouter} from '../../connection/actions/preview.router.js';
 import {browserRouter} from '../../connection/actions/browser.router.js';
@@ -10,13 +10,13 @@ import {qrRouter} from '../../connection/actions/qr.router.js';
 
 /** Socket route tree, declared once like the HTTP routers. */
 export const socketRouter = Router();
-[
-    inputRouter,
-    browserRouter,
-    qrRouter,
-    adminRouter,
-    previewRouter,
-    samsungRouter,
-    vlcRouter,
-    windowRouter,
-].forEach((route) => socketRouter.use(route));
+socketRouter
+    .use('/mouse', mouseRouter)
+    .use('/keyboard', keyboardRouter)
+    .use('/browser', browserRouter)
+    .use('/qr', qrRouter)
+    .use('/admin', adminRouter)
+    .use('/preview', previewRouter)
+    .use('/samsung', samsungRouter)
+    .use('/vlc', vlcRouter)
+    .use('/window', windowRouter);

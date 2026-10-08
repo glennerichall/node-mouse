@@ -1,11 +1,5 @@
 import {createLogger} from '../../application/logger.js';
 import {
-    REMOTE_EVENT_QR_OPEN_BROWSER_CLIENT,
-    REMOTE_EVENT_QR_OPEN_BROWSER_SERVER,
-    REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN,
-    REMOTE_EVENT_QR_TOGGLE_OVERLAY,
-} from '../../../utils/remoteCommands.js';
-import {
     getClientId,
     getClientLabel
 } from '../client-channel.js';
@@ -22,10 +16,10 @@ const eventLog = getModuleLog();
 const getQrActions = (request) => request.services.getRemotes().qrActions;
 
 export const qrRouter = Router()
-    .post(`/${REMOTE_EVENT_QR_OPEN_BROWSER_SERVER}`, async (request, response, next) => {
+    .post(`/open-browser-server`, async (request, response, next) => {
         const client = getClientLabel(request.socket);
         const qrActions = getQrActions(request);
-        eventLog.info({client}, `Demande ${REMOTE_EVENT_QR_OPEN_BROWSER_SERVER}`);
+        eventLog.info({client}, `Demande open-browser-server`);
         const result = await qrActions.openQrBrowserServer({clientId: getClientId(request.socket)});
         response.response({
             ok: Boolean(result.ok),
@@ -34,10 +28,10 @@ export const qrRouter = Router()
         next();
     })
 
-    .post(`/${REMOTE_EVENT_QR_OPEN_BROWSER_CLIENT}`, async (request, response, next) => {
+    .post(`/open-browser-client`, async (request, response, next) => {
         const client = getClientLabel(request.socket);
         const qrActions = getQrActions(request);
-        eventLog.info({client}, `Demande ${REMOTE_EVENT_QR_OPEN_BROWSER_CLIENT}`);
+        eventLog.info({client}, `Demande open-browser-client`);
         const result = await qrActions.openQrBrowserClient({clientId: getClientId(request.socket)});
         response.response({
             ok: Boolean(result.ok),
@@ -46,10 +40,10 @@ export const qrRouter = Router()
         next();
     })
 
-    .post(`/${REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN}`, async (request, response, next) => {
+    .post(`/rotate-entry-token`, async (request, response, next) => {
         const client = getClientLabel(request.socket);
         const qrActions = getQrActions(request);
-        eventLog.info({client}, `Demande ${REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN}`);
+        eventLog.info({client}, `Demande rotate-entry-token`);
         const result = await qrActions.rotateEntryToken({clientId: getClientId(request.socket)});
         response.response({
             ok: Boolean(result.ok),
@@ -58,10 +52,10 @@ export const qrRouter = Router()
         next();
     })
 
-    .post(`/${REMOTE_EVENT_QR_TOGGLE_OVERLAY}`, async (request, response, next) => {
+    .post(`/toggle-overlay`, async (request, response, next) => {
         const client = getClientLabel(request.socket);
         const qrActions = getQrActions(request);
-        eventLog.info({client}, `Demande ${REMOTE_EVENT_QR_TOGGLE_OVERLAY}`);
+        eventLog.info({client}, `Demande toggle-overlay`);
         const result = await qrActions.toggleQrOverlay({clientId: getClientId(request.socket)});
         response.response({
             ok: Boolean(result.ok),

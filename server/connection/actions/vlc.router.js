@@ -44,22 +44,22 @@ export const ensureVlcUsable = async (request, _response, next) => {
     next();
 };
 vlcRouter
-    .post(`/${REMOTE_EVENT_VLC_OPEN}`, ensureVlcUsable, async (request, _response, next) => {
+    .post(`/open`, ensureVlcUsable, async (request, _response, next) => {
         await getVlc(request).focusOrLaunch();
         next();
     })
-    .post(`/${REMOTE_EVENT_VLC_COMMAND}`, ensureVlcUsable, async (request, _response, next) => {
+    .post(`/command`, ensureVlcUsable, async (request, _response, next) => {
         const vlc = getVlc(request);
         const command = VLC_ACTIONS[request.body?.action];
         const keyboard = request.services.getInputController().keyboard;
         if (command && await vlc.focusOrLaunch()) await keyboard.pressSpecialKey(command.key, command.modifiers);
         next();
     })
-    .post(`/${REMOTE_EVENT_VLC_WINDOW_TOGGLE}`, ensureVlcUsable, async (request, _response, next) => {
+    .post(`/window-toggle`, ensureVlcUsable, async (request, _response, next) => {
         await getVlc(request).toggleWindow();
         next();
     })
-    .post(`/${REMOTE_EVENT_VLC_WINDOW_CLOSE}`, ensureVlcUsable, async (request, _response, next) => {
+    .post(`/window-close`, ensureVlcUsable, async (request, _response, next) => {
         await getVlc(request).closeWindow();
         next();
     });

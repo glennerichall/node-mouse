@@ -43,7 +43,7 @@ describe('remote command registrars', () => {
       focusOrLaunchBrowser: sandbox.stub().resolves(),
     };
 
-    await browserRouter({method: 'POST', url: `/${REMOTE_EVENT_BROWSER_OPEN}`, originalUrl: `/${REMOTE_EVENT_BROWSER_OPEN}`, socket: {id: 'abcdef123456'}, services: {getRemotes: () => ({browser}), getConfig: () => ({})}, body: {browserId: 'firefox'}}, {}, () => {});
+    await browserRouter({method: 'POST', url: '/open', originalUrl: '/open', socket: {id: 'abcdef123456'}, services: {getRemotes: () => ({browser}), getConfig: () => ({})}, body: {browserId: 'firefox'}}, {}, () => {});
 
     expect(browser.focusOrLaunchBrowser.calledOnceWithExactly('firefox')).toBe(true);
   });

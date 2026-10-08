@@ -1,10 +1,12 @@
+import {createLogger} from '../../application/logger.js';
+
 export function createAdminEventGuard({
   getSystemConfig = () => ({adminActionsEnabled: true}),
   getAuthorization = () => ({authorize: () => ({allowed: true})}),
   isAdminActionsEnabled: configuredEnabled,
   isAdmin: configuredAdmin,
   client: configuredClient = 'unknown',
-  log,
+  log = createLogger('events:admin'),
 }) {
   return function adminEventGuard(request, response, next) {
     request ??= {};

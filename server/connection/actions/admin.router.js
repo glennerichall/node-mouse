@@ -1,55 +1,60 @@
-import {createLogger} from '../../application/logger.js';
 import {createAdminEventGuard} from './admin.guard.js';
-import {
-    getClientId,
-    getClientLabel
-} from '../client-channel.js';
 import Router from 'router';
-import {
-    REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT,
-    REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER,
-    REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_CLIENT,
-    REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER,
-    REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN,
-    REMOTE_EVENT_ADMIN_SERVICE_RESTART,
-    REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY,
-    REMOTE_EVENT_ADMIN_UPDATE_CHECK,
-    REMOTE_EVENT_ADMIN_UPDATE_INSTALL,
-} from '../../../utils/remoteCommands.js';
+import {getClientId} from '../client-channel.js';
 
-let log;
-
-function getModuleLog() {
-    log ??= createLogger('events:admin');
-    return log;
-}
-
-const eventLog = getModuleLog();
 const adminGuard = createAdminEventGuard({
     getSystemConfig: (request) => request.services.getSystemConfig(),
     getAuthorization: (request) => request.services.getAuthorization(),
-    log: eventLog,
 });
-const handleAdminAction = (eventName, action) => async (request, response, next) => {
-    const client = getClientLabel(request.socket);
-    eventLog.info({client}, `Demande ${eventName}`);
-    const remotes = request.services.getRemotes();
-    const result = await action({
-        adminActions: remotes.adminActions,
-        qrActions: remotes.qrActions,
-        clientId: getClientId(request.socket),
-    });
-    response.response?.({ok: Boolean(result.ok), message: result.message});
-    next();
-};
 
 export const adminRouter = Router()
-  .post(`/${REMOTE_EVENT_ADMIN_UPDATE_CHECK}`, adminGuard, handleAdminAction(REMOTE_EVENT_ADMIN_UPDATE_CHECK, ({adminActions, clientId}) => adminActions.forceUpdateCheck({clientId})))
-  .post(`/${REMOTE_EVENT_ADMIN_UPDATE_INSTALL}`, adminGuard, handleAdminAction(REMOTE_EVENT_ADMIN_UPDATE_INSTALL, ({adminActions, clientId}) => adminActions.installUpdate({clientId})))
-  .post(`/${REMOTE_EVENT_ADMIN_SERVICE_RESTART}`, adminGuard, handleAdminAction(REMOTE_EVENT_ADMIN_SERVICE_RESTART, ({adminActions, clientId}) => adminActions.restartService({clientId})))
-  .post(`/${REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER}`, adminGuard, handleAdminAction(REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER, ({qrActions, clientId}) => qrActions.openQrBrowserServer({clientId})))
-  .post(`/${REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT}`, adminGuard, handleAdminAction(REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT, ({qrActions, clientId}) => qrActions.openQrBrowserClient({clientId})))
-  .post(`/${REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER}`, adminGuard, handleAdminAction(REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER, ({adminActions, clientId}) => adminActions.openServerInfoBrowserServer({clientId})))
-  .post(`/${REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_CLIENT}`, adminGuard, handleAdminAction(REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_CLIENT, ({adminActions, clientId}) => adminActions.openServerInfoBrowserClient({clientId})))
-  .post(`/${REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN}`, adminGuard, handleAdminAction(REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN, ({qrActions, clientId}) => qrActions.rotateEntryToken({clientId})))
-  .post(`/${REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY}`, adminGuard, handleAdminAction(REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY, ({qrActions, clientId}) => qrActions.toggleQrOverlay({clientId})));
+    .use(adminGuard)
+    .use((req, _res, next) => {
+        req.log.info({client: req.socket?.id}, `Demande ${req.originalUrl}`);
+        next();
+    })
+    .post('/update-check', async (req, res, next) => {
+        const result = await req.services.getRemotes().adminActions.forceUpdateCheck({clientId: getClientId(req.socket)});
+        res.response?.({ok: Boolean(result.ok), message: result.message});
+        next();
+    })
+    .post('/update-install', async (req, res, next) => {
+        const result = await req.services.getRemotes().adminActions.installUpdate({clientId: getClientId(req.socket)});
+        res.response?.({ok: Boolean(result.ok), message: result.message});
+        next();
+    })
+    .post('/service-restart', async (req, res, next) => {
+        const result = await req.services.getRemotes().adminActions.restartService({clientId: getClientId(req.socket)});
+        res.response?.({ok: Boolean(result.ok), message: result.message});
+        next();
+    })
+    .post('/open-qr-browser-server', async (req, res, next) => {
+        const result = await req.services.getRemotes().qrActions.openQrBrowserServer({clientId: getClientId(req.socket)});
+        res.response?.({ok: Boolean(result.ok), message: result.message});
+        next();
+    })
+    .post('/open-qr-browser-client', async (req, res, next) => {
+        const result = await req.services.getRemotes().qrActions.openQrBrowserClient({clientId: getClientId(req.socket)});
+        res.response?.({ok: Boolean(result.ok), message: result.message});
+        next();
+    })
+    .post('/open-server-info-browser-server', async (req, res, next) => {
+        const result = await req.services.getRemotes().adminActions.openServerInfoBrowserServer({clientId: getClientId(req.socket)});
+        res.response?.({ok: Boolean(result.ok), message: result.message});
+        next();
+    })
+    .post('/open-server-info-browser-client', async (req, res, next) => {
+        const result = await req.services.getRemotes().adminActions.openServerInfoBrowserClient({clientId: getClientId(req.socket)});
+        res.response?.({ok: Boolean(result.ok), message: result.message});
+        next();
+    })
+    .post('/rotate-entry-token', async (req, res, next) => {
+        const result = await req.services.getRemotes().qrActions.rotateEntryToken({clientId: getClientId(req.socket)});
+        res.response?.({ok: Boolean(result.ok), message: result.message});
+        next();
+    })
+    .post('/toggle-qr-overlay', async (req, res, next) => {
+        const result = await req.services.getRemotes().qrActions.toggleQrOverlay({clientId: getClientId(req.socket)});
+        res.response?.({ok: Boolean(result.ok), message: result.message});
+        next();
+    });

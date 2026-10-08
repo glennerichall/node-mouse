@@ -1,64 +1,54 @@
 import {createLogger} from '../../application/logger.js';
-import {
-    REMOTE_EVENT_SAMSUNG_ENTER,
-    REMOTE_EVENT_SAMSUNG_INPUT,
-    REMOTE_EVENT_SAMSUNG_MUTE,
-    REMOTE_EVENT_SAMSUNG_OFF,
-    REMOTE_EVENT_SAMSUNG_ON,
-    REMOTE_EVENT_SAMSUNG_PC_INPUT,
-    REMOTE_EVENT_SAMSUNG_VOL_DOWN,
-    REMOTE_EVENT_SAMSUNG_VOL_UP,
-} from '../../../utils/remoteCommands.js';
 import {getClientLabel} from '../client-channel.js';
 import Router from 'router';
 
 const log = createLogger('samsung:remote');
 
 export const samsungRouter = Router()
-    .post(`/${REMOTE_EVENT_SAMSUNG_ON}`, async (request, _response, next) => {
-        log.info({client: getClientLabel(request.socket)}, `Demande ${REMOTE_EVENT_SAMSUNG_ON}`);
+    .post(`/on`, async (request, _response, next) => {
+        log.info({client: getClientLabel(request.socket)}, `Demande on`);
         await request.services.getRemotes().samsung.turnOn();
         next();
     })
     
-    .post(`/${REMOTE_EVENT_SAMSUNG_OFF}`, async (request, _response, next) => {
-        log.info({client: getClientLabel(request.socket)}, `Demande ${REMOTE_EVENT_SAMSUNG_OFF}`);
+    .post(`/off`, async (request, _response, next) => {
+        log.info({client: getClientLabel(request.socket)}, `Demande off`);
         await request.services.getRemotes().samsung.turnOff();
         next();
     })
 
-    .post(`/${REMOTE_EVENT_SAMSUNG_VOL_UP}`, async (request, _response, next) => {
-        log.info({client: getClientLabel(request.socket)}, `Demande ${REMOTE_EVENT_SAMSUNG_VOL_UP}`);
+    .post(`/volup`, async (request, _response, next) => {
+        log.info({client: getClientLabel(request.socket)}, `Demande volup`);
         await request.services.getRemotes().samsung.volumeUp();
         next();
     })
 
-    .post(`/${REMOTE_EVENT_SAMSUNG_VOL_DOWN}`, async (request, _response, next) => {
-        log.info({client: getClientLabel(request.socket)}, `Demande ${REMOTE_EVENT_SAMSUNG_VOL_DOWN}`);
+    .post(`/voldown`, async (request, _response, next) => {
+        log.info({client: getClientLabel(request.socket)}, `Demande voldown`);
         await request.services.getRemotes().samsung.volumeDown();
         next();
     })
 
-    .post(`/${REMOTE_EVENT_SAMSUNG_MUTE}`, async (request, _response, next) => {
-        log.info({client: getClientLabel(request.socket)}, `Demande ${REMOTE_EVENT_SAMSUNG_MUTE}`);
+    .post(`/mute`, async (request, _response, next) => {
+        log.info({client: getClientLabel(request.socket)}, `Demande mute`);
         await request.services.getRemotes().samsung.mute();
         next();
     })
 
-    .post(`/${REMOTE_EVENT_SAMSUNG_INPUT}`, async (request, _response, next) => {
-        log.info({client: getClientLabel(request.socket)}, `Demande ${REMOTE_EVENT_SAMSUNG_INPUT}`);
+    .post(`/input`, async (request, _response, next) => {
+        log.info({client: getClientLabel(request.socket)}, `Demande input`);
         await request.services.getRemotes().samsung.switchInput();
         next();
     })
 
-    .post(`/${REMOTE_EVENT_SAMSUNG_ENTER}`, async (request, _response, next) => {
-        log.info({client: getClientLabel(request.socket)}, `Demande ${REMOTE_EVENT_SAMSUNG_ENTER}`);
+    .post(`/enter`, async (request, _response, next) => {
+        log.info({client: getClientLabel(request.socket)}, `Demande enter`);
         await request.services.getRemotes().samsung.confirm();
         next();
     })
 
-    .post(`/${REMOTE_EVENT_SAMSUNG_PC_INPUT}`, async (request, _response, next) => {
-        log.info({client: getClientLabel(request.socket)}, `Demande ${REMOTE_EVENT_SAMSUNG_PC_INPUT}`);
+    .post(`/pc-input`, async (request, _response, next) => {
+        log.info({client: getClientLabel(request.socket)}, `Demande pc-input`);
         await request.services.getRemotes().samsung.switchToPcInput();
         next();
     });

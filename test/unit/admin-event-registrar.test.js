@@ -15,14 +15,15 @@ describe('adminRouter', () => {
 
     await adminRouter({
       method: 'POST',
-      url: `/${REMOTE_EVENT_ADMIN_UPDATE_CHECK}`,
-      originalUrl: `/${REMOTE_EVENT_ADMIN_UPDATE_CHECK}`,
+      url: '/update-check',
+      originalUrl: '/update-check',
       socket: channel,
       services: {
         getRemotes: () => ({adminActions, qrActions}),
         getSystemConfig: () => ({adminActionsEnabled: true}),
         getAuthorization: () => ({authorize: () => ({allowed: true})}),
       },
+      log: {info() {}},
       body: {},
     }, {response}, () => {});
 

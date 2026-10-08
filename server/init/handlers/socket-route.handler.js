@@ -23,9 +23,10 @@ export function createSocketRouteHandler({services, router}) {
     };
 
     return (socket, payload, response) => {
-        const request = eventRequest(socket, payload);
-        request.services = services;
-        request.securityContext = socket.securityContext;
+    const request = eventRequest(socket, payload);
+    request.services = services;
+    request.securityContext = socket.securityContext;
+    request.log = services.getLogger?.() ?? createLogger('socket:request').child({socketId: socket.id});
         router(request, {response}, finalhandler);
     };
 }

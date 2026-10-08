@@ -16,15 +16,15 @@ function getModuleLog() {
 const eventLog = getModuleLog();
 export const windowRouter = Router()
     
-    .post(`/${REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE}`, async (request, _response, next) => {
-        eventLog.info({client: getClientLabel(request.socket)}, `Demande ${REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE}`);
+    .post(`/toggle-maximize`, async (request, _response, next) => {
+        eventLog.info({client: getClientLabel(request.socket)}, `Demande toggle-maximize`);
         const windowActions = request.services.getRemotes().windowActions;
         await windowActions.toggleMaximizeMinimize();
         next();
     })
 
-    .post(`/${REMOTE_EVENT_WINDOW_CLOSE}`, async (request, _response, next) => {
-        eventLog.info({client: getClientLabel(request.socket)}, `Demande ${REMOTE_EVENT_WINDOW_CLOSE}`);
+    .post(`/close`, async (request, _response, next) => {
+        eventLog.info({client: getClientLabel(request.socket)}, `Demande close`);
         const windowActions = request.services.getRemotes().windowActions;
         await windowActions.closeActiveWindow();
         next();

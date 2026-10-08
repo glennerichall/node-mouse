@@ -1,5 +1,4 @@
 import {createLogger} from '../../application/logger.js';
-import {REMOTE_EVENT_BROWSER_OPEN} from '../../../utils/remoteCommands.js';
 import {getClientLabel} from '../client-channel.js';
 import Router from 'router';
 
@@ -16,7 +15,7 @@ function isBrowserEnabled(config, browserId) {
 
 const eventLog = getModuleLog();
 export const browserRouter = Router()
-    .post(`/${REMOTE_EVENT_BROWSER_OPEN}`,
+    .post(`/open`,
         async (request, _response, next) => {
             const browserId = typeof request.body?.browserId === 'string' ? request.body.browserId : 'brave';
             const browser = request.services.getRemotes().browser;
@@ -29,7 +28,7 @@ export const browserRouter = Router()
                 return;
             }
             
-            eventLog.info({client, browserId}, `Demande ${REMOTE_EVENT_BROWSER_OPEN}`);
+            eventLog.info({client, browserId}, `Demande open`);
             await browser.focusOrLaunchBrowser(browserId);
             
             next();

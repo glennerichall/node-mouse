@@ -1,11 +1,3 @@
-import {
-    REMOTE_EVENT_KEYBOARD_KEY,
-    REMOTE_EVENT_KEYBOARD_TEXT,
-    REMOTE_EVENT_MOUSE_BUTTON,
-    REMOTE_EVENT_MOUSE_CLICK,
-    REMOTE_EVENT_MOUSE_MOVE,
-    REMOTE_EVENT_MOUSE_SCROLL,
-} from '../../../utils/remoteCommands.js';
 import {createMouseMoveDispatcher} from '../../services/input/createMouseMoveDispatcher.js';
 import Router from 'router';
 
@@ -19,29 +11,30 @@ const getMove = (request, mouse) => {
     }
     return move;
 };
-export const inputRouter = Router()
-    .post(`/${REMOTE_EVENT_MOUSE_MOVE}`, async (request, _response, next) => {
+export const mouseRouter = Router()
+    .post(`/move`, async (request, _response, next) => {
         const {mouse} = getInput(request);
         await getMove(request, mouse)(request.body);
         next();
     })
-    .post(`/${REMOTE_EVENT_MOUSE_CLICK}`, (request, _response, next) => {
+    .post(`/click`, (request, _response, next) => {
         getInput(request).mouse.click(request.body.button);
         next();
     })
-    .post(`/${REMOTE_EVENT_MOUSE_BUTTON}`, (request, _response, next) => {
+    .post(`/button`, (request, _response, next) => {
         getInput(request).mouse.setButtonState(request.body.button, request.body.state);
         next();
     })
-    .post(`/${REMOTE_EVENT_MOUSE_SCROLL}`, (request, _response, next) => {
+    .post(`/scroll`, (request, _response, next) => {
         getInput(request).mouse.scroll(Number(request.body.dy) || 0);
         next();
     })
-    .post(`/${REMOTE_EVENT_KEYBOARD_TEXT}`, (request, _response, next) => {
+export const keyboardRouter = Router()
+    .post(`/text`, (request, _response, next) => {
         getInput(request).keyboard.typeText(request.body.text);
         next();
     })
-    .post(`/${REMOTE_EVENT_KEYBOARD_KEY}`, (request, _response, next) => {
+    .post(`/key`, (request, _response, next) => {
         getInput(request).keyboard.pressSpecialKey(request.body.key, request.body.modifiers);
         next();
     });
