@@ -38,22 +38,22 @@ export const ensureVlcUsable = async (request, response, next) => {
 };
 export const vlcRouter = Router()
     .use(ensureVlcUsable)
-    .post(`/open`, async (request, response) => {
-        await getVlc(request).focusOrLaunch();
-        response.send({ok: true});
+    .post(`/window`, async (request, response) => {
+        const opened = await getVlc(request).focusOrLaunch();
+        response.status(opened === false ? 409 : 201).send({ok: opened !== false});
     })
-    .post(`/command`, async (request, response) => {
+    .post(`/commands`, async (request, response) => {
         const vlc = getVlc(request);
         const command = VLC_ACTIONS[request.body?.action];
         const keyboard = request.services.getInputController().keyboard;
         if (command && await vlc.focusOrLaunch()) await keyboard.pressSpecialKey(command.key, command.modifiers);
-        response.send({ok: true});
+        response.status(204).end();
     })
-    .post(`/window-toggle`, async (request, response) => {
+    .patch(`/window`, async (request, response) => {
         await getVlc(request).toggleWindow();
-        response.send({ok: true});
+        response.status(204).end();
     })
-    .post(`/window-close`, async (request, response) => {
+    .delete(`/window`, async (request, response) => {
         await getVlc(request).closeWindow();
-        response.send({ok: true});
+        response.status(204).end();
     });

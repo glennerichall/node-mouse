@@ -68,7 +68,7 @@ export function bindPreviewStream(services, dom) {
       return;
     }
     if (isPreviewActive) {
-      emitWithTimestamp(socket, REMOTE_EVENT_PREVIEW_STOP);
+      emitWithTimestamp(socket, REMOTE_EVENT_PREVIEW_STOP, {}, 'DELETE');
       isPreviewActive = false;
     }
     hidePreview();
@@ -93,7 +93,7 @@ export function bindPreviewStream(services, dom) {
       return;
     }
     if (!isPreviewActive) {
-      emitWithTimestamp(socket, REMOTE_EVENT_PREVIEW_START);
+      emitWithTimestamp(socket, REMOTE_EVENT_PREVIEW_START, {}, 'POST');
       isPreviewActive = true;
       showPreview();
     }

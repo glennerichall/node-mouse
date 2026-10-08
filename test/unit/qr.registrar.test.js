@@ -2,10 +2,7 @@ import {jest} from '@jest/globals';
 import {qrRouter} from '../../server/connection/actions/qr.router.js';
 import {createSocketResponse} from '../../server/connection/socket/socket-response.adapter.js';
 import {
-  REMOTE_EVENT_QR_OPEN_BROWSER_CLIENT,
-  REMOTE_EVENT_QR_OPEN_BROWSER_SERVER,
   REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN,
-  REMOTE_EVENT_QR_TOGGLE_OVERLAY,
 } from '../../utils/remoteCommands.js';
 
 describe('QR event registrar', () => {
@@ -20,7 +17,7 @@ describe('QR event registrar', () => {
     const response = jest.fn();
     const socket = {id: 'controller-1'};
     const next = jest.fn();
-    await qrRouter({method: 'POST', url: '/rotate-entry-token', originalUrl: '/rotate-entry-token', socket, services: {getRemotes: () => ({qrActions})}, body: {}},
+    await qrRouter({method: 'POST', url: '/entry-token', originalUrl: '/entry-token', socket, services: {getRemotes: () => ({qrActions})}, body: {}},
       createSocketResponse(response),
       next,
     );

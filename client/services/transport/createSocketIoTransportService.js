@@ -23,10 +23,10 @@ export function createSocketIoTransportService(services) {
     emit(eventName, payload) {
       ensureSocket().emit('route:request', {path: eventName, method: 'POST', body: payload ?? {}});
     },
-    emitWithTimestamp(eventName, payload = {}) {
-      ensureSocket().emit('route:request', {
-        path: eventName,
-        method: 'POST',
+    emitWithTimestamp(eventName, payload = {}, method = 'POST') {
+        ensureSocket().emit('route:request', {
+            path: eventName,
+            method,
         body: {...payload, ts: Date.now()},
       });
     },

@@ -42,7 +42,7 @@ export function bindAdminRemoteButtons(services, dom) {
         btnOpenConfigPage,
     ];
     let relockAvailable = false;
-    const emit = (eventName) => () => emitWithTimestamp(socket, eventName);
+    const emit = (eventName, payload = {}, method = 'POST') => () => emitWithTimestamp(socket, eventName, payload, method);
 
     const syncAdminButtonsState = () => {
         const {
@@ -128,14 +128,14 @@ export function bindAdminRemoteButtons(services, dom) {
         }
     });
 
-    btnForceUpdateCheck.addEventListener('click', emit(REMOTE_EVENT_ADMIN_UPDATE_CHECK));
+    btnForceUpdateCheck.addEventListener('click', emit(REMOTE_EVENT_ADMIN_UPDATE_CHECK, {}, 'GET'));
     btnInstallUpdate.addEventListener('click', emit(REMOTE_EVENT_ADMIN_UPDATE_INSTALL));
     btnRestartService.addEventListener('click', emit(REMOTE_EVENT_ADMIN_SERVICE_RESTART));
     btnOpenQrBrowserServer.addEventListener('click', emit(REMOTE_EVENT_QR_OPEN_BROWSER_SERVER));
     btnOpenQrBrowserClient.addEventListener('click', () => {
         window.location.href = '/qr';
     });
-    btnToggleQrOverlay.addEventListener('click', emit(REMOTE_EVENT_QR_TOGGLE_OVERLAY));
+    btnToggleQrOverlay.addEventListener('click', emit(REMOTE_EVENT_QR_TOGGLE_OVERLAY, {}, 'PATCH'));
     btnOpenServerInfoBrowserServer.addEventListener('click', emit(REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER));
     btnOpenServerInfoBrowserClient.addEventListener('click', () => {
         window.location.href = '/ui/admin/server-info';
@@ -146,7 +146,7 @@ export function bindAdminRemoteButtons(services, dom) {
     btnOpenPreferencesPage?.addEventListener('click', () => {
         window.location.href = '/ui/admin/preferences';
     });
-    btnRotateEntryToken.addEventListener('click', emit(REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN));
+    btnRotateEntryToken.addEventListener('click', emit(REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN, {}, 'POST'));
 
     syncAdminButtonsState();
     syncPasswordVisibility(false);

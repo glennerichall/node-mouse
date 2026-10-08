@@ -14,10 +14,18 @@ export function createSocketResponse(acknowledge) {
     let statusCode = 200;
     let ended = false;
 
+    const validateStatus = (code) => {
+        const value = Number(code);
+        if (!Number.isInteger(value) || value < 100 || value > 999) {
+            throw new RangeError(`Invalid HTTP status code: ${code}`);
+        }
+        return value;
+    };
+
     const end = (body) => {
         if (ended) return response;
         ended = true;
-        acknowledge?.(body);
+        acknowledge?.(statusCode === 204 || statusCode === 304 ? undefined : body);
         return response;
     };
 
@@ -25,8 +33,11 @@ export function createSocketResponse(acknowledge) {
         get statusCode() {
             return statusCode;
         },
+        get ended() {
+            return ended;
+        },
         status(code) {
-            statusCode = Number(code) || 200;
+            statusCode = validateStatus(code);
             return response;
         },
         send(body) {
@@ -34,8 +45,10 @@ export function createSocketResponse(acknowledge) {
         },
         end,
         sendStatus(code) {
-            statusCode = Number(code) || 200;
-            return end(STATUS_TEXT[statusCode] ?? String(statusCode));
+            statusCode = validateStatus(code);
+            return end(statusCode === 204 || statusCode === 304
+                ? undefined
+                : STATUS_TEXT[statusCode] ?? String(statusCode));
         },
     };
     return response;

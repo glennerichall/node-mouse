@@ -43,8 +43,8 @@ export function bindVlcRemoteButtons(services, dom) {
 
   const emitCommand = (action) => () => emitWithTimestamp(socket, REMOTE_EVENT_VLC_COMMAND, { action });
   const emitOpen = () => emitWithTimestamp(socket, REMOTE_EVENT_VLC_OPEN);
-  const emitWindowToggle = () => emitWithTimestamp(socket, REMOTE_EVENT_VLC_WINDOW_TOGGLE);
-  const emitWindowClose = () => emitWithTimestamp(socket, REMOTE_EVENT_VLC_WINDOW_CLOSE);
+  const emitWindowToggle = () => emitWithTimestamp(socket, REMOTE_EVENT_VLC_WINDOW_TOGGLE, {}, 'PATCH');
+  const emitWindowClose = () => emitWithTimestamp(socket, REMOTE_EVENT_VLC_WINDOW_CLOSE, {}, 'DELETE');
 
   bindTouchPassthrough(buttons, touchpad);
 

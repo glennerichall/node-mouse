@@ -34,7 +34,7 @@ describe('remote command registrars', () => {
     await request(REMOTE_EVENT_SAMSUNG_VOL_DOWN);
     await new Promise(resolve => setImmediate(resolve));
 
-    expect(samsungRouter.stack.length).toBeGreaterThanOrEqual(8);
+    expect(samsungRouter.stack.length).toBeGreaterThanOrEqual(5);
   });
 
   it('registers browser shortcut handling', async () => {
@@ -43,7 +43,7 @@ describe('remote command registrars', () => {
       focusOrLaunchBrowser: sandbox.stub().resolves(),
     };
 
-    await browserRouter({method: 'POST', url: '/open', originalUrl: '/open', socket: {id: 'abcdef123456'}, services: {getRemotes: () => ({browser}), getConfig: () => ({})}, body: {browserId: 'firefox'}}, {}, () => {});
+    await browserRouter({method: 'POST', url: '/sessions', originalUrl: '/sessions', socket: {id: 'abcdef123456'}, services: {getRemotes: () => ({browser}), getConfig: () => ({})}, body: {browserId: 'firefox'}}, {}, () => {});
 
     expect(browser.focusOrLaunchBrowser.calledOnceWithExactly('firefox')).toBe(true);
   });

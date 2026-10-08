@@ -15,9 +15,9 @@ describe('adminRouter', () => {
     const response = sinon.stub();
 
     await adminRouter({
-      method: 'POST',
-      url: '/update-check',
-      originalUrl: '/update-check',
+      method: 'GET',
+      url: '/update',
+      originalUrl: '/update',
       socket: channel,
       services: {
         getRemotes: () => ({adminActions, qrActions}),

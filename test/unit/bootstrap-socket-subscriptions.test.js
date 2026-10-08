@@ -39,10 +39,18 @@ describe('bootstrapSocket route builders', () => {
 
     const routeRequest = socket.on.mock.calls.find(([eventName]) => eventName === 'route:request')[1];
     const response = jest.fn();
-    routeRequest({path: 'admin/update-check', method: 'POST', body: {}}, response);
+    routeRequest({path: 'admin/update', method: 'GET', body: {}}, response);
     await new Promise(resolve => setImmediate(resolve));
 
     expect(response).toHaveBeenCalledWith({ok: true, message: 'done'});
     expect(socket.on).toHaveBeenCalledWith('disconnect', expect.any(Function));
+
+    const invalidResponse = jest.fn();
+    routeRequest({path: 'unknown/resource', method: 'POST', body: {}}, invalidResponse);
+    expect(invalidResponse).toHaveBeenCalledWith({ok: false, message: 'Unknown route domain.'});
+
+    const missingResponse = jest.fn();
+    routeRequest({path: 'mouse/unknown', method: 'POST', body: {}}, missingResponse);
+    expect(missingResponse).toHaveBeenCalledWith({ok: false, message: 'Route not found.'});
   });
 });

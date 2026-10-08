@@ -22,12 +22,12 @@ test('sends mouse and keyboard commands through the shipped Socket.IO client', a
         })
       : Promise.resolve(false);
     if (globalThis.__REMOTE_MOUSE_ASSERT_PREVIEW__) {
-      socket.emit('route:request', {path: 'preview/start', method: 'POST', body: {ts: Date.now()}});
+      socket.emit('route:request', {path: 'preview/sessions', method: 'POST', body: {ts: Date.now()}});
     }
-      socket.emit('route:request', {path: 'mouse/move', method: 'POST', body: {dx: 14, dy: -9, ts: Date.now()}});
-      socket.emit('route:request', {path: 'keyboard/text', method: 'POST', body: {text: 'a', ts: Date.now()}});
-      socket.emit('route:request', {path: 'keyboard/key', method: 'POST', body: {key: 'enter', ts: Date.now()}});
-      socket.emit('route:request', {path: 'mouse/click', method: 'POST', body: {button: 'left', ts: Date.now()}});
+      socket.emit('route:request', {path: 'mouse/movements', method: 'POST', body: {dx: 14, dy: -9, ts: Date.now()}});
+      socket.emit('route:request', {path: 'keyboard/texts', method: 'POST', body: {text: 'a', ts: Date.now()}});
+      socket.emit('route:request', {path: 'keyboard/keys', method: 'POST', body: {key: 'enter', ts: Date.now()}});
+      socket.emit('route:request', {path: 'mouse/clicks', method: 'POST', body: {button: 'left', ts: Date.now()}});
     const receivedPreview = await previewFrame;
     socket.close();
     return {receivedPreview};

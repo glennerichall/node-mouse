@@ -10,7 +10,7 @@ describe('preview event registrar', () => {
       startForSocket: jest.fn(),
     };
 
-    await previewRouter({method: 'POST', url: '/start', originalUrl: '/start', socket, services: {getRemotes: () => ({preview}), getConfig: () => ({preview: {enabled: true}})}, body: {}}, {}, jest.fn());
+    await previewRouter({method: 'POST', url: '/sessions', originalUrl: '/sessions', socket, services: {getRemotes: () => ({preview}), getConfig: () => ({preview: {enabled: true}})}, body: {}}, {status: () => ({send: jest.fn(), end: jest.fn()})}, jest.fn());
 
     expect(preview.isAvailable).toHaveBeenCalledTimes(1);
     expect(preview.startForSocket).not.toHaveBeenCalled();

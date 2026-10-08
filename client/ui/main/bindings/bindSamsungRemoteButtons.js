@@ -219,9 +219,9 @@ export function bindSamsungRemoteButtons(services, dom) {
     let samsungStatusInterval = null;
     let currentSamsungPowerState = 'unknown';
     let expeditedPollTimers = [];
-    const emit = (eventName) => () => emitWithTimestamp(socket, eventName);
-    const emitSamsungOn = emit(REMOTE_EVENT_SAMSUNG_ON);
-    const emitSamsungOff = emit(REMOTE_EVENT_SAMSUNG_OFF);
+    const emit = (eventName, payload = {}, method = 'POST') => () => emitWithTimestamp(socket, eventName, payload, method);
+    const emitSamsungOn = emit(REMOTE_EVENT_SAMSUNG_ON, {state: 'on'}, 'PATCH');
+    const emitSamsungOff = emit(REMOTE_EVENT_SAMSUNG_OFF, {state: 'off'}, 'PATCH');
 
     const clearExpeditedSamsungPolling = () => {
         for (const timer of expeditedPollTimers) {
@@ -307,12 +307,12 @@ export function bindSamsungRemoteButtons(services, dom) {
         emitSamsungOff();
         startExpeditedSamsungPolling('off');
     });
-    bindRepeatingButton(btnSamsungVolUp, emit(REMOTE_EVENT_SAMSUNG_VOL_UP));
-    bindRepeatingButton(btnSamsungVolDown, emit(REMOTE_EVENT_SAMSUNG_VOL_DOWN));
+    bindRepeatingButton(btnSamsungVolUp, emit(REMOTE_EVENT_SAMSUNG_VOL_UP, {direction: 'up'}));
+    bindRepeatingButton(btnSamsungVolDown, emit(REMOTE_EVENT_SAMSUNG_VOL_DOWN, {direction: 'down'}));
     btnSamsungMute.addEventListener('click', emit(REMOTE_EVENT_SAMSUNG_MUTE));
-    btnSamsungInput.addEventListener('click', emit(REMOTE_EVENT_SAMSUNG_INPUT));
-    btnSamsungEnter.addEventListener('click', emit(REMOTE_EVENT_SAMSUNG_ENTER));
-    btnSamsungPcInput.addEventListener('click', emit(REMOTE_EVENT_SAMSUNG_PC_INPUT));
+    btnSamsungInput.addEventListener('click', emit(REMOTE_EVENT_SAMSUNG_INPUT, {source: 'next'}));
+    btnSamsungEnter.addEventListener('click', emit(REMOTE_EVENT_SAMSUNG_ENTER, {key: 'enter'}));
+    btnSamsungPcInput.addEventListener('click', emit(REMOTE_EVENT_SAMSUNG_PC_INPUT, {source: 'pc'}));
     syncSamsungVisibility();
     ensureSamsungStatusPolling();
     clientConfig.onChange(syncSamsungVisibility);

@@ -27,8 +27,8 @@ export function bindSystemRemoteButtons(services, dom) {
   ].filter(Boolean);
 
   const emitKey = (payload = {}) => () => emitWithTimestamp(socket, REMOTE_EVENT_KEYBOARD_KEY, payload);
-  const emitWindowToggle = () => emitWithTimestamp(socket, REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE);
-  const emitWindowClose = () => emitWithTimestamp(socket, REMOTE_EVENT_WINDOW_CLOSE);
+  const emitWindowToggle = () => emitWithTimestamp(socket, REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE, {}, 'PATCH');
+  const emitWindowClose = () => emitWithTimestamp(socket, REMOTE_EVENT_WINDOW_CLOSE, {}, 'DELETE');
 
   bindTouchPassthrough(buttons, touchpad);
 

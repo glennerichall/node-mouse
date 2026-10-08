@@ -22,6 +22,16 @@ describe('socket response adapter', () => {
     response.sendStatus(204);
 
     expect(response.statusCode).toBe(204);
-    expect(acknowledge).toHaveBeenCalledWith('No Content');
+    expect(acknowledge).toHaveBeenCalledWith(undefined);
+  });
+
+  it('rejects invalid status codes and does not send a body for 204', () => {
+    const acknowledge = jest.fn();
+    const response = createSocketResponse(acknowledge);
+
+    expect(() => response.status(99)).toThrow(RangeError);
+    response.status(204).send({ignored: true});
+
+    expect(acknowledge).toHaveBeenCalledWith(undefined);
   });
 });
