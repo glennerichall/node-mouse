@@ -1,44 +1,18 @@
-import {createLogger} from '../../application/logger.js';
+/** Express-style admin authorization middleware for socket routes. */
+export function adminGuard(request, response, next) {
+  const client = String(request.socket?.id ?? 'unknown').slice(0, 8);
+  const authorization = request.services.getAuthorization()
+    .authorize(request.socket?.securityContext, 'admin:manage');
 
-export function createAdminEventGuard({
-  getSystemConfig = () => ({adminActionsEnabled: true}),
-  getAuthorization = () => ({authorize: () => ({allowed: true})}),
-  isAdminActionsEnabled: configuredEnabled,
-  isAdmin: configuredAdmin,
-  client: configuredClient = 'unknown',
-  log = createLogger('events:admin'),
-}) {
-  return function adminEventGuard(request, response, next) {
-    request ??= {};
-    const client = request.socket ? String(request.socket.id ?? 'unknown').slice(0, 8) : configuredClient;
-    const authorization = request.socket
-      ? getAuthorization(request).authorize(request.socket.securityContext, 'admin:manage')
-      : {allowed: configuredAdmin};
-    const isAdminActionsEnabled = configuredEnabled ?? getSystemConfig(request).adminActionsEnabled;
-    const isAdmin = configuredAdmin ?? authorization.allowed;
-    const reply = typeof response === 'function'
-      ? response
-      : (payload) => response.status(403).send(payload);
-    if (!isAdmin) {
-      log.warn({client}, 'Admin action rejected: insufficient role');
-      reply?.({
-        ok: false,
-        message: 'Permission administrateur requise.',
-      });
-      next(new Error('admin_forbidden'));
-      return;
-    }
+  if (!authorization.allowed) {
+    request.log.warn({client}, 'Admin action rejected: insufficient role');
+    response.status(403).send({ok: false, message: 'Permission administrateur requise.'});
+    return;
+  }
 
-    if (isAdminActionsEnabled) {
-      next();
-      return;
-    }
+  if (request.services.getSystemConfig().adminActionsEnabled) return next();
 
-    log.warn({client}, 'Admin action rejected: ADMIN_ACTIONS_ENABLED=false');
-    reply?.({
-      ok: false,
-      message: 'Admin actions disabled.',
-    });
-    next(new Error('admin_actions_disabled'));
-  };
+  request.log.warn({client}, 'Admin action rejected: ADMIN_ACTIONS_ENABLED=false');
+  response.status(403).send({ok: false, message: 'Admin actions disabled.'});
+  return;
 }

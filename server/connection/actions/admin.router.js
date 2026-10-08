@@ -1,11 +1,6 @@
-import {createAdminEventGuard} from './admin.guard.js';
+import {adminGuard} from './admin.guard.js';
 import Router from 'router';
 import {getClientId} from '../client-channel.js';
-
-const adminGuard = createAdminEventGuard({
-    getSystemConfig: (request) => request.services.getSystemConfig(),
-    getAuthorization: (request) => request.services.getAuthorization(),
-});
 
 export const adminRouter = Router()
     .use(adminGuard)

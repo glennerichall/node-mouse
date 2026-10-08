@@ -1,66 +1,33 @@
 import sinon from 'sinon';
-import {createAdminEventGuard} from '../../server/connection/actions/admin.guard.js';
+import {adminGuard} from '../../server/connection/actions/admin.guard.js';
 
-describe('createAdminEventGuard', () => {
-  let sandbox;
+function request({allowed = true, enabled = true} = {}) {
+  return {
+    socket: {id: 'abc12345', securityContext: {}},
+    log: {warn: sinon.stub()},
+    services: {
+      getAuthorization: () => ({authorize: () => ({allowed})}),
+      getSystemConfig: () => ({adminActionsEnabled: enabled}),
+    },
+  };
+}
 
-  beforeEach(() => {
-    sandbox = sinon.createSandbox();
-  });
-
-  afterEach(() => {
-    sandbox.restore();
-  });
-
-  it('allows an admin action when enabled', () => {
-    const next = sandbox.stub();
-    const guard = createAdminEventGuard({
-      isAdminActionsEnabled: true,
-      isAdmin: true,
-      client: 'abc12345',
-      log: {warn: sandbox.stub()},
-    });
-
-    guard({}, sandbox.stub(), next);
-
+describe('adminGuard', () => {
+  it('allows an enabled admin request', () => {
+    const next = sinon.stub();
+    adminGuard(request(), {status: sinon.stub()}, next);
     expect(next.calledOnceWithExactly()).toBe(true);
   });
 
-  it('responds and blocks when admin actions are disabled', () => {
-    const next = sandbox.stub();
-    const response = sandbox.stub();
-    const guard = createAdminEventGuard({
-      isAdminActionsEnabled: false,
-      isAdmin: true,
-      client: 'abc12345',
-      log: {warn: sandbox.stub()},
-    });
-
-    guard({}, response, next);
-
-    expect(response.calledOnceWithExactly({
-      ok: false,
-      message: 'Admin actions disabled.',
-    })).toBe(true);
-    expect(next.firstCall.args[0].message).toBe('admin_actions_disabled');
-  });
-
-  it('responds and blocks a non-admin client', () => {
-    const next = sandbox.stub();
-    const response = sandbox.stub();
-    const guard = createAdminEventGuard({
-      isAdminActionsEnabled: true,
-      isAdmin: false,
-      client: 'abc12345',
-      log: {warn: sandbox.stub()},
-    });
-
-    guard({}, response, next);
-
-    expect(response.calledOnceWithExactly({
-      ok: false,
-      message: 'Permission administrateur requise.',
-    })).toBe(true);
-    expect(next.firstCall.args[0].message).toBe('admin_forbidden');
+  it.each([
+    [false, true, 'admin_forbidden', 'Permission administrateur requise.'],
+    [true, false, 'admin_actions_disabled', 'Admin actions disabled.'],
+  ])('sends an error response when allowed=%s and enabled=%s', (allowed, enabled, _errorCode, message) => {
+    const next = sinon.stub();
+    const send = sinon.stub();
+    const response = {status: sinon.stub().returns({send})};
+    adminGuard(request({allowed, enabled}), response, next);
+    expect(send.calledOnceWithExactly({ok: false, message})).toBe(true);
+    expect(next.notCalled).toBe(true);
   });
 });
