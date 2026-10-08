@@ -69,6 +69,37 @@ describe('client socket io initialization', () => {
     }
   });
 
+  it('maps server transport timing to Socket.IO options', () => {
+    const previousIo = global.io;
+    const previousWindow = global.window;
+    const socket = {on: jest.fn()};
+    global.io = jest.fn(() => socket);
+    global.window = new EventTarget();
+    global.window.sessionStorage = {getItem: () => '0', setItem: jest.fn()};
+
+    try {
+      initSocketIo({
+        socket: {
+          reconnectAttempts: 3,
+          reconnectDelayMs: 400,
+          reconnectDelayMaxMs: 5000,
+          pingIntervalMs: 12000,
+          pingTimeoutMs: 6000,
+        },
+      });
+      expect(global.io).toHaveBeenCalledWith(expect.objectContaining({
+        reconnectionAttempts: 3,
+        reconnectionDelay: 400,
+        reconnectionDelayMax: 5000,
+        pingInterval: 12000,
+        pingTimeout: 6000,
+      }));
+    } finally {
+      global.io = previousIo;
+      global.window = previousWindow;
+    }
+  });
+
   it('reconnects immediately when the page returns after a long inactive period', () => {
     const windowRef = new EventTarget();
     const documentRef = createMutableDocument('visible');

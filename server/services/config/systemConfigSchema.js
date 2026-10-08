@@ -22,6 +22,11 @@ export const SYSTEM_CONFIG_SCHEMA = Joi.object({
     cookieSecret: Joi.string().min(1).required(),
     cookieMaxAgeDays: Joi.number().positive().required(),
     socketEventMaxAgeMs: Joi.number().positive().required(),
+    socketReconnectAttempts: Joi.number().integer().min(0).max(100).required(),
+    socketReconnectDelayMs: Joi.number().integer().min(50).max(60000).required(),
+    socketReconnectDelayMaxMs: Joi.number().integer().min(100).max(300000).required(),
+    socketPingIntervalMs: Joi.number().integer().min(1000).max(300000).required(),
+    socketPingTimeoutMs: Joi.number().integer().min(1000).max(300000).required(),
   }).required(),
   adminActionsEnabled: Joi.boolean().required(),
   admin: Joi.object({

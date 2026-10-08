@@ -51,7 +51,8 @@ export function createSocketIoTransportService(services, {
   function ensureSocket() {
     if (!socket) {
       publishConnectionState(CONNECTION_STATE.connecting);
-      socket = socketFactory();
+      const transportConfig = services.getClientConfig?.().getConfig?.().system?.transport;
+      socket = socketFactory(transportConfig);
       bindSocketLifecycle(socket);
       getPubSub().publish('transport.connected-service', {transport: api});
     }

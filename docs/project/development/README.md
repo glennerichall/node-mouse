@@ -206,6 +206,8 @@ l'itération et devient append-only dès sa clôture.
   drainage robuste des mouvements coalescés.
 - [REL-002](./rel-REL-002-2026-10-08.md): reprise automatique du backend
   uinput après redémarrage du service.
+- [REL-003](./rel-REL-003-2026-10-08.md): configuration des délais de
+  reconnexion et du heartbeat Socket.IO.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

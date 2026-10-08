@@ -57,6 +57,11 @@ export const DEFAULT_SYSTEM_CONFIG = {
         cookieSecret: 'change-me',
         cookieMaxAgeDays: 7,
         socketEventMaxAgeMs: 1200,
+        socketReconnectAttempts: 10,
+        socketReconnectDelayMs: 250,
+        socketReconnectDelayMaxMs: 2000,
+        socketPingIntervalMs: 25000,
+        socketPingTimeoutMs: 20000,
     },
     adminActionsEnabled: true,
     admin: {

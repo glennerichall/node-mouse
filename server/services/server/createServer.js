@@ -25,6 +25,8 @@ export function createServer(services) {
 
     const io = new Server(server, {
         maxHttpBufferSize: 64 * 1024,
+        pingInterval: config.session.socketPingIntervalMs,
+        pingTimeout: config.session.socketPingTimeoutMs,
         cors: {origin: true, credentials: true},
         allowRequest: (request, callback) => {
             const origin = request.headers?.origin;

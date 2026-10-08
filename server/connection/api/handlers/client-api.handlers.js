@@ -3,10 +3,30 @@ import {PUBSUB_SERVICE_CLIENT_CONFIG} from '../../../services/pubsub/serviceEven
 import {getManagedConfigSnapshot} from '../configs.js';
 import {isAdminPasswordConfigured} from '../../../services/security/adminPasswordPolicy.js';
 
+const DEFAULT_SOCKET_TRANSPORT_CONFIG = {
+  reconnectAttempts: 10,
+  reconnectDelayMs: 250,
+  reconnectDelayMaxMs: 2000,
+  pingIntervalMs: 25000,
+  pingTimeoutMs: 20000,
+};
+
+function getSocketTransportConfig(systemConfig = {}) {
+  const session = systemConfig.session || {};
+  return {
+    reconnectAttempts: session.socketReconnectAttempts ?? DEFAULT_SOCKET_TRANSPORT_CONFIG.reconnectAttempts,
+    reconnectDelayMs: session.socketReconnectDelayMs ?? DEFAULT_SOCKET_TRANSPORT_CONFIG.reconnectDelayMs,
+    reconnectDelayMaxMs: session.socketReconnectDelayMaxMs ?? DEFAULT_SOCKET_TRANSPORT_CONFIG.reconnectDelayMaxMs,
+    pingIntervalMs: session.socketPingIntervalMs ?? DEFAULT_SOCKET_TRANSPORT_CONFIG.pingIntervalMs,
+    pingTimeoutMs: session.socketPingTimeoutMs ?? DEFAULT_SOCKET_TRANSPORT_CONFIG.pingTimeoutMs,
+  };
+}
+
 export async function getClientConfig(req, res) {
   const config = getManagedConfigSnapshot(req.services.getConfig(), CLIENT_CONFIG_PATHS);
   const vlcAvailable = await req.services.getRemotes().vlc.isAvailable();
   const previewAvailable = req.services.getRemotes().preview.isAvailable();
+  const systemConfig = req.services.getSystemConfig();
   config.vlc.enabled = vlcAvailable && config.vlc.enabled !== false;
   config.preview.enabled = previewAvailable && config.preview.enabled !== false;
 
@@ -19,7 +39,10 @@ export async function getClientConfig(req, res) {
       adminUnlocked: req.securityContext?.role === 'admin',
       adminRelockAvailable: req.securityContext?.role === 'admin'
         && req.securityContext?.authenticationMethod === 'session',
-      adminUnlockAvailable: isAdminPasswordConfigured(req.services.getSystemConfig().admin),
+      adminUnlockAvailable: isAdminPasswordConfigured(systemConfig.admin),
+      transport: {
+        socket: getSocketTransportConfig(systemConfig),
+      },
     },
   });
 }

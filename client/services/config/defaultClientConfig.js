@@ -1,6 +1,15 @@
 export const DEFAULT_CLIENT_CONFIG = {
   system: {
     adminActionsEnabled: true,
+    transport: {
+      socket: {
+        reconnectAttempts: 10,
+        reconnectDelayMs: 250,
+        reconnectDelayMaxMs: 2000,
+        pingIntervalMs: 25000,
+        pingTimeoutMs: 20000,
+      },
+    },
   },
   input: {
     touchDragHoldMs: 420,

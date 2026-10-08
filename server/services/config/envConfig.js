@@ -27,6 +27,11 @@ export function getEnvConfig() {
             cookieSecret: readOptionalString('SESSION_COOKIE_SECRET'),
             cookieMaxAgeDays: readOptionalNumber('SESSION_COOKIE_MAX_AGE_DAYS'),
             socketEventMaxAgeMs: readOptionalNumber('SOCKET_EVENT_MAX_AGE_MS'),
+            socketReconnectAttempts: readOptionalNumber('SOCKET_RECONNECT_ATTEMPTS'),
+            socketReconnectDelayMs: readOptionalNumber('SOCKET_RECONNECT_DELAY_MS'),
+            socketReconnectDelayMaxMs: readOptionalNumber('SOCKET_RECONNECT_DELAY_MAX_MS'),
+            socketPingIntervalMs: readOptionalNumber('SOCKET_PING_INTERVAL_MS'),
+            socketPingTimeoutMs: readOptionalNumber('SOCKET_PING_TIMEOUT_MS'),
         },
         adminActionsEnabled: readOptionalBoolean('ADMIN_ACTIONS_ENABLED'),
         admin: {

@@ -43,6 +43,15 @@ describe('client API router', () => {
       adminUnlocked: false,
       adminRelockAvailable: false,
       adminUnlockAvailable: false,
+      transport: {
+        socket: {
+          reconnectAttempts: 10,
+          reconnectDelayMs: 250,
+          reconnectDelayMaxMs: 2000,
+          pingIntervalMs: 25000,
+          pingTimeoutMs: 20000,
+        },
+      },
     });
     expect(payload.config.samsungTv).toEqual({enabled: true});
     expect(payload.config.preview).toEqual({enabled: false, hideDelayMs: 5000});
@@ -74,6 +83,15 @@ describe('client API router', () => {
         adminUnlocked: true,
         adminRelockAvailable: false,
         adminUnlockAvailable: false,
+        transport: {
+          socket: {
+            reconnectAttempts: 10,
+            reconnectDelayMs: 250,
+            reconnectDelayMaxMs: 2000,
+            pingIntervalMs: 25000,
+            pingTimeoutMs: 20000,
+          },
+        },
       },
     }));
   });

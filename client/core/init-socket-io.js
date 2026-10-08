@@ -5,7 +5,7 @@ const SYSTEM_RELOAD_GUARD_MS = 15_000;
 const WAKE_RECONNECT_IDLE_MS = 5_000;
 const WAKE_RECONNECT_DEBOUNCE_MS = 100;
 
-const SOCKET_IO_OPTIONS = {
+const DEFAULT_SOCKET_IO_OPTIONS = {
   reconnection: true,
   reconnectionAttempts: 10,
   reconnectionDelay: 250,
@@ -13,6 +13,18 @@ const SOCKET_IO_OPTIONS = {
   randomizationFactor: 0.2,
   timeout: 4_000,
 };
+
+function getSocketIoOptions(transportConfig = {}) {
+  const socket = transportConfig.socket || {};
+  return {
+    ...DEFAULT_SOCKET_IO_OPTIONS,
+    reconnectionAttempts: socket.reconnectAttempts ?? DEFAULT_SOCKET_IO_OPTIONS.reconnectionAttempts,
+    reconnectionDelay: socket.reconnectDelayMs ?? DEFAULT_SOCKET_IO_OPTIONS.reconnectionDelay,
+    reconnectionDelayMax: socket.reconnectDelayMaxMs ?? DEFAULT_SOCKET_IO_OPTIONS.reconnectionDelayMax,
+    pingInterval: socket.pingIntervalMs,
+    pingTimeout: socket.pingTimeoutMs,
+  };
+}
 
 function getDefaultSetTimeout(windowRef) {
   return typeof windowRef?.setTimeout === 'function'
@@ -103,8 +115,8 @@ export function bindSocketWakeReconnect(socket, {
   };
 }
 
-export function initSocketIo() {
-  const socket = io(SOCKET_IO_OPTIONS);
+export function initSocketIo(transportConfig) {
+  const socket = io(getSocketIoOptions(transportConfig));
   bindSocketWakeReconnect(socket);
   socket.on(REMOTE_EVENT_SYSTEM_RELOAD, () => {
     const lastReloadAt = Number(window.sessionStorage.getItem(SYSTEM_RELOAD_GUARD_KEY) || 0);
