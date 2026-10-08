@@ -39,6 +39,21 @@ describe('createSocketTimestampGuardMiddleware', () => {
     expect(next.firstCall.args[0].message).toBe('stale_event');
   });
 
+  it('rejects a packet timestamped beyond the allowed future clock skew', () => {
+    const middleware = socketTimestampGuardMiddleware({
+      maxEventAgeMs: 1000,
+      maxClockSkewMs: 500,
+      socketId: 's1',
+    });
+    const next = sandbox.stub();
+
+    middleware(['mouse/move', {ts: Date.now() + 1000}], next);
+
+    expect(next.calledOnce).toBe(true);
+    expect(next.firstCall.args[0]).toBeInstanceOf(Error);
+    expect(next.firstCall.args[0].message).toBe('clock_skew');
+  });
+
   it('accepts fresh packet', () => {
     const middleware = socketTimestampGuardMiddleware({maxEventAgeMs: 1000, socketId: 's1'});
     const next = sandbox.stub();

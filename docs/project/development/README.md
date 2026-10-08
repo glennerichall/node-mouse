@@ -202,6 +202,8 @@ l'itération et devient append-only dès sa clôture.
   convention de style, contrôle automatisé et prévention progressive.
 - [CODE-003/004](./code-CODE-003-004-2026-10-08.md): imports, conventions de
   nommage des modules et contrôle stylistique renforcé.
+- [REL-001](./rel-REL-001-2026-10-08.md): bornes des timestamps d'entrée et
+  drainage robuste des mouvements coalescés.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

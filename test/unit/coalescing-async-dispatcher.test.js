@@ -25,4 +25,26 @@ describe('coalescing async dispatcher', () => {
     expect(consume).toHaveBeenCalledTimes(2);
     expect(consume).toHaveBeenLastCalledWith(8);
   });
+
+  it('reports consumption failures and continues draining pending work', async () => {
+    const onError = jest.fn();
+    const consume = jest.fn()
+      .mockRejectedValueOnce(new Error('input_unavailable'))
+      .mockResolvedValue(undefined);
+    const dispatch = createCoalescingAsyncDispatcher({
+      normalize: (value) => value,
+      canMerge: () => true,
+      merge: (pending, contribution) => pending + contribution,
+      consume,
+      onError,
+    });
+
+    dispatch(1);
+    dispatch(2);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(onError).toHaveBeenCalledWith(expect.any(Error), 1);
+    expect(consume).toHaveBeenCalledTimes(2);
+    expect(consume).toHaveBeenLastCalledWith(2);
+  });
 });

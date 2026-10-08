@@ -30,6 +30,12 @@ export function socketTimestampGuardMiddleware({
     }
 
     const rawDeltaMs = Date.now() - ts;
+    if (rawDeltaMs < -maxClockSkewMs) {
+      log.warn({socketId, event, rawDeltaMs, maxClockSkewMs}, 'Socket message clock is ahead');
+      next(new Error('clock_skew'));
+      return;
+    }
+
     if (observedClockOffsetMs == null && Math.abs(rawDeltaMs) <= maxClockSkewMs) {
       observedClockOffsetMs = rawDeltaMs;
       log.info({ socketId, event, observedClockOffsetMs }, 'Socket clock calibrated');

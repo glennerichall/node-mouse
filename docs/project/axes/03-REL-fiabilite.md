@@ -7,6 +7,10 @@ et assurer un cycle de vie robuste du serveur et des connexions.
 
 ## Plan de travail
 
+- [x] **REL-001 — bornes des messages d'entrée:** rejeter les timestamps
+  impossibles ou obsolètes et garantir que le dispatcher de mouvements conserve
+  au plus une contribution en attente, avec une erreur de consommation
+  observable sans rejet de promesse non géré.
 - [ ] Mesurer la latence souris/clavier; traiter mouvements obsolètes et backpressure.
 - [ ] Fiabiliser reconnexion après veille, changement Wi-Fi et redémarrage.
 - [ ] Rendre délais et heartbeats configurables par transport.

@@ -1,4 +1,10 @@
-export function createCoalescingAsyncDispatcher({normalize, canMerge, merge, consume}) {
+export function createCoalescingAsyncDispatcher({
+  normalize,
+  canMerge,
+  merge,
+  consume,
+  onError = () => {},
+}) {
   let pending = null;
   let processing = false;
 
@@ -9,7 +15,11 @@ export function createCoalescingAsyncDispatcher({normalize, canMerge, merge, con
       while (pending !== null) {
         const contribution = pending;
         pending = null;
-        await consume(contribution);
+        try {
+          await consume(contribution);
+        } catch (error) {
+          onError(error, contribution);
+        }
       }
     } finally {
       processing = false;
