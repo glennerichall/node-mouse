@@ -183,6 +183,10 @@ l'itération et devient append-only dès sa clôture.
   réponses implicites fournies par le callback.
 - [ARCH-040](./arch-ARCH-040-2026-10-07.md): navigation locale des pages client
   et réduction des réponses d'action.
+- [ARCH-041](./arch-ARCH-041-2026-10-07.md): alignement du subscriber QR sur
+  le channel fluent et sa réponse directe.
+- [ARCH-042](./arch-ARCH-042-2026-10-07.md): suppression du helper intermédiaire
+  dans les callbacks QR.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

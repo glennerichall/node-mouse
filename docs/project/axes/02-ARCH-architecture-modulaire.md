@@ -407,6 +407,35 @@ et les tests avant son implémentation.
 - le champ `action` et le topic client `admin.result.received` sont supprimés;
 - la suite complète reste verte et la version patch est incrémentée.
 
+## ARCH-041 — Subscriber QR conforme au channel fluent
+
+**Modules concernés:**
+
+- `server/connection/subscribers/qr.subscriber.js`;
+- test du subscriber QR et contrat fluent du channel.
+
+**Critères d'acceptation:**
+
+- les quatre événements QR sont enregistrés par chaînage de `channel.on`;
+- le subscriber ne normalise pas lui-même le payload;
+- la réponse est transmise directement par `response` avec `{ok, message}`;
+- l'adapter reste responsable du payload absent et du chaînage;
+- la suite complète reste verte et la version patch est incrémentée.
+
+## ARCH-042 — Callbacks QR explicites
+
+**Modules concernés:**
+
+- `server/connection/subscribers/qr.subscriber.js`;
+- test du subscriber QR.
+
+**Critères d'acceptation:**
+
+- aucun helper intermédiaire ne masque les callbacks QR;
+- chaque événement est visible directement dans la chaîne `channel.on`;
+- chaque callback utilise le payload fourni et la réponse du channel;
+- la suite complète reste verte et la version patch est incrémentée.
+
 ## ARCH-023 — Handlers d'actions administrateur
 
 **Modules concernés:**

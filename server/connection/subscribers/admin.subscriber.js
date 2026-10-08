@@ -37,7 +37,7 @@ export function createAdminEventSubscriber({
 
         const authorization = getAuthorization().authorize(channel.securityContext, 'admin:manage');
 
-        const guard = () => createAdminEventGuard({
+        const guard = createAdminEventGuard({
             isAdminActionsEnabled: getSystemConfig().adminActionsEnabled,
             isAdmin: authorization.allowed,
             client,
@@ -46,99 +46,99 @@ export function createAdminEventSubscriber({
 
         channel
             .on(REMOTE_EVENT_ADMIN_UPDATE_CHECK,
-                guard(),
+                guard,
                 async (_payload, response) => {
                     log.info({client}, `Demande ${REMOTE_EVENT_ADMIN_UPDATE_CHECK}`);
                     const result = await adminActions.forceUpdateCheck({clientId});
-                    response?.({
+                    response({
                         ok: Boolean(result.ok),
                         message: result.message,
                     });
                 })
 
             .on(REMOTE_EVENT_ADMIN_UPDATE_INSTALL,
-                guard(),
+                guard,
                 async (_payload, response) => {
                     log.info({client}, `Demande ${REMOTE_EVENT_ADMIN_UPDATE_INSTALL}`);
                     const result = await adminActions.installUpdate({clientId});
-                    response?.({
+                    response({
                         ok: Boolean(result.ok),
                         message: result.message,
                     });
                 })
 
             .on(REMOTE_EVENT_ADMIN_SERVICE_RESTART,
-                guard(),
+                guard,
                 async (_payload, response) => {
                     log.info({client}, `Demande ${REMOTE_EVENT_ADMIN_SERVICE_RESTART}`);
                     const result = await adminActions.restartService({clientId});
-                    response?.({
+                    response({
                         ok: Boolean(result.ok),
                         message: result.message,
                     });
                 })
 
             .on(REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER,
-                guard(),
+                guard,
                 async (_payload, response) => {
                     log.info({client}, `Demande ${REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER}`);
                     const result = await qrActions.openQrBrowserServer({clientId});
-                    response?.({
+                    response({
                         ok: Boolean(result.ok),
                         message: result.message,
                     });
                 })
 
             .on(REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT,
-                guard(),
+                guard,
                 async (_payload, response) => {
                     log.info({client}, `Demande ${REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT}`);
                     const result = await qrActions.openQrBrowserClient({clientId});
-                    response?.({
+                    response({
                         ok: Boolean(result.ok),
                         message: result.message,
                     });
                 })
 
             .on(REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER,
-                guard(),
+                guard,
                 async (_payload, response) => {
                     log.info({client}, `Demande ${REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER}`);
                     const result = await adminActions.openServerInfoBrowserServer({clientId});
-                    response?.({
+                    response({
                         ok: Boolean(result.ok),
                         message: result.message,
                     });
                 })
 
             .on(REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_CLIENT,
-                guard(),
+                guard,
                 async (_payload, response) => {
                     log.info({client}, `Demande ${REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_CLIENT}`);
                     const result = await adminActions.openServerInfoBrowserClient({clientId});
-                    response?.({
+                    response({
                         ok: Boolean(result.ok),
                         message: result.message,
                     });
                 })
 
             .on(REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN,
-                guard(),
+                guard,
                 async (_payload, response) => {
                     log.info({client}, `Demande ${REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN}`);
                     const result = await qrActions.rotateEntryToken({clientId});
-                    response?.({
+                    response({
                         ok: Boolean(result.ok),
                         message: result.message,
                     });
                 })
 
             .on(REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY,
-                guard(),
+                guard,
                 async (_payload, response) => {
                     log.info({client}, `Demande ${REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY}`);
                     const result = await qrActions.toggleQrOverlay({clientId});
-                    response?.({
+                    response({
                         ok: Boolean(result.ok),
                         message: result.message,
                     });

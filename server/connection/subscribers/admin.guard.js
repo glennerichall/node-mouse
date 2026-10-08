@@ -7,7 +7,7 @@ export function createAdminEventGuard({
   return function adminEventGuard(_payload, response, next) {
     if (!isAdmin) {
       log.warn({client}, 'Admin action rejected: insufficient role');
-      response?.({
+      response({
         ok: false,
         message: 'Permission administrateur requise.',
       });
@@ -21,7 +21,7 @@ export function createAdminEventGuard({
     }
 
     log.warn({client}, 'Admin action rejected: ADMIN_ACTIONS_ENABLED=false');
-    response?.({
+    response({
       ok: false,
       message: 'Admin actions disabled.',
     });

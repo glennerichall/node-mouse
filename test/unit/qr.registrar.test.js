@@ -12,7 +12,10 @@ describe('QR event registrar', () => {
     const handlers = new Map();
     const socket = {
       id: 'controller-1',
-      on: jest.fn((eventName, handler) => handlers.set(eventName, handler)),
+      on: jest.fn((eventName, handler) => {
+        handlers.set(eventName, handler);
+        return socket;
+      }),
       emit: jest.fn(),
     };
     const qrActions = {
@@ -30,7 +33,9 @@ describe('QR event registrar', () => {
       REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN,
       REMOTE_EVENT_QR_TOGGLE_OVERLAY,
     ]);
-    await handlers.get(REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN)();
+    const response = jest.fn();
+    await handlers.get(REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN)(undefined, response);
     expect(qrActions.rotateEntryToken).toHaveBeenCalledWith({clientId: socket.id});
+    expect(response).toHaveBeenCalledWith({ok: true, message: undefined});
   });
 });
