@@ -1,13 +1,12 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 import {
     loadEnvFile,
     readString,
     resolveConfigDir,
     resolveEnvFilePath
-} from "../../utils/env.js";
-
-import {fileURLToPath} from "node:url";
-import path from "node:path";
-import fs from "node:fs";
+} from '../../utils/env.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

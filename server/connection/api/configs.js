@@ -1,8 +1,8 @@
+import Joi from 'joi';
 import {CONFIG_PATHS} from '../../services/config/configPaths.js';
 import {getConfigFieldDefinition, getManagedConfigSchema} from '../../services/config/configSchema.js';
 import {DEFAULT_PERSISTED_CONFIG} from '../../services/config/defaultConfig.js';
 import {setNestedValue} from '../../../utils/object.utils.js';
-import Joi from 'joi';
 
 export const adminConfigSchema = getManagedConfigSchema(CONFIG_PATHS);
 

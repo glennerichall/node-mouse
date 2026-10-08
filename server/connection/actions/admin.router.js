@@ -1,5 +1,5 @@
-import {adminGuard} from './admin.guard.js';
 import Router from 'router';
+import {adminGuard} from './admin.guard.js';
 import {getClientId} from '../client-channel.js';
 
 export const adminRouter = Router()

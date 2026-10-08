@@ -1,5 +1,5 @@
-import {createMouseMoveDispatcher} from '../../services/input/createMouseMoveDispatcher.js';
 import Router from 'router';
+import {createMouseMoveDispatcher} from '../../services/input/createMouseMoveDispatcher.js';
 
 const moves = new WeakMap();
 const getInput = (request) => request.services.getInputController();

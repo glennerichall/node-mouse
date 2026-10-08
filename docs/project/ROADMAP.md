@@ -23,7 +23,7 @@ entraîner de renommage.
 | 5 | [02 — ARCH — Architecture](./axes/02-ARCH-architecture-modulaire.md) | Services métier indépendants des transports et adaptateurs | ARCH-046 terminée |
 | 6 | [03 — REL — Fiabilité](./axes/03-REL-fiabilite.md) | Commandes et prévisualisation prévisibles sous charge | Planifié |
 | 7 | [06 — PWA — Application web](./axes/06-PWA-application-web.md) | Installation web et transports optionnels sécurisés | Planifié |
-| 8 | [09 — CODE — Qualité du code](./axes/09-CODE-qualite-et-uniformite.md) | Style cohérent, conventions explicites et dette mesurée | Planifié — CODE-001 |
+| 8 | [09 — CODE — Qualité du code](./axes/09-CODE-qualite-et-uniformite.md) | Style cohérent, conventions explicites et dette mesurée | À jour — CODE-004 terminée |
 | 9 | [08 — QUA — Qualité](./axes/08-QUA-qualite.md) | Changements vérifiés et versions reproductibles | Continu |
 | 99 | [BACK — Backlog transversal](./axes/99-BACK-backlog-transversal.md) | Idées à promouvoir dans un axe avant implantation | Exploration |
 

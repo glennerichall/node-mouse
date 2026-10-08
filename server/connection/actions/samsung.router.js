@@ -1,6 +1,6 @@
+import Router from 'router';
 import {createLogger} from '../../application/logger.js';
 import {getClientLabel} from '../client-channel.js';
-import Router from 'router';
 
 const log = createLogger('samsung:remote');
 

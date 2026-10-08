@@ -5,7 +5,7 @@ import {
     sessionManagementRouter,
     sessionRouter,
 } from '../connection/api/middlewares/session.middleware.js';
-import {qrPageHandler} from '../connection/api/handlers/qr-page.handler.js';
+import {qrPageHandler} from '../connection/api/handlers/qr-page.handlers.js';
 import {adminUiRouter} from "./routers/createAdminUiRouter.js";
 import {adminApiRouter, adminAuthRouter} from '../connection/api/routers/admin.router.js';
 import {remotesRouter, clientApiRouter} from '../connection/api/routers/client.router.js';

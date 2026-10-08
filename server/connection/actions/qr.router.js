@@ -1,6 +1,6 @@
+import Router from 'router';
 import {createLogger} from '../../application/logger.js';
 import {getClientId, getClientLabel} from '../client-channel.js';
-import Router from 'router';
 
 let log;
 

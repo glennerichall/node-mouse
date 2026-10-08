@@ -198,6 +198,10 @@ l'itération et devient append-only dès sa clôture.
   migration complète des subscribers en factories de routes.
 - [ARCH-046 — clôture HTTP](./arch-ARCH-046-2026-10-08.md): validation du
   montage Express des routeurs d'actions et du transport HTTP agnostique.
+- [CODE-001/002/005/006](./code-CODE-001-2026-10-08.md): audit mesuré,
+  convention de style, contrôle automatisé et prévention progressive.
+- [CODE-003/004](./code-CODE-003-004-2026-10-08.md): imports, conventions de
+  nommage des modules et contrôle stylistique renforcé.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

@@ -1,16 +1,16 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import {
     getEntrypoint,
     getPlatformKind,
     getSystemdUnitPath,
     isDaemonProcess,
     shellQuote,
-} from "../../services/application/utils.js";
-import fs from "node:fs";
-import path from "node:path";
+} from '../../services/application/utils.js';
 import {
     execFileAsync,
     spawnDetached
-} from "../../utils/process.js";
+} from '../../utils/process.js';
 
 export function buildSystemdUnit({entrypoint, nodePath}) {
     const nodeBinDir = path.dirname(String(nodePath || process.execPath));

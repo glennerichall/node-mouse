@@ -1,9 +1,9 @@
 import http from 'node:http';
+import cookieParser from 'cookie-parser';
 import express from 'express';
 import {Server} from 'socket.io';
 import {getPublicUrl, normalizeBaseUrl} from '../../utils/network.js';
-import cookieParser from "cookie-parser";
-import {createHttpsServer} from "./createHttpsServer.js";
+import {createHttpsServer} from './createHttpsServer.js';
 import {createLogger} from '../../application/logger.js';
 import {isOriginAllowed} from '../../connection/security/origin.js';
 
@@ -78,4 +78,3 @@ export function createServer(services) {
         }
     };
 }
-

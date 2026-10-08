@@ -1,6 +1,6 @@
-import path from "node:path";
-import {projectRoot} from "../../utils/paths.js";
-import os from "node:os";
+import os from 'node:os';
+import path from 'node:path';
+import {projectRoot} from '../../utils/paths.js';
 
 export function getPlatformKind() {
     if (process.platform === 'linux') {
