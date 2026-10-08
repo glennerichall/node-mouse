@@ -7,6 +7,7 @@ const WAKE_RECONNECT_DEBOUNCE_MS = 100;
 
 const SOCKET_IO_OPTIONS = {
   reconnection: true,
+  reconnectionAttempts: 10,
   reconnectionDelay: 250,
   reconnectionDelayMax: 2_000,
   randomizationFactor: 0.2,

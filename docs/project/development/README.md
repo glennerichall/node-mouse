@@ -204,6 +204,8 @@ l'itération et devient append-only dès sa clôture.
   nommage des modules et contrôle stylistique renforcé.
 - [REL-001](./rel-REL-001-2026-10-08.md): bornes des timestamps d'entrée et
   drainage robuste des mouvements coalescés.
+- [REL-002](./rel-REL-002-2026-10-08.md): reprise automatique du backend
+  uinput après redémarrage du service.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

@@ -57,6 +57,7 @@ describe('client socket io initialization', () => {
       expect(initSocketIo()).toBe(socket);
       expect(global.io).toHaveBeenCalledWith(expect.objectContaining({
         reconnection: true,
+        reconnectionAttempts: 10,
         reconnectionDelay: 250,
         reconnectionDelayMax: 2000,
         timeout: 4000,

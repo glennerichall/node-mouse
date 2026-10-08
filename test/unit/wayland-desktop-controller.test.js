@@ -56,6 +56,38 @@ describe('Wayland desktop controller', () => {
     expect(backend.authorize).toHaveBeenCalledTimes(1);
   });
 
+  it('retries backend authorization before input after a service restart', () => {
+    let status = {status: 'uinput-unavailable'};
+    const backend = {
+      authorize: jest.fn(() => { status = {status: 'ready'}; }),
+      getStatus: jest.fn(() => status),
+      moveRelative: jest.fn(),
+      button: jest.fn(),
+      key: jest.fn(),
+      scroll: jest.fn(),
+    };
+    const desktop = createWaylandDesktopController(backend, {adapter: 'wayland-uinput'});
+
+    desktop.moveMouseRelative(4, -2);
+    desktop.mouseToggle('down', 'left');
+    desktop.keyTap('a');
+
+    expect(backend.authorize).toHaveBeenCalledTimes(1);
+    expect(backend.moveRelative).toHaveBeenCalledWith(4, -2);
+    expect(backend.button).toHaveBeenCalledWith(272, true);
+    expect(backend.key).toHaveBeenCalled();
+  });
+
+  it('does not trigger interactive portal authorization from an input command', () => {
+    const backend = createBackend({status: 'permission-required'});
+    const desktop = createWaylandDesktopController(backend, {adapter: 'wayland-portal'});
+
+    desktop.moveMouseRelative(4, -2);
+
+    expect(backend.authorize).not.toHaveBeenCalled();
+    expect(backend.moveRelative).not.toHaveBeenCalled();
+  });
+
   it('maps text, special keys and modifiers to evdev keycodes', () => {
     const backend = createBackend();
     const desktop = createWaylandDesktopController(backend);

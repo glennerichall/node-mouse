@@ -41,8 +41,19 @@ export function createWaylandDesktopController(backend, {
     let hoverPointerInitialized = !getPointerPosition;
     let hasRemotePointerMotion = false;
 
+    function ensureBackendReady() {
+        if (backend.getStatus?.().status === 'ready') {
+            return true;
+        }
+
+        if (adapter === 'wayland-uinput') {
+            backend.authorize?.();
+        }
+        return backend.getStatus?.().status === 'ready';
+    }
+
     function key(code, pressed) {
-        if (Number.isInteger(code)) {
+        if (Number.isInteger(code) && ensureBackendReady()) {
             backend.key(code, pressed);
         }
     }
@@ -73,6 +84,9 @@ export function createWaylandDesktopController(backend, {
     }
 
     function moveMouseRelative(dx, dy) {
+        if (!ensureBackendReady()) {
+            return;
+        }
         const x = Number(dx) || 0;
         const y = Number(dy) || 0;
         pointer.x += x;
@@ -104,6 +118,9 @@ export function createWaylandDesktopController(backend, {
     }
 
     function mouseToggle(state, button = 'left') {
+        if (!ensureBackendReady()) {
+            return;
+        }
         backend.button(buttonCode(button), state === 'down');
     }
 

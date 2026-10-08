@@ -11,6 +11,12 @@ et assurer un cycle de vie robuste du serveur et des connexions.
   impossibles ou obsolètes et garantir que le dispatcher de mouvements conserve
   au plus une contribution en attente, avec une erreur de consommation
   observable sans rejet de promesse non géré.
+- [x] **REL-002 — cycle de reconnexion:** borner et exposer l'état de la
+  reconnexion, restaurer l'état client après le retour du serveur, empêcher les
+  doublons et les paquets Socket.IO tamponnés, traiter explicitement les
+  commandes émises pendant la coupure, et tester le cycle déconnexion/
+  reconnexion. Inclut la reprise du backend uinput après redémarrage du
+  service.
 - [ ] Mesurer la latence souris/clavier; traiter mouvements obsolètes et backpressure.
 - [ ] Fiabiliser reconnexion après veille, changement Wi-Fi et redémarrage.
 - [ ] Rendre délais et heartbeats configurables par transport.
