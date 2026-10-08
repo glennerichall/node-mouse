@@ -196,6 +196,8 @@ l'itération et devient append-only dès sa clôture.
   première migration du subscriber QR vers une factory de routes.
 - [ARCH-046](./arch-ARCH-046-2026-10-07.md): protocole `route:request` et
   migration complète des subscribers en factories de routes.
+- [ARCH-046 — clôture HTTP](./arch-ARCH-046-2026-10-08.md): validation du
+  montage Express des routeurs d'actions et du transport HTTP agnostique.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

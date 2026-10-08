@@ -82,6 +82,8 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
   avec payload, réponse et chaîne de callbacks.
 - [x] ARCH-035 — extraire le chaînage de callbacks dans un composant neutre
   réutilisable par les adapters Socket.IO et WebRTC.
+- [x] ARCH-046 — faire de `route:request` le protocole générique des messages
+  d'actions et vérifier le montage des routeurs sur un transport HTTP Express.
 
 Voir aussi l'[axe PWA](./06-PWA-application-web.md) pour les contrats de
 transport et déploiement.
@@ -516,7 +518,8 @@ et les tests avant son implémentation.
 - `client/core/socket-emit.js` et le transport Socket.IO pour le nouveau
   paquet `{path, method, body}`;
 - guards de timestamp et de taille/rate-limit pour lire le chemin encapsulé;
-- tests unitaires des factories et du protocole.
+- tests unitaires des factories, du protocole et du montage HTTP Express des
+  routeurs d'actions.
 
 **Critères d'acceptation:**
 
@@ -526,36 +529,11 @@ et les tests avant son implémentation.
 - les commandes client passent exclusivement par `route:request`;
 - le serveur reçoit `route:request` avec `{path, method, body}` et transmet la
   requête au routeur;
+- les routeurs d'actions restent montables dans une application Express et
+  leurs domaines, méthodes et statuts sont vérifiés par transport HTTP;
 - les guards de transport conservent validation de timestamp, taille et
   limitation des routes administratives;
 - la suite complète reste verte et la version patch est incrémentée.
-
-## ARCH-047 — Domaines de routes et statuts HTTP cohérents
-
-**Modules concernés:**
-
-- `server/connection/actions/*.router.js` pour les chemins de ressources et
-  les méthodes HTTP par domaine;
-- `utils/remoteCommands.js` et les émetteurs clients pour aligner le protocole
-  `route:request` sur les chemins structurés;
-- `server/connection/socket/socket-response.adapter.js` et les handlers pour
-  les statuts `200`, `201`, `204` et les réponses sans contenu;
-- tests unitaires et intégrés des routeurs et de l'adaptateur de réponse.
-
-**Critères d'acceptation:**
-
-- chaque route est rattachée à un domaine de ressource explicite et n'emploie
-  pas un verbe d'action comme nom de ressource;
-- les opérations de création, modification et suppression utilisent les
-  méthodes HTTP et chemins de ressources appropriés;
-- les réponses de création utilisent `201`, les suppressions sans contenu
-  utilisent `204` et les lectures ou mutations retournant un corps utilisent
-  un statut explicite cohérent;
-- l'adaptateur Socket.IO expose et respecte `status`, `send`, `end` et
-  `sendStatus` sans double réponse;
-- le protocole client et les tests couvrent les nouveaux chemins sans alias
-  d'action;
-- la suite complète reste verte.
 
 ## ARCH-023 — Handlers d'actions administrateur
 
