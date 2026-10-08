@@ -1,5 +1,4 @@
 import {createLogger} from '../../application/logger.js';
-import {createSocketActionResponder} from '../socket/socket-action-responder.js';
 import {getClientId, getClientLabel} from '../client-channel.js';
 import {
   REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT,
@@ -19,65 +18,77 @@ function getModuleLog() {
   return log;
 }
 
+function respondAdminAction(response, action, result = {}) {
+  if (typeof response !== 'function') {
+    return;
+  }
+
+  response({
+    action,
+    ok: Boolean(result.ok),
+    message: result.message,
+    openUrl: result.openUrl,
+  });
+}
+
 export function createAdminEventSubscriber({adminActions, qrActions}) {
   const log = getModuleLog();
   return function subscribeAdmin(channel) {
     const clientId = getClientId(channel);
     const client = getClientLabel(channel);
-    const respondAdminAction = createSocketActionResponder({socket: channel});
 
-    channel.on(REMOTE_EVENT_ADMIN_UPDATE_CHECK, async () => {
+    channel.on(REMOTE_EVENT_ADMIN_UPDATE_CHECK, async (_payload, response) => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_UPDATE_CHECK}`);
       const result = await adminActions.forceUpdateCheck({ clientId });
-      respondAdminAction('update-check', result);
+      respondAdminAction(response, 'update-check', result);
     });
 
-    channel.on(REMOTE_EVENT_ADMIN_UPDATE_INSTALL, async () => {
+    channel.on(REMOTE_EVENT_ADMIN_UPDATE_INSTALL, async (_payload, response) => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_UPDATE_INSTALL}`);
       const result = await adminActions.installUpdate({ clientId });
-      respondAdminAction('update-install', result);
+      respondAdminAction(response, 'update-install', result);
     });
 
-    channel.on(REMOTE_EVENT_ADMIN_SERVICE_RESTART, async () => {
+    channel.on(REMOTE_EVENT_ADMIN_SERVICE_RESTART, async (_payload, response) => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_SERVICE_RESTART}`);
       const result = await adminActions.restartService({ clientId });
-      respondAdminAction('service-restart', result);
+      respondAdminAction(response, 'service-restart', result);
     });
 
-    channel.on(REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER, async () => {
+    channel.on(REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER, async (_payload, response) => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_SERVER}`);
       const result = await qrActions.openQrBrowserServer({ clientId });
-      respondAdminAction('open-qr-browser-server', result);
+      respondAdminAction(response, 'open-qr-browser-server', result);
     });
 
-    channel.on(REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT, async () => {
+    channel.on(REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT, async (_payload, response) => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_OPEN_QR_BROWSER_CLIENT}`);
       const result = await qrActions.openQrBrowserClient({ clientId });
-      respondAdminAction('open-qr-browser-client', result);
+      respondAdminAction(response, 'open-qr-browser-client', result);
     });
 
-    channel.on(REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER, async () => {
+    channel.on(REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER, async (_payload, response) => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER}`);
       const result = await adminActions.openServerInfoBrowserServer({ clientId });
-      respondAdminAction('open-server-info-browser-server', result);
+      respondAdminAction(response, 'open-server-info-browser-server', result);
     });
 
-    channel.on(REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_CLIENT, async () => {
+    channel.on(REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_CLIENT, async (_payload, response) => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_CLIENT}`);
       const result = await adminActions.openServerInfoBrowserClient({ clientId });
-      respondAdminAction('open-server-info-browser-client', result);
+      respondAdminAction(response, 'open-server-info-browser-client', result);
     });
 
-    channel.on(REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN, async () => {
+    channel.on(REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN, async (_payload, response) => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_ROTATE_ENTRY_TOKEN}`);
       const result = await qrActions.rotateEntryToken({ clientId });
-      respondAdminAction('rotate-entry-token', result);
+      respondAdminAction(response, 'rotate-entry-token', result);
     });
 
-    channel.on(REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY, async () => {
+    channel.on(REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY, async (_payload, response) => {
       log.info({ client }, `Demande ${REMOTE_EVENT_ADMIN_TOGGLE_QR_OVERLAY}`);
       const result = await qrActions.toggleQrOverlay({ clientId });
-      respondAdminAction('toggle-qr-overlay', result);
+      respondAdminAction(response, 'toggle-qr-overlay', result);
     });
   };
 }

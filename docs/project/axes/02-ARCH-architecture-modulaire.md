@@ -325,6 +325,25 @@ et les tests avant son implémentation.
   métier correspondant;
 - la suite complète reste verte et la version patch est incrémentée.
 
+## ARCH-037 — Réponse administrateur portée par le canal
+
+**Modules concernés:**
+
+- `server/connection/subscribers/admin.subscriber.js` pour la réponse des
+  actions administrateur;
+- tests unitaires du subscriber administrateur.
+
+**Critères d'acceptation:**
+
+- le subscriber admin utilise le paramètre `response` fourni au callback du
+  canal;
+- aucune dépendance à `createSocketActionResponder` ne subsiste dans ce
+  subscriber;
+- le payload de réponse conserve les champs `action`, `ok`, `message` et
+  `openUrl`;
+- l'absence de callback de réponse reste tolérée;
+- la suite complète reste verte et la version patch est incrémentée.
+
 ## ARCH-023 — Handlers d'actions administrateur
 
 **Modules concernés:**

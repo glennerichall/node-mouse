@@ -175,6 +175,8 @@ l'itération et devient append-only dès sa clôture.
   callbacks dans un composant indépendant du transport.
 - [ARCH-036](./arch-ARCH-036-2026-10-07.md): regroupement des subscribers de
   connexion sous une arborescence dédiée, distincte des actions métier.
+- [ARCH-037](./arch-ARCH-037-2026-10-07.md): utilisation de la réponse du
+  canal pour les résultats des actions administrateur.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.
