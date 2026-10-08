@@ -43,7 +43,6 @@ export function createOpenQrBrowserAction(services, options = {}) {
       return {
         ok: true,
         message: 'Page QR ouverte sur le client.',
-        openUrl: clientQrUrl,
       };
     }
 

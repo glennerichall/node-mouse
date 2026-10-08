@@ -4,12 +4,21 @@ import {
   REMOTE_EVENT_ADMIN_UPDATE_CHECK,
 } from '../../utils/remoteCommands.js';
 
-describe('createAdminEventRegistrar', () => {
-  it('subscribes on a channel and emits action results without requiring socket guards', async () => {
+describe('createAdminEventSubscriber', () => {
+  it('subscribes guarded admin actions and returns results through the channel response', async () => {
     const handlers = new Map();
     const channel = {
       id: 'channel-123456789',
-      on: sinon.spy((eventName, handler) => handlers.set(eventName, handler)),
+      on: sinon.spy((eventName, ...callbacks) => {
+        handlers.set(eventName, (...args) => {
+          const next = (error) => {
+            if (error) throw error;
+            return callbacks[1]?.(...args, next);
+          };
+          return callbacks[0](...args, next);
+        });
+        return channel;
+      }),
     };
     const adminActions = {
       forceUpdateCheck: sinon.stub().resolves({ok: true, message: 'done'}),
@@ -25,10 +34,8 @@ describe('createAdminEventRegistrar', () => {
       clientId: channel.id,
     })).toBe(true);
     expect(response.calledOnceWithExactly({
-      action: 'update-check',
       ok: true,
       message: 'done',
-      openUrl: undefined,
     })).toBe(true);
   });
 });

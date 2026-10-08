@@ -6,7 +6,10 @@ describe('preview event registrar', () => {
   it('refuses preview start when native capture is unavailable', () => {
     const handlers = new Map();
     const socket = {
-      on: jest.fn((event, handler) => handlers.set(event, handler)),
+      on: jest.fn((event, handler) => {
+        handlers.set(event, handler);
+        return socket;
+      }),
     };
     const preview = {
       isAvailable: jest.fn(() => false),

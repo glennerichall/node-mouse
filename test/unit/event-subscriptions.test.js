@@ -22,7 +22,10 @@ describe('createEventSubscriptions', () => {
     const handlers = new Map();
     const channel = {
       id: 'client-1234',
-      on: jest.fn((eventName, handler) => handlers.set(eventName, handler)),
+      on: jest.fn((eventName, handler) => {
+        handlers.set(eventName, handler);
+        return channel;
+      }),
       emit: jest.fn(),
     };
 
@@ -30,7 +33,7 @@ describe('createEventSubscriptions', () => {
     subscriptions.subscribe(channel);
     const secondChannel = {
       id: 'client-5678',
-      on: jest.fn(),
+      on: jest.fn(() => secondChannel),
       emit: jest.fn(),
     };
     subscriptions.subscribe(secondChannel);

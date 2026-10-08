@@ -10,16 +10,19 @@ import {createEventCallbackChain} from '../../services/transport/createEventCall
 export function createSocketChannelAdapter(socket) {
   const channel = {
     id: socket.id,
+    securityContext: socket.securityContext,
     on(eventName, callbackChainFirst, ...callbacksChain) {
       const callbacks = [callbackChainFirst, ...callbacksChain];
       if (callbacks.some((callback) => typeof callback !== 'function')) {
         throw new TypeError('A channel callback chain must contain functions.');
       }
 
-      socket.on(eventName, createEventCallbackChain(
+      const listener = createEventCallbackChain(
         callbacks,
         (error) => socket.emit('error', error),
-      ));
+      );
+
+      socket.on(eventName, (payload, response) => listener(payload ?? {}, response));
       return channel;
     },
     emit(eventName, payload) {

@@ -17,7 +17,7 @@ export const createBrowserSubscriber = ({browser, getConfig = () => ({})}) => {
     return function subscribeBrowser(channel) {
         const client = getClientLabel(channel);
 
-        channel.on(REMOTE_EVENT_BROWSER_OPEN, async (payload = {}) => {
+        channel.on(REMOTE_EVENT_BROWSER_OPEN, async (payload) => {
             const browserId = typeof payload?.browserId === 'string' ? payload.browserId : 'brave';
             if (!isBrowserEnabled(getConfig(), browserId)) {
                 log.info({client, browserId}, 'Browser ignored: disabled by configuration.');

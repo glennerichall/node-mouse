@@ -344,6 +344,69 @@ et les tests avant son implémentation.
 - l'absence de callback de réponse reste tolérée;
 - la suite complète reste verte et la version patch est incrémentée.
 
+## ARCH-038 — Guards et réponses regroupés avec les subscribers
+
+**Modules concernés:**
+
+- `server/connection/subscribers/admin.guard.js` et
+  `server/connection/subscribers/admin.subscriber.js` pour le montage local
+  des guards administrateur;
+- `server/services/transport/sendActionResponse.js` pour la forme commune des
+  réponses d'action;
+- `server/connection/subscribers/qr.subscriber.js` et l'adapter Socket.IO;
+- tests des guards, subscribers et du bootstrap Socket.IO.
+
+**Critères d'acceptation:**
+
+- le guard administrateur est monté uniquement sur les événements `admin:*`;
+- aucun guard administrateur métier n'est enregistré comme middleware global
+  Socket.IO;
+- les subscribers admin et QR utilisent la même abstraction de réponse;
+- le payload de réponse est uniforme (`action`, `ok`, `message`, `openUrl`);
+- le contexte de sécurité est disponible sur le channel adapté;
+- la suite complète reste verte et la version patch est incrémentée.
+
+## ARCH-039 — Canal fluent et réponse implicite
+
+**Modules concernés:**
+
+- `server/connection/socket/createSocketChannelAdapter.js` pour la
+  normalisation du payload et le chaînage fluent;
+- `server/connection/subscribers/admin.subscriber.js` pour la composition
+  directe des appels `channel.on`;
+- subscribers d'entrée, navigateur et VLC pour la suppression des valeurs par
+  défaut transport-spécifiques;
+- tests du channel adapter et des subscribers.
+
+**Critères d'acceptation:**
+
+- chaque appel `channel.on(...)` retourne le channel et peut être chaîné;
+- l'adapter transforme un payload absent en objet avant d'appeler le callback;
+- les callbacks n'initialisent plus eux-mêmes `payload = {}`;
+- les réponses sont envoyées directement via le callback `response`;
+- aucune abstraction `sendActionResponse` n'est nécessaire dans les
+  subscribers;
+- la suite complète reste verte et la version patch est incrémentée.
+
+## ARCH-040 — Navigation client et réponses minimales
+
+**Modules concernés:**
+
+- `client/ui/main/bindings/bindAdminRemoteButtons.js` pour la navigation
+  locale des pages QR et informations serveur;
+- actions administrateur de navigation et subscribers admin/QR;
+- `client/services/notifications/createNotificationService.js` pour le retrait
+  de l'ancien événement de résultat;
+- tests unitaires des actions et réponses.
+
+**Critères d'acceptation:**
+
+- le client ouvre directement `/qr` et `/ui/admin/server-info`;
+- les actions serveur de navigation ne renvoient plus `openUrl`;
+- les réponses d'action contiennent uniquement `ok` et `message`;
+- le champ `action` et le topic client `admin.result.received` sont supprimés;
+- la suite complète reste verte et la version patch est incrémentée.
+
 ## ARCH-023 — Handlers d'actions administrateur
 
 **Modules concernés:**

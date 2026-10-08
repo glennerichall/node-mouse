@@ -1,4 +1,3 @@
-import {REMOTE_EVENT_ADMIN_RESULT} from '../../../utils/remoteCommands.js';
 import {showToast} from '../../ui/notifications/show-toast.js';
 
 export function createNotificationService(services) {
@@ -28,14 +27,6 @@ export function createNotificationService(services) {
     showToast(root, payload, getI18n().t);
   }
 
-  function handleAdminResult(payload = {}) {
-    getPubSub().publish('admin.result.received', payload);
-
-    if (payload?.openUrl) {
-      window.open(String(payload.openUrl), '_blank', 'noopener,noreferrer');
-    }
-  }
-
   return {
     bindRoot(nextRoot) {
       root = nextRoot || null;
@@ -48,7 +39,6 @@ export function createNotificationService(services) {
 
       const transport = getTransport();
       transport.on('notification', notify);
-      transport.on(REMOTE_EVENT_ADMIN_RESULT, handleAdminResult);
       transportBound = true;
     },
     notify,

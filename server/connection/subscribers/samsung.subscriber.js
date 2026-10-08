@@ -17,44 +17,45 @@ export function createSamsungSubscriber({samsung}) {
     return function subscribeSamsung(channel) {
         const client = getClientLabel(channel);
 
-        channel.on(REMOTE_EVENT_SAMSUNG_ON, async () => {
-            log.info({client}, `Demande ${REMOTE_EVENT_SAMSUNG_ON}`);
-            await samsung.turnOn();
-        });
+        channel
+            .on(REMOTE_EVENT_SAMSUNG_ON, async () => {
+                log.info({client}, `Demande ${REMOTE_EVENT_SAMSUNG_ON}`);
+                await samsung.turnOn();
+            })
 
-        channel.on(REMOTE_EVENT_SAMSUNG_OFF, async () => {
-            log.info({client}, `Demande ${REMOTE_EVENT_SAMSUNG_OFF}`);
-            await samsung.turnOff();
-        });
+            .on(REMOTE_EVENT_SAMSUNG_OFF, async () => {
+                log.info({client}, `Demande ${REMOTE_EVENT_SAMSUNG_OFF}`);
+                await samsung.turnOff();
+            })
 
-        channel.on(REMOTE_EVENT_SAMSUNG_VOL_UP, async () => {
-            log.info({client}, `Demande ${REMOTE_EVENT_SAMSUNG_VOL_UP}`);
-            await samsung.volumeUp();
-        });
+            .on(REMOTE_EVENT_SAMSUNG_VOL_UP, async () => {
+                log.info({client}, `Demande ${REMOTE_EVENT_SAMSUNG_VOL_UP}`);
+                await samsung.volumeUp();
+            })
 
-        channel.on(REMOTE_EVENT_SAMSUNG_VOL_DOWN, async () => {
-            log.info({client}, `Demande ${REMOTE_EVENT_SAMSUNG_VOL_DOWN}`);
-            await samsung.volumeDown();
-        });
+            .on(REMOTE_EVENT_SAMSUNG_VOL_DOWN, async () => {
+                log.info({client}, `Demande ${REMOTE_EVENT_SAMSUNG_VOL_DOWN}`);
+                await samsung.volumeDown();
+            })
 
-        channel.on(REMOTE_EVENT_SAMSUNG_MUTE, async () => {
-            log.info({client}, `Demande ${REMOTE_EVENT_SAMSUNG_MUTE}`);
-            await samsung.mute();
-        });
+            .on(REMOTE_EVENT_SAMSUNG_MUTE, async () => {
+                log.info({client}, `Demande ${REMOTE_EVENT_SAMSUNG_MUTE}`);
+                await samsung.mute();
+            })
 
-        channel.on(REMOTE_EVENT_SAMSUNG_INPUT, async () => {
-            log.info({client}, `Demande ${REMOTE_EVENT_SAMSUNG_INPUT}`);
-            await samsung.switchInput();
-        });
+            .on(REMOTE_EVENT_SAMSUNG_INPUT, async () => {
+                log.info({client}, `Demande ${REMOTE_EVENT_SAMSUNG_INPUT}`);
+                await samsung.switchInput();
+            })
 
-        channel.on(REMOTE_EVENT_SAMSUNG_ENTER, async () => {
-            log.info({client}, `Demande ${REMOTE_EVENT_SAMSUNG_ENTER}`);
-            await samsung.confirm();
-        });
+            .on(REMOTE_EVENT_SAMSUNG_ENTER, async () => {
+                log.info({client}, `Demande ${REMOTE_EVENT_SAMSUNG_ENTER}`);
+                await samsung.confirm();
+            })
 
-        channel.on(REMOTE_EVENT_SAMSUNG_PC_INPUT, async () => {
-            log.info({client}, `Demande ${REMOTE_EVENT_SAMSUNG_PC_INPUT}`);
-            await samsung.switchToPcInput();
-        });
+            .on(REMOTE_EVENT_SAMSUNG_PC_INPUT, async () => {
+                log.info({client}, `Demande ${REMOTE_EVENT_SAMSUNG_PC_INPUT}`);
+                await samsung.switchToPcInput();
+            });
     }
 }

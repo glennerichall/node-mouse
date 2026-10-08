@@ -177,6 +177,12 @@ l'itération et devient append-only dès sa clôture.
   connexion sous une arborescence dédiée, distincte des actions métier.
 - [ARCH-037](./arch-ARCH-037-2026-10-07.md): utilisation de la réponse du
   canal pour les résultats des actions administrateur.
+- [ARCH-038](./arch-ARCH-038-2026-10-07.md): montage local du guard admin et
+  abstraction commune des réponses d'action.
+- [ARCH-039](./arch-ARCH-039-2026-10-07.md): adoption du channel fluent et des
+  réponses implicites fournies par le callback.
+- [ARCH-040](./arch-ARCH-040-2026-10-07.md): navigation locale des pages client
+  et réduction des réponses d'action.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

@@ -35,6 +35,7 @@ describe('remote command registrars', () => {
       id: 'abcdef123456',
       on(eventName, handler) {
         handlers.set(eventName, handler);
+        return this;
       },
     });
 
@@ -57,6 +58,7 @@ describe('remote command registrars', () => {
       id: 'abcdef123456',
       on(eventName, handler) {
         handlers.set(eventName, handler);
+        return this;
       },
     });
 

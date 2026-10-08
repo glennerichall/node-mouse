@@ -34,7 +34,6 @@ export function createOpenServerInfoBrowserAction(services, options = {}) {
       return {
         ok: true,
         message: 'Page server info ouverte sur le client.',
-        openUrl: clientInfoUrl,
       };
     }
 

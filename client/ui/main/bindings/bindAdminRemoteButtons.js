@@ -1,11 +1,9 @@
 import {emitWithTimestamp} from '../../../core/socket-emit.js';
 import {
-    REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_CLIENT,
     REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER,
     REMOTE_EVENT_ADMIN_SERVICE_RESTART,
     REMOTE_EVENT_ADMIN_UPDATE_CHECK,
     REMOTE_EVENT_ADMIN_UPDATE_INSTALL,
-    REMOTE_EVENT_QR_OPEN_BROWSER_CLIENT,
     REMOTE_EVENT_QR_OPEN_BROWSER_SERVER,
     REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN,
     REMOTE_EVENT_QR_TOGGLE_OVERLAY,
@@ -134,10 +132,14 @@ export function bindAdminRemoteButtons(services, dom) {
     btnInstallUpdate.addEventListener('click', emit(REMOTE_EVENT_ADMIN_UPDATE_INSTALL));
     btnRestartService.addEventListener('click', emit(REMOTE_EVENT_ADMIN_SERVICE_RESTART));
     btnOpenQrBrowserServer.addEventListener('click', emit(REMOTE_EVENT_QR_OPEN_BROWSER_SERVER));
-    btnOpenQrBrowserClient.addEventListener('click', emit(REMOTE_EVENT_QR_OPEN_BROWSER_CLIENT));
+    btnOpenQrBrowserClient.addEventListener('click', () => {
+        window.location.href = '/qr';
+    });
     btnToggleQrOverlay.addEventListener('click', emit(REMOTE_EVENT_QR_TOGGLE_OVERLAY));
     btnOpenServerInfoBrowserServer.addEventListener('click', emit(REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_SERVER));
-    btnOpenServerInfoBrowserClient.addEventListener('click', emit(REMOTE_EVENT_ADMIN_OPEN_SERVER_INFO_BROWSER_CLIENT));
+    btnOpenServerInfoBrowserClient.addEventListener('click', () => {
+        window.location.href = '/ui/admin/server-info';
+    });
     btnOpenConfigPage.addEventListener('click', () => {
         window.location.href = '/ui/admin/config';
     });

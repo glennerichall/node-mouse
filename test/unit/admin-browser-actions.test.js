@@ -11,7 +11,7 @@ describe('admin browser actions', () => {
     jest.resetModules();
   });
 
-  it('returns a client-side openUrl for QR client action', async () => {
+  it('reports client-side QR navigation without opening a host URL', async () => {
     const {createOpenQrBrowserAction} = await import('../../server/remotes/admin/createOpenQrBrowserAction.js');
     const events = {
       publishEvent: jest.fn(),
@@ -31,7 +31,6 @@ describe('admin browser actions', () => {
     expect(result).toEqual({
       ok: true,
       message: 'Page QR ouverte sur le client.',
-      openUrl: '/qr',
     });
     expect(browser.openUrlOnHost).not.toHaveBeenCalled();
     expect(events.publishEvent).toHaveBeenCalledWith(PUBSUB_SERVICE_ADMIN_OPEN_QR_BROWSER, PUBSUB_EVENT_ADMIN_CLIENT_OPENED, {
@@ -39,7 +38,7 @@ describe('admin browser actions', () => {
     });
   });
 
-  it('returns a client-side openUrl for server info client action', async () => {
+  it('reports client-side server-info navigation without opening a host URL', async () => {
     const {createOpenServerInfoBrowserAction} = await import('../../server/remotes/admin/createOpenServerInfoBrowserAction.js');
     const events = {
       publishEvent: jest.fn(),
@@ -59,7 +58,6 @@ describe('admin browser actions', () => {
     expect(result).toEqual({
       ok: true,
       message: 'Page server info ouverte sur le client.',
-      openUrl: '/ui/admin/server-info',
     });
     expect(browser.openUrlOnHost).not.toHaveBeenCalled();
     expect(events.publishEvent).toHaveBeenCalledWith(PUBSUB_SERVICE_ADMIN_OPEN_SERVER_INFO_BROWSER, PUBSUB_EVENT_ADMIN_CLIENT_OPENED, {

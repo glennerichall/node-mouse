@@ -1,13 +1,7 @@
 import sinon from 'sinon';
-import {createAdminEventGuardMiddleware} from '../../server/remotes/admin/createAdminEventGuardMiddleware.js';
-import {
-  REMOTE_EVENT_ADMIN_SERVICE_RESTART,
-  REMOTE_EVENT_ADMIN_UPDATE_CHECK,
-  REMOTE_EVENT_MOUSE_MOVE,
-  REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN,
-} from '../../utils/remoteCommands.js';
+import {createAdminEventGuard} from '../../server/connection/subscribers/admin.guard.js';
 
-describe('createAdminEventGuardMiddleware', () => {
+describe('createAdminEventGuard', () => {
   let sandbox;
 
   beforeEach(() => {
@@ -18,108 +12,55 @@ describe('createAdminEventGuardMiddleware', () => {
     sandbox.restore();
   });
 
-  it('passes through non-admin events', () => {
-    const warn = sandbox.stub();
-    const respondAdminAction = sandbox.stub();
+  it('allows an admin action when enabled', () => {
     const next = sandbox.stub();
-    const guard = createAdminEventGuardMiddleware({
-      isAdminActionsEnabled: false,
-      isAdmin: true,
-      client: 'abc12345',
-      log: {warn},
-      respondAdminAction,
-    });
-
-    guard([REMOTE_EVENT_MOUSE_MOVE, {dx: 1, dy: 2}], next);
-
-    expect(next.calledOnceWithExactly()).toBe(true);
-    expect(warn.called).toBe(false);
-    expect(respondAdminAction.called).toBe(false);
-  });
-
-  it('does not classify QR and entry-token controls as admin events', () => {
-    const warn = sandbox.stub();
-    const respondAdminAction = sandbox.stub();
-    const next = sandbox.stub();
-    const guard = createAdminEventGuardMiddleware({
-      isAdminActionsEnabled: false,
-      isAdmin: false,
-      client: 'abc12345',
-      log: {warn},
-      respondAdminAction,
-    });
-
-    guard([REMOTE_EVENT_QR_ROTATE_ENTRY_TOKEN], next);
-
-    expect(next.calledOnceWithExactly()).toBe(true);
-    expect(warn.called).toBe(false);
-    expect(respondAdminAction.called).toBe(false);
-  });
-
-  it('allows admin events when enabled', () => {
-    const warn = sandbox.stub();
-    const respondAdminAction = sandbox.stub();
-    const next = sandbox.stub();
-    const guard = createAdminEventGuardMiddleware({
+    const guard = createAdminEventGuard({
       isAdminActionsEnabled: true,
       isAdmin: true,
       client: 'abc12345',
-      log: {warn},
-      respondAdminAction,
+      log: {warn: sandbox.stub()},
     });
 
-    guard([REMOTE_EVENT_ADMIN_UPDATE_CHECK, {}], next);
+    guard({}, sandbox.stub(), next);
 
     expect(next.calledOnceWithExactly()).toBe(true);
-    expect(warn.called).toBe(false);
-    expect(respondAdminAction.called).toBe(false);
   });
 
-  it('blocks admin events when disabled and responds to client', () => {
-    const warn = sandbox.stub();
-    const respondAdminAction = sandbox.stub();
+  it('responds and blocks when admin actions are disabled', () => {
     const next = sandbox.stub();
-    const guard = createAdminEventGuardMiddleware({
+    const response = sandbox.stub();
+    const guard = createAdminEventGuard({
       isAdminActionsEnabled: false,
       isAdmin: true,
       client: 'abc12345',
-      log: {warn},
-      respondAdminAction,
+      log: {warn: sandbox.stub()},
     });
 
-    guard([REMOTE_EVENT_ADMIN_SERVICE_RESTART, {}], next);
+    guard({}, response, next);
 
-    expect(warn.calledOnce).toBe(true);
-    expect(respondAdminAction.calledOnce).toBe(true);
-    expect(respondAdminAction.firstCall.args[0]).toBe('service-restart');
-    expect(respondAdminAction.firstCall.args[1]).toEqual({
+    expect(response.calledOnceWithExactly({
       ok: false,
       message: 'Admin actions disabled.',
-    });
-    expect(next.calledOnce).toBe(true);
-    expect(next.firstCall.args[0]).toBeInstanceOf(Error);
+    })).toBe(true);
     expect(next.firstCall.args[0].message).toBe('admin_actions_disabled');
   });
 
-  it('blocks admin events from a controller even when admin actions are enabled', () => {
-    const warn = sandbox.stub();
-    const respondAdminAction = sandbox.stub();
+  it('responds and blocks a non-admin client', () => {
     const next = sandbox.stub();
-    const guard = createAdminEventGuardMiddleware({
+    const response = sandbox.stub();
+    const guard = createAdminEventGuard({
       isAdminActionsEnabled: true,
       isAdmin: false,
       client: 'abc12345',
-      log: {warn},
-      respondAdminAction,
+      log: {warn: sandbox.stub()},
     });
 
-    guard([REMOTE_EVENT_ADMIN_SERVICE_RESTART, {}], next);
+    guard({}, response, next);
 
-    expect(respondAdminAction.calledOnceWithExactly('service-restart', {
+    expect(response.calledOnceWithExactly({
       ok: false,
       message: 'Permission administrateur requise.',
     })).toBe(true);
-    expect(next.firstCall.args[0]).toBeInstanceOf(Error);
     expect(next.firstCall.args[0].message).toBe('admin_forbidden');
   });
 });
