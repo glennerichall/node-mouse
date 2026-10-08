@@ -16,7 +16,7 @@ describe('createSocketTimestampGuardMiddleware', () => {
     const middleware = socketTimestampGuardMiddleware({maxEventAgeMs: 1000, socketId: 's1'});
     const next = sandbox.stub();
 
-    middleware(['mouse:move', {}], next);
+    middleware(['mouse/move', {}], next);
 
     expect(next.calledOnce).toBe(true);
     expect(next.firstCall.args[0]).toBeInstanceOf(Error);
@@ -32,7 +32,7 @@ describe('createSocketTimestampGuardMiddleware', () => {
     const next = sandbox.stub();
     const ts = Date.now() - 1000;
 
-    middleware(['mouse:move', {ts}], next);
+    middleware(['mouse/move', {ts}], next);
 
     expect(next.calledOnce).toBe(true);
     expect(next.firstCall.args[0]).toBeInstanceOf(Error);
@@ -44,7 +44,7 @@ describe('createSocketTimestampGuardMiddleware', () => {
     const next = sandbox.stub();
     const ts = Date.now();
 
-    middleware(['mouse:move', {ts}], next);
+    middleware(['mouse/move', {ts}], next);
 
     expect(next.calledOnceWithExactly()).toBe(true);
   });
@@ -57,8 +57,8 @@ describe('createSocketTimestampGuardMiddleware', () => {
     });
     const next = sandbox.stub();
 
-    middleware(['mouse:move', {ts: Date.now() - 15_000}], next);
-    middleware(['mouse:move', {ts: Date.now() - 15_020}], next);
+    middleware(['mouse/move', {ts: Date.now() - 15_000}], next);
+    middleware(['mouse/move', {ts: Date.now() - 15_020}], next);
 
     expect(next.calledTwice).toBe(true);
     expect(next.firstCall.args).toEqual([]);
@@ -73,8 +73,8 @@ describe('createSocketTimestampGuardMiddleware', () => {
     });
     const next = sandbox.stub();
 
-    middleware(['mouse:move', {ts: Date.now() - 15_000}], next);
-    middleware(['mouse:move', {ts: Date.now() - 18_000}], next);
+    middleware(['mouse/move', {ts: Date.now() - 15_000}], next);
+    middleware(['mouse/move', {ts: Date.now() - 18_000}], next);
 
     expect(next.firstCall.args).toEqual([]);
     expect(next.secondCall.args[0]).toBeInstanceOf(Error);

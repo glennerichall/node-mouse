@@ -97,10 +97,10 @@ describe('keyboard panel', () => {
     }));
     input.value = 'h';
     input.dispatchEvent(createInputEvent('input', {isComposing: true}));
-    expect(socket.emit).toHaveBeenCalledWith(
-      REMOTE_EVENT_KEYBOARD_TEXT,
-      expect.objectContaining({text: 'h'}),
-    );
+    expect(socket.emit).toHaveBeenCalledWith('route:request', expect.objectContaining({
+      path: REMOTE_EVENT_KEYBOARD_TEXT,
+      body: expect.objectContaining({text: 'h'}),
+    }));
 
     input.dispatchEvent(createInputEvent('beforeinput', {
       data: 'hé',
@@ -115,8 +115,8 @@ describe('keyboard panel', () => {
     jest.runOnlyPendingTimers();
 
     const transmittedText = socket.emit.mock.calls
-      .filter(([eventName]) => eventName === REMOTE_EVENT_KEYBOARD_TEXT)
-      .map(([, payload]) => payload.text)
+      .filter(([, payload]) => payload?.path === REMOTE_EVENT_KEYBOARD_TEXT)
+      .map(([, payload]) => payload.body.text)
       .join('');
     expect(transmittedText).toBe('hé');
     expect(input.value).toBe('');
@@ -129,14 +129,14 @@ describe('keyboard panel', () => {
     keyboard.liveTextInput.value = 'c';
     keyboard.liveTextInput.dispatchEvent(createInputEvent('input', {isComposing: false}));
 
-    expect(socket.emit).toHaveBeenCalledWith(
-      REMOTE_EVENT_KEYBOARD_KEY,
-      expect.objectContaining({key: 'c', modifiers: ['control']}),
-    );
-    expect(socket.emit).not.toHaveBeenCalledWith(
-      REMOTE_EVENT_KEYBOARD_TEXT,
-      expect.objectContaining({text: 'c'}),
-    );
+    expect(socket.emit).toHaveBeenCalledWith('route:request', expect.objectContaining({
+      path: REMOTE_EVENT_KEYBOARD_KEY,
+      body: expect.objectContaining({key: 'c', modifiers: ['control']}),
+    }));
+    expect(socket.emit).not.toHaveBeenCalledWith('route:request', expect.objectContaining({
+      path: REMOTE_EVENT_KEYBOARD_TEXT,
+      body: expect.objectContaining({text: 'c'}),
+    }));
   });
 
   it('provides dedicated copy and paste shortcuts', () => {
@@ -146,8 +146,8 @@ describe('keyboard panel', () => {
     keyboard.keyboardPaste.dispatchEvent(new Event('click'));
 
     const shortcutPayloads = socket.emit.mock.calls
-      .filter(([eventName]) => eventName === REMOTE_EVENT_KEYBOARD_KEY)
-      .map(([, payload]) => payload);
+      .filter(([, payload]) => payload?.path === REMOTE_EVENT_KEYBOARD_KEY)
+      .map(([, payload]) => payload.body);
     expect(shortcutPayloads).toEqual([
       expect.objectContaining({key: 'c', modifiers: ['control']}),
       expect.objectContaining({key: 'v', modifiers: ['control']}),
@@ -163,8 +163,8 @@ describe('keyboard panel', () => {
     keyboard.keyboardRight.dispatchEvent(new Event('click'));
 
     const arrowPayloads = socket.emit.mock.calls
-      .filter(([eventName]) => eventName === REMOTE_EVENT_KEYBOARD_KEY)
-      .map(([, payload]) => payload.key);
+      .filter(([, payload]) => payload?.path === REMOTE_EVENT_KEYBOARD_KEY)
+      .map(([, payload]) => payload.body.key);
     expect(arrowPayloads).toEqual(['left', 'up', 'down', 'right']);
   });
 });

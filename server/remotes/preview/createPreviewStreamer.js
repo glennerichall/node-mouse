@@ -66,7 +66,7 @@ export function createPreviewStreamer(services, runtime = {}) {
           } = captureAroundCursor(desktopController, frameWidth, frameHeight, screen);
           const frame = bgraToRgbaBuffer(capture, frameWidth, frameHeight);
           socket.volatile.emit(
-            'preview:frame',
+            'preview/frame',
             {
               width: frameWidth,
               height: frameHeight,

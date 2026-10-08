@@ -32,7 +32,9 @@ export function createSocketInputGuard({
 
   return function socketInputGuard(socket, next) {
     socket.use((packet, continuePacket) => {
-      const eventName = String(packet?.[0] || '');
+      const eventName = packet?.[0] === 'route:request'
+        ? String(packet?.[1]?.path || '')
+        : String(packet?.[0] || '');
       let serialized;
       try {
         serialized = JSON.stringify(packet);

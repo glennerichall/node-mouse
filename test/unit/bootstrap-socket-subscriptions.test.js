@@ -1,10 +1,9 @@
 import {jest} from '@jest/globals';
 import {bootstrapSocket} from '../../server/init/bootstrapSocket.js';
 
-describe('bootstrapSocket event subscriptions', () => {
-  it('uses the registered event subscription service for new channels', () => {
+describe('bootstrapSocket route builders', () => {
+  it('builds the route tree and attaches the service container to each request', async () => {
     const connectionHandlers = [];
-    const subscribe = jest.fn();
     const publishEvent = jest.fn();
     const io = {
       engine: {use: jest.fn()},
@@ -13,8 +12,18 @@ describe('bootstrapSocket event subscriptions', () => {
     };
     const services = {
       getServer: () => ({io, cookieParser: jest.fn()}),
-      getEventSubscriptions: () => ({subscribe}),
       getEvents: () => ({publishEvent}),
+      getInputController: () => ({mouse: {click: jest.fn()}, keyboard: {}, updateConfig: jest.fn()}),
+      getRemotes: () => ({
+        browser: {},
+        adminActions: {forceUpdateCheck: jest.fn().mockResolvedValue({ok: true, message: 'done'})},
+        qrActions: {},
+        preview: {},
+        samsung: {},
+        vlc: {},
+        windowActions: {},
+      }),
+      getConfig: () => ({}),
       getSystemConfig: () => ({
         protocol: 'http',
         allowedOrigins: [],
@@ -25,14 +34,15 @@ describe('bootstrapSocket event subscriptions', () => {
     };
 
     bootstrapSocket(services);
-    const socket = {id: 'client-123', on: jest.fn(), emit: jest.fn()};
+    const socket = {id: 'client-123', securityContext: {}, on: jest.fn(), emit: jest.fn()};
     connectionHandlers[0](socket);
 
-    expect(subscribe).toHaveBeenCalledWith(expect.objectContaining({
-      id: socket.id,
-      on: expect.any(Function),
-      emit: expect.any(Function),
-    }));
-    expect(subscribe.mock.calls[0][0]).not.toBe(socket);
+    const routeRequest = socket.on.mock.calls.find(([eventName]) => eventName === 'route:request')[1];
+    const response = jest.fn();
+    routeRequest({path: 'admin/update-check', method: 'POST', body: {}}, response);
+    await new Promise(resolve => setImmediate(resolve));
+
+    expect(response).toHaveBeenCalledWith({ok: true, message: 'done'});
+    expect(socket.on).toHaveBeenCalledWith('disconnect', expect.any(Function));
   });
 });

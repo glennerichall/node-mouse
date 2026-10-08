@@ -187,6 +187,15 @@ l'itération et devient append-only dès sa clôture.
   le channel fluent et sa réponse directe.
 - [ARCH-042](./arch-ARCH-042-2026-10-07.md): suppression du helper intermédiaire
   dans les callbacks QR.
+- [ARCH-043](./arch-ARCH-043-2026-10-07.md): adoption de `pillarjs/router`
+  pour router les paquets Socket.IO et passage des événements de transport à
+  une notation par chemins.
+- [ARCH-044](./arch-ARCH-044-2026-10-07.md): isolation et validation d'un
+  adaptateur routeur avant toute migration progressive des subscribers.
+- [ARCH-045](./arch-ARCH-045-2026-10-07.md): routeur global au bootstrap et
+  première migration du subscriber QR vers une factory de routes.
+- [ARCH-046](./arch-ARCH-046-2026-10-07.md): protocole `route:request` et
+  migration complète des subscribers en factories de routes.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

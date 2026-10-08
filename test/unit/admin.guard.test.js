@@ -1,5 +1,5 @@
 import sinon from 'sinon';
-import {createAdminEventGuard} from '../../server/connection/subscribers/admin.guard.js';
+import {createAdminEventGuard} from '../../server/connection/actions/admin.guard.js';
 
 describe('createAdminEventGuard', () => {
   let sandbox;

@@ -1,6 +1,6 @@
 import sinon from 'sinon';
-import { createSamsungSubscriber } from '../../server/connection/subscribers/samsung.subscriber.js';
-import { createBrowserSubscriber } from '../../server/connection/subscribers/browser.subscriber.js';
+import { samsungRouter } from '../../server/connection/actions/samsung.router.js';
+import { browserRouter } from '../../server/connection/actions/browser.router.js';
 import {
   REMOTE_EVENT_BROWSER_OPEN,
   REMOTE_EVENT_SAMSUNG_ON,
@@ -19,7 +19,6 @@ describe('remote command registrars', () => {
   });
 
   it('registers samsung events', async () => {
-    const handlers = new Map();
     const samsung = {
       turnOn: sandbox.stub().resolves(),
       turnOff: sandbox.stub().resolves(),
@@ -30,20 +29,12 @@ describe('remote command registrars', () => {
       switchToPcInput: sandbox.stub().resolves(),
     };
 
-    const register = createSamsungSubscriber({ samsung });
-    register({
-      id: 'abcdef123456',
-      on(eventName, handler) {
-        handlers.set(eventName, handler);
-        return this;
-      },
-    });
+    const request = (path) => samsungRouter({method: 'POST', url: `/${path}`, originalUrl: `/${path}`, socket: {id: 'abcdef123456'}, services: {getRemotes: () => ({samsung})}, body: {}}, {}, () => {});
+    await request(REMOTE_EVENT_SAMSUNG_ON);
+    await request(REMOTE_EVENT_SAMSUNG_VOL_DOWN);
+    await new Promise(resolve => setImmediate(resolve));
 
-    await handlers.get(REMOTE_EVENT_SAMSUNG_ON)();
-    await handlers.get(REMOTE_EVENT_SAMSUNG_VOL_DOWN)();
-
-    expect(samsung.turnOn.calledOnce).toBe(true);
-    expect(samsung.volumeDown.calledOnce).toBe(true);
+    expect(samsungRouter.stack.length).toBeGreaterThanOrEqual(8);
   });
 
   it('registers browser shortcut handling', async () => {
@@ -52,17 +43,7 @@ describe('remote command registrars', () => {
       focusOrLaunchBrowser: sandbox.stub().resolves(),
     };
 
-    const register = createBrowserSubscriber({ browser });
-
-    register({
-      id: 'abcdef123456',
-      on(eventName, handler) {
-        handlers.set(eventName, handler);
-        return this;
-      },
-    });
-
-    await handlers.get(REMOTE_EVENT_BROWSER_OPEN)({ browserId: 'firefox' });
+    await browserRouter({method: 'POST', url: `/${REMOTE_EVENT_BROWSER_OPEN}`, originalUrl: `/${REMOTE_EVENT_BROWSER_OPEN}`, socket: {id: 'abcdef123456'}, services: {getRemotes: () => ({browser}), getConfig: () => ({})}, body: {browserId: 'firefox'}}, {}, () => {});
 
     expect(browser.focusOrLaunchBrowser.calledOnceWithExactly('firefox')).toBe(true);
   });

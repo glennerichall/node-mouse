@@ -121,7 +121,7 @@ export function bindPreviewStream(services, dom) {
     setKeyboardPreviewActive(Boolean(value));
   });
 
-  socket.on('preview:frame', onPreviewFrame);
+  socket.on('preview/frame', onPreviewFrame);
   socket.on('disconnect', stopPreview);
   window.addEventListener('beforeunload', stopPreview);
   clientConfig.onChange(() => {

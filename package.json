@@ -1,6 +1,6 @@
 {
   "name": "@velor/remote-mouse",
-  "version": "6.19.42",
+  "version": "6.19.47",
   "type": "module",
   "description": "Remote mouse and keyboard with mobile client",
   "homepage": "https://github.com/glennerichall/node-mouse#readme",
@@ -53,6 +53,7 @@
     "proxy-addr": "^2.0.7",
     "qrcode": "^1.5.4",
     "qrcode-terminal": "^0.12.0",
+    "router": "^2.2.0",
     "samsung-tv-remote": "^3.0.4",
     "socket.io": "^4.8.1",
     "yargs": "^15.4.1"

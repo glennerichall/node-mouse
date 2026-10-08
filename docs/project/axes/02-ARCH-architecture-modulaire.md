@@ -307,7 +307,7 @@ et les tests avant son implémentation.
 
 **Modules concernés:**
 
-- `server/connection/subscribers/` pour l'ensemble des adapters de souscription
+- `../../../server/connection/actions` pour l'ensemble des adapters de souscription
   aux événements de transport;
 - `server/services/transport/createEventSubscriptionService.js` pour la
   composition des subscribers;
@@ -316,7 +316,7 @@ et les tests avant son implémentation.
 **Critères d'acceptation:**
 
 - les subscribers d'entrée, de remotes et de connexion sont regroupés sous
-  `server/connection/subscribers/`;
+  `../../../server/connection/actions`;
 - les actions métier restent dans `server/remotes/` et ne sont pas déplacées
   dans cette consolidation;
 - les imports du service et des tests utilisent les nouveaux chemins sans
@@ -329,7 +329,7 @@ et les tests avant son implémentation.
 
 **Modules concernés:**
 
-- `server/connection/subscribers/admin.subscriber.js` pour la réponse des
+- `../../../server/connection/actions` pour la réponse des
   actions administrateur;
 - tests unitaires du subscriber administrateur.
 
@@ -348,12 +348,12 @@ et les tests avant son implémentation.
 
 **Modules concernés:**
 
-- `server/connection/subscribers/admin.guard.js` et
-  `server/connection/subscribers/admin.subscriber.js` pour le montage local
+- `../../../server/connection/actions` et
+  `../../../server/connection/actions` pour le montage local
   des guards administrateur;
 - `server/services/transport/sendActionResponse.js` pour la forme commune des
   réponses d'action;
-- `server/connection/subscribers/qr.subscriber.js` et l'adapter Socket.IO;
+- `../../../server/connection/actions` et l'adapter Socket.IO;
 - tests des guards, subscribers et du bootstrap Socket.IO.
 
 **Critères d'acceptation:**
@@ -372,7 +372,7 @@ et les tests avant son implémentation.
 
 - `server/connection/socket/createSocketChannelAdapter.js` pour la
   normalisation du payload et le chaînage fluent;
-- `server/connection/subscribers/admin.subscriber.js` pour la composition
+- `../../../server/connection/actions` pour la composition
   directe des appels `channel.on`;
 - subscribers d'entrée, navigateur et VLC pour la suppression des valeurs par
   défaut transport-spécifiques;
@@ -411,7 +411,7 @@ et les tests avant son implémentation.
 
 **Modules concernés:**
 
-- `server/connection/subscribers/qr.subscriber.js`;
+- `../../../server/connection/actions`;
 - test du subscriber QR et contrat fluent du channel.
 
 **Critères d'acceptation:**
@@ -426,7 +426,7 @@ et les tests avant son implémentation.
 
 **Modules concernés:**
 
-- `server/connection/subscribers/qr.subscriber.js`;
+- `../../../server/connection/actions`;
 - test du subscriber QR.
 
 **Critères d'acceptation:**
@@ -434,6 +434,100 @@ et les tests avant son implémentation.
 - aucun helper intermédiaire ne masque les callbacks QR;
 - chaque événement est visible directement dans la chaîne `channel.on`;
 - chaque callback utilise le payload fourni et la réponse du channel;
+- la suite complète reste verte et la version patch est incrémentée.
+
+## ARCH-043 — Routage commun des événements par `pillarjs/router`
+
+**Modules concernés:**
+
+- `server/connection/socket/createSocketChannelAdapter.js` pour le pont
+  Socket.IO vers une instance de routeur middleware;
+- `utils/remoteCommands.js` et les événements de prévisualisation pour la
+  convention de chemins (`admin/update-check`, `mouse/move`, etc.);
+- tests unitaires du channel et du bootstrap Socket.IO;
+- dépendances npm et documentation d'architecture.
+
+**Critères d'acceptation:**
+
+- l'adaptateur retourne directement une instance fonctionnelle de
+  `pillarjs/router`, enrichie du contrat `id`, `securityContext`, `on` et
+  `emit`;
+- chaque abonnement `channel.on(event, ...callbacks)` devient une route
+  middleware, avec prise en charge des guards et du chaînage `next`;
+- le middleware `socket.use` transforme les paquets Socket.IO en requêtes
+  synthétiques envoyées au routeur, puis relaie les erreurs à `next`;
+- les événements de transport utilisent une notation par chemin séparé par
+  `/`, sans modifier les permissions ou les topics internes du serveur;
+- la suite complète reste verte et la version patch est incrémentée.
+
+## ARCH-044 — Adaptateur routeur isolé et migration progressive
+
+**Modules concernés:**
+
+- `server/services/transport/createRouterChannelAdapter.js` pour l'adaptateur
+  indépendant du transport;
+- `server/connection/socket/createSocketChannelAdapter.js` pour conserver le
+  comportement Socket.IO éprouvé pendant la migration;
+- tests unitaires du nouvel adaptateur et de son contrat middleware.
+
+**Critères d'acceptation:**
+
+- le nouvel adaptateur est testable sans Socket.IO et retourne une instance
+  `pillarjs/router` enrichie du contrat de channel;
+- son entrée `dispatch` transforme un événement en requête synthétique et
+  permet d'utiliser `channel.use` pour les guards;
+- l'adaptateur Socket.IO existant reste inchangé pendant cette phase;
+- aucun subscriber n'est basculé implicitement: les migrations seront faites
+  une par une après validation de cet adaptateur;
+- les tests ciblés et la suite complète restent verts, avec bump patch.
+
+## ARCH-045 — Routeur Socket.IO global et factories de routes
+
+**Modules concernés:**
+
+- `server/init/bootstrapSocket.js` pour le routeur partagé et le pont
+  `socket.use`;
+- `server/services/transport/createEventSubscriptionService.js` pour séparer
+  l'enregistrement des routes des abonnements Socket.IO historiques;
+- `../../../server/connection/actions` comme première factory de
+  routes migrée;
+- tests du bootstrap, du registre d'événements et de la factory QR.
+
+**Critères d'acceptation:**
+
+- un seul routeur est créé au bootstrap et toutes les routes migrées y sont
+  enregistrées avant les connexions;
+- `socket.use(([event, ...args], next) => ...)` construit une requête avec le
+  socket, le payload et la réponse, puis appelle le routeur global;
+- la factory QR utilise directement `router.post` et le contexte de
+  `request.socket`;
+- les subscribers non migrés continuent d'utiliser l'adaptateur Socket.IO
+  existant sans régression;
+- la suite complète reste verte et la version patch est incrémentée.
+
+## ARCH-046 — Protocole `route:request` et migration complète des subscribers
+
+**Modules concernés:**
+
+- `server/init/bootstrapSocket.js` pour le routeur global par connexion et le
+  listener Socket.IO `route:request`;
+- tous les fichiers `../../../server/connection/actions` pour les
+  factories `router.post`;
+- `client/core/socket-emit.js` et le transport Socket.IO pour le nouveau
+  paquet `{path, method, body}`;
+- guards de timestamp et de taille/rate-limit pour lire le chemin encapsulé;
+- tests unitaires des factories et du protocole.
+
+**Critères d'acceptation:**
+
+- aucun subscriber ne s'enregistre plus avec `channel.on(event, ...)`;
+- chaque subscriber routeur exporte directement une instance `*.router.js`
+  montée sur le routeur global;
+- les commandes client passent exclusivement par `route:request`;
+- le serveur reçoit `route:request` avec `{path, method, body}` et transmet la
+  requête au routeur;
+- les guards de transport conservent validation de timestamp, taille et
+  limitation des routes administratives;
 - la suite complète reste verte et la version patch est incrémentée.
 
 ## ARCH-023 — Handlers d'actions administrateur

@@ -15,13 +15,16 @@ export function socketTimestampGuardMiddleware({
   let observedClockOffsetMs = null;
 
   return function enforceSocketEventTimestamp(packet, next) {
-    const [, payload] = packet;
-    const ts = payload && typeof payload === 'object'
-      ? Number(payload.ts)
+    const [packetEvent, payload] = packet;
+    const route = packetEvent === 'route:request' ? payload : undefined;
+    const body = route?.body ?? payload;
+    const event = route?.path ?? packetEvent;
+    const ts = body && typeof body === 'object'
+      ? Number(body.ts)
       : NaN;
 
     if (!Number.isFinite(ts)) {
-      log.warn({ socketId, event: packet[0] }, 'Socket message has no timestamp');
+      log.warn({ socketId, event }, 'Socket message has no timestamp');
       next(new Error('missing_timestamp'));
       return;
     }
@@ -29,14 +32,14 @@ export function socketTimestampGuardMiddleware({
     const rawDeltaMs = Date.now() - ts;
     if (observedClockOffsetMs == null && Math.abs(rawDeltaMs) <= maxClockSkewMs) {
       observedClockOffsetMs = rawDeltaMs;
-      log.info({ socketId, event: packet[0], observedClockOffsetMs }, 'Socket clock calibrated');
+      log.info({ socketId, event, observedClockOffsetMs }, 'Socket clock calibrated');
     }
 
     const ageMs = rawDeltaMs - (observedClockOffsetMs || 0);
     if (ageMs > maxEventAgeMs) {
       log.warn({
         socketId,
-        event: packet[0],
+        event,
         ageMs,
         rawDeltaMs,
         observedClockOffsetMs,
