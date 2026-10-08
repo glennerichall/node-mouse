@@ -115,6 +115,7 @@ export const DEFAULT_PERSISTED_CONFIG = {
         width: 128,
         height: 84,
         fps: 6,
+        maxFps: 30,
         hideDelayMs: 10000,
     },
     notifications: {

@@ -4,7 +4,7 @@ import {createPreviewStreamer} from '../../server/remotes/preview/createPreviewS
 function createFixture(options = {
   platform: 'linux',
   env: {XDG_SESSION_TYPE: 'x11', DISPLAY: ':0'},
-}) {
+}, preview = {width: 2, height: 2, fps: 20}) {
   const capture = jest.fn(() => ({image: Buffer.alloc(16), byteWidth: 8}));
   const getScreenInfo = jest.fn(async () => ({width: 1920, height: 1080}));
   const queuedFrames = [];
@@ -21,7 +21,7 @@ function createFixture(options = {
     },
   };
   const streamer = createPreviewStreamer({
-    getConfig: () => ({preview: {width: 2, height: 2, fps: 20}}),
+    getConfig: () => ({preview}),
     getDesktopController: () => ({getMousePos: () => ({x: 100, y: 100}), screen: {capture}}),
     getSystem: () => ({getScreenInfo}),
   }, options);
@@ -55,6 +55,38 @@ describe('preview streamer', () => {
     const session = streamer.startForSocket(socket);
     await jest.advanceTimersByTimeAsync(50);
     expect(queuedFrames).toHaveLength(0);
+    session.stop();
+  });
+
+  it('clamps capture dimensions to the available screen and supports 30 FPS', async () => {
+    const {streamer, socket, capture, queuedFrames, getScreenInfo} = createFixture(
+      undefined,
+      {width: 4000, height: 2000, fps: 30},
+    );
+    getScreenInfo.mockResolvedValue({width: 320, height: 200});
+    const session = streamer.startForSocket(socket);
+
+    await jest.advanceTimersByTimeAsync(34);
+
+    expect(capture).toHaveBeenCalledWith(0, 0, 320, 200);
+    expect(queuedFrames[0][1]).toEqual(expect.objectContaining({
+      width: 320,
+      height: 200,
+    }));
+    session.stop();
+  });
+
+  it('uses the configured maximum FPS instead of a source-code constant', async () => {
+    const {streamer, socket, capture} = createFixture(
+      undefined,
+      {width: 2, height: 2, fps: 30, maxFps: 10},
+    );
+    const session = streamer.startForSocket(socket);
+
+    await jest.advanceTimersByTimeAsync(50);
+    expect(capture).not.toHaveBeenCalled();
+    await jest.advanceTimersByTimeAsync(50);
+    expect(capture).toHaveBeenCalled();
     session.stop();
   });
 

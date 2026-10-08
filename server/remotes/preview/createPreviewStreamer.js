@@ -29,8 +29,15 @@ export function createPreviewStreamer(services, runtime = {}) {
       }
 
       const previewConfig = getPreviewConfig();
-      const fps = Number(previewConfig.fps) || DEFAULT_PERSISTED_CONFIG.preview.fps;
-      const intervalMs = Math.max(50, Math.round(1000 / fps));
+      const maxFps = Math.max(
+        1,
+        Number(previewConfig.maxFps) || DEFAULT_PERSISTED_CONFIG.preview.maxFps,
+      );
+      const fps = Math.min(
+        maxFps,
+        Math.max(1, Number(previewConfig.fps) || DEFAULT_PERSISTED_CONFIG.preview.fps),
+      );
+      const intervalMs = Math.max(1, Math.round(1000 / fps));
 
       timer = setTimeout(async () => {
         timer = null;
@@ -46,8 +53,6 @@ export function createPreviewStreamer(services, runtime = {}) {
         try {
           const desktopController = services.getDesktopController();
           const currentPreviewConfig = getPreviewConfig();
-          const frameWidth = Number(currentPreviewConfig.width) || DEFAULT_PERSISTED_CONFIG.preview.width;
-          const frameHeight = Number(currentPreviewConfig.height) || DEFAULT_PERSISTED_CONFIG.preview.height;
           const screen = await services.getSystem().getScreenInfo();
           if (!active || !socket.connected) {
             return;
@@ -55,6 +60,14 @@ export function createPreviewStreamer(services, runtime = {}) {
           if (!screen) {
             throw new Error('Screen size unavailable');
           }
+          const frameWidth = Math.min(
+            Math.max(1, Number(currentPreviewConfig.width) || DEFAULT_PERSISTED_CONFIG.preview.width),
+            Math.max(1, Number(screen.width) || 1),
+          );
+          const frameHeight = Math.min(
+            Math.max(1, Number(currentPreviewConfig.height) || DEFAULT_PERSISTED_CONFIG.preview.height),
+            Math.max(1, Number(screen.height) || 1),
+          );
           const {
             capture,
             x,

@@ -103,6 +103,13 @@ export const CONFIG_SCHEMA = {
         max: 30,
         step: 1,
       },
+      maxFps: {
+        label: 'FPS maximal',
+        type: 'integer',
+        min: 1,
+        max: 120,
+        step: 1,
+      },
       hideDelayMs: {
         label: 'Delai de masque (ms)',
         type: 'integer',

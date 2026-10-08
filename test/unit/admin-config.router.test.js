@@ -65,9 +65,12 @@ describe('admin config router helpers', () => {
 
   it('validates API values with the field range and type', () => {
     const schema = getConfigValueSchema('preview.fps');
+    const maxFpsSchema = getConfigValueSchema('preview.maxFps');
 
     expect(schema.validate('12').value).toBe(12);
     expect(schema.validate('0').error).toBeTruthy();
     expect(schema.validate('not-a-number').error).toBeTruthy();
+    expect(maxFpsSchema.validate('60').value).toBe(60);
+    expect(maxFpsSchema.validate('121').error).toBeTruthy();
   });
 });

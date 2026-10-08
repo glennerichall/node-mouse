@@ -28,6 +28,7 @@ export const CONFIG_PATHS = [
     'preview.width',
     'preview.height',
     'preview.fps',
+    'preview.maxFps',
     'preview.hideDelayMs',
     'notifications.ttlMs',
     ...getNotificationPaths(),

@@ -20,6 +20,11 @@ et assurer un cycle de vie robuste du serveur et des connexions.
 - [x] **REL-003 — délais par transport:** configurer les tentatives, délais de
   reconnexion et heartbeat Socket.IO depuis la configuration serveur, exposer
   cette configuration au client et vérifier les bornes avec des tests.
+- [x] **REL-004 — prévisualisation adaptative:** borner la résolution capturée
+  à l'écran disponible, respecter la cadence configurée jusqu'à 30 FPS et
+  conserver une seule frame en vol lorsque le transport est saturé, avec une
+  implantation de capture réutilisable par les environnements X11 et
+  Wayland/XWayland compatibles.
 - [ ] Mesurer la latence souris/clavier; traiter mouvements obsolètes et backpressure.
 - [ ] Fiabiliser reconnexion après veille, changement Wi-Fi et redémarrage.
 - [ ] Rendre délais et heartbeats configurables par transport.

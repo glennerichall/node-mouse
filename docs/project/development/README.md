@@ -208,6 +208,10 @@ l'itération et devient append-only dès sa clôture.
   uinput après redémarrage du service.
 - [REL-003](./rel-REL-003-2026-10-08.md): configuration des délais de
   reconnexion et du heartbeat Socket.IO.
+- [REL-004](./rel-REL-004-2026-10-08.md): bornes de capture et cadence
+  adaptative de la prévisualisation.
+- [REL-004a](./rel-REL-004a-2026-10-08.md): limite maximale de cadence rendue
+  configurable et protégée par un test de non-régression.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.
