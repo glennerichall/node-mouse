@@ -16,7 +16,7 @@ function isBrowserEnabled(config, browserId) {
 const eventLog = getModuleLog();
 export const browserRouter = Router()
     .post(`/open`,
-        async (request, _response, next) => {
+        async (request, response, next) => {
             const browserId = typeof request.body?.browserId === 'string' ? request.body.browserId : 'brave';
             const browser = request.services.getRemotes().browser;
             const getConfig = request.services.getConfig;
@@ -24,12 +24,12 @@ export const browserRouter = Router()
             
             if (!isBrowserEnabled(getConfig(), browserId)) {
                 eventLog.info({client, browserId}, 'Browser ignored: disabled by configuration.');
-                next();
+                response.send({ok: true, ignored: true});
                 return;
             }
             
             eventLog.info({client, browserId}, `Demande open`);
             await browser.focusOrLaunchBrowser(browserId);
             
-            next();
+            response.send({ok: true});
         });

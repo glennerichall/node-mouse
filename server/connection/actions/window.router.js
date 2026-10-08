@@ -1,8 +1,4 @@
 import {createLogger} from '../../application/logger.js';
-import {
-    REMOTE_EVENT_WINDOW_CLOSE,
-    REMOTE_EVENT_WINDOW_TOGGLE_MAXIMIZE
-} from '../../../utils/remoteCommands.js';
 import {getClientLabel} from '../client-channel.js';
 import Router from 'router';
 
@@ -16,16 +12,16 @@ function getModuleLog() {
 const eventLog = getModuleLog();
 export const windowRouter = Router()
     
-    .post(`/toggle-maximize`, async (request, _response, next) => {
+    .post(`/toggle-maximize`, async (request, response) => {
         eventLog.info({client: getClientLabel(request.socket)}, `Demande toggle-maximize`);
         const windowActions = request.services.getRemotes().windowActions;
         await windowActions.toggleMaximizeMinimize();
-        next();
+      response.send({ok: true});
     })
 
-    .post(`/close`, async (request, _response, next) => {
+    .post(`/close`, async (request, response) => {
         eventLog.info({client: getClientLabel(request.socket)}, `Demande close`);
         const windowActions = request.services.getRemotes().windowActions;
         await windowActions.closeActiveWindow();
-        next();
+      response.send({ok: true});
     });

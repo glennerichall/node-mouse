@@ -9,18 +9,18 @@ const stop = (socket) => {
     }
 };
 export const previewRouter = Router()
-    .post(`/start`, (request, _response, next) => {
+    .post(`/start`, (request, response) => {
         const socket = request.socket;
         const preview = request.services.getRemotes().preview;
         const getConfig = request.services.getConfig;
         if (getConfig()?.preview?.enabled !== false && preview?.isAvailable?.() !== false && !sessions.has(socket)) {
             sessions.set(socket, preview.startForSocket(socket));
         }
-        next();
+        response.send({ok: true});
     })
-    .post(`/stop`, (request, _response, next) => {
+    .post(`/stop`, (request, response) => {
         stop(request.socket);
-        next();
+        response.send({ok: true});
     });
 
 export function registerPreviewConnection(socket) {

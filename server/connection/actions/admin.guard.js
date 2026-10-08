@@ -16,7 +16,9 @@ export function createAdminEventGuard({
       : {allowed: configuredAdmin};
     const isAdminActionsEnabled = configuredEnabled ?? getSystemConfig(request).adminActionsEnabled;
     const isAdmin = configuredAdmin ?? authorization.allowed;
-    const reply = typeof response === 'function' ? response : response.response;
+    const reply = typeof response === 'function'
+      ? response
+      : (payload) => response.status(403).send(payload);
     if (!isAdmin) {
       log.warn({client}, 'Admin action rejected: insufficient role');
       reply?.({

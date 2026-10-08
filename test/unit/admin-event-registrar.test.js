@@ -1,5 +1,6 @@
 import sinon from 'sinon';
 import {adminRouter} from '../../server/connection/actions/admin.router.js';
+import {createSocketResponse} from '../../server/connection/socket/socket-response.adapter.js';
 import {
   REMOTE_EVENT_ADMIN_UPDATE_CHECK,
 } from '../../utils/remoteCommands.js';
@@ -25,7 +26,7 @@ describe('adminRouter', () => {
       },
       log: {info() {}},
       body: {},
-    }, {response}, () => {});
+    }, createSocketResponse(response), () => {});
 
     expect(adminActions.forceUpdateCheck.calledOnceWithExactly({
       clientId: channel.id,

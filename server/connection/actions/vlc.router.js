@@ -1,10 +1,4 @@
 import {createLogger} from '../../application/logger.js';
-import {
-    REMOTE_EVENT_VLC_COMMAND,
-    REMOTE_EVENT_VLC_OPEN,
-    REMOTE_EVENT_VLC_WINDOW_CLOSE,
-    REMOTE_EVENT_VLC_WINDOW_TOGGLE
-} from '../../../utils/remoteCommands.js';
 import {getClientLabel} from '../client-channel.js';
 import Router from 'router';
 
@@ -28,38 +22,38 @@ function isVlcEnabled(config) {
 const eventLog = getModuleLog();
 export const vlcRouter = Router()
 const getVlc = (request) => request.services.getRemotes().vlc;
-export const ensureVlcUsable = async (request, _response, next) => {
+export const ensureVlcUsable = async (request, response, next) => {
     const vlc = getVlc(request);
     const getConfig = request.services.getConfig;
     if (!(await vlc.isAvailable())) {
         eventLog.info({client: getClientLabel(request.socket)}, 'VLC ignored: unavailable on host.');
-        next('route');
+        response.send({ok: false, ignored: true});
         return;
     }
     if (!isVlcEnabled(getConfig())) {
         eventLog.info({client: getClientLabel(request.socket)}, 'VLC ignored: disabled by configuration.');
-        next('route');
+        response.send({ok: false, ignored: true});
         return;
     }
     next();
 };
 vlcRouter
-    .post(`/open`, ensureVlcUsable, async (request, _response, next) => {
+    .post(`/open`, ensureVlcUsable, async (request, response) => {
         await getVlc(request).focusOrLaunch();
-        next();
+        response.send({ok: true});
     })
-    .post(`/command`, ensureVlcUsable, async (request, _response, next) => {
+    .post(`/command`, ensureVlcUsable, async (request, response) => {
         const vlc = getVlc(request);
         const command = VLC_ACTIONS[request.body?.action];
         const keyboard = request.services.getInputController().keyboard;
         if (command && await vlc.focusOrLaunch()) await keyboard.pressSpecialKey(command.key, command.modifiers);
-        next();
+        response.send({ok: true});
     })
-    .post(`/window-toggle`, ensureVlcUsable, async (request, _response, next) => {
+    .post(`/window-toggle`, ensureVlcUsable, async (request, response) => {
         await getVlc(request).toggleWindow();
-        next();
+        response.send({ok: true});
     })
-    .post(`/window-close`, ensureVlcUsable, async (request, _response, next) => {
+    .post(`/window-close`, ensureVlcUsable, async (request, response) => {
         await getVlc(request).closeWindow();
-        next();
+        response.send({ok: true});
     });

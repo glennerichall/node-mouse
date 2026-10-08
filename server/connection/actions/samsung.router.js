@@ -5,50 +5,50 @@ import Router from 'router';
 const log = createLogger('samsung:remote');
 
 export const samsungRouter = Router()
-    .post(`/on`, async (request, _response, next) => {
+    .post(`/on`, async (request, response) => {
         log.info({client: getClientLabel(request.socket)}, `Demande on`);
         await request.services.getRemotes().samsung.turnOn();
-        next();
+        response.send({ok: true});
     })
     
-    .post(`/off`, async (request, _response, next) => {
+    .post(`/off`, async (request, response) => {
         log.info({client: getClientLabel(request.socket)}, `Demande off`);
         await request.services.getRemotes().samsung.turnOff();
-        next();
+        response.send({ok: true});
     })
 
-    .post(`/volup`, async (request, _response, next) => {
+    .post(`/volup`, async (request, response) => {
         log.info({client: getClientLabel(request.socket)}, `Demande volup`);
         await request.services.getRemotes().samsung.volumeUp();
-        next();
+        response.send({ok: true});
     })
 
-    .post(`/voldown`, async (request, _response, next) => {
+    .post(`/voldown`, async (request, response) => {
         log.info({client: getClientLabel(request.socket)}, `Demande voldown`);
         await request.services.getRemotes().samsung.volumeDown();
-        next();
+        response.send({ok: true});
     })
 
-    .post(`/mute`, async (request, _response, next) => {
+    .post(`/mute`, async (request, response) => {
         log.info({client: getClientLabel(request.socket)}, `Demande mute`);
         await request.services.getRemotes().samsung.mute();
-        next();
+        response.send({ok: true});
     })
 
-    .post(`/input`, async (request, _response, next) => {
+    .post(`/input`, async (request, response) => {
         log.info({client: getClientLabel(request.socket)}, `Demande input`);
         await request.services.getRemotes().samsung.switchInput();
-        next();
+        response.send({ok: true});
     })
 
-    .post(`/enter`, async (request, _response, next) => {
+    .post(`/enter`, async (request, response) => {
         log.info({client: getClientLabel(request.socket)}, `Demande enter`);
         await request.services.getRemotes().samsung.confirm();
-        next();
+        response.send({ok: true});
     })
 
-    .post(`/pc-input`, async (request, _response, next) => {
+    .post(`/pc-input`, async (request, response) => {
         log.info({client: getClientLabel(request.socket)}, `Demande pc-input`);
         await request.services.getRemotes().samsung.switchToPcInput();
-        next();
+        response.send({ok: true});
     });

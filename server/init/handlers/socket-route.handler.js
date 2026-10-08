@@ -2,6 +2,7 @@ import {registerConnection} from "../../connection/actions/connection.subscriber
 import {registerPreviewConnection} from "../../connection/actions/preview.router.js";
 import {socketRouter} from "../routers/socket.router.js";
 import {createLogger} from "../../application/logger.js";
+import {createSocketResponse} from '../../connection/socket/socket-response.adapter.js';
 
 /** Normalize the Socket.IO route packet to the request shape expected by router. */
 export function eventRequest(socket, payload) {
@@ -23,11 +24,11 @@ export function createSocketRouteHandler({services, router}) {
     };
 
     return (socket, payload, response) => {
-    const request = eventRequest(socket, payload);
-    request.services = services;
-    request.securityContext = socket.securityContext;
-    request.log = services.getLogger?.() ?? createLogger('socket:request').child({socketId: socket.id});
-        router(request, {response}, finalhandler);
+        const request = eventRequest(socket, payload);
+        request.services = services;
+        request.securityContext = socket.securityContext;
+        request.log = services.getLogger?.() ?? createLogger('socket:request').child({socketId: socket.id});
+        router(request, createSocketResponse(response), finalhandler);
     };
 }
 

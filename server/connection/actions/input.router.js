@@ -12,29 +12,29 @@ const getMove = (request, mouse) => {
     return move;
 };
 export const mouseRouter = Router()
-    .post(`/move`, async (request, _response, next) => {
+    .post(`/move`, async (request, response) => {
         const {mouse} = getInput(request);
-        await getMove(request, mouse)(request.body);
-        next();
+        getMove(request, mouse)(request.body);
+        response.send({ok: true});
     })
-    .post(`/click`, (request, _response, next) => {
+    .post(`/click`, (request, response) => {
         getInput(request).mouse.click(request.body.button);
-        next();
+        response.send({ok: true});
     })
-    .post(`/button`, (request, _response, next) => {
+    .post(`/button`, (request, response) => {
         getInput(request).mouse.setButtonState(request.body.button, request.body.state);
-        next();
+        response.send({ok: true});
     })
-    .post(`/scroll`, (request, _response, next) => {
+    .post(`/scroll`, (request, response) => {
         getInput(request).mouse.scroll(Number(request.body.dy) || 0);
-        next();
+        response.send({ok: true});
     })
 export const keyboardRouter = Router()
-    .post(`/text`, (request, _response, next) => {
+    .post(`/text`, (request, response) => {
         getInput(request).keyboard.typeText(request.body.text);
-        next();
+        response.send({ok: true});
     })
-    .post(`/key`, (request, _response, next) => {
+    .post(`/key`, (request, response) => {
         getInput(request).keyboard.pressSpecialKey(request.body.key, request.body.modifiers);
-        next();
+        response.send({ok: true});
     });

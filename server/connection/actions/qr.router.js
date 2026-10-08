@@ -21,11 +21,10 @@ export const qrRouter = Router()
         const qrActions = getQrActions(request);
         eventLog.info({client}, `Demande open-browser-server`);
         const result = await qrActions.openQrBrowserServer({clientId: getClientId(request.socket)});
-        response.response({
+        response.status(200).send({
             ok: Boolean(result.ok),
             message: result.message
         });
-        next();
     })
 
     .post(`/open-browser-client`, async (request, response, next) => {
@@ -33,11 +32,10 @@ export const qrRouter = Router()
         const qrActions = getQrActions(request);
         eventLog.info({client}, `Demande open-browser-client`);
         const result = await qrActions.openQrBrowserClient({clientId: getClientId(request.socket)});
-        response.response({
+        response.status(200).send({
             ok: Boolean(result.ok),
             message: result.message
         });
-        next();
     })
 
     .post(`/rotate-entry-token`, async (request, response, next) => {
@@ -45,11 +43,10 @@ export const qrRouter = Router()
         const qrActions = getQrActions(request);
         eventLog.info({client}, `Demande rotate-entry-token`);
         const result = await qrActions.rotateEntryToken({clientId: getClientId(request.socket)});
-        response.response({
+        response.status(200).send({
             ok: Boolean(result.ok),
             message: result.message
         });
-        next();
     })
 
     .post(`/toggle-overlay`, async (request, response, next) => {
@@ -57,9 +54,8 @@ export const qrRouter = Router()
         const qrActions = getQrActions(request);
         eventLog.info({client}, `Demande toggle-overlay`);
         const result = await qrActions.toggleQrOverlay({clientId: getClientId(request.socket)});
-        response.response({
+        response.status(200).send({
             ok: Boolean(result.ok),
             message: result.message
         });
-        next();
     });
