@@ -38,11 +38,21 @@ export function createXWaylandOverlayClient(options, dependencies = {}) {
   };
   child.once?.('exit', markClosed);
   child.once?.('error', markClosed);
+  child.stdin?.on?.('error', (error) => {
+    markClosed();
+    if (error.code !== 'EPIPE') child.emit?.('error', error);
+    if (!child.killed) child.kill('SIGTERM');
+  });
 
   function send(command) {
     if (closed || !child.stdin?.writable) return false;
-    child.stdin.write(`${command}\n`);
-    return true;
+    try {
+      child.stdin.write(`${command}\n`);
+      return true;
+    } catch {
+      markClosed();
+      return false;
+    }
   }
 
   return {

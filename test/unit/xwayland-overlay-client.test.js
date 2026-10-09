@@ -10,7 +10,9 @@ function createChild() {
   child.stdout = new EventEmitter();
   child.stdout.setEncoding = jest.fn();
   child.stderr = new EventEmitter();
-  child.stdin = {writable: true, write: jest.fn()};
+  child.stdin = new EventEmitter();
+  child.stdin.writable = true;
+  child.stdin.write = jest.fn();
   child.kill = jest.fn();
   child.killed = false;
   return child;
@@ -47,5 +49,19 @@ describe('X11/XWayland QR overlay helper client', () => {
       'UPDATE /tmp/qr.png 10 15 200 800 0\n',
       'CLOSE\n',
     ]);
+  });
+
+  it('does not crash when the helper pipe emits EPIPE during shutdown', () => {
+    const child = createChild();
+    child.stdin.write.mockImplementation(() => {
+      child.stdin.emit('error', Object.assign(new Error('write EPIPE'), {code: 'EPIPE'}));
+    });
+    const client = createXWaylandOverlayClient({
+      qrPath: '/tmp/qr.png', x: 100, y: 20, size: 175, showDelayMs: 1200, autoHide: true,
+    }, {spawnProcess: () => child, helperPath: '/app/overlay'});
+
+    expect(() => client.close()).not.toThrow();
+    expect(client.getState()).toBe('closed');
+    expect(child.kill).toHaveBeenCalledWith('SIGTERM');
   });
 });

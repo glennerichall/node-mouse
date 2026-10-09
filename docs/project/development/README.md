@@ -50,6 +50,8 @@ l'itération et devient append-only dès sa clôture.
   OS.
 - [Exploitation — OPS-001](./operations-OPS-001-2026-10-02.md): commande CLI
   locale affichant la version du paquet installé.
+- [Exploitation — OPS-004](./ops-OPS-004-2026-10-09.md): version et chemin
+  réellement exécutés, version candidate et résultat effectif de l'installation.
 
 - [Sécurité — lot A, SEC-001 à SEC-008](./security-lot-a.md): historique
   existant conservé lors de la réorganisation; SEC-008 est terminée.
@@ -98,6 +100,8 @@ l'itération et devient append-only dès sa clôture.
 - [Plateformes — PLAT-004l](./platforms-PLAT-004l-2026-10-03.md): remplacement
   implanté de YAD par un helper QR X11/XWayland; validation visuelle terrain
   encore requise avant clôture.
+- [Plateformes — PLAT-004m](./platforms-PLAT-004m-2026-10-09.md): absorption
+  des erreurs `EPIPE` du helper XWayland durant l'arrêt du service.
 - [Plateformes — PLAT-004g2](./platforms-PLAT-004g2-2026-10-03.md): séparation
   des périphériques uinput souris/clavier sans nouvelle permission système et
   retrait du lecteur de position XWayland du parcours uinput.

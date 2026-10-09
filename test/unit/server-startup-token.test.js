@@ -11,8 +11,9 @@ const createServicesRegistry = jest.fn();
 const bootstrapApi = jest.fn();
 const bootstrapSocket = jest.fn();
 const bootstrapLogger = jest.fn();
+const startupLogInfo = jest.fn();
 const createLogger = jest.fn(() => ({
-  info: jest.fn(),
+  info: startupLogInfo,
   warn: jest.fn(),
   error: jest.fn(),
   debug: jest.fn(),
@@ -194,6 +195,11 @@ describe('startServer', () => {
       'http://127.0.0.1:3000/api/sessions/startup-token',
       {small: true},
     );
+    expect(startupLogInfo).toHaveBeenCalledWith(expect.objectContaining({
+      version: expect.any(String),
+      packagePath: expect.stringContaining('package.json'),
+      nodeExecutable: process.execPath,
+    }), 'Remote Mouse server started');
     expect(error).not.toHaveBeenCalled();
   });
 });

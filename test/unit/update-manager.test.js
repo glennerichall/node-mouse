@@ -28,7 +28,12 @@ const {
 
 function createServices({
   config = {updateCheck: {enabled: true}},
-  systemConfig = {updateCheck: {}},
+  systemConfig = {
+    updateCheck: {
+      packageName: '@velor/remote-mouse',
+      currentVersion: '6.19.64',
+    },
+  },
   events = {publishState: jest.fn()},
 } = {}) {
   return {
@@ -103,6 +108,8 @@ describe('createUpdateManager', () => {
     const check = jest.fn(async () => ({
       hasUpdate: true,
       key: 'npm:6.5.0',
+      currentVersion: '6.4.10',
+      latestVersion: '6.5.0',
       title: 'Mise a jour disponible',
       message: 'Version 6.5.0 disponible.',
       ttlMs: 9000,
@@ -117,6 +124,14 @@ describe('createUpdateManager', () => {
     });
 
     expect(chooseUpdateCheckSource).toHaveBeenCalledTimes(1);
+    expect(logger.info).toHaveBeenCalledWith(expect.objectContaining({
+      source: 'npm',
+      packageName: '@velor/remote-mouse',
+      installedVersion: expect.any(String),
+      currentVersion: '6.4.10',
+      latestVersion: '6.5.0',
+      updateAvailable: true,
+    }), 'Update check completed');
     expect(events.publishState).toHaveBeenCalledWith('update-manager', {
       enabled: true,
       lastKey: 'npm:6.5.0',
@@ -220,6 +235,12 @@ describe('createUpdateManager', () => {
   });
 
   it('delegates install execution and logs the resolved command', async () => {
+    chooseUpdateCheckSource.mockReturnValue(async () => ({
+      hasUpdate: true,
+      key: 'npm:6.5.0',
+      currentVersion: '6.4.10',
+      latestVersion: '6.5.0',
+    }));
     const install = jest.fn(async () => ({
       ok: true,
       status: 'completed',
@@ -228,6 +249,7 @@ describe('createUpdateManager', () => {
     install.command = 'npm update -g remote-mouse --force';
     chooseUpdateInstallSource.mockReturnValue(install);
     const updateManager = createUpdateManager(createServices());
+    await updateManager.check();
 
     await expect(updateManager.update()).resolves.toEqual({
       ok: true,
@@ -236,10 +258,18 @@ describe('createUpdateManager', () => {
     });
 
     expect(chooseUpdateInstallSource).toHaveBeenCalledTimes(1);
-    expect(logger.info).toHaveBeenNthCalledWith(1, {
+    expect(logger.info).toHaveBeenCalledWith(expect.objectContaining({
+      packageName: '@velor/remote-mouse',
+      currentVersion: expect.any(String),
+      targetVersion: '6.5.0',
       installCommand: 'npm update -g remote-mouse --force',
-      }, 'Executing update install command');
-    expect(logger.info).toHaveBeenNthCalledWith(2, 'Update install completed successfully');
+    }), 'Executing update install command');
+    expect(logger.info).toHaveBeenCalledWith(expect.objectContaining({
+      packageName: '@velor/remote-mouse',
+      currentVersion: expect.any(String),
+      targetVersion: '6.5.0',
+      installedVersion: expect.any(String),
+    }), 'Update install completed successfully');
   });
 });
 

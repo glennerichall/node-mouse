@@ -7,12 +7,15 @@ import {
     PUBSUB_SERVICE_UPDATE_MANAGER
 } from "../pubsub/serviceEventConstants.js";
 import {createLogger} from '../../application/logger.js';
+import {packageJsonPath} from '../config/bootstrapConfig.js';
+import {readPackageVersion} from '../../utils/env.js';
 
 export function createUpdateManager(services) {
     const log = createLogger('update-check');
     let lastKey = '';
     let lastInstallCommand = '';
     let lastResult = null;
+    let lastLatestVersion = '';
 
     function publishState(type = PUBSUB_EVENT_UPDATE_CHECK) {
         services.getEvents().publishState(PUBSUB_SERVICE_UPDATE_MANAGER, {
@@ -47,6 +50,18 @@ export function createUpdateManager(services) {
             log.debug('Update check: source resolved');
             const result = await runCheck();
             log.debug({ result }, 'Update check: source returned');
+            const updateConfig = services.getSystemConfig().updateCheck || {};
+            const currentVersion = result?.currentVersion || updateConfig.currentVersion || '(unknown)';
+            const latestVersion = result?.latestVersion || '';
+            lastLatestVersion = latestVersion;
+            log.info({
+                source: updateConfig.checkCommand ? 'command' : 'npm',
+                packageName: updateConfig.packageName || '(unknown)',
+                installedVersion: readPackageVersion(packageJsonPath),
+                currentVersion,
+                latestVersion: latestVersion || '(unknown)',
+                updateAvailable: Boolean(result?.hasUpdate),
+            }, 'Update check completed');
 
             if (!result?.hasUpdate || !result.key || (!force && result.key === lastKey)) {
                 log.debug({
@@ -102,16 +117,23 @@ export function createUpdateManager(services) {
     async function update() {
         const install = chooseUpdateInstallSource(services);
         lastInstallCommand = String(install.command || '');
+        const updateConfig = services.getSystemConfig().updateCheck || {};
+        const versionFields = {
+            packageName: updateConfig.packageName || '(unknown)',
+            currentVersion: readPackageVersion(packageJsonPath),
+            targetVersion: lastLatestVersion || '(unknown)',
+        };
         log.debug({ installCommand: lastInstallCommand }, 'Install update: source resolved');
-        log.info({installCommand: lastInstallCommand}, 'Executing update install command');
+        log.info({...versionFields, installCommand: lastInstallCommand}, 'Executing update install command');
         const result = await install();
         log.debug({ result }, 'Install update: source returned');
+        const installedVersion = readPackageVersion(packageJsonPath);
         if (result.ok) {
-            log.info('Update install completed successfully');
+            log.info({...versionFields, installedVersion}, 'Update install completed successfully');
             return result;
         }
         if (result?.status === 'failed') {
-            log.error({details: result.details}, 'Update install failed');
+            log.error({...versionFields, installedVersion, details: result.details}, 'Update install failed');
         }
         return result;
     }

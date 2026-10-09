@@ -13,6 +13,8 @@ import {notifyIfRestarted} from '../remotes/admin/notifyIfRestarted.js';
 import {ensureApplicationLifecycleState} from './state.js';
 import {createLogger} from './logger.js';
 import {listenForServer} from './listenForServer.js';
+import {packageJsonPath} from '../services/config/bootstrapConfig.js';
+import {readPackageVersion} from '../utils/env.js';
 
 export function createApplicationStart(services) {
   function logStartupUrls(urls) {
@@ -72,7 +74,13 @@ export function createApplicationStart(services) {
       config,
     });
 
-    log.info({url: urls.entryUrl, qrUrl: urls.qrUrl}, 'Remote Mouse server started');
+    log.info({
+      version: readPackageVersion(packageJsonPath),
+      packagePath: packageJsonPath,
+      nodeExecutable: process.execPath,
+      url: urls.entryUrl,
+      qrUrl: urls.qrUrl,
+    }, 'Remote Mouse server started');
     logStartupUrls(urls);
     log.info('Scan this QR code with your mobile device');
 

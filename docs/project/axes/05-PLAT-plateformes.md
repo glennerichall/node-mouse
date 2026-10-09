@@ -31,6 +31,10 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   explicitement par XWayland lorsque le positionnement global est requis.
 - [x] PLAT-004i — empêcher YAD de rogner le QR lorsque la fenêtre a exactement
   la taille configurée, en adaptant l'image à la zone intérieure du widget.
+- [x] PLAT-004m — absorber `EPIPE` et les erreurs de stdin du helper
+  XWayland lors de sa fermeture concurrente, afin que l'arrêt normal du service
+  après une mise à jour ne fasse pas planter le processus Node.js; couvrir le
+  scénario de pipe cassé par un test unitaire.
 - [ ] PLAT-004j — rétablir sous Wayland/XWayland le masquage temporaire de
   l'overlay QR lorsque le pointeur le survole, puis son réaffichage après la
   sortie du pointeur, sans oscillation, perte permanente de la fenêtre ni
