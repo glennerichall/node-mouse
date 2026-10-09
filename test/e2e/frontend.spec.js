@@ -260,6 +260,53 @@ test('admin config page renders editable server configuration', async ({page}) =
   await expect(page.locator('#config-form')).toContainText('browser.enabled');
 });
 
+test('admin can review paired devices, revoke another device, and open pairing QR', async ({page}) => {
+  let revoked = false;
+  let revokeRequests = 0;
+  await page.route('**/api/admin/sessions', async (route) => {
+    const sessions = [
+      {
+        id: 'current-session',
+        deviceName: 'This device',
+        role: 'controller',
+        state: 'active',
+        lastActivityAt: Date.now(),
+        isCurrent: true,
+      },
+      {
+        id: 'tablet-session',
+        deviceName: 'Development tablet',
+        role: 'controller',
+        state: revoked ? 'revoked' : 'active',
+        lastActivityAt: Date.now(),
+        isCurrent: false,
+      },
+    ];
+    await route.fulfill({json: {ok: true, sessions, history: []}});
+  });
+  await page.route('**/api/admin/sessions/tablet-session', async (route) => {
+    expect(route.request().method()).toBe('DELETE');
+    revokeRequests += 1;
+    revoked = true;
+    await route.fulfill({status: 204, body: ''});
+  });
+  page.on('dialog', (dialog) => dialog.accept());
+
+  await page.goto('/ui/admin/config');
+  await expect(page.getByRole('heading', {name: /Appareils associes|Paired devices/i})).toBeVisible();
+  await expect(page.locator('#device-sessions-list')).toContainText('Development tablet');
+  await expect(page.locator('#device-sessions-list .device-session-current')).toHaveCount(1);
+  await expect(page.locator('#device-sessions-list .device-session-revoke')).toHaveCount(1);
+  await expect(page.getByRole('link', {name: /Associer un appareil|Pair a device/i}))
+    .toHaveAttribute('href', '/qr');
+
+  await page.getByRole('button', {name: /Revoquer|Revoke/i}).click();
+
+  await expect.poll(() => revokeRequests).toBe(1);
+  await expect(page.locator('#device-sessions-list .device-session-revoke')).toHaveCount(0);
+  await expect(page.locator('#device-sessions-status')).toContainText(/revoquee|revoked/i);
+});
+
 test('admin config sections can be expanded and collapsed', async ({page}) => {
   await page.goto('/ui/admin/config');
 
@@ -310,7 +357,7 @@ test('admin config updates automatically when server config changes', async ({pa
   const patchResponse = await page.request.patch('/api/admin/configs/input.mouseSpeed', {
     data: {value: nextValue},
   });
-  expect(patchResponse.ok()).toBe(true);
+  expect(patchResponse.ok(), `${patchResponse.status()} ${await patchResponse.text()}`).toBe(true);
 
   await expect(mouseSpeedInput).toHaveValue(String(nextValue));
 
