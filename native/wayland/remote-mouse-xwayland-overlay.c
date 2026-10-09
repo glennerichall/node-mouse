@@ -238,6 +238,11 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
     Overlay overlay = {0};
+    /* getline() is used only after poll() reports stdin readable. Keep stdio
+     * from reading ahead: if it buffers two commands at once, poll() may no
+     * longer see the second command in the kernel pipe and the helper can
+     * strand a rapid HIDE/SHOW (or UPDATE/SHOW) sequence indefinitely. */
+    setvbuf(stdin, NULL, _IONBF, 0);
     overlay.x = atoi(argv[2]);
     overlay.y = atoi(argv[3]);
     overlay.size = (unsigned int)strtoul(argv[4], NULL, 10);

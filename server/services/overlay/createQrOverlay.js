@@ -62,17 +62,25 @@ export async function createQrOverlay(services, dependencies = {}) {
     handle = null;
   }
 
-  function hide() {
+  function hideNow() {
     visible = false;
     adapter.hide(handle);
     return false;
   }
 
-  async function show() {
+  async function showNow() {
     visible = true;
-    await queue(updateNow);
+    await updateNow();
     adapter.show(handle);
     return true;
+  }
+
+  function hide() {
+    return queue(hideNow);
+  }
+
+  function show() {
+    return queue(showNow);
   }
 
   function setSuppressed(nextSuppressed) {
@@ -86,8 +94,11 @@ export async function createQrOverlay(services, dependencies = {}) {
   }
 
   async function toggle() {
-    if (visible) return hide();
-    return show();
+    return queue(() => {
+      const hiddenByHover = adapter.managesHover && adapter.isSuppressed(handle);
+      if (visible && !hiddenByHover) return hideNow();
+      return showNow();
+    });
   }
 
   return {

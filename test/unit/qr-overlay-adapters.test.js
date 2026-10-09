@@ -20,6 +20,75 @@ function createServices() {
 }
 
 describe('QR overlay OS adapters', () => {
+  it('re-shows the QR when toggle is called while hover has temporarily hidden it', async () => {
+    let helperState = 'starting';
+    const client = {
+      show: jest.fn(() => { helperState = 'visible'; }),
+      hide: jest.fn(() => { helperState = 'hidden'; }),
+      update: jest.fn(),
+      close: jest.fn(),
+      getState: jest.fn(() => helperState),
+      process: {once: jest.fn()},
+    };
+    const adapter = createLinuxQrOverlayAdapter({
+      access: async () => {},
+      helperPath: '/app/overlay',
+      createClient: () => client,
+    });
+    const overlay = await createQrOverlay(createServices(), {
+      adapter,
+      qrPath: '/tmp/qr.png',
+      writeQr: jest.fn(async () => {}),
+      log: {warn: jest.fn()},
+    });
+
+    await overlay.show();
+    helperState = 'hover-hidden';
+
+    await expect(overlay.toggle()).resolves.toBe(true);
+    expect(client.show).toHaveBeenCalledTimes(2);
+    expect(client.hide).not.toHaveBeenCalled();
+  });
+
+  it('keeps a hide requested during a QR refresh after that refresh completes', async () => {
+    let finishQrWrite;
+    let qrWriteStarted;
+    let writeCount = 0;
+    const started = new Promise((resolve) => { qrWriteStarted = resolve; });
+    const operations = [];
+    const client = {
+      show: jest.fn(() => operations.push('show')),
+      hide: jest.fn(() => operations.push('hide')),
+      update: jest.fn(() => operations.push('update')),
+      close: jest.fn(),
+      getState: jest.fn(() => 'visible'),
+      process: {once: jest.fn()},
+    };
+    const overlay = await createQrOverlay(createServices(), {
+      adapter: createLinuxQrOverlayAdapter({
+        access: async () => {}, helperPath: '/app/overlay', createClient: () => client,
+      }),
+      qrPath: '/tmp/qr.png',
+      writeQr: () => {
+        writeCount += 1;
+        if (writeCount === 1) return Promise.resolve();
+        qrWriteStarted();
+        return new Promise((resolve) => { finishQrWrite = resolve; });
+      },
+      log: {warn: jest.fn()},
+    });
+
+    await overlay.show();
+    operations.length = 0;
+    const showing = overlay.show();
+    await started;
+    const hiding = overlay.hide();
+    finishQrWrite();
+    await Promise.all([showing, hiding]);
+
+    expect(operations).toEqual(['update', 'show', 'hide']);
+  });
+
   it('runs the common service contract against the Linux adapter', async () => {
     const client = {
       show: jest.fn(),
@@ -83,7 +152,7 @@ describe('QR overlay OS adapters', () => {
     );
     expect(spawnScript).toHaveBeenCalledWith('C:\\Temp\\remote-mouse-overlay.ps1');
 
-    overlay.hide();
+    await overlay.hide();
     expect(child.kill).toHaveBeenCalledWith('SIGTERM');
   });
 

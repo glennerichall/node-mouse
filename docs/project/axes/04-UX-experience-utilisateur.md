@@ -42,6 +42,9 @@ compréhensibles sur mobile et desktop.
   curseurs persistés localement, pour la vitesse lente et la vitesse rapide;
   interpoler entre les deux de façon bornée, utiliser la vitesse lente lorsque
   l'accélération est désactivée et inclure ces valeurs dans la remise à zéro.
+- [x] UX-007 — nommer explicitement la commande d'affichage du QR comme une
+  bascule et traduire son libellé et son intitulé accessible dans toutes les
+  langues prises en charge.
 - [ ] Ajouter retour haptique et commandes configurables.
 - [ ] Tester navigation clavier, lecteurs d'écran, contrastes et traductions.
 

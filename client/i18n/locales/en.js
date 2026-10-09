@@ -79,7 +79,7 @@ export const en = {
   'main.openPreferencesTitle': 'Open the local preferences page',
   'main.accessAria': 'Access',
   'main.toggleQrOverlay': 'Toggle QR',
-  'main.toggleQrOverlayTitle': 'Show or hide the QR overlay',
+  'main.toggleQrOverlayTitle': 'Show or hide the QR code',
   'main.rotateEntryToken': 'Rotate entry token',
   'main.rotateEntryTokenTitle': 'Force entry token rotation',
   'main.adminActionsDisabledMessage': 'Server admin actions are disabled.',

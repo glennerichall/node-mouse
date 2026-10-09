@@ -102,6 +102,12 @@ l'itération et devient append-only dès sa clôture.
   encore requise avant clôture.
 - [Plateformes — PLAT-004m](./platforms-PLAT-004m-2026-10-09.md): absorption
   des erreurs `EPIPE` du helper XWayland durant l'arrêt du service.
+- [Plateformes — PLAT-004n](./platforms-PLAT-004n-2026-10-09.md): correction
+  des commandes `HIDE`/`SHOW` perdues par le read-ahead stdio du helper QR.
+- [Plateformes — PLAT-004o](./platforms-PLAT-004o-2026-10-09.md): bascule du QR
+  cohérente avec le masquage au survol et transitions d'affichage sérialisées.
+- [Expérience utilisateur — UX-007](./ux-UX-007-2026-10-09.md): libellé
+  explicite et traductions du bouton de bascule QR.
 - [Plateformes — PLAT-004g2](./platforms-PLAT-004g2-2026-10-03.md): séparation
   des périphériques uinput souris/clavier sans nouvelle permission système et
   retrait du lecteur de position XWayland du parcours uinput.

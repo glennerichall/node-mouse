@@ -35,6 +35,14 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   XWayland lors de sa fermeture concurrente, afin que l'arrêt normal du service
   après une mise à jour ne fasse pas planter le processus Node.js; couvrir le
   scénario de pipe cassé par un test unitaire.
+- [ ] PLAT-004n — garantir le traitement ordonné de commandes IPC rapprochées
+  du helper QR XWayland (notamment masquer puis réafficher), sans perte de
+  commande liée à la lecture tamponnée de stdin; couvrir le cycle par un test
+  d'intégration avec un serveur X virtuel lorsque disponible.
+- [x] PLAT-004o — rendre atomiques les opérations de visibilité de l'overlay
+  QR et faire qu'une commande de bascule réaffiche aussi un overlay masqué
+  temporairement par le survol; tester les transitions concurrentes et
+  l'état `hover-hidden`.
 - [ ] PLAT-004j — rétablir sous Wayland/XWayland le masquage temporaire de
   l'overlay QR lorsque le pointeur le survole, puis son réaffichage après la
   sortie du pointeur, sans oscillation, perte permanente de la fenêtre ni
