@@ -206,17 +206,25 @@ test('preferences persist theme and locale through AppState', async ({page}) => 
   await expect(page.getByRole('heading', {name: 'Local preferences'})).toBeVisible();
 });
 
-test('preferences persist pointer speed and acceleration locally', async ({page}) => {
+test('preferences persist the pointer speed curve locally', async ({page}) => {
   await page.goto('/ui/admin/preferences');
-  await page.locator('#pointer-speed').fill('2');
+  await expect(page.locator('#pointer-slow-speed')).toHaveValue('1.3');
+  await expect(page.locator('#pointer-fast-speed')).toHaveValue('3');
+  await page.locator('#pointer-slow-speed').fill('2.4');
+  await page.locator('#pointer-fast-speed').fill('4.2');
   await page.locator('#pointer-acceleration').uncheck();
-  await expect.poll(() => page.evaluate(() => localStorage.getItem('remote-mouse.pointer-speed'))).toBe('2');
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('remote-mouse.pointer-speed'))).toBe('2.4');
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('remote-mouse.pointer-fast-speed'))).toBe('4.2');
   await expect.poll(() => page.evaluate(() => localStorage.getItem('remote-mouse.pointer-acceleration'))).toBe('false');
   await page.reload();
-  await expect(page.locator('#pointer-speed')).toHaveValue('2');
+  await expect(page.locator('#pointer-slow-speed')).toHaveValue('2.4');
+  await expect(page.locator('#pointer-fast-speed')).toHaveValue('4.2');
+  await expect(page.locator('#pointer-fast-speed')).toBeDisabled();
   await expect(page.locator('#pointer-acceleration')).not.toBeChecked();
   await page.locator('#pointer-preferences-reset').click();
-  await expect(page.locator('#pointer-speed')).toHaveValue('1.3');
+  await expect(page.locator('#pointer-slow-speed')).toHaveValue('1.3');
+  await expect(page.locator('#pointer-fast-speed')).toHaveValue('3');
+  await expect(page.locator('#pointer-acceleration')).toBeChecked();
 });
 
 test('drawer content stays inside its viewport and acceleration aligns left', async ({page}) => {
@@ -230,9 +238,11 @@ test('drawer content stays inside its viewport and acceleration aligns left', as
   expect(contained).toEqual({horizontal: true, vertical: true});
 
   await page.goto('/ui/admin/preferences');
-  const speed = await page.locator('#pointer-speed').boundingBox();
+  const speed = await page.locator('#pointer-slow-speed').boundingBox();
+  const fastSpeed = await page.locator('#pointer-fast-speed').boundingBox();
   const acceleration = await page.locator('#pointer-acceleration').boundingBox();
   expect(Math.abs(speed.x - acceleration.x)).toBeLessThanOrEqual(2);
+  expect(Math.abs(fastSpeed.x - acceleration.x)).toBeLessThanOrEqual(2);
 });
 
 test('local remote visibility preference affects the main page', async ({page}) => {

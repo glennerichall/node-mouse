@@ -36,6 +36,8 @@ l'itération et devient append-only dès sa clôture.
   verticale du panneau latéral aux écrans mobiles courts.
 - [Expérience utilisateur — UX-006c](./ux-UX-006c-2026-10-04.md): bordure
   d'élévation sur la commande d'accès et les actions administratives actives.
+- [Expérience utilisateur — UX-006d](./ux-UX-006d-2026-10-09.md): réglage local
+  des vitesses lente et rapide de la courbe du pointeur.
 - [Expérience utilisateur — UX-001/002](./ux-UX-002-2026-10-09.md): liste des
   appareils associés, révocation d'une association et accès au parcours QR.
 - [Expérience utilisateur — UX-002a/002b](./ux-UX-002a-002b-2026-10-09.md):

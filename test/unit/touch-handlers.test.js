@@ -116,7 +116,7 @@ describe('touch handlers', () => {
     const state = createState();
     const handler = {
       buttonState: jest.fn(), move: jest.fn(), scroll: jest.fn(), click: jest.fn(), flush: jest.fn(),
-      getPointerPreferences: () => ({speed: 2, acceleration: false, accelerationStrength: 1}),
+      getPointerPreferences: () => ({slowSpeed: 2, fastSpeed: 4, acceleration: false}),
     };
     const touchpad = {getBoundingClientRect: () => ({left: 0, top: 0, width: 300, height: 200})};
     nowSpy.mockReturnValue(1000);
@@ -124,5 +124,21 @@ describe('touch handlers', () => {
     nowSpy.mockReturnValue(1016);
     handleTouchMove(createTouchEvent({touches: [{clientX: 24, clientY: 17}]}), {state, handler});
     expect(handler.move).toHaveBeenCalledWith(8, -6);
+  });
+
+  it('uses the fast endpoint of the local curve for fast movement', () => {
+    const nowSpy = jest.spyOn(Date, 'now');
+    const state = createState();
+    const handler = {
+      buttonState: jest.fn(), move: jest.fn(), scroll: jest.fn(), click: jest.fn(), flush: jest.fn(),
+      getPointerPreferences: () => ({slowSpeed: 1.5, fastSpeed: 4, acceleration: true}),
+    };
+    const touchpad = {getBoundingClientRect: () => ({left: 0, top: 0, width: 300, height: 200})};
+    nowSpy.mockReturnValue(1000);
+    handleTouchStart(createTouchEvent({touches: [{clientX: 20, clientY: 20}]}), {touchpad, state, handler});
+    nowSpy.mockReturnValue(1010);
+    handleTouchMove(createTouchEvent({touches: [{clientX: 30, clientY: 20}]}), {state, handler});
+
+    expect(handler.move).toHaveBeenCalledWith(40, 0);
   });
 });

@@ -10,9 +10,9 @@ export const APP_STATE_HANDEDNESS = 'preferences.handedness';
 export const APP_STATE_REMOTE_AUTO_HIDE = 'preferences.remoteAutoHide';
 export const APP_STATE_REMOTE_VISIBILITY = 'preferences.remoteVisibility';
 export const APP_STATE_BROWSER_VISIBILITY = 'preferences.browserVisibility';
-export const APP_STATE_POINTER_SPEED = 'preferences.pointerSpeed';
+export const APP_STATE_POINTER_SLOW_SPEED = 'preferences.pointerSlowSpeed';
+export const APP_STATE_POINTER_FAST_SPEED = 'preferences.pointerFastSpeed';
 export const APP_STATE_POINTER_ACCELERATION = 'preferences.pointerAcceleration';
-export const APP_STATE_POINTER_ACCELERATION_STRENGTH = 'preferences.pointerAccelerationStrength';
 
 export const APP_STATE_EFFECTIVE_BROWSER_REMOTE_VISIBLE = 'effective.remote.browser.visible';
 export const APP_STATE_EFFECTIVE_KEYBOARD_REMOTE_VISIBLE = 'effective.remote.keyboard.visible';

@@ -10,15 +10,14 @@ export function scaleSigned(value, gain) {
   return Math.sign(value) * Math.abs(value) * gain;
 }
 
-export function applyNonLinearAcceleration(dx, dy, elapsedMs, strength = 1) {
+export function applyPointerSpeedCurve(dx, dy, elapsedMs, slowSpeed = 1.3, fastSpeed = 3) {
   const dt = Math.max(elapsedMs, 1);
-  const dist = Math.hypot(dx, dy);
-  const speed = dist / dt; // px/ms
-
-  // Courbe non lineaire: fine precision a basse vitesse, acceleration plus forte quand ca bouge vite.
-  const normalized = clamp(speed / 0.75, 0, 5);
-  const acceleratedGain = clamp(0.55 + normalized ** 1.65, 0.55, 5.5);
-  const gain = 1 + (acceleratedGain - 1) * clamp(Number(strength) || 1, 0.25, 2);
+  const pointerSpeed = Math.hypot(dx, dy) / dt; // px/ms
+  const normalized = clamp((pointerSpeed - 0.05) / 0.7, 0, 1);
+  const curvePosition = normalized ** 1.65;
+  const minimumGain = clamp(Number(slowSpeed) || 1.3, 0.25, 5);
+  const maximumGain = clamp(Number(fastSpeed) || 3, minimumGain, 8);
+  const gain = minimumGain + (maximumGain - minimumGain) * curvePosition;
 
   return {
     dx: dx * gain,

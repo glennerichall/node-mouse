@@ -11,8 +11,7 @@ import {createServicesRegistry} from '../../services/createServicesRegistry.js';
 import {initializeCoreServices} from '../../services/createServicesContainer.js';
 import {bindPreferenceSwitchers} from './bindPreferenceSwitchers.js';
 import {
-  APP_STATE_POINTER_SPEED, APP_STATE_POINTER_ACCELERATION,
-  APP_STATE_POINTER_ACCELERATION_STRENGTH,
+  APP_STATE_POINTER_SLOW_SPEED, APP_STATE_POINTER_FAST_SPEED, APP_STATE_POINTER_ACCELERATION,
 } from '../../services/app-state/createAppStateService.js';
 
 const services = createServicesRegistry();
@@ -21,25 +20,53 @@ services.getI18n().translateRoot(document);
 bindPreferenceSwitchers(services);
 
 const pointerState = services.getAppState();
-const pointerSpeed = document.getElementById('pointer-speed');
+const pointerSlowSpeed = document.getElementById('pointer-slow-speed');
+const pointerFastSpeed = document.getElementById('pointer-fast-speed');
 const pointerAcceleration = document.getElementById('pointer-acceleration');
-const pointerStrength = document.getElementById('pointer-acceleration-strength');
-function syncPointerPreferences() {
-  pointerSpeed.value = String(pointerState.get(APP_STATE_POINTER_SPEED));
-  pointerAcceleration.checked = pointerState.get(APP_STATE_POINTER_ACCELERATION);
-  pointerStrength.value = String(pointerState.get(APP_STATE_POINTER_ACCELERATION_STRENGTH));
-  pointerStrength.disabled = !pointerAcceleration.checked;
+const pointerSlowSpeedValue = document.getElementById('pointer-slow-speed-value');
+const pointerFastSpeedValue = document.getElementById('pointer-fast-speed-value');
+
+function formatSpeed(value) {
+  return `${Number(value).toFixed(1)}×`;
 }
-pointerSpeed.addEventListener('input', () => pointerState.set(APP_STATE_POINTER_SPEED, pointerSpeed.value));
+
+function syncPointerPreferences() {
+  const slowSpeed = pointerState.get(APP_STATE_POINTER_SLOW_SPEED);
+  const fastSpeed = Math.max(slowSpeed, pointerState.get(APP_STATE_POINTER_FAST_SPEED));
+  if (fastSpeed !== pointerState.get(APP_STATE_POINTER_FAST_SPEED)) {
+    pointerState.set(APP_STATE_POINTER_FAST_SPEED, fastSpeed);
+  }
+  pointerSlowSpeed.value = String(slowSpeed);
+  pointerFastSpeed.value = String(fastSpeed);
+  pointerAcceleration.checked = pointerState.get(APP_STATE_POINTER_ACCELERATION);
+  pointerFastSpeed.disabled = !pointerAcceleration.checked;
+  pointerSlowSpeed.max = pointerFastSpeed.value;
+  pointerFastSpeed.min = pointerSlowSpeed.value;
+  pointerSlowSpeedValue.value = formatSpeed(pointerSlowSpeed.value);
+  pointerFastSpeedValue.value = formatSpeed(pointerFastSpeed.value);
+}
+pointerSlowSpeed.addEventListener('input', () => {
+  pointerState.set(APP_STATE_POINTER_SLOW_SPEED, pointerSlowSpeed.value);
+  if (Number(pointerSlowSpeed.value) > Number(pointerFastSpeed.value)) {
+    pointerState.set(APP_STATE_POINTER_FAST_SPEED, pointerSlowSpeed.value);
+  }
+  syncPointerPreferences();
+});
+pointerFastSpeed.addEventListener('input', () => {
+  pointerState.set(APP_STATE_POINTER_FAST_SPEED, pointerFastSpeed.value);
+  if (Number(pointerFastSpeed.value) < Number(pointerSlowSpeed.value)) {
+    pointerState.set(APP_STATE_POINTER_SLOW_SPEED, pointerFastSpeed.value);
+  }
+  syncPointerPreferences();
+});
 pointerAcceleration.addEventListener('change', () => {
   pointerState.set(APP_STATE_POINTER_ACCELERATION, pointerAcceleration.checked);
   syncPointerPreferences();
 });
-pointerStrength.addEventListener('input', () => pointerState.set(APP_STATE_POINTER_ACCELERATION_STRENGTH, pointerStrength.value));
 document.getElementById('pointer-preferences-reset').addEventListener('click', () => {
-  pointerState.set(APP_STATE_POINTER_SPEED, 1.3);
+  pointerState.set(APP_STATE_POINTER_SLOW_SPEED, 1.3);
+  pointerState.set(APP_STATE_POINTER_FAST_SPEED, 3);
   pointerState.set(APP_STATE_POINTER_ACCELERATION, true);
-  pointerState.set(APP_STATE_POINTER_ACCELERATION_STRENGTH, 1);
   syncPointerPreferences();
 });
 syncPointerPreferences();

@@ -15,9 +15,9 @@ import {
     APP_STATE_HANDEDNESS,
     APP_STATE_PREVIEW_ACTIVITY_AT,
     APP_STATE_REMOTE_AUTO_HIDE,
-    APP_STATE_POINTER_SPEED,
+    APP_STATE_POINTER_SLOW_SPEED,
+    APP_STATE_POINTER_FAST_SPEED,
     APP_STATE_POINTER_ACCELERATION,
-    APP_STATE_POINTER_ACCELERATION_STRENGTH,
 } from '../services/app-state/createAppStateService.js';
 
 const REMOTE_HIDE_DELAY_MS = 300;
@@ -231,9 +231,9 @@ export function bindTouchpad(services, dom) {
         getInputConfig: () => services.getConfigView().getInputConfig(),
         getHandedness: () => appState.get(APP_STATE_HANDEDNESS),
         getPointerPreferences: () => ({
-            speed: appState.get(APP_STATE_POINTER_SPEED),
+            slowSpeed: appState.get(APP_STATE_POINTER_SLOW_SPEED),
+            fastSpeed: appState.get(APP_STATE_POINTER_FAST_SPEED),
             acceleration: appState.get(APP_STATE_POINTER_ACCELERATION),
-            accelerationStrength: appState.get(APP_STATE_POINTER_ACCELERATION_STRENGTH),
         }),
     });
 

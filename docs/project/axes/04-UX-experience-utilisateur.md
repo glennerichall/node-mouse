@@ -38,6 +38,10 @@ compréhensibles sur mobile et desktop.
 - [x] UX-006c — signaler visuellement l'élévation administrative par une
   bordure orangée sur la commande de déverrouillage et, une fois déverrouillées,
   sur les seules actions qui dépendent du rôle administrateur.
+- [x] UX-006d — rendre la courbe de sensibilité du pointeur réglable avec deux
+  curseurs persistés localement, pour la vitesse lente et la vitesse rapide;
+  interpoler entre les deux de façon bornée, utiliser la vitesse lente lorsque
+  l'accélération est désactivée et inclure ces valeurs dans la remise à zéro.
 - [ ] Ajouter retour haptique et commandes configurables.
 - [ ] Tester navigation clavier, lecteurs d'écran, contrastes et traductions.
 

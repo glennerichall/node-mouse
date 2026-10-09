@@ -1,6 +1,6 @@
 import { getScrollZoneLayout } from './gesture-zone.js';
 import {
-  applyNonLinearAcceleration,
+  applyPointerSpeedCurve,
   distance2D,
   scaleSigned,
 } from '../../utils/math.js';
@@ -20,11 +20,11 @@ function getDragStillDistancePx(handler) {
 
 function adjustPointer(handler, dx, dy, elapsed) {
   const preferences = handler.getPointerPreferences?.() || {};
-  const speed = Number(preferences.speed) || 1.3;
-  const adjusted = preferences.acceleration === false
-    ? {dx, dy}
-    : applyNonLinearAcceleration(dx, dy, elapsed, preferences.accelerationStrength);
-  return {dx: adjusted.dx * speed, dy: adjusted.dy * speed};
+  const slowSpeed = Number(preferences.slowSpeed) || 1.3;
+  const fastSpeed = Math.max(slowSpeed, Number(preferences.fastSpeed) || 3);
+  return preferences.acceleration === false
+    ? {dx: dx * slowSpeed, dy: dy * slowSpeed}
+    : applyPointerSpeedCurve(dx, dy, elapsed, slowSpeed, fastSpeed);
 }
 
 function startDrag(state, handler) {

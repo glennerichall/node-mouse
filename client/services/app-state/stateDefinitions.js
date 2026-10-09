@@ -4,9 +4,9 @@ import {
   REMOTE_AUTO_HIDE_STORAGE_KEY,
   REMOTE_VISIBILITY_STORAGE_KEY,
   THEME_STORAGE_KEY,
-  POINTER_SPEED_STORAGE_KEY,
+  POINTER_SLOW_SPEED_STORAGE_KEY,
+  POINTER_FAST_SPEED_STORAGE_KEY,
   POINTER_ACCELERATION_STORAGE_KEY,
-  POINTER_ACCELERATION_STRENGTH_STORAGE_KEY,
 } from '../../preferences/constants.js';
 import {LOCALE_STORAGE_KEY} from '../../i18n/constants.js';
 import {resolveLocale} from '../../i18n/core.js';
@@ -20,9 +20,9 @@ import {
   APP_STATE_REMOTE_AUTO_HIDE,
   APP_STATE_REMOTE_VISIBILITY,
   APP_STATE_THEME,
-  APP_STATE_POINTER_SPEED,
+  APP_STATE_POINTER_SLOW_SPEED,
+  APP_STATE_POINTER_FAST_SPEED,
   APP_STATE_POINTER_ACCELERATION,
-  APP_STATE_POINTER_ACCELERATION_STRENGTH,
 } from './appStateKeys.js';
 import {
   normalizeBooleanRecord,
@@ -37,17 +37,17 @@ export const APP_STATE_STORE_STATE = 'state';
 export const APP_STATE_STORE_PERSIST = 'persist';
 
 export const APP_STATE_DEFINITIONS = {
-  [APP_STATE_POINTER_SPEED]: {
-    store: APP_STATE_STORE_PERSIST, storageKey: POINTER_SPEED_STORAGE_KEY, defaultValue: 1.3,
-    normalize: (value) => Math.min(3, Math.max(0.25, Number(value) || 1.3)), serialize: String,
+  [APP_STATE_POINTER_SLOW_SPEED]: {
+    store: APP_STATE_STORE_PERSIST, storageKey: POINTER_SLOW_SPEED_STORAGE_KEY, defaultValue: 1.3,
+    normalize: (value) => Math.min(5, Math.max(0.25, Number(value) || 1.3)), serialize: String,
+  },
+  [APP_STATE_POINTER_FAST_SPEED]: {
+    store: APP_STATE_STORE_PERSIST, storageKey: POINTER_FAST_SPEED_STORAGE_KEY, defaultValue: 3,
+    normalize: (value) => Math.min(8, Math.max(0.25, Number(value) || 3)), serialize: String,
   },
   [APP_STATE_POINTER_ACCELERATION]: {
     store: APP_STATE_STORE_PERSIST, storageKey: POINTER_ACCELERATION_STORAGE_KEY, defaultValue: true,
     normalize: (value) => value === true || value === 'true', serialize: String,
-  },
-  [APP_STATE_POINTER_ACCELERATION_STRENGTH]: {
-    store: APP_STATE_STORE_PERSIST, storageKey: POINTER_ACCELERATION_STRENGTH_STORAGE_KEY, defaultValue: 1,
-    normalize: (value) => Math.min(2, Math.max(0.25, Number(value) || 1)), serialize: String,
   },
   [APP_STATE_PREVIEW_ACTIVITY_AT]: {
     store: APP_STATE_STORE_STATE,

@@ -36,9 +36,9 @@
         <p class="section-description" data-i18n="preferences.section.pointer.description">Ces réglages s'appliquent seulement à cet appareil.</p>
       </div>
       <div class="page-toolbar-actions preferences-remotes-list" id="pointer-preferences">
-        <label class="preferences-remote-row"><span class="preferences-remote-label" data-i18n="preferences.pointer.speed">Vitesse</span><input id="pointer-speed" type="range" min="0.25" max="3" step="0.05"></label>
+        <label class="preferences-remote-row"><span class="preferences-remote-label"><span data-i18n="preferences.pointer.slowSpeed">Vitesse lente</span> <output id="pointer-slow-speed-value" for="pointer-slow-speed"></output></span><input id="pointer-slow-speed" type="range" min="0.25" max="5" step="0.05"></label>
+        <label class="preferences-remote-row"><span class="preferences-remote-label"><span data-i18n="preferences.pointer.fastSpeed">Vitesse rapide</span> <output id="pointer-fast-speed-value" for="pointer-fast-speed"></output></span><input id="pointer-fast-speed" type="range" min="0.25" max="8" step="0.05"></label>
         <label class="preferences-remote-row"><span class="preferences-remote-label" data-i18n="preferences.pointer.acceleration">Accélération</span><input id="pointer-acceleration" type="checkbox"></label>
-        <label class="preferences-remote-row"><span class="preferences-remote-label" data-i18n="preferences.pointer.strength">Intensité</span><input id="pointer-acceleration-strength" type="range" min="0.25" max="2" step="0.05"></label>
         <button id="pointer-preferences-reset" type="button" data-i18n="preferences.pointer.reset">Réinitialiser</button>
       </div>
     </section>
