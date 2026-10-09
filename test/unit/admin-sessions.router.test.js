@@ -72,13 +72,54 @@ describe('admin sessions controllers', () => {
     });
   });
 
-  it('revokes the session collection', () => {
-    const revokeAllSessions = jest.fn(() => 3);
-    const req = {services: {getDeviceSessionService: () => ({revokeAllSessions})}};
+  it('revokes all other sessions and disconnects their sockets while preserving the current session', () => {
+    const revokeAllSessions = jest.fn(() => 2);
+    const currentSocket = {
+      securityContext: {deviceSessionId: 'current'},
+      disconnect: jest.fn(),
+    };
+    const activeSocket = {
+      securityContext: {deviceSessionId: 'active-other'},
+      disconnect: jest.fn(),
+    };
+    const expiredSocket = {
+      securityContext: {deviceSessionId: 'expired-other'},
+      disconnect: jest.fn(),
+    };
+    const revokedSocket = {
+      securityContext: {deviceSessionId: 'already-revoked'},
+      disconnect: jest.fn(),
+    };
+    const service = {
+      listSessions: () => [
+        {id: 'current', state: 'active'},
+        {id: 'active-other', state: 'active'},
+        {id: 'expired-other', state: 'expired'},
+        {id: 'already-revoked', state: 'revoked'},
+      ],
+      revokeAllSessions,
+    };
+    const req = {
+      securityContext: {deviceSessionId: 'current'},
+      services: {
+        getDeviceSessionService: () => service,
+        getServer: () => ({io: {of: () => ({sockets: new Map([
+          ['current', currentSocket],
+          ['active', activeSocket],
+          ['expired', expiredSocket],
+          ['revoked', revokedSocket],
+        ])})}}),
+      },
+    };
     const res = createResponse();
 
     revokeAllDeviceSessions(req, res);
 
-    expect(res.json).toHaveBeenCalledWith({ok: true, revokedCount: 3});
+    expect(revokeAllSessions).toHaveBeenCalledWith({exceptId: 'current'});
+    expect(currentSocket.disconnect).not.toHaveBeenCalled();
+    expect(activeSocket.disconnect).toHaveBeenCalledWith(true);
+    expect(expiredSocket.disconnect).toHaveBeenCalledWith(true);
+    expect(revokedSocket.disconnect).not.toHaveBeenCalled();
+    expect(res.json).toHaveBeenCalledWith({ok: true, revokedCount: 2});
   });
 });

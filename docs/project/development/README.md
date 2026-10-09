@@ -38,6 +38,8 @@ l'itération et devient append-only dès sa clôture.
   d'élévation sur la commande d'accès et les actions administratives actives.
 - [Expérience utilisateur — UX-001/002](./ux-UX-002-2026-10-09.md): liste des
   appareils associés, révocation d'une association et accès au parcours QR.
+- [Expérience utilisateur — UX-002a/002b](./ux-UX-002a-002b-2026-10-09.md):
+  révocation en lot, protection de la session courante et page Sécurité dédiée.
 
 - [Architecture — ARCH-008](./architecture-ARCH-008-2026-10-03.md): handlers
   nommés et exportés pour les routes de configuration et abonnements clients.

@@ -258,12 +258,34 @@ test('admin config page renders editable server configuration', async ({page}) =
   await expect(page.locator('#config-status')).toContainText(/Configuration chargee|Configuration loaded/i);
   await expect(page.locator('#config-form')).toContainText('input.mouseSpeed');
   await expect(page.locator('#config-form')).toContainText('browser.enabled');
+  await expect(page.locator('#device-sessions-list')).toHaveCount(0);
 });
 
-test('admin can review paired devices, revoke another device, and open pairing QR', async ({page}) => {
-  let revoked = false;
+test('admin can open security page, revoke devices, and keep the current session', async ({page}) => {
+  await page.setViewportSize({width: 390, height: 844});
+  const revokedSessionIds = new Set();
   let revokeRequests = 0;
+  let revokeAllRequests = 0;
+  await page.route('**/api/client/config', async (route) => {
+    await route.fulfill({json: {
+      config: {},
+      systemConfig: {
+        adminActionsConfigured: true,
+        adminActionsEnabled: true,
+        adminUnlocked: true,
+        adminRelockAvailable: true,
+        adminUnlockAvailable: false,
+      },
+    }});
+  });
   await page.route('**/api/admin/sessions', async (route) => {
+    if (route.request().method() === 'DELETE') {
+      revokeAllRequests += 1;
+      revokedSessionIds.add('phone-session');
+      await route.fulfill({json: {ok: true, revokedCount: 1}});
+      return;
+    }
+
     const sessions = [
       {
         id: 'current-session',
@@ -277,7 +299,15 @@ test('admin can review paired devices, revoke another device, and open pairing Q
         id: 'tablet-session',
         deviceName: 'Development tablet',
         role: 'controller',
-        state: revoked ? 'revoked' : 'active',
+        state: revokedSessionIds.has('tablet-session') ? 'revoked' : 'active',
+        lastActivityAt: Date.now(),
+        isCurrent: false,
+      },
+      {
+        id: 'phone-session',
+        deviceName: 'Test phone',
+        role: 'controller',
+        state: revokedSessionIds.has('phone-session') ? 'revoked' : 'active',
         lastActivityAt: Date.now(),
         isCurrent: false,
       },
@@ -287,24 +317,35 @@ test('admin can review paired devices, revoke another device, and open pairing Q
   await page.route('**/api/admin/sessions/tablet-session', async (route) => {
     expect(route.request().method()).toBe('DELETE');
     revokeRequests += 1;
-    revoked = true;
+    revokedSessionIds.add('tablet-session');
     await route.fulfill({status: 204, body: ''});
   });
   page.on('dialog', (dialog) => dialog.accept());
 
-  await page.goto('/ui/admin/config');
-  await expect(page.getByRole('heading', {name: /Appareils associes|Paired devices/i})).toBeVisible();
+  await page.goto('/');
+  await expect(page.locator('#device-sessions-list')).toHaveCount(0);
+  await page.locator('#app').evaluate((element) => element.classList.add('admin-drawer-open'));
+  await page.locator('#btn-open-device-security').click();
+  await expect(page).toHaveURL(/\/ui\/admin\/security$/);
+  await expect(page.locator('h1')).toContainText(/Appareils associes|Paired devices/i);
   await expect(page.locator('#device-sessions-list')).toContainText('Development tablet');
   await expect(page.locator('#device-sessions-list .device-session-current')).toHaveCount(1);
-  await expect(page.locator('#device-sessions-list .device-session-revoke')).toHaveCount(1);
+  await expect(page.locator('#device-sessions-list .device-session-revoke')).toHaveCount(2);
   await expect(page.getByRole('link', {name: /Associer un appareil|Pair a device/i}))
     .toHaveAttribute('href', '/qr');
 
-  await page.getByRole('button', {name: /Revoquer|Revoke/i}).click();
+  await page.locator('#device-sessions-list .device-session-revoke').first().click();
 
   await expect.poll(() => revokeRequests).toBe(1);
-  await expect(page.locator('#device-sessions-list .device-session-revoke')).toHaveCount(0);
+  await expect(page.locator('#device-sessions-list .device-session-revoke')).toHaveCount(1);
+  await expect(page.locator('#device-sessions-list .device-session-revoked .device-session-meta-compact')).toBeVisible();
   await expect(page.locator('#device-sessions-status')).toContainText(/revoquee|revoked/i);
+
+  await page.getByRole('button', {name: /Tout révoquer|Revoke all/i}).click();
+  await expect.poll(() => revokeAllRequests).toBe(1);
+  await expect(page.locator('#device-sessions-list .device-session-current')).toHaveCount(1);
+  await expect(page.locator('#device-sessions-list .device-session-revoke')).toHaveCount(0);
+  await expect(page.locator('#revoke-all-device-sessions')).toBeDisabled();
 });
 
 test('admin config sections can be expanded and collapsed', async ({page}) => {
