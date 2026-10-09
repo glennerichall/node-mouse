@@ -78,6 +78,9 @@ export function createApplicationShutdown(services) {
       });
     });
 
+    await runShutdownStep('Failed to close persistence database', () =>
+      services.getPersistence().close?.());
+
     process.exit(0);
   };
 }

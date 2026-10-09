@@ -1,4 +1,5 @@
 import {jest} from '@jest/globals';
+import {EventEmitter} from 'node:events';
 import {
   PUBSUB_EVENT_CONFIG_UPDATED,
   PUBSUB_EVENT_TOKEN_CHANGED,
@@ -80,6 +81,10 @@ describe('startServer', () => {
       }),
     };
 
+    const httpServer = new EventEmitter();
+    httpServer.listen = (_port, callback) => callback();
+    httpServer.close = (callback) => callback();
+
     createServicesRegistry.mockResolvedValue({
       getTokenManager: () => ({
         createToken,
@@ -101,10 +106,7 @@ describe('startServer', () => {
       }),
       getConfig: () => configState,
       getServer: () => ({
-        server: {
-          listen: (_port, callback) => callback(),
-          close: (callback) => callback(),
-        },
+        server: httpServer,
       }),
       getQrOverlay: () => ({
         show,

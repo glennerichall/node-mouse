@@ -12,6 +12,7 @@ import {startUpdateManagerLogObserver} from '../init/observers/startUpdateManage
 import {notifyIfRestarted} from '../remotes/admin/notifyIfRestarted.js';
 import {ensureApplicationLifecycleState} from './state.js';
 import {createLogger} from './logger.js';
+import {listenForServer} from './listenForServer.js';
 
 export function createApplicationStart(services) {
   function logStartupUrls(urls) {
@@ -60,40 +61,34 @@ export function createApplicationStart(services) {
       void state.shutdown?.('SIGTERM');
     });
 
-    await new Promise((resolve) => {
-      const onListening = async () => {
-        const urls = services.getUrls();
-
-        logStartupConfig(log, {
-          systemConfig,
-          config,
-        });
-
-        log.info({url: urls.entryUrl, qrUrl: urls.qrUrl}, 'Remote Mouse server started');
-        logStartupUrls(urls);
-        log.info('Scan this QR code with your mobile device');
-
-        if (services.getConfig().qrOverlay?.enabled) {
-          await qrOverlay.show();
-        }
-
-        await taskManager.start();
-
-        try {
-          state.cliServer = await startCliServer(services);
-        } catch (error) {
-          log.error({err: error}, 'Failed to start the local CLI interface');
-        }
-
-        qrcodeTerminal.generate(urls.entryUrl, {small: true});
-        resolve();
-      };
-      if (systemConfig.listenHost) {
-        httpServer.listen(systemConfig.port, systemConfig.listenHost, onListening);
-      } else {
-        httpServer.listen(systemConfig.port, onListening);
-      }
+    await listenForServer(httpServer, {
+      port: systemConfig.port,
+      host: systemConfig.listenHost,
     });
+    const urls = services.getUrls();
+
+    logStartupConfig(log, {
+      systemConfig,
+      config,
+    });
+
+    log.info({url: urls.entryUrl, qrUrl: urls.qrUrl}, 'Remote Mouse server started');
+    logStartupUrls(urls);
+    log.info('Scan this QR code with your mobile device');
+
+    if (services.getConfig().qrOverlay?.enabled) {
+      await qrOverlay.show();
+    }
+
+    await taskManager.start();
+
+    try {
+      state.cliServer = await startCliServer(services);
+    } catch (error) {
+      log.error({err: error}, 'Failed to start the local CLI interface');
+    }
+
+    qrcodeTerminal.generate(urls.entryUrl, {small: true});
 
     return {
       shutdown: state.shutdown,

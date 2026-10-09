@@ -214,6 +214,8 @@ l'itération et devient append-only dès sa clôture.
   configurable et protégée par un test de non-régression.
 - [REL-006](./rel-REL-006-2026-10-08.md): reprise explicite du socket après
   coupure réseau et retour de connectivité.
+- [REL-007](./rel-REL-007-2026-10-08.md): erreur explicite de port occupé,
+  contrôle d'intégrité et fermeture propre de SQLite.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

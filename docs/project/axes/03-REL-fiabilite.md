@@ -31,10 +31,13 @@ et assurer un cycle de vie robuste du serveur et des connexions.
 - [x] **REL-006 — reprise après veille et réseau:** rétablir proprement la
   connexion après veille, changement Wi-Fi et redémarrage réseau, sans
   conserver de socket obsolète ni dupliquer les commandes.
+- [x] **REL-007 — arrêt et reprise du serveur:** fermer les ressources
+  applicatives et SQLite après le drainage HTTP, signaler immédiatement un
+  port déjà occupé, et valider l'intégrité SQLite au démarrage après un arrêt
+  brutal. Ajouter des tests ciblés du démarrage, de l'arrêt et de la reprise.
 - [ ] Rendre délais et heartbeats configurables par transport.
 - [ ] Adapter résolution/fréquence/compression de la prévisualisation.
 - [ ] Suspendre les captures inutilisées et éviter les frames périmées.
-- [ ] Tester arrêt gracieux, ports indisponibles, reprise après crash et SQLite.
 - [ ] Distinguer contrôles de santé internes et externes.
 
 Les critères quantitatifs (latence, charge, stabilité) sont à établir dans la

@@ -12,6 +12,7 @@ export function createPersistence(services) {
 
     return {
         getDatabase,
+        close: getDatabase.close,
         configDao: createConfigDao({
             getDatabase,
         }),
