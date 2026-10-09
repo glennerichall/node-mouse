@@ -96,9 +96,17 @@ export function bindSocketWakeReconnect(socket, {
     markInactive();
   }
 
+  function handleOffline() {
+    markInactive();
+    if (socket.connected) {
+      socket.disconnect?.();
+    }
+  }
+
   windowRef.addEventListener('pageshow', scheduleWakeReconnect);
   windowRef.addEventListener('focus', scheduleWakeReconnect);
   windowRef.addEventListener('online', scheduleWakeReconnect);
+  windowRef.addEventListener('offline', handleOffline);
   windowRef.addEventListener('pagehide', markInactive);
   documentRef?.addEventListener?.('visibilitychange', handleVisibilityChange);
 
@@ -110,6 +118,7 @@ export function bindSocketWakeReconnect(socket, {
     windowRef.removeEventListener?.('pageshow', scheduleWakeReconnect);
     windowRef.removeEventListener?.('focus', scheduleWakeReconnect);
     windowRef.removeEventListener?.('online', scheduleWakeReconnect);
+    windowRef.removeEventListener?.('offline', handleOffline);
     windowRef.removeEventListener?.('pagehide', markInactive);
     documentRef?.removeEventListener?.('visibilitychange', handleVisibilityChange);
   };

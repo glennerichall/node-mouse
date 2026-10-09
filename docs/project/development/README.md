@@ -212,6 +212,8 @@ l'itération et devient append-only dès sa clôture.
   adaptative de la prévisualisation.
 - [REL-004a](./rel-REL-004a-2026-10-08.md): limite maximale de cadence rendue
   configurable et protégée par un test de non-régression.
+- [REL-006](./rel-REL-006-2026-10-08.md): reprise explicite du socket après
+  coupure réseau et retour de connectivité.
 - Aucun journal d'implémentation PWA distinct n'existait. Les décisions
   historiques restent dans [l'axe PWA](../axes/06-PWA-application-web.md); le journal PWA commence
   avec la première itération réelle, sans rétro-construire d'historique.

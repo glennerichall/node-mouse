@@ -181,4 +181,32 @@ describe('client socket io initialization', () => {
     expect(socket.disconnect).not.toHaveBeenCalled();
     expect(socket.connect).toHaveBeenCalledTimes(1);
   });
+
+  it('disconnects a stale socket while offline and reconnects when the network returns', () => {
+    const windowRef = new EventTarget();
+    const documentRef = createMutableDocument('visible');
+    const socket = {
+      connected: true,
+      connect: jest.fn(),
+      disconnect: jest.fn(() => {
+        socket.connected = false;
+      }),
+    };
+    const timers = createTimerHarness();
+
+    bindSocketWakeReconnect(socket, {
+      windowRef,
+      documentRef,
+      setTimeoutFn: timers.setTimeoutFn,
+      clearTimeoutFn: timers.clearTimeoutFn,
+    });
+
+    windowRef.dispatchEvent(new Event('offline'));
+    expect(socket.disconnect).toHaveBeenCalledTimes(1);
+
+    windowRef.dispatchEvent(new Event('online'));
+    expect(timers.size).toBe(1);
+    timers.runNext();
+    expect(socket.connect).toHaveBeenCalledTimes(1);
+  });
 });
