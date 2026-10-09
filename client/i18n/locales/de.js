@@ -69,6 +69,8 @@ export const de = {
   'main.openServerInfoServerTitle': 'Serverinfo-Seite auf dem Server oeffnen',
   'main.openServerInfoClientTitle': 'Serverinfo-Seite auf dem Client oeffnen',
   'main.openConfigTitle': 'Konfigurationsseite oeffnen',
+  'main.openDeviceSecurity': 'Sicherheit und Geräte',
+  'main.openDeviceSecurityTitle': 'Sicherheit und gekoppelte Geräte verwalten',
   'main.openPreferences': 'Einstellungen',
   'main.openPreferencesTitle': 'Lokale Einstellungsseite oeffnen',
   'main.toggleQrOverlayTitle': 'QR-Overlay ein- oder ausblenden',

@@ -7,7 +7,6 @@ import {
 } from '../../../utils/notificationSettings.js';
 import {createServicesRegistry} from '../../services/createServicesRegistry.js';
 import {initializeCoreServices} from '../../services/createServicesContainer.js';
-import {createDeviceSessionsPanel} from './device-sessions-panel.js';
 
 const services = createServicesRegistry();
 await initializeCoreServices(services);
@@ -23,15 +22,6 @@ applyPageTranslations(document, t);
 function t(key, params) {
   return services.getI18n().t(key, params);
 }
-
-const deviceSessionsPanel = createDeviceSessionsPanel({
-  listNode: document.getElementById('device-sessions-list'),
-  statusNode: document.getElementById('device-sessions-status'),
-  reloadButton: document.getElementById('reload-device-sessions'),
-  revokeAllButton: document.getElementById('revoke-all-device-sessions'),
-  locale: services.getI18n().locale,
-  t,
-});
 
 function translateOr(key, fallback = '') {
   const value = t(key);
@@ -643,7 +633,6 @@ function renderConfigForm(config, schema) {
 function refreshLocalizedTexts() {
   applyPageTranslations(document, t);
   renderConfigForm(currentConfig, currentSchema);
-  deviceSessionsPanel.refreshTranslations(services.getI18n().locale);
 }
 
 function collectFormValues(schema) {
@@ -840,7 +829,6 @@ restartButton.addEventListener('click', () => {
 refreshConfigFromServer().catch((error) => {
   setStatus(error.message || t('adminConfig.statusLoadError'), 'error');
 });
-deviceSessionsPanel.load();
 subscribeToConfigEvents().catch(() => {});
 window.addEventListener('beforeunload', () => {
   configStream?.close();

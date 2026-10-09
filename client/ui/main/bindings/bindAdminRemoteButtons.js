@@ -23,6 +23,7 @@ export function bindAdminRemoteButtons(services, dom) {
         btnOpenServerInfoBrowserServer,
         btnOpenServerInfoBrowserClient,
         btnOpenConfigPage,
+        btnOpenDeviceSecurity,
         btnOpenPreferencesPage,
         btnRotateEntryToken,
         adminActionsDisabledMessage,
@@ -40,6 +41,7 @@ export function bindAdminRemoteButtons(services, dom) {
         btnOpenServerInfoBrowserServer,
         btnOpenServerInfoBrowserClient,
         btnOpenConfigPage,
+        btnOpenDeviceSecurity,
     ];
     let relockAvailable = false;
     const emit = (eventName, payload = {}, method = 'POST') => () => emitWithTimestamp(socket, eventName, payload, method);
@@ -142,6 +144,9 @@ export function bindAdminRemoteButtons(services, dom) {
     });
     btnOpenConfigPage.addEventListener('click', () => {
         window.location.href = '/ui/admin/config';
+    });
+    btnOpenDeviceSecurity?.addEventListener('click', () => {
+        window.location.href = '/ui/admin/security';
     });
     btnOpenPreferencesPage?.addEventListener('click', () => {
         window.location.href = '/ui/admin/preferences';

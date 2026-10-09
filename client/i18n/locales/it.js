@@ -67,6 +67,8 @@ export const it = {
   'main.openServerInfoServerTitle': 'Apri la pagina info server sul server',
   'main.openServerInfoClientTitle': 'Apri la pagina info server sul client',
   'main.openConfigTitle': 'Apri la pagina di configurazione',
+  'main.openDeviceSecurity': 'Sicurezza e dispositivi',
+  'main.openDeviceSecurityTitle': 'Gestisci sicurezza e dispositivi associati',
   'main.openPreferences': 'Preferenze',
   'main.openPreferencesTitle': 'Apri la pagina delle preferenze locali',
   'main.toggleQrOverlayTitle': 'Mostra o nascondi l overlay QR',

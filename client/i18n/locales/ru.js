@@ -27,6 +27,8 @@ export const ru = {
   'main.openServerInfoClientTitle': 'Открыть страницу информации о сервере на клиенте',
   'main.openConfig': 'Конфигурация',
   'main.openConfigTitle': 'Открыть страницу конфигурации',
+  'main.openDeviceSecurity': 'Безопасность и устройства',
+  'main.openDeviceSecurityTitle': 'Управление безопасностью и связанными устройствами',
   'main.openPreferences': 'Настройки',
   'main.openPreferencesTitle': 'Открыть страницу локальных настроек',
   'main.accessAria': 'Доступ',

@@ -123,6 +123,7 @@ function getAdminRemoteDom() {
     btnOpenServerInfoBrowserServer: getElement('btn-open-server-info-browser-server'),
     btnOpenServerInfoBrowserClient: getElement('btn-open-server-info-browser-client'),
     btnOpenConfigPage: getElement('btn-open-config-page'),
+    btnOpenDeviceSecurity: getElement('btn-open-device-security'),
     btnOpenPreferencesPage: getElement('btn-open-preferences-page'),
     btnRotateEntryToken: getElement('btn-rotate-entry-token'),
     adminUnlockForm: getElement('admin-unlock-form'),

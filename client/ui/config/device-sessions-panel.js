@@ -47,14 +47,22 @@ export function createDeviceSessionsPanel({
       const state = t(`adminConfig.devices.state.${session.state || 'unknown'}`);
       const lastActivityAt = Number(session.lastActivityAt);
       const lastActivity = Number.isFinite(lastActivityAt) && lastActivityAt > 0
-        ? new Intl.DateTimeFormat(locale, {dateStyle: 'medium', timeStyle: 'short'}).format(lastActivityAt)
+        ? new Intl.DateTimeFormat(locale, {
+          dateStyle: session.state === 'revoked' ? 'short' : 'medium',
+          timeStyle: 'short',
+        }).format(lastActivityAt)
         : t('adminConfig.devices.unknownActivity');
 
-      details.append(
-        createTextNode('h3', 'device-session-name', name),
-        createTextNode('p', 'device-session-meta', t('adminConfig.devices.meta', {role, state})),
-        createTextNode('p', 'device-session-activity', t('adminConfig.devices.lastActivity', {value: lastActivity})),
-      );
+      details.append(createTextNode('h3', 'device-session-name', name));
+      if (session.state === 'revoked') {
+        details.append(createTextNode('p', 'device-session-meta device-session-meta-compact',
+          t('adminConfig.devices.revokedSummary', {state, value: lastActivity})));
+      } else {
+        details.append(
+          createTextNode('p', 'device-session-meta', t('adminConfig.devices.meta', {role, state})),
+          createTextNode('p', 'device-session-activity', t('adminConfig.devices.lastActivity', {value: lastActivity})),
+        );
+      }
       item.append(details);
 
       if (session.state === 'active' && !session.isCurrent) {

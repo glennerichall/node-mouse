@@ -67,6 +67,8 @@ export const zh = {
   'main.openServerInfoServerTitle': '在服务器上打开服务器信息页面',
   'main.openServerInfoClientTitle': '在客户端上打开服务器信息页面',
   'main.openConfigTitle': '打开配置页面',
+  'main.openDeviceSecurity': '安全与设备',
+  'main.openDeviceSecurityTitle': '管理安全设置和已配对设备',
   'main.openPreferences': '偏好设置',
   'main.openPreferencesTitle': '打开本地偏好设置页面',
   'main.toggleQrOverlayTitle': '显示或隐藏二维码覆盖层',

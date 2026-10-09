@@ -282,6 +282,7 @@ button[hidden] {
 }
 
 .device-sessions-section {
+  display: grid;
   gap: 14px;
 }
 
@@ -300,7 +301,7 @@ button[hidden] {
 
 .device-sessions-list {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -311,9 +312,9 @@ button[hidden] {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 14px;
+  padding: 12px 14px;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 12px;
   background: var(--panel-strong);
 }
 
@@ -345,24 +346,49 @@ button[hidden] {
   text-align: right;
 }
 
-.device-session-revoke {
-  flex: 0 0 auto;
+.device-session-revoke,
+.device-sessions-actions #revoke-all-device-sessions {
   border-color: color-mix(in srgb, var(--danger), transparent 45%);
 }
 
-.device-session-revoke-all {
-  border-color: color-mix(in srgb, var(--danger), transparent 45%);
+.device-session-revoked {
+  display: block;
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+.device-session-revoked .device-session-details {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.device-session-revoked .device-session-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.device-session-meta-compact {
+  flex: 0 0 auto;
+  font-size: 0.78rem;
+  text-align: right;
+  white-space: nowrap;
 }
 
 @media (max-width: 600px) {
-  .device-session {
+  .device-session:not(.device-session-revoked) {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .device-session-revoke,
-  .device-session-current {
-    align-self: flex-end;
+  .device-session-revoked {
+    display: block;
+  }
+
+  .device-session-meta-compact {
+    text-align: left;
   }
 }
 

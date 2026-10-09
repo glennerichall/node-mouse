@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Remote Mouse Config</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="stylesheet" href="/admin-config.css?v=20261009a" />
+  <link rel="stylesheet" href="/admin-config.css?v=20261009b" />
 </head>
 <body>
   <main class="config-page">
@@ -21,23 +21,6 @@
         <button id="restart-service" type="button" data-i18n="adminConfig.restart">Redemarrer le service</button>
       </div>
     </header>
-
-    <section class="config-section device-sessions-section" aria-labelledby="device-sessions-title">
-      <div class="section-heading">
-        <div class="section-heading-copy">
-          <p class="section-key" data-i18n="adminConfig.devices.key">Securite</p>
-          <h2 id="device-sessions-title" data-i18n="adminConfig.devices.title">Appareils associes</h2>
-          <p class="section-description" data-i18n="adminConfig.devices.description">Gerez les appareils autorises et associez-en de nouveaux avec le QR code.</p>
-        </div>
-      </div>
-      <div class="device-sessions-actions">
-        <a class="secondary-link" href="/qr" target="_blank" rel="noopener noreferrer" data-i18n="adminConfig.devices.reassociate">Associer un appareil</a>
-        <button id="revoke-all-device-sessions" class="device-session-revoke-all" type="button" disabled data-i18n="adminConfig.devices.revokeAll">Tout révoquer</button>
-        <button id="reload-device-sessions" type="button" data-i18n="adminConfig.devices.reload">Actualiser</button>
-      </div>
-      <p id="device-sessions-status" class="device-sessions-status" role="status" aria-live="polite"></p>
-      <ul id="device-sessions-list" class="device-sessions-list" aria-labelledby="device-sessions-title"></ul>
-    </section>
 
     <section class="status-bar" aria-live="polite">
       <p id="config-status" data-i18n="adminConfig.loading">Chargement de la configuration...</p>
@@ -75,6 +58,6 @@
     </div>
   </template>
 
-  <script type="module" src="/client/ui/config/page.js?v=20261009a"></script>
+  <script type="module" src="/client/ui/config/page.js?v=20261009b"></script>
 </body>
 </html>

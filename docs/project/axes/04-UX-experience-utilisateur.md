@@ -16,6 +16,10 @@ compréhensibles sur mobile et desktop.
   autres que celle de l'appareil courant; confirmer le nombre concerné, garder
   l'appareil courant connecté et déconnecter immédiatement les autres sessions
   révoquées.
+- [ ] UX-002b — ajouter au panneau latéral un bouton qui ouvre une page dédiée
+  à la sécurité et aux appareils associés; ne pas afficher la liste dans le
+  panneau latéral ni dans la page de configuration, et compacter les
+  informations des appareils révoqués.
 - [x] UX-003 — améliorer les diagnostics de connexion et afficher le transport.
 - [ ] UX-004 — sélection multi-écrans.
 - [ ] UX-005 — profils de contrôle.

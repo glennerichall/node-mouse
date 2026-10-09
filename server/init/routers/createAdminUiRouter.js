@@ -8,6 +8,10 @@ export const adminUiRouter = express.Router()
         res.sendFile(path.join(publicDir, 'admin-config.html'));
     })
 
+    .get('/security', (_req, res) => {
+        res.sendFile(path.join(publicDir, 'admin-security.html'));
+    })
+
     .get('/server-info', (_req, res) => {
         res.sendFile(path.join(publicDir, 'server-info.html'));
     })

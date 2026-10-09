@@ -67,6 +67,8 @@ export const ja = {
   'main.openServerInfoServerTitle': 'サーバーでサーバー情報ページを開く',
   'main.openServerInfoClientTitle': 'クライアントでサーバー情報ページを開く',
   'main.openConfigTitle': '設定ページを開く',
+  'main.openDeviceSecurity': 'セキュリティとデバイス',
+  'main.openDeviceSecurityTitle': 'セキュリティとペアリング済みデバイスを管理',
   'main.openPreferences': '設定',
   'main.openPreferencesTitle': 'ローカル設定ページを開く',
   'main.toggleQrOverlayTitle': 'QR オーバーレイを表示または非表示',
