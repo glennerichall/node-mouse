@@ -28,6 +28,8 @@ l'itération et devient append-only dès sa clôture.
 
 ## Historique existant
 
+- [Code — CODE-008](./code-CODE-008-2026-10-09.md): suppression des alias npm
+  redondants et renommage explicite du hook `postinstall` Linux.
 - [Code — CODE-007](./code-CODE-007-2026-10-09.md): retrait du vérificateur
   de style maison et de son intégration à `npm test`.
 - [Plateformes — PLAT-001c](./platforms-PLAT-001c-2026-10-09.md): installation

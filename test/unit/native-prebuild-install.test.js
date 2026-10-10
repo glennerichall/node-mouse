@@ -1,23 +1,19 @@
 import {jest} from '@jest/globals';
-import {buildNativeInputIfAvailable} from '../../scripts/build-native-input-if-available.mjs';
+import {prepareLinuxNativeRuntime} from '../../scripts/postinstall-linux.mjs';
 import {buildNativePrebuilds} from '../../scripts/build-native-prebuilds.mjs';
 
 describe('native prebuild installation', () => {
   it('does not invoke compilers when all packaged binaries are present', () => {
-    const execute = jest.fn();
     const migrateUInput = jest.fn();
     const stderr = {write: jest.fn()};
-    const result = buildNativeInputIfAvailable({
+    const result = prepareLinuxNativeRuntime({
       platform: 'linux',
       arch: 'x64',
       exists: (filePath) => filePath.includes('/prebuilds/linux-x64/'),
-      probe: () => ({status: 0}),
-      execute,
       stderr,
       migrateUInput,
     });
 
-    expect(execute).not.toHaveBeenCalled();
     expect(result.built).toEqual([]);
     expect(result.skipped).toEqual([]);
     expect(stderr.write).not.toHaveBeenCalled();
@@ -25,21 +21,15 @@ describe('native prebuild installation', () => {
   });
 
   it('never compiles native features during installation when package artifacts are missing', () => {
-    const execute = jest.fn();
-    const probe = jest.fn(() => ({status: 0}));
     const stderr = {write: jest.fn()};
-    const result = buildNativeInputIfAvailable({
+    const result = prepareLinuxNativeRuntime({
       platform: 'linux',
       arch: 'arm64',
       exists: () => false,
-      probe,
-      execute,
       stderr,
       migrateUInput: jest.fn(),
     });
 
-    expect(execute).not.toHaveBeenCalled();
-    expect(probe).not.toHaveBeenCalled();
     expect(result.built).toEqual([]);
     expect(result.skipped).toEqual(['uinput', 'xwaylandPointer', 'xwaylandOverlay', 'waylandPortal']);
     expect(stderr.write).toHaveBeenCalledWith(expect.stringContaining('npm install did not compile them'));
@@ -47,7 +37,7 @@ describe('native prebuild installation', () => {
 
   it('keeps the libei portal helper optional without warning during installation', () => {
     const stderr = {write: jest.fn()};
-    const result = buildNativeInputIfAvailable({
+    const result = prepareLinuxNativeRuntime({
       platform: 'linux',
       arch: 'x64',
       exists: (filePath) => !filePath.endsWith('/remote-mouse-wayland'),

@@ -13,7 +13,7 @@ const REQUIRED_COMPONENTS = ['uinput', 'xwaylandPointer', 'xwaylandOverlay'];
  * Keep npm installation free of native compilation. Developers can invoke
  * the explicit build scripts; published packages must carry their binaries.
  */
-export function buildNativeInputIfAvailable({
+export function prepareLinuxNativeRuntime({
   platform = process.platform,
   arch = process.arch,
   exists = existsSync,
@@ -43,5 +43,5 @@ export function buildNativeInputIfAvailable({
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  buildNativeInputIfAvailable();
+  prepareLinuxNativeRuntime();
 }

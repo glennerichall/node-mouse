@@ -1,6 +1,6 @@
 # 09 — CODE — Qualité et uniformité du code
 
-**État:** à jour; CODE-003 et CODE-004 terminées.
+**État:** à jour; CODE-001 à CODE-008 terminées.
 
 ## Résultat visé
 
@@ -66,6 +66,10 @@ découpage des responsabilités et des contrats entre composants.
   `scripts/check-code-style.mjs` et son branchement npm; le contrôle de style
   générique ne fait pas partie des vérifications nécessaires au fonctionnement
   ni aux tests métier du produit.
+- [x] **CODE-008 — Nettoyage des scripts de dépôt:** inventorier les fichiers
+  de `scripts/` et les commandes npm; supprimer les alias réellement redondants,
+  retirer les scripts sans appel actif démontré et clarifier les noms qui ne
+  décrivent plus leur rôle, sans casser les points d'entrée documentés.
 
 ## Critères d'acceptation de l'axe
 
