@@ -200,7 +200,7 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
 - [x] PLAT-005e — abandonner l'orchestration Vagrant/Packer des machines de
   développement; les développeurs fournissent leurs VM et les scripts de
   `dev/deploy/` déploient le dépôt par SSH/rsync avant les tests intégrés.
-- [ ] PLAT-005f — fournir un installateur idempotent pour préparer un poste de
+- [x] PLAT-005f — fournir un installateur idempotent pour préparer un poste de
   développement Linux Ubuntu/Debian : vérifier la version de Node.js attendue
   par le projet, installer ou signaler les outils système requis pour le
   développement, la compilation locale des composants natifs et les tests,

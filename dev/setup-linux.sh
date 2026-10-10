@@ -71,7 +71,7 @@ for package in "${system_packages[@]}"; do
 done
 
 native_outputs=(
-  build/wayland/remote-mouse-uinput.node
+  build/uinput/remote-mouse-uinput.node
   build/wayland/remote-mouse-xwayland-pointer.node
   build/wayland/remote-mouse-xwayland-overlay
 )

@@ -108,5 +108,7 @@ describe('Linux development setup', () => {
     expect(script).toContain('npm run build:uinput');
     expect(script).toContain('npm run build:xwayland-pointer');
     expect(script).toContain('npm run build:xwayland-overlay');
+    expect(script).toContain('build/uinput/remote-mouse-uinput.node');
+    expect(script).toContain('build/wayland/remote-mouse-xwayland-pointer.node');
   });
 });

@@ -1,6 +1,6 @@
 # Plateformes — PLAT-005f — 2026-10-09
 
-État: implanté; validation complète sur un hôte préparé en attente
+État: terminé
 
 ## Objectif et critères d'acceptation
 
@@ -42,14 +42,17 @@ il doit pouvoir être relancé sans opération manuelle destructive.
 - `npm ci --dry-run --ignore-scripts --no-audit --no-fund` : réussi après
   synchronisation du lockfile.
 - `git diff --check` : réussi.
-- Le mode `--check` a identifié `libxtst-dev` et le bridge uinput comme absents
-  sur l'hôte courant, sans modifier le système. Les parcours APT ont été testés
-  avec des commandes simulées; aucun paquet système n'a été installé et les
-  compilations natives réelles restent à valider sur un hôte préparé.
+- L'installateur a été exécuté avec succès par le développeur sur Ubuntu/Debian
+  x86_64; `npm run setup:dev:linux -- --check` confirme les paquets, npm et les
+  trois helpers natifs prêts. `file` confirme que les deux bridges sont des
+  bibliothèques partagées ELF x86-64 et que l'overlay est un exécutable ELF
+  x86-64.
+- La vérification a d'abord cherché le bridge uinput sous `build/wayland/`;
+  le contrôle a révélé que le script de build le produit sous `build/uinput/`.
+  Le chemin de contrôle a été corrigé puis revérifié avec succès.
+- Les parcours APT ont également été testés avec des commandes simulées.
 
 ## Blocages / risques / suite
 
-Le test d'installation complet des paquets et la compilation effective des
-helpers doivent être confirmés après lancement de `npm run setup:dev:linux` sur
-un poste Ubuntu/Debian. Le helper libei facultatif n'est pas installé ni compilé
-par ce parcours.
+Le helper libei facultatif n'est pas installé ni compilé par ce parcours.
+PLAT-001c doit maintenant générer et valider les prébuilds sur x64 et ARM64.
