@@ -1,6 +1,6 @@
 # Plateformes — PLAT-001c — 2026-10-09
 
-État: en cours
+État: terminé
 
 ## Objectif et critères d'acceptation
 
@@ -37,16 +37,11 @@ contenu du paquet publié et les bibliothèques partagées runtime.
 
 - Tests unitaires ajoutés pour la résolution, le postinstall sans compilation
   et la vérification du contenu des artefacts propres au projet.
-- La complétude réelle du tarball reste à vérifier après génération des
-  composants natifs projet sur des hôtes Linux x64 et ARM64.
+- Le suivi initial des artefacts x64 et la clôture après compilation croisée
+  ARM64 sont consignés dans le [journal de validation x64/ARM64](./platforms-PLAT-001c-x64-2026-10-09.md).
 
 ## Blocages / risques / suite
 
-- Aucun artefact natif propre au projet n'est encore présent dans
-  `prebuilds/`; les en-têtes X11/libpng et le compilateur manquent sur cet hôte.
-- Le générateur actuel choisit l'architecture cible explicitement et prend en
-  charge la compilation croisée ARM64 depuis x64 avec `aarch64-linux-gnu-gcc`;
-  le toolchain et les bibliothèques de développement cibles doivent être
-  installés avant le build. Il reste à réaliser et valider ce build ARM64,
-  réunir les deux répertoires, puis tester l'installation sans toolchain.
-- Le niveau minimal de glibc pour les binaires publiés reste à fixer.
+- Le plancher glibc et les essais d'installation/chargement depuis un tarball
+  isolé restent à couvrir dans PLAT-001e; les prébuilds générés sont ignorés
+  par Git et doivent être régénérés par le processus de packaging.

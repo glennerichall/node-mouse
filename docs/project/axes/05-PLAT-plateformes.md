@@ -14,7 +14,7 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
 - [x] PLAT-001b — rattacher la migration privilégiée uinput au `postinstall`
   déclenché par la mise à jour intégrée; demander l'autorisation locale via
   Polkit seulement lorsque la configuration système manque.
-- [ ] PLAT-001c — distribuer les composants natifs Linux sous forme d'artéfacts
+- [x] PLAT-001c — distribuer les composants natifs Linux sous forme d'artéfacts
   précompilés dans le paquet npm, sélectionnés selon l'architecture; le
   `postinstall` les utilise sans exiger de compilateur ni d'en-têtes de
   développement sur la machine cible. Inventorier les dépendances npm natives
@@ -212,7 +212,7 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   installés, les privilèges nécessaires, les limites de distribution et les
   étapes de vérification; permettre de relancer le script sans effets
   indésirables.
-- [ ] PLAT-005g — étendre `dev/setup-linux.sh` pour préparer la génération des
+- [x] PLAT-005g — étendre `dev/setup-linux.sh` pour préparer la génération des
   prébuilds projet x64 et ARM64 sur un hôte amd64 : détecter l'architecture
   étrangère et les paquets cibles requis, configurer la source ARM64 officielle
   Ubuntu sans écraser une configuration gérée par le développeur, installer le

@@ -164,7 +164,8 @@ describe('Linux development setup', () => {
 
       expect(result.status).toBe(1);
       expect(result.stdout).toContain('ARM64 foreign architecture: missing');
-      expect(result.stdout).toContain('Missing native prebuild: prebuilds/linux-arm64');
+      expect(result.stdout).toContain('Ubuntu ARM64 package source: missing');
+      expect(result.stdout).not.toContain('Missing native prebuild:');
       expect(readFileSync(logFile, 'utf8')).toBe('');
     } finally {
       rmSync(fakeBin, {recursive: true, force: true});

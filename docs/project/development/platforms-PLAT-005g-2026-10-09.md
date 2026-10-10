@@ -1,6 +1,6 @@
 # Plateformes — PLAT-005g — 2026-10-09
 
-État: en cours
+État: terminé
 
 ## Objectif
 
@@ -30,15 +30,15 @@ d'exécuter séparément les commandes APT du toolchain croisé.
 - Suite `test/unit/dev-setup-linux.test.js` : 6 tests réussis, dont les appels
   simulés d'activation ARM64, d'installation APT et de génération des prébuilds.
 - `bash -n dev/setup-linux.sh` et `npm run check:version` réussis.
-- `npm run setup:dev:linux -- --check` indique correctement que ce poste ne
-  possède pas encore le toolchain, les paquets ARM64 ni les prébuilds ARM64;
-  il n'a exécuté aucune commande privilégiée.
+- Le développeur a confirmé l'installation du setup; `npm run setup:dev:linux
+  -- --check` confirme toolchain, architecture étrangère, source Ubuntu,
+  bibliothèques et prébuilds x64/ARM64 présents.
+- La compilation croisée ARM64 a été exécutée : les trois artefacts sont ELF64
+  AArch64 et `npm run verify:native:prebuilds` confirme leur présence dans le
+  tarball npm.
 - Version patch portée à 6.19.80.
 
 ## Reste à valider
 
-Le parcours APT réel et la compilation croisée n'ont pas été exécutés dans
-cette passe. La tâche reste ouverte jusqu'à ce que le développeur relance
-`npm run setup:dev:linux`, vérifie les paquets et artefacts générés avec
-`npm run setup:dev:linux -- --check`, puis valide le tarball et son exécution
-sur une cible ARM64.
+Le chargement et l'exécution des binaires ARM64 sur une cible réelle restent
+à valider dans le packaging PLAT-001e.

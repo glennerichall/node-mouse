@@ -36,12 +36,11 @@ l'itération et devient append-only dès sa clôture.
   sans compilation native sur la cible, résolution des binaires précompilés
   Linux et vérification des artefacts x64/ARM64 du paquet.
 - [Plateformes — PLAT-001c x64](./platforms-PLAT-001c-x64-2026-10-09.md):
-  génération des prébuilds projet x64, ajout de la compilation croisée ARM64
-  et vérification de l'architecture des ELF; le toolchain ARM64 doit encore
-  être installé pour valider la production réelle des binaires cibles.
+  génération des prébuilds projet x64/ARM64, vérification de l'architecture ELF
+  et inclusion des deux cibles dans le tarball npm.
 - [Plateformes — PLAT-005g](./platforms-PLAT-005g-2026-10-09.md): préparation
-  du toolchain ARM64 et génération des deux architectures par l'installateur
-  de l'environnement de développement; validation sur le poste reste à faire.
+  du toolchain ARM64 et génération validée des deux architectures par
+  l'installateur de l'environnement de développement.
 - [Expérience utilisateur — UX-006](./ux-UX-006-2026-10-04.md): vitesse et
   accélération du pointeur configurables localement par appareil.
 - [Expérience utilisateur — UX-006a](./ux-UX-006a-2026-10-04.md): mise en page
