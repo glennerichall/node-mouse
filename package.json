@@ -1,6 +1,6 @@
 {
   "name": "@velor/remote-mouse",
-  "version": "6.19.84",
+  "version": "6.19.86",
   "type": "module",
   "description": "Remote mouse and keyboard with mobile client",
   "homepage": "https://github.com/glennerichall/node-mouse#readme",
@@ -31,8 +31,6 @@
     "scripts/build-xwayland-pointer-bridge.sh",
     "scripts/configure-uinput-access.sh",
     "scripts/configure-uinput-after-update.mjs",
-    "scripts/install-linux.sh",
-    "scripts/install-windows.ps1",
     "scripts/postinstall-linux.mjs",
     "utils/"
   ],
@@ -50,7 +48,7 @@
     "postinstall": "node scripts/postinstall-linux.mjs",
     "check:version": "node scripts/check-package-version.mjs",
     "test": "npm run check:version && NODE_OPTIONS=--experimental-vm-modules jest --runInBand --coverage",
-    "test:install": "NODE_OPTIONS=--experimental-vm-modules jest test/unit/install-scripts.test.js --runInBand",
+    "test:install": "NODE_OPTIONS=--experimental-vm-modules jest test/unit/setup-command.test.js --runInBand",
     "test:install:integration": "node test/integration/install/run-linux-install.mjs",
     "test:remote": "node test/integration/run-remote.mjs linux-install",
     "test:remote:x11": "node test/integration/run-remote.mjs linux-x11",

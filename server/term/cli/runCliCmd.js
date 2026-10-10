@@ -4,6 +4,7 @@ import {printCliLog, printCliResult} from "./printCliResult.js";
 import {sendCliCommand} from "./sendCliCommand.js";
 import {withCliVerbosity} from "../srv/executeCliRequest.js";
 import {getInstalledVersion} from './versionCommand.js';
+import {runSetup} from './setupCommand.js';
 
 function isLocalServiceCommand(command) {
     return command?.name === 'service'
@@ -32,6 +33,7 @@ export async function runCliCmd(args) {
         console.log('  remote-mouse sys-config   Affiche la configuration systeme');
         console.log('  remote-mouse system-config Alias de sys-config');
         console.log('  remote-mouse service install Installe le daemon/service local');
+        console.log('  remote-mouse setup [--yes] [--no-service] [--configure-uinput] Configure the app and local service');
         console.log('  remote-mouse service disable Desactive le daemon/service local');
         console.log('  remote-mouse service uninstall Desinstalle le daemon/service local');
         console.log('  remote-mouse service restart Redemarre le daemon/service local');
@@ -51,6 +53,11 @@ export async function runCliCmd(args) {
         if (isLocalServiceCommand(command)) {
             const result = await withCliVerbosity(options, () => executeLocalServiceCommand(command), printCliLog);
             printCliResult(result);
+            process.exit(result?.ok ? 0 : 1);
+        }
+
+        if (command?.name === 'setup') {
+            const result = await runSetup({options: options.setup});
             process.exit(result?.ok ? 0 : 1);
         }
 

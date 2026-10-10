@@ -31,75 +31,31 @@ The application includes:
 
 ## Install
 
-### Automatic (preferred)
+### Linux and Windows
 
-Linux installer:
-
-[scripts/install-linux.sh](https://raw.githubusercontent.com/glennerichall/node-mouse/main/scripts/install-linux.sh)
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/glennerichall/node-mouse/main/scripts/install-linux.sh | bash
-```
-
-For local development from this repository, run [`scripts/install-linux.sh`](./scripts/install-linux.sh):
+Install Node.js 20 or newer and npm, then install the package and run its
+first-run setup:
 
 ```bash
-scripts/install-linux.sh
+npm install -g @velor/remote-mouse
+remote-mouse setup
 ```
 
-Use `-y` to automatically accept every confirmation prompt:
+On Windows, run the same npm command from an elevated terminal only if npm
+requires it; the scheduled task itself runs in the current user's desktop
+session. `remote-mouse setup --yes` accepts the service-install prompt, while
+`--no-service` creates configuration without registering the service. Under
+Wayland, setup asks separately before changing the restricted `/dev/uinput`
+permission; `--configure-uinput` explicitly requests that change.
 
-```bash
-scripts/install-linux.sh -y
-```
-
-When running the installer through `curl | bash`, pass options after `bash -s --`:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/glennerichall/node-mouse/main/scripts/install-linux.sh | bash -s -- -y
-```
-
-The Linux installer is also the supported migration path for an existing
-installation. It updates the npm package and missing uinput permissions while
-preserving the existing `.env`, session secret, certificates and SQLite data.
-Missing migration keys are appended idempotently. Use `--overwrite-config`
-only when replacing the complete `.env` is intentional. After uinput is added
-to an existing user, reconnect the desktop session before restarting the user
-service.
-
-Windows installer:
-
-[scripts/install-windows.ps1](https://raw.githubusercontent.com/glennerichall/node-mouse/main/scripts/install-windows.ps1)
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/install-windows.ps1
-```
-
-Use `-Yes` to automatically accept every confirmation prompt:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/install-windows.ps1 -Yes
-```
-
-For a downloaded script:
-
-```powershell
-iwr https://raw.githubusercontent.com/glennerichall/node-mouse/main/scripts/install-windows.ps1 -OutFile install-windows.ps1
-powershell -ExecutionPolicy Bypass -File .\install-windows.ps1
-```
-
-Downloaded script with automatic confirmations:
-
-```powershell
-iwr https://raw.githubusercontent.com/glennerichall/node-mouse/main/scripts/install-windows.ps1 -OutFile install-windows.ps1
-powershell -ExecutionPolicy Bypass -File .\install-windows.ps1 -Yes
-```
-
-macOS installer scripts will be added later.
+Setup creates a private configuration directory and a unique session secret,
+preserves existing settings and data, and offers to install/start the local
+service. Updates remain a package operation (`npm update -g
+@velor/remote-mouse`) and do not replace the configuration.
 
 ### Session cookie secret
 
-The Linux and Windows installers generate a unique 32-byte random
+`remote-mouse setup` generates a unique random
 `SESSION_COOKIE_SECRET` in the configuration `.env` file. Production startup
 refuses the default `change-me` value and secrets shorter than 64 characters.
 For a manual production setup, generate a secret with
@@ -112,14 +68,12 @@ session cookies will no longer be valid, so connected clients must establish a
 new session. Back up the configuration file securely before editing it, and do
 not reuse the previous secret.
 
-The automatic installer is expected to handle:
+The setup command handles:
 
-- Node.js installation or validation
-- platform native dependencies
-- npm package installation
+- Node.js version and supported-platform validation
 - initial `.env` creation
 - optional local service installation
-- first-run access URL and QR code display
+- explicit opt-in for Linux Wayland uinput permissions
 
 ### Custom
 
@@ -263,10 +217,12 @@ Install the published npm package globally:
 
 ```bash
 npm install -g @velor/remote-mouse
-remote-mouse
+remote-mouse setup
 ```
 
-On startup, the server prints the client access URL and the corresponding QR code.
+The setup command creates the initial configuration and offers to install the
+user-level service. To run interactively without a service, use
+`remote-mouse setup --no-service`, then start the server with `remote-mouse`.
 
 #### Source Install
 
@@ -315,9 +271,8 @@ The application can manage its own `systemd --user` service.
 
 Typical setup:
 
-1. Install the package with npm, or use the source install path above.
-2. Create a `.env` file based on [`.env.example`](./.env.example).
-3. Run `remote-mouse service install`.
+1. Install the package globally with npm.
+2. Run `remote-mouse setup` and accept service installation.
 4. Use `remote-mouse service restart`, `remote-mouse service disable`, or `remote-mouse service uninstall` as needed.
 
 The generated unit is equivalent to the following:
@@ -356,9 +311,8 @@ On Windows, the application manages a Task Scheduler entry that runs at user log
 
 Typical setup:
 
-1. Install the package with npm, or use the source install path above.
-2. Create a `.env` file based on [`.env.example`](./.env.example).
-3. Run `remote-mouse service install`.
+1. Install the package globally with npm.
+2. Run `remote-mouse setup` and accept service installation.
 4. Use `remote-mouse service restart`, `remote-mouse service disable`, or `remote-mouse service uninstall` as needed.
 
 The generated scheduled task follows this model:
@@ -428,8 +382,8 @@ remote-mouse service restart
 
 This keeps the existing configuration and database. If npm reports a permission
 error, use the same Node/npm installation and privilege method that were used
-for the original global installation. Do not delete the configuration directory
-or rerun the installer with configuration overwrite enabled.
+for the original global installation. Do not delete the configuration directory;
+`remote-mouse setup` preserves existing settings and data.
 
 After the update, add `ADMIN_PASSWORD` and optionally `ADMIN_UNLOCK_MINUTES` to
 the existing `.env`, restart the service, rescan the QR if necessary, and use
@@ -445,6 +399,7 @@ Useful server pages:
 Useful CLI commands:
 
 - `help` displays the available CLI commands
+- `setup` creates initial configuration and offers local service installation
 - `version` displays the installed package version without contacting the daemon
 - `info` prints the server capabilities
 - `config` prints the effective persisted configuration

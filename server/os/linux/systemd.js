@@ -18,6 +18,13 @@ export function buildSystemdUnit({entrypoint, nodePath}) {
         .filter(Boolean)
         .join(':');
 
+    const configEnvironment = ['CONFIG_DIR', 'ENV_FILE_PATH']
+        .filter((key) => String(process.env[key] || '').trim())
+        .map((key) => {
+            const value = String(process.env[key]).replace(/%/g, '%%').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+            return `Environment="${key}=${value}"`;
+        });
+
     return [
         '[Unit]',
         'Description=Remote Mouse Server',
@@ -32,6 +39,7 @@ export function buildSystemdUnit({entrypoint, nodePath}) {
         `Environment=PATH=${environmentPath}`,
         'Environment=NODE_ENV=production',
         'Environment=REMOTE_MOUSE_DAEMON=1',
+        ...configEnvironment,
         'PassEnvironment=DISPLAY WAYLAND_DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS',
         '',
         '[Install]',

@@ -65,22 +65,15 @@ if (!runtime) {
 const workspace = process.cwd();
 const containerScript = `
 set -euo pipefail
-apt-get update
-apt-get install -y bash ca-certificates
 rm -rf /tmp/remote-mouse-package
 mkdir -p /tmp/remote-mouse-package
 tar --exclude=.git --exclude=node_modules -C /workspace -cf - . | tar -C /tmp/remote-mouse-package -xf -
-scripts/install-linux.sh \\
-  -y \\
-  --package /tmp/remote-mouse-package \\
-  --config-dir /tmp/remote-mouse-config \\
-  --port 3987 \\
-  --no-https \\
-  --no-service
+npm install -g /tmp/remote-mouse-package
+remote-mouse setup --yes --no-service --config-dir /tmp/remote-mouse-config --port 3987
 remote-mouse help
 test -f /tmp/remote-mouse-config/.env
 grep -q '^PORT=3987$' /tmp/remote-mouse-config/.env
-grep -q '^HTTPS=false$' /tmp/remote-mouse-config/.env
+grep -Eq '^SESSION_COOKIE_SECRET=.{$64,}$' /tmp/remote-mouse-config/.env
 `;
 
 const result = await run(runtime, [
@@ -90,7 +83,7 @@ const result = await run(runtime, [
   `${workspace}:/workspace:ro`,
   '-w',
   '/workspace',
-  'ubuntu:24.04',
+  'node:22-bookworm',
   'bash',
   '-lc',
   containerScript,

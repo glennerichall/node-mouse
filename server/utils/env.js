@@ -25,6 +25,9 @@ export function resolveConfigDir(explicitConfigDir = '') {
   if (process.env.NODE_ENV === 'test') {
     return path.join(os.tmpdir(), 'remote-mouse');
   }
+  if (process.platform === 'win32') {
+    return path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), 'remote-mouse');
+  }
   return path.join(os.homedir(), '.config', 'remote-mouse');
 }
 

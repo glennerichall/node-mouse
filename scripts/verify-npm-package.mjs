@@ -29,6 +29,7 @@ const requiredFiles = [
   'scripts/build-xwayland-overlay.sh',
   'scripts/build-xwayland-pointer-bridge.sh',
   'scripts/postinstall-linux.mjs',
+  'server/term/cli/setupCommand.js',
   'server/term/cli/versionCommand.js',
 ];
 const forbiddenPathPrefixes = [

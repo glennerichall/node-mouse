@@ -11,7 +11,13 @@ import {
 function buildWindowsTaskCommand() {
     const nodePath = process.execPath.replace(/'/g, "''");
     const entrypoint = getEntrypoint().replace(/'/g, "''");
-    return `powershell -NoProfile -WindowStyle Hidden -Command "$env:REMOTE_MOUSE_DAEMON='1'; & '${nodePath}' '${entrypoint}'"`;
+  const configDir = String(process.env.CONFIG_DIR || '').replace(/'/g, "''");
+  const envFilePath = String(process.env.ENV_FILE_PATH || '').replace(/'/g, "''");
+  const configuration = [
+    configDir ? `$env:CONFIG_DIR='${configDir}';` : '',
+    envFilePath ? `$env:ENV_FILE_PATH='${envFilePath}';` : '',
+  ].join('');
+  return `powershell -NoProfile -WindowStyle Hidden -Command "$env:REMOTE_MOUSE_DAEMON='1'; ${configuration} & '${nodePath}' '${entrypoint}'"`;
 }
 
 export async function installWindowsDaemon(serviceName) {

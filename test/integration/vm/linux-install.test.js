@@ -52,7 +52,7 @@ describe('Ubuntu installation guest', () => {
       'env_file=$HOME/.config/remote-mouse/.env',
       'grep -q ^INTEGRATION_SENTINEL= "$env_file" || printf "\\nINTEGRATION_SENTINEL=preserved\\n" >> "$env_file"',
       'before=$(sha256sum "$env_file" | cut -d" " -f1)',
-      'XDG_SESSION_TYPE=wayland /workspace/remote-mouse/scripts/install-linux.sh --yes --package /workspace/remote-mouse --config-dir "$HOME/.config/remote-mouse" --port 3987 --no-https --wayland --install-service',
+      'npm install -g /workspace/remote-mouse && XDG_SESSION_TYPE=wayland CONFIG_DIR="$HOME/.config/remote-mouse" remote-mouse setup --yes --port 3987 --configure-uinput',
       'after=$(sha256sum "$env_file" | cut -d" " -f1)',
       'test "$before" = "$after"',
     ].join('; ');

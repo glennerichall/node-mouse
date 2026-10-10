@@ -9,7 +9,7 @@ describe('developer-provided VM deployment', () => {
     expect(deploy).toContain('rsync');
     expect(deploy).toContain('ssh');
     expect(deploy).not.toContain('vagrant');
-    expect(provision).toContain('install-linux.sh');
+    expect(provision).toContain('remote-mouse setup');
   });
 
   test('requires an explicit target host', () => {

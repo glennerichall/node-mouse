@@ -28,6 +28,13 @@ l'itération et devient append-only dès sa clôture.
 
 ## Historique existant
 
+- [Plateformes — PLAT-001h](./platforms-PLAT-001h-2026-10-10.md): extraction
+  de l'orchestration générique de setup et stratégies d'installation Linux et
+  Windows sélectionnées selon l'OS hôte.
+- [Plateformes — PLAT-001d](./platforms-PLAT-001d-2026-10-10.md): installation
+  publique `npm install -g` puis `remote-mouse setup`, secrets et service
+  idempotents, permission Wayland explicitement autorisée et retrait des anciens
+  installateurs par système.
 - [Code — CODE-008](./code-CODE-008-2026-10-09.md): suppression des alias npm
   redondants et renommage explicite du hook `postinstall` Linux.
 - [Code — CODE-007](./code-CODE-007-2026-10-09.md): retrait du vérificateur

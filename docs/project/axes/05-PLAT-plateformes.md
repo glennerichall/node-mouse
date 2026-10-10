@@ -56,7 +56,7 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   téléverser. Les vérifications npm imbriquées doivent désactiver les hooks pour
   éviter la récursion. Documenter les prérequis du toolchain et de
   l'authentification npm. Dépend de PLAT-001e.
-- [ ] PLAT-001d — simplifier l'installation publique autour de
+- [x] PLAT-001d — simplifier l'installation publique autour de
   `npm install -g @velor/remote-mouse`, puis d'une commande explicite
   `remote-mouse setup` qui configure l'application sur Linux et Windows.
   Séparer l'installation du paquet des changements système : le setup doit
@@ -66,9 +66,17 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   préserver configuration et données lors d'une mise à jour. Dépend de
   PLAT-001c et PLAT-001e, et coordonne les critères d'installation récupérable
   d'OPS. Garder
-  `install-linux.sh` et `install-windows.ps1` tant que leurs responsabilités
-  ne sont pas reprises et testées; les supprimer ensuite avec leur
-  documentation et leurs tests propres.
+  Les anciens installateurs par système ont été supprimés après reprise de la
+  configuration, du service et de la permission uinput par la commande `setup`;
+  conserver les tests du nouveau parcours et les outils natifs ciblés.
+- [x] PLAT-001h — refactorer `remote-mouse setup` en orchestration générique
+  appuyée sur une stratégie sélectionnée selon l'OS hôte. Séparer validation,
+  interaction, configuration persistante et installation du service en modules
+  à responsabilité unique. Chaque stratégie Linux/Windows fournit les chemins,
+  valeurs et opérations système propres à l'hôte, sans conditions OS dispersées
+  dans l'algorithme générique. Tester la sélection des stratégies, leurs
+  différences de configuration/permissions et le parcours commun avec des
+  stratégies simulées; préserver l'idempotence et le comportement actuel.
 - [ ] PLAT-002 — tester installation, service, mise à jour et désinstallation Windows.
 - [ ] PLAT-003 — créer l'installation macOS et guider les permissions Accessibilité.
 - [ ] PLAT-004 — intégrer le contrôle et la capture Wayland selon le

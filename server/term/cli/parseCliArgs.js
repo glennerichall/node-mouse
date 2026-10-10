@@ -23,6 +23,7 @@ export function parseCliArgs(args) {
     name: '',
     args: {},
   };
+  let setupOptions = {};
 
   const parsed = yargs(args)
     .scriptName('remote-mouse')
@@ -79,6 +80,21 @@ export function parseCliArgs(args) {
         },
       };
     })
+    .command('setup', false, (builder) => builder
+      .option('yes', {alias: 'y', type: 'boolean', default: false})
+      .option('service', {type: 'boolean', default: true})
+      .option('configure-uinput', {type: 'boolean', default: false})
+      .option('config-dir', {type: 'string'})
+      .option('port', {type: 'number'}), (argv) => {
+      command = {name: 'setup', args: {}};
+      setupOptions = {
+        yes: Boolean(argv.yes),
+        noService: argv.service === false,
+        configureUinput: Boolean(argv['configure-uinput']),
+        configDir: String(argv['config-dir'] || '').trim(),
+        port: argv.port,
+      };
+    })
     .command('tasks', false, () => {}, () => {
       command = {name: 'tasks', args: {}};
     })
@@ -109,12 +125,12 @@ export function parseCliArgs(args) {
     })
     .parse();
 
-  return {
-    command,
-    options: {
-      verbosity: Math.max(normalizeVerbosity(parsed.verbosity), normalizeVerbosity(parsed.v)),
-    },
+  const options = {
+    verbosity: Math.max(normalizeVerbosity(parsed.verbosity), normalizeVerbosity(parsed.v)),
   };
+  if (command.name === 'setup') options.setup = setupOptions;
+
+  return {command, options};
 }
 
 export function formatCliCommand(command) {
