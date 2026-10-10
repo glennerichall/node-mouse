@@ -1,6 +1,10 @@
 import {jest} from '@jest/globals';
 import {prepareLinuxNativeRuntime} from '../../scripts/postinstall-linux.mjs';
 import {buildNativePrebuilds} from '../../scripts/build-native-prebuilds.mjs';
+import {
+  getLinuxNativeBuildPath,
+  getLinuxNativePrebuildPath,
+} from '../../server/os/linux/nativeArtifactPaths.js';
 
 describe('native prebuild installation', () => {
   it('does not invoke compilers when all packaged binaries are present', () => {
@@ -10,6 +14,7 @@ describe('native prebuild installation', () => {
       platform: 'linux',
       arch: 'x64',
       exists: (filePath) => filePath.includes('/prebuilds/linux-x64/'),
+      isCompatible: () => true,
       stderr,
       migrateUInput,
     });
@@ -20,33 +25,83 @@ describe('native prebuild installation', () => {
     expect(migrateUInput).toHaveBeenCalledTimes(1);
   });
 
-  it('never compiles native features during installation when package artifacts are missing', () => {
+  it('compiles missing required components and leaves the optional portal helper alone', () => {
+    const builtPaths = new Set();
+    const compile = jest.fn((name, {root}) => builtPaths.add(getLinuxNativeBuildPath(name, {root})));
     const stderr = {write: jest.fn()};
     const result = prepareLinuxNativeRuntime({
       platform: 'linux',
       arch: 'arm64',
+      root: '/package',
+      exists: (filePath) => builtPaths.has(filePath),
+      isCompatible: (filePath) => builtPaths.has(filePath),
+      compile,
+      stderr,
+      migrateUInput: jest.fn(),
+    });
+
+    expect(result.built).toEqual(['uinput', 'xwaylandPointer', 'xwaylandOverlay']);
+    expect(result.skipped).toEqual(['waylandPortal']);
+    expect(compile.mock.calls.map(([name]) => name)).toEqual(['uinput', 'xwaylandPointer', 'xwaylandOverlay']);
+    expect(stderr.write).not.toHaveBeenCalled();
+  });
+
+  it('compiles only missing components and never trusts an incompatible prebuild', () => {
+    const prebuilt = new Set([getLinuxNativePrebuildPath('uinput', {root: '/package', arch: 'x64'})]);
+    const builtPaths = new Set();
+    const compile = jest.fn((name, {root}) => builtPaths.add(getLinuxNativeBuildPath(name, {root})));
+    const incompatible = getLinuxNativePrebuildPath('xwaylandPointer', {root: '/package', arch: 'x64'});
+    prebuilt.add(incompatible);
+
+    const result = prepareLinuxNativeRuntime({
+      platform: 'linux',
+      arch: 'x64',
+      root: '/package',
+      exists: (filePath) => prebuilt.has(filePath) || builtPaths.has(filePath),
+      isCompatible: (filePath) => filePath !== incompatible || builtPaths.has(
+        getLinuxNativeBuildPath('xwaylandPointer', {root: '/package'}),
+      ),
+      compile,
+      stderr: {write: jest.fn()},
+      migrateUInput: jest.fn(),
+    });
+
+    expect(result.built).toEqual(['xwaylandPointer', 'xwaylandOverlay']);
+    expect(compile.mock.calls.map(([name]) => name)).toEqual(['xwaylandPointer', 'xwaylandOverlay']);
+  });
+
+  it('continues installation with a diagnostic when compilation is unavailable', () => {
+    const stderr = {write: jest.fn()};
+    const result = prepareLinuxNativeRuntime({
+      platform: 'linux',
+      arch: 'x64',
       exists: () => false,
+      isCompatible: () => false,
+      compile: () => { throw new Error('compiler not found'); },
       stderr,
       migrateUInput: jest.fn(),
     });
 
     expect(result.built).toEqual([]);
     expect(result.skipped).toEqual(['uinput', 'xwaylandPointer', 'xwaylandOverlay', 'waylandPortal']);
-    expect(stderr.write).toHaveBeenCalledWith(expect.stringContaining('npm install did not compile them'));
+    expect(stderr.write).toHaveBeenCalledTimes(3);
+    expect(stderr.write).toHaveBeenCalledWith(expect.stringContaining('npm install continues without it'));
   });
 
-  it('keeps the libei portal helper optional without warning during installation', () => {
-    const stderr = {write: jest.fn()};
+  it('does not compile the optional libei helper when required artifacts are available', () => {
+    const compile = jest.fn();
     const result = prepareLinuxNativeRuntime({
       platform: 'linux',
       arch: 'x64',
       exists: (filePath) => !filePath.endsWith('/remote-mouse-wayland'),
-      stderr,
+      isCompatible: () => true,
+      compile,
+      stderr: {write: jest.fn()},
       migrateUInput: jest.fn(),
     });
 
     expect(result.skipped).toEqual(['waylandPortal']);
-    expect(stderr.write).not.toHaveBeenCalled();
+    expect(compile).not.toHaveBeenCalled();
   });
 
   it('builds an architecture-specific package set on native x64 or ARM64 hosts', () => {

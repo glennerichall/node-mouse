@@ -7,8 +7,15 @@ const requiredFiles = [
   'README.md',
   'bin/remote-mouse.js',
   'index.js',
+  'native/uinput/remote-mouse-uinput.c',
+  'native/wayland/remote-mouse-xwayland-overlay.c',
+  'native/wayland/remote-mouse-xwayland-pointer.c',
   'package.json',
   'public/index.html',
+  'scripts/build-uinput-bridge.sh',
+  'scripts/build-xwayland-overlay.sh',
+  'scripts/build-xwayland-pointer-bridge.sh',
+  'scripts/postinstall-linux.mjs',
   'server/term/cli/versionCommand.js',
   ...['x64', 'arm64'].flatMap((arch) => [
     `prebuilds/linux-${arch}/remote-mouse-uinput.node`,
@@ -37,6 +44,29 @@ describe('npm package manifest validation', () => {
       expect.stringContaining('better-sqlite3'),
       expect.stringContaining('robotjs'),
       expect.stringContaining('linux-arm64'),
+    ]));
+  });
+
+  it('requires the native sources and build scripts needed by the install fallback', () => {
+    const fallbackFiles = new Set([
+      'native/uinput/remote-mouse-uinput.c',
+      'native/wayland/remote-mouse-xwayland-overlay.c',
+      'native/wayland/remote-mouse-xwayland-pointer.c',
+      'scripts/build-uinput-bridge.sh',
+      'scripts/build-xwayland-overlay.sh',
+      'scripts/build-xwayland-pointer-bridge.sh',
+      'scripts/postinstall-linux.mjs',
+    ]);
+    const errors = validatePackageManifest({
+      manifest,
+      files: requiredFiles.filter((file) => !fallbackFiles.has(file)),
+    });
+
+    expect(errors).toEqual(expect.arrayContaining([
+      expect.stringContaining('native/uinput/remote-mouse-uinput.c'),
+      expect.stringContaining('native/wayland/remote-mouse-xwayland-overlay.c'),
+      expect.stringContaining('scripts/build-uinput-bridge.sh'),
+      expect.stringContaining('scripts/postinstall-linux.mjs'),
     ]));
   });
 

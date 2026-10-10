@@ -44,6 +44,9 @@ l'itération et devient append-only dès sa clôture.
 - [Plateformes — PLAT-001g](./platforms-PLAT-001g-2026-10-09.md): hook
   `prepublishOnly` pour produire et vérifier les prébuilds x64/ARM64 et tester
   le tarball avant toute publication npm.
+- [Plateformes — PLAT-001f](./platforms-PLAT-001f-2026-10-10.md): compilation
+  locale de secours des composants natifs Linux manquants, avec vérification
+  ELF et avertissement non bloquant si le toolchain est indisponible.
 - [Plateformes — PLAT-005g](./platforms-PLAT-005g-2026-10-09.md): préparation
   du toolchain ARM64 et génération validée des deux architectures par
   l'installateur de l'environnement de développement.

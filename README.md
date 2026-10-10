@@ -169,10 +169,15 @@ VLC media player is optional. Install it on the host machine if you want the VLC
 
 ##### Linux
 
-Published npm packages are expected to ship Linux native binaries for x64 and
-ARM64. Installation never compiles native code on the target machine; missing
-artifacts are reported and must be built on a development/release host. The
-XWayland QR helper still needs X11 and libpng shared libraries at runtime.
+Published npm packages ship Linux native binaries for x64 and ARM64. During
+installation, a matching packaged binary is preferred; if it is missing, npm
+tries to compile only this project's required native components for the local
+architecture. This fallback needs a C compiler, Node.js headers, and (for the
+XWayland QR helper) X11 and libpng development headers. If those are missing or
+the build fails, installation continues with a warning, but the unavailable
+native feature cannot be used. Artifacts for a different architecture are
+never loaded. The XWayland QR helper also needs X11 and libpng shared libraries
+at runtime.
 
 Typical Debian or Ubuntu packages for native development/build hosts:
 

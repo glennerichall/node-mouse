@@ -35,7 +35,7 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   le chargement des composants natifs. Couvrir les architectures prises en
   charge par PLAT-001c. Cette tâche prépare et teste le paquet, sans publier
   automatiquement ni nécessiter de jeton npm.
-- [ ] PLAT-001f — ajouter une compilation locale de secours au `postinstall`
+- [x] PLAT-001f — ajouter une compilation locale de secours au `postinstall`
   uniquement lorsqu'aucun prébuild correspondant à Linux et à l'architecture
   cible n'est fourni. Le résolveur natif doit sélectionner explicitement le
   prébuild compatible en priorité, puis l'artefact local compilé; ne jamais
