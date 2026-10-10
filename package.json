@@ -1,6 +1,6 @@
 {
   "name": "@velor/remote-mouse",
-  "version": "6.19.81",
+  "version": "6.19.83",
   "type": "module",
   "description": "Remote mouse and keyboard with mobile client",
   "homepage": "https://github.com/glennerichall/node-mouse#readme",
@@ -15,6 +15,27 @@
   "bin": {
     "remote-mouse": "./bin/remote-mouse.js"
   },
+  "files": [
+    ".env.example",
+    "bin/",
+    "client/",
+    "index.js",
+    "native/",
+    "prebuilds/",
+    "public/",
+    "server/",
+    "scripts/build-native-prebuilds.mjs",
+    "scripts/build-uinput-bridge.sh",
+    "scripts/build-wayland-helper.sh",
+    "scripts/build-xwayland-overlay.sh",
+    "scripts/build-xwayland-pointer-bridge.sh",
+    "scripts/configure-uinput-access.sh",
+    "scripts/configure-uinput-after-update.mjs",
+    "scripts/install-linux.sh",
+    "scripts/install-windows.ps1",
+    "scripts/postinstall-linux.mjs",
+    "utils/"
+  ],
   "scripts": {
     "start": "node index.js",
     "build:wayland": "bash scripts/build-wayland-helper.sh",
@@ -23,6 +44,8 @@
     "build:uinput": "bash scripts/build-uinput-bridge.sh",
     "build:native:prebuild": "node scripts/build-native-prebuilds.mjs",
     "verify:native:prebuilds": "node scripts/verify-native-prebuilds.mjs",
+    "verify:package": "node scripts/verify-npm-package.mjs",
+    "prepublishOnly": "node scripts/prepare-npm-publish.mjs",
     "setup:dev:linux": "bash dev/setup-linux.sh",
     "postinstall": "node scripts/postinstall-linux.mjs",
     "check:version": "node scripts/check-package-version.mjs",

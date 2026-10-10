@@ -38,6 +38,12 @@ l'itération et devient append-only dès sa clôture.
 - [Plateformes — PLAT-001c x64](./platforms-PLAT-001c-x64-2026-10-09.md):
   génération des prébuilds projet x64/ARM64, vérification de l'architecture ELF
   et inclusion des deux cibles dans le tarball npm.
+- [Plateformes — PLAT-001e](./platforms-PLAT-001e-2026-10-09.md): manifeste npm
+  resserré, validation de publication et installation réelle du tarball avec
+  vérification CLI et chargement des composants natifs x64.
+- [Plateformes — PLAT-001g](./platforms-PLAT-001g-2026-10-09.md): hook
+  `prepublishOnly` pour produire et vérifier les prébuilds x64/ARM64 et tester
+  le tarball avant toute publication npm.
 - [Plateformes — PLAT-005g](./platforms-PLAT-005g-2026-10-09.md): préparation
   du toolchain ARM64 et génération validée des deux architectures par
   l'installateur de l'environnement de développement.

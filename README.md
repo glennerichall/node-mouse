@@ -217,6 +217,14 @@ host with libei/liboeffis development files to include the optional portal
 helper. Build hosts must use a glibc baseline compatible with the oldest
 supported target; this baseline still needs to be fixed by release policy.
 
+To publish, authenticate with npm and run `npm publish` from a Linux x64 build
+host. The `prepublishOnly` hook checks version consistency, generates both
+native architectures, validates the tarball and tests a temporary global
+installation before npm uploads anything. Run `npm publish --dry-run` to execute
+the same preparation and packaging checks without uploading. The hook requires
+the native build toolchain described above and ARM64 cross-compilation
+dependencies; it fails before publication if any check fails.
+
 Notes:
 
 - `libx11-dev`, `libxtst-dev`, and `libpng-dev` are required to build native artifacts from source; X11 and libpng shared libraries are runtime requirements for the QR helper

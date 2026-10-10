@@ -27,7 +27,7 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   l'architecture ELF produite. Définir une matrice reproductible x64/ARM64,
   vérifier le contenu npm et l'absence de compilation à l'installation;
   documenter les bibliothèques partagées qui restent requises au runtime.
-- [ ] PLAT-001e — définir et valider le packaging de publication npm à partir
+- [x] PLAT-001e — définir et valider le packaging de publication npm à partir
   d'un tarball reproductible : contrôler les fichiers inclus/exclus, les
   entrées CLI, les artefacts natifs précompilés et les métadonnées requises;
   exécuter `npm pack` et `npm publish --dry-run`, puis installer le tarball dans
@@ -35,6 +35,27 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   le chargement des composants natifs. Couvrir les architectures prises en
   charge par PLAT-001c. Cette tâche prépare et teste le paquet, sans publier
   automatiquement ni nécessiter de jeton npm.
+- [ ] PLAT-001f — ajouter une compilation locale de secours au `postinstall`
+  uniquement lorsqu'aucun prébuild correspondant à Linux et à l'architecture
+  cible n'est fourni. Le résolveur natif doit sélectionner explicitement le
+  prébuild compatible en priorité, puis l'artefact local compilé; ne jamais
+  charger un binaire d'une autre architecture. Limiter la compilation aux
+  composants natifs maintenus par le projet, vérifier les sources et outils
+  requis dans le tarball, et laisser l'installation npm se terminer avec un
+  avertissement diagnostique si le toolchain manque ou si la compilation échoue.
+  Tester le choix du résolveur et le `postinstall` avec prébuild présent/absent,
+  toolchain disponible/indisponible et architectures x64/ARM64. Dépend de
+  PLAT-001c et PLAT-001e; cette évolution révise la décision de PLAT-001c de ne
+  jamais compiler pendant l'installation.
+- [x] PLAT-001g — automatiser la préparation de publication via le hook npm
+  `prepublishOnly` : sur un hôte Linux x64, générer les prébuilds x64 et ARM64
+  au moyen de `build:native:prebuild`, vérifier les architectures et le contenu
+  du tarball, puis exécuter la validation d'installation de PLAT-001e avant
+  qu'`npm publish` ne publie le paquet. Ne pas créer de commande `publish`
+  personnalisée; `npm publish --dry-run` doit permettre de tester la chaîne sans
+  téléverser. Les vérifications npm imbriquées doivent désactiver les hooks pour
+  éviter la récursion. Documenter les prérequis du toolchain et de
+  l'authentification npm. Dépend de PLAT-001e.
 - [ ] PLAT-001d — simplifier l'installation publique autour de
   `npm install -g @velor/remote-mouse`, puis d'une commande explicite
   `remote-mouse setup` qui configure l'application sur Linux et Windows.

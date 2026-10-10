@@ -12,6 +12,13 @@ function joinParts(parts) {
 }
 
 export function parseCliArgs(args) {
+  if (args.length === 1 && ['--version', '-V'].includes(args[0])) {
+    return {
+      command: {name: 'version', args: {}},
+      options: {verbosity: 0},
+    };
+  }
+
   let command = {
     name: '',
     args: {},

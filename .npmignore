@@ -23,9 +23,15 @@ playwright-report/
 test-results/
 test/
 jest.config.js
+jest.*.config.js
 playwright.config.js
+playwright.*.config.js
+scripts/check-package-version.mjs
+scripts/generate-mobile-screenshots.mjs
+scripts/verify-native-prebuilds.mjs
+scripts/verify-npm-package.mjs
 
 # Generated documentation assets
-.artifacts/*
-!.artifacts/screenshots/
-!.artifacts/screenshots/*.png
+.artifacts/
+build/
+docs/project/
