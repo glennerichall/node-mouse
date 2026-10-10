@@ -15,8 +15,27 @@ const BUILD_COMMANDS = {
   waylandPortal: 'scripts/build-wayland-helper.sh',
 };
 
-function run(command) {
-  execFileSync('bash', [command], {cwd: projectRoot, stdio: 'inherit'});
+function run(command, {env = process.env} = {}) {
+  execFileSync('bash', [command], {cwd: projectRoot, stdio: 'inherit', env});
+}
+
+function getCompiler({arch, hostArch, env}) {
+  if (env.CC) return env.CC;
+  if (arch === hostArch) return 'cc';
+  if (arch === 'arm64' && hostArch === 'x64') return 'aarch64-linux-gnu-gcc';
+  throw new Error(`No default cross-compiler is configured for ${hostArch} -> ${arch}; set CC.`);
+}
+
+function assertBinaryArchitecture(filePath, arch, inspect) {
+  const result = inspect(filePath);
+  if (result.status !== 0) {
+    throw new Error(`Could not inspect native artifact architecture for ${filePath}; install binutils (readelf).`);
+  }
+  const machine = result.stdout?.match(/^\s*Machine:\s*(.+)$/m)?.[1]?.trim();
+  const expected = arch === 'arm64' ? /^(AArch64|ARM aarch64)$/i : /^(Advanced Micro Devices X86-64|x86-64)$/i;
+  if (!machine || !expected.test(machine)) {
+    throw new Error(`Native artifact ${filePath} has machine '${machine || 'unknown'}', expected ${arch}.`);
+  }
 }
 
 export function buildNativePrebuilds({
@@ -31,6 +50,8 @@ export function buildNativePrebuilds({
   root = projectRoot,
   env = process.env,
   stdout = process.stdout,
+  hostArch = process.arch,
+  inspect = (filePath) => spawnSync('readelf', ['-h', filePath], {encoding: 'utf8'}),
 } = {}) {
   if (platform !== 'linux') {
     throw new Error('Native prebuilds are currently supported only on Linux build hosts.');
@@ -39,15 +60,19 @@ export function buildNativePrebuilds({
     throw new Error(`Unsupported prebuild architecture: ${arch}; expected x64 or arm64.`);
   }
 
-  const compiler = probe('cc', ['--version']);
+  const compilerName = getCompiler({arch, hostArch, env});
+  const compiler = probe(compilerName, ['--version']);
   if (compiler.status !== 0) {
-    throw new Error('A C compiler is required on the build host to prepare native prebuilds.');
+    throw new Error(`C compiler '${compilerName}' is required to prepare Linux ${arch} native prebuilds.`);
   }
+  const buildEnv = {...env, CC: compilerName};
+  if (arch !== hostArch) stdout.write(`Cross-compiling Linux ${arch} artifacts with ${compilerName}.\n`);
 
   for (const name of REQUIRED_COMPONENTS) {
-    build(BUILD_COMMANDS[name]);
+    build(BUILD_COMMANDS[name], {env: buildEnv});
     const source = getLinuxNativeBuildPath(name, {root});
     if (!exists(source)) throw new Error(`Build did not produce required native component: ${source}`);
+    assertBinaryArchitecture(source, arch, inspect);
     const destination = getLinuxNativePrebuildPath(name, {arch, root});
     makeDirectory(path.dirname(destination), {recursive: true});
     copy(source, destination);
@@ -60,9 +85,10 @@ export function buildNativePrebuilds({
     if (portalDependencies.status !== 0) {
       throw new Error('REMOTE_MOUSE_BUILD_LIBEI=1 requires pkg-config, libei and liboeffis development files.');
     }
-    build(BUILD_COMMANDS.waylandPortal);
+    build(BUILD_COMMANDS.waylandPortal, {env: buildEnv});
     const source = getLinuxNativeBuildPath('waylandPortal', {root});
     if (!exists(source)) throw new Error(`Build did not produce required native component: ${source}`);
+    assertBinaryArchitecture(source, arch, inspect);
     const destination = getLinuxNativePrebuildPath('waylandPortal', {arch, root});
     makeDirectory(path.dirname(destination), {recursive: true});
     copy(source, destination);
@@ -79,7 +105,14 @@ export function buildNativePrebuilds({
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   try {
-    buildNativePrebuilds();
+    const args = process.argv.slice(2);
+    let arch = process.arch;
+    for (let index = 0; index < args.length; index += 1) {
+      if (args[index] === '--arch' && args[index + 1]) arch = args[++index];
+      else if (args[index].startsWith('--arch=')) arch = args[index].slice('--arch='.length);
+      else throw new Error(`Unknown build option: ${args[index]}`);
+    }
+    buildNativePrebuilds({arch});
   } catch (error) {
     process.stderr.write(`${error.message}\n`);
     process.exitCode = 1;

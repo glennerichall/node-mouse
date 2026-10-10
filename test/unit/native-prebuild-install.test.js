@@ -61,6 +61,7 @@ describe('native prebuild installation', () => {
       env: {},
       build,
       probe: () => ({status: 0}),
+      inspect: () => ({status: 0, stdout: '  Machine:                           AArch64\n'}),
       exists: () => true,
       copy,
       makeDirectory,
@@ -73,6 +74,49 @@ describe('native prebuild installation', () => {
     expect(copy).toHaveBeenCalledTimes(3);
     expect(copy.mock.calls[0][1]).toBe('/workspace/prebuilds/linux-arm64/remote-mouse-uinput.node');
     expect(setMode).toHaveBeenCalledWith('/workspace/prebuilds/linux-arm64/remote-mouse-xwayland-overlay', 0o755);
+  });
+
+  it('selects the ARM64 cross-compiler on an x64 host and passes it to each build script', () => {
+    const build = jest.fn();
+    const probe = jest.fn(() => ({status: 0}));
+
+    buildNativePrebuilds({
+      platform: 'linux',
+      hostArch: 'x64',
+      arch: 'arm64',
+      root: '/workspace',
+      env: {},
+      build,
+      probe,
+      inspect: () => ({status: 0, stdout: '  Machine:                           AArch64\n'}),
+      exists: () => true,
+      copy: jest.fn(),
+      makeDirectory: jest.fn(),
+      setMode: jest.fn(),
+      stdout: {write: jest.fn()},
+    });
+
+    expect(probe).toHaveBeenCalledWith('aarch64-linux-gnu-gcc', ['--version']);
+    expect(build).toHaveBeenCalledTimes(3);
+    expect(build.mock.calls[0][1].env.CC).toBe('aarch64-linux-gnu-gcc');
+  });
+
+  it('refuses to label an artifact ARM64 when its ELF machine is x64', () => {
+    expect(() => buildNativePrebuilds({
+      platform: 'linux',
+      hostArch: 'x64',
+      arch: 'arm64',
+      root: '/workspace',
+      env: {},
+      build: jest.fn(),
+      probe: () => ({status: 0}),
+      inspect: () => ({status: 0, stdout: '  Machine:                           Advanced Micro Devices X86-64\n'}),
+      exists: () => true,
+      copy: jest.fn(),
+      makeDirectory: jest.fn(),
+      setMode: jest.fn(),
+      stdout: {write: jest.fn()},
+    })).toThrow("expected arm64");
   });
 
   it('rejects architectures without a published build target', () => {

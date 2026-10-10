@@ -22,9 +22,11 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   et mécanismes de distribution amont; ne pas copier ni maintenir leurs binaires
   dans ce projet.
   Couvrir les bridges Node-API `uinput`/XWayland et l'overlay QR; garder le
-  helper libei optionnel. Définir une matrice reproductible x64/ARM64, vérifier
-  le contenu npm et l'absence de compilation à l'installation; documenter les
-  bibliothèques partagées qui restent requises au runtime.
+  helper libei optionnel. Permettre la compilation croisée ARM64 depuis un hôte
+  Linux x64 avec toolchain et bibliothèques de développement cibles, et vérifier
+  l'architecture ELF produite. Définir une matrice reproductible x64/ARM64,
+  vérifier le contenu npm et l'absence de compilation à l'installation;
+  documenter les bibliothèques partagées qui restent requises au runtime.
 - [ ] PLAT-001e — définir et valider le packaging de publication npm à partir
   d'un tarball reproductible : contrôler les fichiers inclus/exclus, les
   entrées CLI, les artefacts natifs précompilés et les métadonnées requises;

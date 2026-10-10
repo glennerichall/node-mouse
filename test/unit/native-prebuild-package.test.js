@@ -41,6 +41,10 @@ describe('native prebuild package verification', () => {
     expect(verifyNativePrebuildPackage({
       root: '/package',
       exists: () => true,
+      inspect: (filePath) => ({
+        status: 0,
+        stdout: `  Machine:                           ${filePath.includes('linux-x64') ? 'Advanced Micro Devices X86-64' : 'AArch64'}\n`,
+      }),
       pack: () => ({status: 0, stdout: JSON.stringify([{files}]), stderr: ''}),
       stderr,
     })).toBe(true);
@@ -53,9 +57,28 @@ describe('native prebuild package verification', () => {
     expect(verifyNativePrebuildPackage({
       root: '/package',
       exists: () => true,
+      inspect: (filePath) => ({
+        status: 0,
+        stdout: `  Machine:                           ${filePath.includes('linux-x64') ? 'Advanced Micro Devices X86-64' : 'AArch64'}\n`,
+      }),
       pack: () => ({status: 0, stdout: JSON.stringify([{files: []}]), stderr: ''}),
       stderr,
     })).toBe(false);
     expect(stderr.write).toHaveBeenCalledWith(expect.stringContaining('not included in the npm package'));
+  });
+
+  it('rejects binaries whose ELF machine does not match their prebuild directory', () => {
+    const pack = jest.fn();
+    const stderr = {write: jest.fn()};
+
+    expect(verifyNativePrebuildPackage({
+      root: '/package',
+      exists: () => true,
+      inspect: () => ({status: 0, stdout: '  Machine:                           Advanced Micro Devices X86-64\n'}),
+      pack,
+      stderr,
+    })).toBe(false);
+    expect(pack).not.toHaveBeenCalled();
+    expect(stderr.write).toHaveBeenCalledWith(expect.stringContaining('expected arm64'));
   });
 });

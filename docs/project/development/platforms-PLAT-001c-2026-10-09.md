@@ -44,7 +44,9 @@ contenu du paquet publié et les bibliothèques partagées runtime.
 
 - Aucun artefact natif propre au projet n'est encore présent dans
   `prebuilds/`; les en-têtes X11/libpng et le compilateur manquent sur cet hôte.
-- Il faut exécuter `npm run build:native:prebuild` sur un hôte x64 et un hôte
-  ARM64, réunir les deux répertoires, puis valider le paquet npm et un test
-  d'installation propre sans toolchain.
+- Le générateur actuel choisit l'architecture cible explicitement et prend en
+  charge la compilation croisée ARM64 depuis x64 avec `aarch64-linux-gnu-gcc`;
+  le toolchain et les bibliothèques de développement cibles doivent être
+  installés avant le build. Il reste à réaliser et valider ce build ARM64,
+  réunir les deux répertoires, puis tester l'installation sans toolchain.
 - Le niveau minimal de glibc pour les binaires publiés reste à fixer.

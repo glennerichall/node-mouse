@@ -35,6 +35,10 @@ l'itération et devient append-only dès sa clôture.
 - [Plateformes — PLAT-001c](./platforms-PLAT-001c-2026-10-09.md): installation
   sans compilation native sur la cible, résolution des binaires précompilés
   Linux et vérification des artefacts x64/ARM64 du paquet.
+- [Plateformes — PLAT-001c x64](./platforms-PLAT-001c-x64-2026-10-09.md):
+  génération des prébuilds projet x64, ajout de la compilation croisée ARM64
+  et vérification de l'architecture des ELF; le toolchain ARM64 doit encore
+  être installé pour valider la production réelle des binaires cibles.
 - [Expérience utilisateur — UX-006](./ux-UX-006-2026-10-04.md): vitesse et
   accélération du pointeur configurables localement par appareil.
 - [Expérience utilisateur — UX-006a](./ux-UX-006a-2026-10-04.md): mise en page

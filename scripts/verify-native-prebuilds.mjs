@@ -20,6 +20,7 @@ export function getMissingNativePrebuilds({root = projectRoot, exists = existsSy
 export function verifyNativePrebuildPackage({
   root = projectRoot,
   exists = existsSync,
+  inspect = (filePath) => spawnSync('readelf', ['-h', filePath], {encoding: 'utf8'}),
   pack = () => spawnSync('npm', ['pack', '--dry-run', '--json'], {
     cwd: root,
     encoding: 'utf8',
@@ -30,6 +31,19 @@ export function verifyNativePrebuildPackage({
   if (missing.length) {
     stderr.write(`Missing project native prebuilds:\n${missing.map((file) => ` - ${file}`).join('\n')}\n`);
     return false;
+  }
+
+  for (const arch of ARCHITECTURES) {
+    const expected = arch === 'arm64' ? /^(AArch64|ARM aarch64)$/i : /^(Advanced Micro Devices X86-64|x86-64)$/i;
+    for (const file of COMPONENT_FILES) {
+      const filePath = path.join(root, 'prebuilds', `linux-${arch}`, file);
+      const result = inspect(filePath);
+      const machine = result.stdout?.match(/^\s*Machine:\s*(.+)$/m)?.[1]?.trim();
+      if (result.status !== 0 || !machine || !expected.test(machine)) {
+        stderr.write(`Native prebuild has wrong or unreadable ELF architecture: ${filePath} (found ${machine || 'unknown'}, expected ${arch}).\n`);
+        return false;
+      }
+    }
   }
 
   const result = pack();

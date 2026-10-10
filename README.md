@@ -195,9 +195,22 @@ install `pkg-config libei-dev liboeffis-dev`, run `npm run build:wayland`, and
 set `REMOTE_MOUSE_WAYLAND_INPUT=portal`.
 
 To prepare a distributable native artifact set, run `npm run build:native:prebuild`
-on each supported Linux build architecture (x64 and ARM64). This project-owned
-build covers the uinput bridge, XWayland pointer bridge and QR overlay; RobotJS
-and uses the upstream npm packages for their own native artifacts; those
+for the host architecture. On an x64 Debian/Ubuntu host, ARM64 can be built with
+`npm run build:native:prebuild -- --arch arm64` after installing the cross
+toolchain and ARM64 X11/PNG development libraries:
+
+```bash
+sudo dpkg --add-architecture arm64
+sudo apt-get update
+sudo apt-get install crossbuild-essential-arm64 libx11-dev:arm64 libpng-dev:arm64
+npm run build:native:prebuild -- --arch arm64
+```
+
+The cross compiler can be overridden with `CC`; set `SYSROOT` when using a
+custom target sysroot. The build verifies each resulting ELF machine type
+before placing it in the target directory. This project-owned
+build covers the uinput bridge, XWayland pointer bridge and QR overlay. RobotJS
+and better-sqlite3 use their upstream npm packages for native artifacts; those
 dependency internals are not copied or maintained here. Combine the resulting
 `prebuilds/linux-x64` and `prebuilds/linux-arm64` directories in the same
 package workspace, then run `npm run verify:native:prebuilds` before publishing.
