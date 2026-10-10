@@ -194,15 +194,12 @@ the user to the general `input` group. To use the optional portal strategy,
 install `pkg-config libei-dev liboeffis-dev`, run `npm run build:wayland`, and
 set `REMOTE_MOUSE_WAYLAND_INPUT=portal`.
 
-To prepare a distributable native artifact set, run `npm run build:native:prebuild`
-for the host architecture. On an x64 Debian/Ubuntu host, ARM64 can be built with
-`npm run build:native:prebuild -- --arch arm64` after installing the cross
-toolchain and ARM64 X11/PNG development libraries:
+To prepare a distributable native artifact set, run `npm run setup:dev:linux`.
+On an x64 Debian/Ubuntu host, this installs (after confirmation) the cross
+toolchain and ARM64 X11/PNG development libraries, then builds both targets.
+To build ARM64 manually after preparing the host, run:
 
 ```bash
-sudo dpkg --add-architecture arm64
-sudo apt-get update
-sudo apt-get install crossbuild-essential-arm64 libx11-dev:arm64 libpng-dev:arm64
 npm run build:native:prebuild -- --arch arm64
 ```
 

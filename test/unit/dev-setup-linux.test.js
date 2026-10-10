@@ -11,12 +11,29 @@ describe('Linux development setup', () => {
     chmodSync(file, 0o755);
   };
 
+  const createDpkgStub = (directory, foreignArchitecture = 'arm64') => {
+    createCommandStub(directory, 'dpkg', `
+      case "$1" in
+        --print-architecture) printf 'amd64\\n' ;;
+        --print-foreign-architectures) printf '${foreignArchitecture}\\n' ;;
+        --add-architecture) printf 'dpkg %s\\n' "$*" >> "$REMOTE_MOUSE_TEST_LOG" ;;
+      esac
+    `);
+  };
+
+  const createTeeStub = (directory) => createCommandStub(
+    directory,
+    'tee',
+    'cat >/dev/null; printf "tee %s\\n" "$*" >> "$REMOTE_MOUSE_TEST_LOG"',
+  );
+
   test('help is available without running installation steps', () => {
     const result = spawnSync('bash', ['dev/setup-linux.sh', '--help'], {encoding: 'utf8'});
 
     expect(result.status).toBe(0);
     expect(result.stdout).toContain('Ubuntu/Debian');
     expect(result.stdout).toContain('--check');
+    expect(result.stdout).toContain('ARM64');
   });
 
   test('rejects Node.js older than the supported minimum', () => {
@@ -42,8 +59,11 @@ describe('Linux development setup', () => {
     const fakeBin = mkdtempSync(path.join(os.tmpdir(), 'remote-mouse-dev-setup-'));
     const logFile = path.join(fakeBin, 'commands.log');
     createCommandStub(fakeBin, 'dpkg-query', 'printf "ii 1.0\\n"');
+    createDpkgStub(fakeBin);
+    createTeeStub(fakeBin);
+    createCommandStub(fakeBin, 'apt-get', 'printf "apt-get %s\\n" "$*" >> "$REMOTE_MOUSE_TEST_LOG"');
     createCommandStub(fakeBin, 'npm', 'printf "npm %s\\n" "$*" >> "$REMOTE_MOUSE_TEST_LOG"');
-    createCommandStub(fakeBin, 'sudo', 'printf "sudo %s\\n" "$*" >> "$REMOTE_MOUSE_TEST_LOG"; exit 99');
+    createCommandStub(fakeBin, 'sudo', 'printf "sudo %s\\n" "$*" >> "$REMOTE_MOUSE_TEST_LOG"; "$@"');
 
     try {
       const result = spawnSync('bash', ['dev/setup-linux.sh', '--yes'], {
@@ -52,15 +72,19 @@ describe('Linux development setup', () => {
           ...process.env,
           PATH: `${fakeBin}:${process.env.PATH}`,
           REMOTE_MOUSE_TEST_LOG: logFile,
+          REMOTE_MOUSE_APT_SOURCES_DIR: path.join(fakeBin, 'apt-sources'),
         },
       });
 
       expect(result.status).toBe(0);
-      expect(readFileSync(logFile, 'utf8').trim().split('\n')).toEqual([
+      const loggedCommands = readFileSync(logFile, 'utf8').trim().split('\n');
+      expect(loggedCommands.filter((line) => line.startsWith('npm '))).toEqual([
         'npm ci',
         'npm run build:uinput',
         'npm run build:xwayland-pointer',
         'npm run build:xwayland-overlay',
+        'npm run build:native:prebuild',
+        'npm run build:native:prebuild -- --arch arm64',
       ]);
       expect(result.stdout).toContain('Development environment ready');
     } finally {
@@ -68,7 +92,7 @@ describe('Linux development setup', () => {
     }
   });
 
-  test('installs only the declared apt prerequisites when some are missing', () => {
+  test('installs declared prerequisites and configures the ARM64 cross-build', () => {
     const fakeBin = mkdtempSync(path.join(os.tmpdir(), 'remote-mouse-dev-setup-'));
     const logFile = path.join(fakeBin, 'commands.log');
     createCommandStub(
@@ -76,10 +100,11 @@ describe('Linux development setup', () => {
       'dpkg-query',
       'case " $REMOTE_MOUSE_TEST_MISSING " in *" $3 "*) exit 1 ;; esac; printf "ii 1.0\\n"',
     );
+    createDpkgStub(fakeBin, '');
+    createTeeStub(fakeBin);
+    createCommandStub(fakeBin, 'apt-get', 'printf "apt-get %s\\n" "$*" >> "$REMOTE_MOUSE_TEST_LOG"');
     createCommandStub(fakeBin, 'npm', 'printf "npm %s\\n" "$*" >> "$REMOTE_MOUSE_TEST_LOG"');
     createCommandStub(fakeBin, 'sudo', 'printf "sudo %s\\n" "$*" >> "$REMOTE_MOUSE_TEST_LOG"; "$@"');
-    createCommandStub(fakeBin, 'apt-get', 'printf "apt-get %s\\n" "$*" >> "$REMOTE_MOUSE_TEST_LOG"');
-
     try {
       const result = spawnSync('bash', ['dev/setup-linux.sh', '--yes'], {
         encoding: 'utf8',
@@ -87,13 +112,17 @@ describe('Linux development setup', () => {
           ...process.env,
           PATH: `${fakeBin}:${process.env.PATH}`,
           REMOTE_MOUSE_TEST_LOG: logFile,
-          REMOTE_MOUSE_TEST_MISSING: 'libxtst-dev',
+          REMOTE_MOUSE_TEST_MISSING: 'libxtst-dev crossbuild-essential-arm64 libx11-dev:arm64 libpng-dev:arm64',
+          REMOTE_MOUSE_APT_SOURCES_DIR: path.join(fakeBin, 'apt-sources'),
         },
       });
 
       expect(result.status).toBe(0);
-      expect(readFileSync(logFile, 'utf8')).toContain('sudo apt-get install -y --no-install-recommends libxtst-dev');
-      expect(result.stdout).toContain('System packages to install: libxtst-dev');
+      const loggedCommands = readFileSync(logFile, 'utf8');
+      expect(loggedCommands).toContain('sudo dpkg --add-architecture arm64');
+      expect(loggedCommands).toContain('sudo apt-get install -y --no-install-recommends libxtst-dev crossbuild-essential-arm64 libx11-dev:arm64 libpng-dev:arm64');
+      expect(loggedCommands).toContain('sudo apt-get update');
+      expect(result.stdout).toContain('crossbuild-essential-arm64');
     } finally {
       rmSync(fakeBin, {recursive: true, force: true});
     }
@@ -110,5 +139,35 @@ describe('Linux development setup', () => {
     expect(script).toContain('npm run build:xwayland-overlay');
     expect(script).toContain('build/uinput/remote-mouse-uinput.node');
     expect(script).toContain('build/wayland/remote-mouse-xwayland-pointer.node');
+    expect(script).toContain('crossbuild-essential-arm64');
+    expect(script).toContain('npm run build:native:prebuild -- --arch arm64');
+  });
+
+  test('check mode reports missing ARM64 setup without invoking privileged commands', () => {
+    const fakeBin = mkdtempSync(path.join(os.tmpdir(), 'remote-mouse-dev-setup-'));
+    const logFile = path.join(fakeBin, 'commands.log');
+    writeFileSync(logFile, '');
+    createCommandStub(fakeBin, 'dpkg-query', 'printf "ii 1.0\\n"');
+    createDpkgStub(fakeBin, '');
+    createCommandStub(fakeBin, 'sudo', 'printf "sudo called\\n" >> "$REMOTE_MOUSE_TEST_LOG"');
+
+    try {
+      const result = spawnSync('bash', ['dev/setup-linux.sh', '--check'], {
+        encoding: 'utf8',
+        env: {
+          ...process.env,
+          PATH: `${fakeBin}:${process.env.PATH}`,
+          REMOTE_MOUSE_TEST_LOG: logFile,
+          REMOTE_MOUSE_APT_SOURCES_DIR: path.join(fakeBin, 'apt-sources'),
+        },
+      });
+
+      expect(result.status).toBe(1);
+      expect(result.stdout).toContain('ARM64 foreign architecture: missing');
+      expect(result.stdout).toContain('Missing native prebuild: prebuilds/linux-arm64');
+      expect(readFileSync(logFile, 'utf8')).toBe('');
+    } finally {
+      rmSync(fakeBin, {recursive: true, force: true});
+    }
   });
 });

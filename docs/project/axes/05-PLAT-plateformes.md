@@ -212,6 +212,13 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   installés, les privilèges nécessaires, les limites de distribution et les
   étapes de vérification; permettre de relancer le script sans effets
   indésirables.
+- [ ] PLAT-005g — étendre `dev/setup-linux.sh` pour préparer la génération des
+  prébuilds projet x64 et ARM64 sur un hôte amd64 : détecter l'architecture
+  étrangère et les paquets cibles requis, configurer la source ARM64 officielle
+  Ubuntu sans écraser une configuration gérée par le développeur, installer le
+  toolchain croisé et les en-têtes X11/libpng cibles après confirmation, puis
+  générer les deux jeux d'artefacts. Le mode `--check` doit signaler les
+  prérequis et artefacts manquants sans modifier le système.
 - [ ] Renforcer diagnostics VLC, navigateurs et Samsung TV.
 - [ ] Définir un contrat d'adaptateur avant de multiplier les intégrations.
 
