@@ -1,6 +1,6 @@
 {
   "name": "@velor/remote-mouse",
-  "version": "6.19.77",
+  "version": "6.19.78",
   "type": "module",
   "description": "Remote mouse and keyboard with mobile client",
   "homepage": "https://github.com/glennerichall/node-mouse#readme",
@@ -23,6 +23,7 @@
     "build:uinput": "bash scripts/build-uinput-bridge.sh",
     "build:native:prebuild": "node scripts/build-native-prebuilds.mjs",
     "verify:native:prebuilds": "node scripts/verify-native-prebuilds.mjs",
+    "setup:dev:linux": "bash dev/setup-linux.sh",
     "postinstall": "node scripts/postinstall-linux.mjs",
     "check:version": "node scripts/check-package-version.mjs",
     "test": "npm run check:version && NODE_OPTIONS=--experimental-vm-modules jest --runInBand --coverage",
@@ -36,7 +37,7 @@
     "deploy:linux:wayland": "bash dev/deploy/deploy-linux.sh wayland",
     "test:all": "npm test && npm run test:e2e && npm run test:remote",
     "test:e2e": "playwright test",
-    "screenshots:mobile": "node scripts/generate-mobile-screenshots.mjs",
+    "screenshots:mobile": "node scripts/generate-mobile-screenshots.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",

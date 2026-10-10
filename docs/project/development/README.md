@@ -148,6 +148,8 @@ l'itération et devient append-only dès sa clôture.
   Socket.IO dans les tests intégrés Linux et Wayland.
 - [Plateformes — PLAT-005e](./platforms-PLAT-005e-2026-10-06.md): suppression de
   Vagrant/Packer et déploiement des tests sur les VM fournies par le développeur.
+- [Plateformes — PLAT-005f](./platforms-PLAT-005f-2026-10-09.md): installateur
+  local de l'environnement de développement Linux Ubuntu/Debian.
 - [OPS-003](./ops-OPS-003-2026-10-06.md): uniformisation en anglais des messages
   techniques des journaux.
 - [UX-003](./ux-UX-003-2026-10-06.md): diagnostic visible du transport et des

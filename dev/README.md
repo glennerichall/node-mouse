@@ -1,5 +1,23 @@
 # Outils de développement
 
+Après un clone du dépôt sur Ubuntu ou Debian, préparer le poste de
+développement avec :
+
+```bash
+npm run setup:dev:linux
+```
+
+Le script vérifie Node.js 22 ou plus récent, demande confirmation avant
+d'installer les paquets système de compilation X11/libpng, exécute `npm ci`,
+puis compile les bridges uinput/XWayland et l'overlay QR pour le poste courant.
+Il ne configure pas les permissions système uinput, n'installe pas les
+dépendances facultatives libei/RemoteDesktop, et ne prépare ni ne gère de VM.
+Pour vérifier l'état sans rien installer :
+
+```bash
+npm run setup:dev:linux -- --check
+```
+
 Les machines de test sont fournies et administrées par le développeur. Le
 projet ne crée ni ne détruit de VM et ne dépend plus de Vagrant, libvirt ou
 Packer.
