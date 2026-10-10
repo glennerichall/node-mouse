@@ -77,6 +77,7 @@ describe('install scripts', () => {
 
     const commands = {
       node: '#!/usr/bin/env bash\necho v22.0.0',
+      ldconfig: '#!/usr/bin/env bash\nprintf \'%s\\n\' \'libX11.so.6\' \'libXtst.so.6\' \'libpng16.so.16\'',
       npm: `#!/usr/bin/env bash
 echo "npm $*" >> "$REMOTE_MOUSE_TEST_LOG"
 if [[ "$1 $2 $3" == "config get prefix" ]]; then echo "$REMOTE_MOUSE_NPM_PREFIX"; fi
@@ -116,7 +117,7 @@ exit 0`);
     const first = await run('bash', args, {cwd: process.cwd(), env});
     const second = await run('bash', args, {cwd: process.cwd(), env});
     expect(first.code).toBe(0);
-    expect(second.code).toBe(0);
+    expect(second).toEqual(expect.objectContaining({code: 0}), `${second.stdout}\n${second.stderr}`);
 
     const migratedEnv = await readFile(envPath, 'utf8');
     expect(migratedEnv).toContain(`PORT=4567`);
@@ -156,6 +157,7 @@ elif [[ "$1" == "--version" ]]; then
   echo "10.0.0"
 fi
 `);
+    await writeExecutable(path.join(mockBin, 'ldconfig'), '#!/usr/bin/env bash\nprintf \'%s\\n\' \'libX11.so.6\' \'libXtst.so.6\' \'libpng16.so.16\'\n');
     await writeExecutable(path.join(mockBin, 'gcc'), `#!/usr/bin/env bash
 echo "gcc $*" >> "$REMOTE_MOUSE_TEST_LOG"
 exit 0
@@ -235,13 +237,14 @@ exit 0
       fs.mkdir(prefix, {recursive: true}),
     ]));
 
-    for (const name of ['node', 'gcc', 'make', 'wmctrl', 'remote-mouse']) {
+    for (const name of ['node', 'wmctrl', 'remote-mouse']) {
       await writeExecutable(path.join(mockBin, name), `#!/usr/bin/env bash
 echo "${name} $*" >> "$REMOTE_MOUSE_TEST_LOG"
 ${name === 'node' ? 'echo "v22.0.0"' : ''}
 exit 0
 `);
     }
+    await writeExecutable(path.join(mockBin, 'ldconfig'), '#!/usr/bin/env bash\nprintf \'%s\\n\' \'libX11.so.6\' \'libXtst.so.6\' \'libpng16.so.16\'\n');
     await writeExecutable(path.join(mockBin, 'npm'), `#!/usr/bin/env bash
 echo "npm $*" >> "$REMOTE_MOUSE_TEST_LOG"
 if [[ "$1 $2 $3" == "config get prefix" ]]; then echo "$REMOTE_MOUSE_NPM_PREFIX"; fi
@@ -257,6 +260,7 @@ exit 0
 echo "apt-get $*" >> "$REMOTE_MOUSE_TEST_LOG"
 exit 9
 `);
+    await writeExecutable(path.join(mockBin, 'ldconfig'), '#!/usr/bin/env bash\nprintf \'%s\\n\' \'libX11.so.6\' \'libXtst.so.6\' \'libpng16.so.16\'\n');
 
     const result = await run('bash', [
       'scripts/install-linux.sh',
@@ -274,7 +278,7 @@ exit 9
       },
     });
 
-    expect(result.code).toBe(0);
+    expect(result).toEqual(expect.objectContaining({code: 0}), `${result.stdout}\n${result.stderr}`);
     const commandLog = await readFile(logPath, 'utf8');
     expect(commandLog).not.toContain('apt-get update');
     expect(commandLog).not.toContain('apt-get install');
@@ -306,6 +310,7 @@ if [[ "$1 $2 $3" == "config get prefix" ]]; then echo "$REMOTE_MOUSE_NPM_PREFIX"
 if [[ "$1" == "--version" ]]; then echo "10.0.0"; fi
 exit 0
 `);
+    await writeExecutable(path.join(mockBin, 'ldconfig'), '#!/usr/bin/env bash\nprintf "libX11.so.6\\nlibXtst.so.6\\nlibpng16.so.16\\n"\n');
     await writeExecutable(path.join(mockBin, 'apt-get'), `#!/usr/bin/env bash
 echo "apt-get $*" >> "$REMOTE_MOUSE_TEST_LOG"
 if [[ "$*" == *"install -y nodejs"* ]]; then touch "$REMOTE_MOUSE_NODE_READY"; fi
@@ -362,7 +367,7 @@ exit 0
       },
     });
 
-    expect(result.code).toBe(0);
+    expect(result).toEqual(expect.objectContaining({code: 0}), `${result.stdout}\n${result.stderr}`);
     const commandLog = await readFile(logPath, 'utf8');
     expect(commandLog).toContain('curl -fsSL https://deb.nodesource.com/setup_22.x');
     expect(commandLog).toContain('apt-get install -y nodejs');

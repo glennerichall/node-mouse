@@ -85,7 +85,10 @@ export function createApplicationStart(services) {
     log.info('Scan this QR code with your mobile device');
 
     if (services.getConfig().qrOverlay?.enabled) {
-      await qrOverlay.show();
+      state.startupQrOverlayPromise = Promise.resolve(qrOverlay.show()).catch((error) => {
+        log.warn({err: error}, 'Failed to start QR overlay during server startup');
+        return false;
+      });
     }
 
     await taskManager.start();

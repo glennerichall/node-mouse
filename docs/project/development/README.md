@@ -28,6 +28,11 @@ l'itération et devient append-only dès sa clôture.
 
 ## Historique existant
 
+- [Code — CODE-007](./code-CODE-007-2026-10-09.md): retrait du vérificateur
+  de style maison et de son intégration à `npm test`.
+- [Plateformes — PLAT-001c](./platforms-PLAT-001c-2026-10-09.md): installation
+  sans compilation native sur la cible, résolution des binaires précompilés
+  Linux et vérification des artefacts x64/ARM64 du paquet.
 - [Expérience utilisateur — UX-006](./ux-UX-006-2026-10-04.md): vitesse et
   accélération du pointeur configurables localement par appareil.
 - [Expérience utilisateur — UX-006a](./ux-UX-006a-2026-10-04.md): mise en page
@@ -106,6 +111,16 @@ l'itération et devient append-only dès sa clôture.
   des commandes `HIDE`/`SHOW` perdues par le read-ahead stdio du helper QR.
 - [Plateformes — PLAT-004o](./platforms-PLAT-004o-2026-10-09.md): bascule du QR
   cohérente avec le masquage au survol et transitions d'affichage sérialisées.
+- [Plateformes — PLAT-004p](./platforms-PLAT-004p-2026-10-09.md): récupération
+  si le helper QR refuse une commande d'affichage ou de mise à jour.
+- [Plateformes — PLAT-004q](./platforms-PLAT-004q-2026-10-09.md): commandes
+  acquittées, état de visibilité confirmé et protection du `SHOW` sous pointeur.
+- [Plateformes — PLAT-004r](./platforms-PLAT-004r-2026-10-09.md): limitation
+  du probe hover pour éviter la saturation CPU et démarrage serveur non bloqué.
+- [Plateformes — PLAT-004s](./platforms-PLAT-004s-2026-10-09.md): confirmation
+  de la position du pointeur avant de masquer le QR sur `EnterNotify`.
+- [Plateformes — PLAT-004t](./platforms-PLAT-004t-2026-10-09.md): coalescence
+  des bascules QR et fermeture sans attente d'ACK pendant l'arrêt.
 - [Expérience utilisateur — UX-007](./ux-UX-007-2026-10-09.md): libellé
   explicite et traductions du bouton de bascule QR.
 - [Plateformes — PLAT-004g2](./platforms-PLAT-004g2-2026-10-03.md): séparation

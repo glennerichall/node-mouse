@@ -1,10 +1,8 @@
 import {createRequire} from 'node:module';
-import {fileURLToPath} from 'node:url';
+import {getLinuxNativeArtifactPath} from '../nativeArtifactPaths.js';
 
 const require = createRequire(import.meta.url);
-const DEFAULT_BRIDGE_PATH = fileURLToPath(
-    new URL('../../../../build/uinput/remote-mouse-uinput.node', import.meta.url),
-);
+const DEFAULT_BRIDGE_PATH = getLinuxNativeArtifactPath('uinput');
 
 export function loadUInputBridge({
                                      bridgePath = process.env.REMOTE_MOUSE_UINPUT_BRIDGE || DEFAULT_BRIDGE_PATH,

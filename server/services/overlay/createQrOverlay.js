@@ -18,9 +18,12 @@ export async function createQrOverlay(services, dependencies = {}) {
   const writeQr = dependencies.writeQr || QRCode.toFile;
   let handle = null;
   let visible = Boolean(services.getConfig()?.qrOverlay?.enabled);
+  let closed = false;
   let suppressed = false;
   let bounds = null;
   let operation = Promise.resolve();
+  let toggleOperation = null;
+  let pendingToggleCount = 0;
 
   function getConfig() {
     return {
@@ -48,8 +51,14 @@ export async function createQrOverlay(services, dependencies = {}) {
   }
 
   async function updateNow() {
-    if (!visible || suppressed) return;
-    handle = await adapter.refresh(handle, await prepareContext());
+    if (closed || !visible || suppressed) return;
+    const context = await prepareContext();
+    if (closed) return;
+    handle = await adapter.refresh(handle, context);
+    if (closed) {
+      adapter.close(handle);
+      handle = null;
+    }
   }
 
   function queue(action) {
@@ -58,20 +67,51 @@ export async function createQrOverlay(services, dependencies = {}) {
   }
 
   function close() {
+    closed = true;
     adapter.close(handle);
     handle = null;
   }
 
-  function hideNow() {
+  async function hideNow() {
+    if (closed) return false;
     visible = false;
-    adapter.hide(handle);
+    await adapter.hide(handle);
     return false;
   }
 
   async function showNow() {
+    if (closed) return false;
     visible = true;
-    await updateNow();
-    adapter.show(handle);
+    if (!suppressed) {
+      const context = await prepareContext();
+      if (closed) return false;
+      handle = await adapter.refresh(handle, context);
+      if (closed) {
+        adapter.close(handle);
+        handle = null;
+        return false;
+      }
+      const shown = await adapter.show(handle);
+      if (closed) return false;
+      if (shown === false) {
+        adapter.close(handle);
+        handle = await adapter.refresh(null, context);
+        if (closed) {
+          adapter.close(handle);
+          handle = null;
+          return false;
+        }
+        const retriedShow = await adapter.show(handle);
+        if (closed) return false;
+        if (retriedShow === false) {
+          adapter.close(handle);
+          handle = null;
+          visible = false;
+          log.warn('QR overlay helper rejected the show command twice');
+          return false;
+        }
+      }
+    }
     return true;
   }
 
@@ -93,12 +133,33 @@ export async function createQrOverlay(services, dependencies = {}) {
     return suppressed;
   }
 
-  async function toggle() {
-    return queue(() => {
-      const hiddenByHover = adapter.managesHover && adapter.isSuppressed(handle);
-      if (visible && !hiddenByHover) return hideNow();
-      return showNow();
-    });
+  function scheduleToggleDrain() {
+    if (!toggleOperation) {
+      toggleOperation = queue(async () => {
+        while (pendingToggleCount > 0 && !closed) {
+          const count = pendingToggleCount;
+          pendingToggleCount = 0;
+          const hiddenByHover = adapter.managesHover && adapter.isSuppressed(handle);
+          const currentlyVisible = visible && !hiddenByHover;
+          const shouldBeVisible = count % 2 === 0
+            ? currentlyVisible
+            : !currentlyVisible;
+          if (shouldBeVisible) await showNow();
+          else await hideNow();
+        }
+        return visible;
+      }).finally(() => {
+        toggleOperation = null;
+        if (pendingToggleCount > 0 && !closed) scheduleToggleDrain();
+      });
+    }
+    return toggleOperation;
+  }
+
+  function toggle() {
+    if (closed) return false;
+    pendingToggleCount += 1;
+    return scheduleToggleDrain();
   }
 
   return {

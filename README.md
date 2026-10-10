@@ -169,7 +169,12 @@ VLC media player is optional. Install it on the host machine if you want the VLC
 
 ##### Linux
 
-Typical Debian or Ubuntu packages:
+Published npm packages are expected to ship Linux native binaries for x64 and
+ARM64. Installation never compiles native code on the target machine; missing
+artifacts are reported and must be built on a development/release host. The
+XWayland QR helper still needs X11 and libpng shared libraries at runtime.
+
+Typical Debian or Ubuntu packages for native development/build hosts:
 
 ```bash
 sudo apt-get update
@@ -189,9 +194,22 @@ the user to the general `input` group. To use the optional portal strategy,
 install `pkg-config libei-dev liboeffis-dev`, run `npm run build:wayland`, and
 set `REMOTE_MOUSE_WAYLAND_INPUT=portal`.
 
+To prepare a distributable native artifact set, run `npm run build:native:prebuild`
+on each supported Linux build architecture (x64 and ARM64). This project-owned
+build covers the uinput bridge, XWayland pointer bridge and QR overlay; RobotJS
+and uses the upstream npm packages for their own native artifacts; those
+dependency internals are not copied or maintained here. Combine the resulting
+`prebuilds/linux-x64` and `prebuilds/linux-arm64` directories in the same
+package workspace, then run `npm run verify:native:prebuilds` before publishing.
+The generated project prebuilds are intentionally ignored by Git but are
+included in the npm package. Set `REMOTE_MOUSE_BUILD_LIBEI=1` only on a build
+host with libei/liboeffis development files to include the optional portal
+helper. Build hosts must use a glibc baseline compatible with the oldest
+supported target; this baseline still needs to be fixed by release policy.
+
 Notes:
 
-- `libx11-dev`, `libxtst-dev`, and `libpng-dev` are required for the native input and QR overlay integrations
+- `libx11-dev`, `libxtst-dev`, and `libpng-dev` are required to build native artifacts from source; X11 and libpng shared libraries are runtime requirements for the QR helper
 - `wmctrl` is used for browser focus and window activation on Linux
 - the Linux QR overlay is built as an isolated native X11/XWayland helper
 - X11 uses RobotJS; Wayland uses uinput without a system consent dialog. Remote

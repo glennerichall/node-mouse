@@ -9,6 +9,7 @@ playwright-report/
 test-results/
 test/.tmp/
 build/
+/prebuilds/
 
 # Local deployment state and licensed installation media.
 dev/deploy/cache/

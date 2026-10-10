@@ -14,6 +14,17 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
 - [x] PLAT-001b — rattacher la migration privilégiée uinput au `postinstall`
   déclenché par la mise à jour intégrée; demander l'autorisation locale via
   Polkit seulement lorsque la configuration système manque.
+- [ ] PLAT-001c — distribuer les composants natifs Linux sous forme d'artéfacts
+  précompilés dans le paquet npm, sélectionnés selon l'architecture; le
+  `postinstall` les utilise sans exiger de compilateur ni d'en-têtes de
+  développement sur la machine cible. Inventorier les dépendances npm natives
+  pour confirmer leur compatibilité x64/ARM64 et s'appuyer sur leurs artefacts
+  et mécanismes de distribution amont; ne pas copier ni maintenir leurs binaires
+  dans ce projet.
+  Couvrir les bridges Node-API `uinput`/XWayland et l'overlay QR; garder le
+  helper libei optionnel. Définir une matrice reproductible x64/ARM64, vérifier
+  le contenu npm et l'absence de compilation à l'installation; documenter les
+  bibliothèques partagées qui restent requises au runtime.
 - [ ] PLAT-002 — tester installation, service, mise à jour et désinstallation Windows.
 - [ ] PLAT-003 — créer l'installation macOS et guider les permissions Accessibilité.
 - [ ] PLAT-004 — intégrer le contrôle et la capture Wayland selon le
@@ -43,6 +54,25 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   QR et faire qu'une commande de bascule réaffiche aussi un overlay masqué
   temporairement par le survol; tester les transitions concurrentes et
   l'état `hover-hidden`.
+- [x] PLAT-004p — détecter les écritures refusées par le canal du helper QR,
+  remplacer son handle périmé et réessayer l'affichage; tester le refus d'une
+  commande `SHOW` après un rafraîchissement pourtant accepté.
+- [ ] PLAT-004q — rendre les commandes du helper QR acquittées avec un
+  identifiant de requête et un délai borné; ne confirmer une transition au
+  service qu'après son accusé de réception; garder le QR visible lorsqu'un
+  `SHOW` le remappe sous un pointeur déjà présent; valider le protocole et ce
+  cas de survol sous Xvfb ou sur un bureau réel.
+- [ ] PLAT-004r — éviter la boucle active du probe hover lorsque le pointeur
+  reste dans la zone QR et ne pas retarder l'initialisation HTTP par l'attente
+  de l'ACK initial du helper; tester les deux scénarios.
+- [ ] PLAT-004s — ne masquer l'overlay QR que si la position réelle du pointeur
+  est dans ses limites lors d'un `EnterNotify`; ignorer les événements d'entrée
+  parasites déclenchés par les remappages X11/XWayland et ajouter un test de
+  régression pour un mouvement du pointeur hors de la zone QR.
+- [x] PLAT-004t — éviter l'accumulation des bascules QR en attente en coalesçant
+  les demandes successives, annuler les opérations QR lors de la fermeture et
+  terminer immédiatement le helper natif pendant SIGINT/SIGTERM; couvrir les
+  bascules concurrentes et l'arrêt pendant une commande sans ACK.
 - [ ] PLAT-004j — rétablir sous Wayland/XWayland le masquage temporaire de
   l'overlay QR lorsque le pointeur le survole, puis son réaffichage après la
   sortie du pointeur, sans oscillation, perte permanente de la fenêtre ni

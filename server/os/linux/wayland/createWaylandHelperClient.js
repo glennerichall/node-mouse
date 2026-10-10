@@ -1,11 +1,8 @@
 import {spawn as spawnProcess} from 'node:child_process';
 import {existsSync} from 'node:fs';
-import {fileURLToPath} from 'node:url';
-import path from 'node:path';
+import {getLinuxNativeArtifactPath} from '../nativeArtifactPaths.js';
 
-const DEFAULT_HELPER_PATH = fileURLToPath(
-    new URL('../../../../build/wayland/remote-mouse-wayland', import.meta.url),
-);
+const DEFAULT_HELPER_PATH = getLinuxNativeArtifactPath('waylandPortal');
 
 export function createWaylandHelperClient({
                                                helperPath = process.env.REMOTE_MOUSE_WAYLAND_HELPER || DEFAULT_HELPER_PATH,

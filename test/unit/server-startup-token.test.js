@@ -60,7 +60,13 @@ describe('startServer', () => {
 
   it('rotates the entry token during startup', async () => {
     const createToken = jest.fn(() => 'startup-token');
-    const show = jest.fn(async () => {});
+    let releaseShow;
+    let resolveShowInvoked;
+    const showInvoked = new Promise((resolve) => { resolveShowInvoked = resolve; });
+    const show = jest.fn(() => {
+      resolveShowInvoked();
+      return new Promise((resolve) => { releaseShow = resolve; });
+    });
     const hide = jest.fn(() => false);
     const update = jest.fn(async () => {});
     const taskStart = jest.fn(async () => {});
@@ -135,7 +141,15 @@ describe('startServer', () => {
     });
 
     const {startServer} = await import('../../server/index.js');
-    await startServer();
+    const starting = startServer();
+    await showInvoked;
+    const startupWasIndependent = await Promise.race([
+      starting.then(() => true),
+      new Promise((resolve) => setTimeout(() => resolve(false), 200)),
+    ]);
+    releaseShow();
+    await starting;
+    expect(startupWasIndependent).toBe(true);
     await new Promise((resolve) => setImmediate(resolve));
 
     for (const subscriber of subscribers) {

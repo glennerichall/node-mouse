@@ -12,6 +12,7 @@ export function ensureApplicationLifecycleState(services) {
       stopDisplaySizeObserver: () => {},
       stopQrOverlayRefreshObserver: () => {},
       stopQrOverlayHoverObserver: () => {},
+      startupQrOverlayPromise: null,
       shutdown: null,
     };
     lifecycleState.set(services, state);

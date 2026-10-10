@@ -250,9 +250,9 @@ package_for_dependency() {
         node) echo "nodejs" ;;
         npm) echo "npm" ;;
         build) echo "build-essential" ;;
-        x11) echo "libx11-dev" ;;
-        xtst) echo "libxtst-dev" ;;
-        png) echo "libpng-dev" ;;
+        x11) echo "libx11-6" ;;
+        xtst) echo "libxtst6" ;;
+        png) echo "libpng16-16" ;;
         wmctrl) echo "wmctrl" ;;
         openssl) echo "openssl" ;;
         pkgconfig) echo "pkg-config" ;;
@@ -265,9 +265,9 @@ package_for_dependency() {
         node) echo "nodejs" ;;
         npm) echo "npm" ;;
         build) echo "gcc-c++ make" ;;
-        x11) echo "libX11-devel" ;;
-        xtst) echo "libXtst-devel" ;;
-        png) echo "libpng-devel" ;;
+        x11) echo "libX11" ;;
+        xtst) echo "libXtst" ;;
+        png) echo "libpng" ;;
         wmctrl) echo "wmctrl" ;;
         openssl) echo "openssl" ;;
         pkgconfig) echo "pkgconf-pkg-config" ;;
@@ -295,9 +295,9 @@ package_for_dependency() {
         node) echo "nodejs" ;;
         npm) echo "npm" ;;
         build) echo "gcc-c++ make" ;;
-        x11) echo "libX11-devel" ;;
-        xtst) echo "libXtst-devel" ;;
-        png) echo "libpng16-devel" ;;
+        x11) echo "libX11-6" ;;
+        xtst) echo "libXtst6" ;;
+        png) echo "libpng16-16" ;;
         wmctrl) echo "wmctrl" ;;
         openssl) echo "openssl" ;;
         pkgconfig) echo "pkg-config" ;;
@@ -374,31 +374,22 @@ dedupe_words() {
   done
 }
 
-can_compile_header() {
-  local include_line="$1"
-  local compiler="${CC:-cc}"
-  if ! command -v "$compiler" >/dev/null 2>&1; then
-    return 1
-  fi
-
-  printf '%s\nint main(void) { return 0; }\n' "$include_line" | "$compiler" -x c - -o /tmp/remote-mouse-install-check >/dev/null 2>&1
-  rm -f /tmp/remote-mouse-install-check
-}
-
 check_functional_dependencies() {
   MISSING_DEPS=()
 
   has_supported_node || MISSING_DEPS+=("node")
   command -v npm >/dev/null 2>&1 || MISSING_DEPS+=("npm")
 
-  if ! command -v gcc >/dev/null 2>&1 && ! command -v cc >/dev/null 2>&1; then
-    MISSING_DEPS+=("build")
-  fi
-  command -v make >/dev/null 2>&1 || MISSING_DEPS+=("build")
+  has_shared_library() {
+    local library_cache
+    command -v ldconfig >/dev/null 2>&1 || return 1
+    library_cache="$(ldconfig -p 2>/dev/null || true)"
+    [[ "$library_cache" == *"$1"* ]]
+  }
 
-  can_compile_header '#include <X11/Xlib.h>' || MISSING_DEPS+=("x11")
-  can_compile_header '#include <X11/extensions/XTest.h>' || MISSING_DEPS+=("xtst")
-  can_compile_header '#include <png.h>' || MISSING_DEPS+=("png")
+  has_shared_library 'libX11.so.6' || MISSING_DEPS+=("x11")
+  has_shared_library 'libXtst.so.6' || MISSING_DEPS+=("xtst")
+  has_shared_library 'libpng16.so.16' || MISSING_DEPS+=("png")
 
   command -v wmctrl >/dev/null 2>&1 || MISSING_DEPS+=("wmctrl")
   command -v openssl >/dev/null 2>&1 || MISSING_DEPS+=("openssl")

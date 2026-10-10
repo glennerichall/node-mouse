@@ -1,9 +1,7 @@
 import {Worker} from 'node:worker_threads';
+import {getLinuxNativeArtifactPath} from '../nativeArtifactPaths.js';
 
-const DEFAULT_BRIDGE_PATH = new URL(
-  '../../../../build/wayland/remote-mouse-xwayland-pointer.node',
-  import.meta.url,
-).pathname;
+const DEFAULT_BRIDGE_PATH = getLinuxNativeArtifactPath('xwaylandPointer');
 const WORKER_URL = new URL('./xwaylandPointerWorker.js', import.meta.url);
 
 function normalizePosition(position) {

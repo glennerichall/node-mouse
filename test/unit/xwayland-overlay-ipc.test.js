@@ -15,6 +15,19 @@ describe('XWayland overlay helper IPC', () => {
     expect(source).toMatch(/setvbuf\(stdin, NULL, _IONBF, 0\)/);
   });
 
+  it('resets the hover deadline when a probe still finds the pointer inside', () => {
+    const source = readFileSync(sourcePath, 'utf8');
+    const insideBranch = source.match(/if \(inside\) \{([\s\S]*?)\n    \}/)?.[1] || '';
+    expect(insideBranch).toMatch(/hidden_at_ms\s*=\s*monotonic_ms\(\)/);
+  });
+
+  it('hides on EnterNotify only when the pointer is inside the QR window', () => {
+    const source = readFileSync(sourcePath, 'utf8');
+    const enterBranch = source.match(/event\.type == EnterNotify([\s\S]*?)\n            \}/)?.[1] || '';
+    expect(enterBranch).toMatch(/pointer_inside\(&overlay\)/);
+    expect(enterBranch).toMatch(/hide_overlay\(&overlay, true\)/);
+  });
+
   const integrationTest = hasXvfb ? it : it.skip;
 
   integrationTest('processes a rapid hide/show pair instead of stranding SHOW in stdio', async () => {
@@ -34,14 +47,15 @@ describe('XWayland overlay helper IPC', () => {
       let output = '';
       child.stdout.setEncoding('utf8');
       child.stdout.on('data', (chunk) => { output += chunk; });
-      child.stdin.write('HIDE\nSHOW\n');
+      child.stdin.write('1 HIDE\n2 SHOW\n');
 
       await new Promise((resolve, reject) => {
         const timeout = setTimeout(() => reject(new Error(`Helper states: ${output}`)), 3000);
         const checkOutput = () => {
           const hiddenIndex = output.indexOf('STATE hidden');
           const visibleIndex = output.indexOf('STATE visible', hiddenIndex + 1);
-          if (hiddenIndex !== -1 && visibleIndex !== -1) {
+          if (hiddenIndex !== -1 && visibleIndex !== -1
+            && output.includes('ACK 1 hidden') && output.includes('ACK 2 visible')) {
             clearTimeout(timeout);
             resolve();
           }

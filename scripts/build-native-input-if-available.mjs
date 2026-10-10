@@ -1,36 +1,47 @@
-import {execFileSync, spawnSync} from 'node:child_process';
+import {existsSync} from 'node:fs';
 import process from 'node:process';
+import {fileURLToPath} from 'node:url';
+import {
+  getLinuxNativePrebuildPath,
+  LINUX_NATIVE_COMPONENTS,
+} from '../server/os/linux/nativeArtifactPaths.js';
 import {configureUInputAfterAppUpdate} from './configure-uinput-after-update.mjs';
 
-if (process.platform !== 'linux') {
-  process.exit(0);
-}
+const REQUIRED_COMPONENTS = ['uinput', 'xwaylandPointer', 'xwaylandOverlay'];
 
-const compiler = spawnSync('cc', ['--version']);
-if (compiler.status === 0) {
-  execFileSync('bash', ['scripts/build-uinput-bridge.sh'], {stdio: 'inherit'});
-  execFileSync('bash', ['scripts/build-xwayland-pointer-bridge.sh'], {stdio: 'inherit'});
-  const overlayDependencies = spawnSync('sh', ['-c', 'test -f /usr/include/X11/Xlib.h && test -f /usr/include/png.h']);
-  if (overlayDependencies.status === 0) {
-    execFileSync('bash', ['scripts/build-xwayland-overlay.sh'], {stdio: 'inherit'});
-  } else {
-    process.stderr.write(
-      'Native QR overlay not built: install the X11 and libpng development headers, then run npm run build:xwayland-overlay.\n',
+/**
+ * Keep npm installation free of native compilation. Developers can invoke
+ * the explicit build scripts; published packages must carry their binaries.
+ */
+export function buildNativeInputIfAvailable({
+  platform = process.platform,
+  arch = process.arch,
+  exists = existsSync,
+  stderr = process.stderr,
+  migrateUInput = configureUInputAfterAppUpdate,
+} = {}) {
+  if (platform !== 'linux') {
+    return {built: [], skipped: LINUX_NATIVE_COMPONENTS};
+  }
+
+  const prebuiltAvailable = Object.fromEntries(
+    LINUX_NATIVE_COMPONENTS.map((name) => [
+      name,
+      exists(getLinuxNativePrebuildPath(name, {arch})),
+    ]),
+  );
+  const unavailable = LINUX_NATIVE_COMPONENTS.filter((name) => !prebuiltAvailable[name]);
+  const unavailableRequired = REQUIRED_COMPONENTS.filter((name) => !prebuiltAvailable[name]);
+  if (unavailableRequired.length) {
+    stderr.write(
+      `Required native components not packaged for Linux ${arch}: ${unavailableRequired.join(', ')}. npm install did not compile them; build artifacts on a development host before publishing.\n`,
     );
   }
-} else {
-  process.stderr.write(
-    'Native input bridges not built: install a C compiler, then run npm run build:uinput and npm run build:xwayland-pointer.\n',
-  );
+
+  migrateUInput();
+  return {built: [], skipped: unavailable};
 }
 
-const dependencies = spawnSync('pkg-config', ['--exists', 'libei-1.0', 'liboeffis-1.0']);
-if (dependencies.status !== 0) {
-  process.stderr.write(
-    'Wayland helper not built: install pkg-config, libei-dev and liboeffis-dev, then run npm run build:wayland.\n',
-  );
-} else {
-  execFileSync('bash', ['scripts/build-wayland-helper.sh'], {stdio: 'inherit'});
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  buildNativeInputIfAvailable();
 }
-
-configureUInputAfterAppUpdate();

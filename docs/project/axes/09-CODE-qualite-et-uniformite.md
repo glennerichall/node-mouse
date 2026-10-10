@@ -62,6 +62,10 @@ découpage des responsabilités et des contrats entre composants.
 - [x] **CODE-006 — Prévention progressive:** appliquer les règles aux fichiers
   modifiés et aux nouveaux fichiers, puis résorber la dette existante par lots
   identifiés et testés.
+- [x] **CODE-007 — Retrait du vérificateur de style maison:** retirer
+  `scripts/check-code-style.mjs` et son branchement npm; le contrôle de style
+  générique ne fait pas partie des vérifications nécessaires au fonctionnement
+  ni aux tests métier du produit.
 
 ## Critères d'acceptation de l'axe
 

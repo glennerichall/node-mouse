@@ -20,6 +20,60 @@ function createServices() {
 }
 
 describe('QR overlay OS adapters', () => {
+  it('replaces a helper that rejects an update instead of keeping a stale handle', async () => {
+    const staleHandle = {
+      update: jest.fn(() => false),
+      getState: jest.fn(() => 'visible'),
+      close: jest.fn(),
+    };
+    const replacement = {update: jest.fn(), getState: jest.fn(() => 'starting'), process: {once: jest.fn()}};
+    const createClient = jest.fn(() => replacement);
+    const adapter = createLinuxQrOverlayAdapter({
+      access: async () => {},
+      helperPath: '/app/overlay',
+      createClient,
+    });
+
+    await expect(adapter.refresh(staleHandle, {qrPath: '/tmp/qr.png'})).resolves.toBe(replacement);
+    expect(staleHandle.close).toHaveBeenCalledTimes(1);
+    expect(createClient).toHaveBeenCalledTimes(1);
+  });
+
+  it('restarts the helper if it closes between refresh and show', async () => {
+    const failedClient = {
+      show: jest.fn(() => false),
+      hide: jest.fn(),
+      update: jest.fn(() => true),
+      close: jest.fn(),
+      getState: jest.fn(() => 'starting'),
+      process: {once: jest.fn()},
+    };
+    const replacementClient = {
+      show: jest.fn(() => true),
+      hide: jest.fn(),
+      update: jest.fn(() => true),
+      close: jest.fn(),
+      getState: jest.fn(() => 'starting'),
+      process: {once: jest.fn()},
+    };
+    const createClient = jest.fn()
+      .mockReturnValueOnce(failedClient)
+      .mockReturnValueOnce(replacementClient);
+    const overlay = await createQrOverlay(createServices(), {
+      adapter: createLinuxQrOverlayAdapter({
+        access: async () => {}, helperPath: '/app/overlay', createClient,
+      }),
+      qrPath: '/tmp/qr.png',
+      writeQr: jest.fn(async () => {}),
+      log: {warn: jest.fn()},
+    });
+
+    await expect(overlay.show()).resolves.toBe(true);
+    expect(failedClient.close).toHaveBeenCalledTimes(1);
+    expect(createClient).toHaveBeenCalledTimes(2);
+    expect(replacementClient.show).toHaveBeenCalledTimes(1);
+  });
+
   it('re-shows the QR when toggle is called while hover has temporarily hidden it', async () => {
     let helperState = 'starting';
     const client = {
@@ -48,6 +102,48 @@ describe('QR overlay OS adapters', () => {
     await expect(overlay.toggle()).resolves.toBe(true);
     expect(client.show).toHaveBeenCalledTimes(2);
     expect(client.hide).not.toHaveBeenCalled();
+  });
+
+  it('coalesces toggles that arrive while the helper is acknowledging a transition', async () => {
+    let helperState = 'starting';
+    let releaseHide;
+    let announceHide;
+    const hideStarted = new Promise((resolve) => { announceHide = resolve; });
+    const client = {
+      show: jest.fn(() => { helperState = 'visible'; }),
+      hide: jest.fn(() => {
+        announceHide();
+        return new Promise((resolve) => {
+          releaseHide = () => {
+            helperState = 'hidden';
+            resolve(true);
+          };
+        });
+      }),
+      update: jest.fn(),
+      close: jest.fn(),
+      getState: jest.fn(() => helperState),
+      process: {once: jest.fn()},
+    };
+    const overlay = await createQrOverlay(createServices(), {
+      adapter: createLinuxQrOverlayAdapter({
+        access: async () => {}, helperPath: '/app/overlay', createClient: () => client,
+      }),
+      qrPath: '/tmp/qr.png',
+      writeQr: jest.fn(async () => {}),
+      log: {warn: jest.fn()},
+    });
+    await overlay.show();
+
+    const firstToggle = overlay.toggle();
+    await hideStarted;
+    const queuedToggles = [overlay.toggle(), overlay.toggle(), overlay.toggle()];
+    releaseHide();
+
+    await Promise.all([firstToggle, ...queuedToggles]);
+
+    expect(client.hide).toHaveBeenCalledTimes(1);
+    expect(client.show).toHaveBeenCalledTimes(2);
   });
 
   it('keeps a hide requested during a QR refresh after that refresh completes', async () => {
