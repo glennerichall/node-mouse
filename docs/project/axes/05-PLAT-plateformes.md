@@ -25,6 +25,27 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   helper libei optionnel. Définir une matrice reproductible x64/ARM64, vérifier
   le contenu npm et l'absence de compilation à l'installation; documenter les
   bibliothèques partagées qui restent requises au runtime.
+- [ ] PLAT-001e — définir et valider le packaging de publication npm à partir
+  d'un tarball reproductible : contrôler les fichiers inclus/exclus, les
+  entrées CLI, les artefacts natifs précompilés et les métadonnées requises;
+  exécuter `npm pack` et `npm publish --dry-run`, puis installer le tarball dans
+  un préfixe global temporaire et vérifier `remote-mouse --version` ainsi que
+  le chargement des composants natifs. Couvrir les architectures prises en
+  charge par PLAT-001c. Cette tâche prépare et teste le paquet, sans publier
+  automatiquement ni nécessiter de jeton npm.
+- [ ] PLAT-001d — simplifier l'installation publique autour de
+  `npm install -g @velor/remote-mouse`, puis d'une commande explicite
+  `remote-mouse setup` qui configure l'application sur Linux et Windows.
+  Séparer l'installation du paquet des changements système : le setup doit
+  détecter/valider les prérequis, créer la configuration initiale et ses
+  secrets, installer le service, et demander explicitement les permissions
+  système requises (notamment uinput sous Linux). Rester idempotent et
+  préserver configuration et données lors d'une mise à jour. Dépend de
+  PLAT-001c et PLAT-001e, et coordonne les critères d'installation récupérable
+  d'OPS. Garder
+  `install-linux.sh` et `install-windows.ps1` tant que leurs responsabilités
+  ne sont pas reprises et testées; les supprimer ensuite avec leur
+  documentation et leurs tests propres.
 - [ ] PLAT-002 — tester installation, service, mise à jour et désinstallation Windows.
 - [ ] PLAT-003 — créer l'installation macOS et guider les permissions Accessibilité.
 - [ ] PLAT-004 — intégrer le contrôle et la capture Wayland selon le
