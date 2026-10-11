@@ -30,17 +30,17 @@ export async function installWindowsDaemon(serviceName) {
     ], {timeout: 30000});
 
     if (!result.ok) {
-        return {ok: false, message: result.stderr || `Impossible d'installer la tache ${serviceName}.`};
+        return {ok: false, message: result.stderr || `Unable to install the scheduled task ${serviceName}.`};
     }
 
     const run = await execFileAsync('schtasks', ['/Run', '/TN', serviceName], {timeout: 10000});
     if (!run.ok) {
-        return {ok: false, message: run.stderr || `Tache ${serviceName} creee mais non lancee.`};
+        return {ok: false, message: run.stderr || `Scheduled task ${serviceName} was created but could not be started.`};
     }
 
     return {
         ok: true,
-        message: `Tache ${serviceName} installee et lancee.`,
+        message: `Scheduled task ${serviceName} installed and started.`,
     };
 }
 
@@ -48,12 +48,12 @@ export async function disableWindowsDaemon(serviceName) {
     await execFileAsync('schtasks', ['/End', '/TN', serviceName], {timeout: 10000});
     const result = await execFileAsync('schtasks', ['/Change', '/TN', serviceName, '/Disable'], {timeout: 30000});
     if (!result.ok) {
-        return {ok: false, message: result.stderr || `Impossible de desactiver la tache ${serviceName}.`};
+        return {ok: false, message: result.stderr || `Unable to disable the scheduled task ${serviceName}.`};
     }
 
     return {
         ok: true,
-        message: `Tache ${serviceName} desactivee.`,
+        message: `Scheduled task ${serviceName} disabled.`,
     };
 }
 
@@ -61,12 +61,12 @@ export async function uninstallWindowsDaemon(serviceName) {
     await execFileAsync('schtasks', ['/End', '/TN', serviceName], {timeout: 10000});
     const result = await execFileAsync('schtasks', ['/Delete', '/TN', serviceName, '/F'], {timeout: 30000});
     if (!result.ok) {
-        return {ok: false, message: result.stderr || `Impossible de supprimer la tache ${serviceName}.`};
+        return {ok: false, message: result.stderr || `Unable to remove the scheduled task ${serviceName}.`};
     }
 
     return {
         ok: true,
-        message: `Tache ${serviceName} desinstallee.`,
+        message: `Scheduled task ${serviceName} removed.`,
     };
 }
 
@@ -77,14 +77,14 @@ export async function restartWindowsDaemon(serviceName) {
     if (!spawned) {
         return {
             ok: false,
-            message: 'Impossible de lancer la tache de redemarrage.',
-            details: {message: 'spawn schtasks failed'},
+            message: 'Unable to launch the scheduled task restart command.',
+            details: {message: 'Failed to spawn schtasks'},
         };
     }
 
     return {
         ok: true,
-        message: `Redemarrage demande pour ${serviceName}.`,
+        message: `Restart requested for ${serviceName}.`,
     };
 }
 

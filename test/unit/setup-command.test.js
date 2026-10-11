@@ -133,6 +133,43 @@ describe('remote-mouse setup command', () => {
     expect(fs.existsSync(path.join(result.configDir, '.env'))).toBe(true);
   });
 
+  it('preserves Windows configuration and secrets when setup is repeated', async () => {
+    const configDir = path.join(root, 'Roaming', 'remote-mouse');
+    const env = {APPDATA: path.dirname(configDir)};
+    const installCalls = [];
+    const setupOptions = {
+      platform: 'win32',
+      nodeVersion: '24.1.0',
+      homeDir: root,
+      env,
+      options: {yes: true},
+      output: createOutput().stream,
+      errorOutput: createOutput().stream,
+      dependencies: {
+        runServiceInstall: async (configEnv) => {
+          installCalls.push(configEnv);
+          return {ok: true};
+        },
+      },
+    };
+
+    const first = await runSetup(setupOptions);
+    const firstConfig = fs.readFileSync(path.join(configDir, '.env'), 'utf8');
+    const secret = firstConfig.match(/^SESSION_COOKIE_SECRET=(.+)$/m)?.[1];
+    fs.appendFileSync(path.join(configDir, '.env'), 'CUSTOM_SETTING=keep-me\n');
+    const updatedConfig = fs.readFileSync(path.join(configDir, '.env'), 'utf8');
+    const second = await runSetup(setupOptions);
+
+    expect(first).toMatchObject({ok: true, serviceInstalled: true});
+    expect(second).toMatchObject({ok: true, serviceInstalled: true});
+    expect(fs.readFileSync(path.join(configDir, '.env'), 'utf8')).toBe(updatedConfig);
+    expect(updatedConfig).toContain(`SESSION_COOKIE_SECRET=${secret}`);
+    expect(installCalls).toEqual([
+      {CONFIG_DIR: configDir, ENV_FILE_PATH: path.join(configDir, '.env')},
+      {CONFIG_DIR: configDir, ENV_FILE_PATH: path.join(configDir, '.env')},
+    ]);
+  });
+
   it('fills an empty cookie-secret setting without duplicating its key', async () => {
     const configDir = path.join(root, 'config');
     fs.mkdirSync(configDir, {recursive: true});

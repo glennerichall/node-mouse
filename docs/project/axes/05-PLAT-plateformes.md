@@ -78,6 +78,12 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   différences de configuration/permissions et le parcours commun avec des
   stratégies simulées; préserver l'idempotence et le comportement actuel.
 - [ ] PLAT-002 — tester installation, service, mise à jour et désinstallation Windows.
+- [x] PLAT-002a — ajouter des tests automatisés de la stratégie de setup
+  Windows et de ses tâches planifiées : réexécution idempotente de la
+  configuration, préservation des réglages existants et chemins de configuration
+  persistés dans la tâche; création/exécution, désactivation, suppression et
+  gestion des échecs `schtasks`. Simuler les commandes système et ne pas
+  présenter ces tests comme une validation sur un hôte Windows réel.
 - [ ] PLAT-003 — créer l'installation macOS et guider les permissions Accessibilité.
 - [ ] PLAT-004 — intégrer le contrôle et la capture Wayland selon le
   [plan dédié](./05-PLAT-004-wayland.md).

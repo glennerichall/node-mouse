@@ -28,6 +28,8 @@ l'itération et devient append-only dès sa clôture.
 
 ## Historique existant
 
+- [Plateformes — PLAT-002a](./platforms-PLAT-002a-2026-10-10.md): tests de
+  préservation de la configuration Windows et du cycle des tâches planifiées.
 - [Plateformes — PLAT-001h](./platforms-PLAT-001h-2026-10-10.md): extraction
   de l'orchestration générique de setup et stratégies d'installation Linux et
   Windows sélectionnées selon l'OS hôte.
