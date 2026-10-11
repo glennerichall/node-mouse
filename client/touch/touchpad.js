@@ -1,4 +1,5 @@
 import {createAccumulatedThrottle} from './throttle.js';
+import {triggerHapticFeedback} from './haptic-feedback.js';
 import {emitWithTimestamp} from '../core/socket-emit.js';
 import {
     REMOTE_EVENT_MOUSE_BUTTON,
@@ -87,6 +88,9 @@ export function createSocketTouchHandler(socket, options = {}) {
         : () => 'right';
     const getPointerPreferences = typeof options.getPointerPreferences === 'function'
         ? options.getPointerPreferences : () => ({speed: 1.3, acceleration: true, accelerationStrength: 1});
+    const onHapticFeedback = typeof options.onHapticFeedback === 'function'
+        ? options.onHapticFeedback
+        : triggerHapticFeedback;
 
     const moveEmitter = createAccumulatedThrottle(
         (payload) => {
@@ -119,6 +123,7 @@ export function createSocketTouchHandler(socket, options = {}) {
             scrollEmitter.addDelta(0, dy);
         },
         click: (button) => {
+            onHapticFeedback();
             emitWithTimestamp(socket, REMOTE_EVENT_MOUSE_CLICK, {button});
         },
         getInputConfig,

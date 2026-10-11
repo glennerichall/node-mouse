@@ -11,10 +11,12 @@ import { bindAdminDrawer } from './bindings/bindAdminDrawer.js';
 import { bindAdminVersion } from './bindings/bindAdminVersion.js';
 import { bindRemoteAccordion } from './bindings/bindRemoteAccordion.js';
 import {applyRemoteVisibilityState} from './applyRemoteVisibilityState.js';
+import {bindTouchHapticFeedback} from '../../touch/haptic-feedback.js';
 
 export function initUi(services) {
 
   services.getI18n().translateRoot(document);
+  bindTouchHapticFeedback(document);
 
   const dom = getDom();
   const {remotes} = dom;

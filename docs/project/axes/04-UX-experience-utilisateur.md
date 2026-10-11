@@ -50,9 +50,12 @@ compréhensibles sur mobile et desktop.
   leur opacité à la fin de l'interaction ou dès que l'option est désactivée.
 - [ ] UX-009 — tester navigation clavier, lecteurs d'écran, contrastes et
   traductions.
-- [ ] UX-010 — ajouter un retour haptique aux interactions tactiles, avec une
+- [x] UX-010 — ajouter un retour haptique aux interactions tactiles, avec une
   dégradation sans erreur lorsque le navigateur ou l'appareil ne le prend pas
   en charge.
+- [x] UX-010a — déclencher aussi le retour haptique lorsqu'un tap reconnu sur
+  le touchpad émet un clic souris, sans vibration pour les mouvements ou
+  contacts qui ne produisent pas de clic.
 
 UX-001/002 dépendent de SEC-008, terminé : l'API admin fournit la liste des
 sessions, leur rôle, leur état, leur dernière activité et la révocation
