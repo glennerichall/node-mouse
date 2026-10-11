@@ -6,6 +6,7 @@ export function execFileAsync(command, args = [], options = {}) {
     execFile(command, args, {
       timeout,
       env: options.env,
+      shell: options.shell,
       maxBuffer: options.maxBuffer,
     }, (error, stdout = '', stderr = '') => {
       resolve({

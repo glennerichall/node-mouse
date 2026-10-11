@@ -1,6 +1,8 @@
 import {jest} from '@jest/globals';
 import {buildNpmGlobalUpdateCommand} from '../../server/services/update-manager/buildNpmGlobalUpdateCommand.js';
 
+const execFileAsync = jest.fn();
+const execShell = jest.fn();
 const chooseUpdateCheckSource = jest.fn();
 const chooseUpdateInstallSource = jest.fn();
 const logger = {
@@ -18,6 +20,12 @@ jest.unstable_mockModule('../../server/services/update-manager/chooseUpdateInsta
   chooseUpdateInstallSource,
 }));
 
+jest.unstable_mockModule('../../server/utils/process.js', () => ({
+  execFileAsync,
+  execShell,
+  spawnDetached: jest.fn(),
+}));
+
 jest.unstable_mockModule('../../server/application/logger.js', () => ({
   createLogger,
 }));
@@ -25,6 +33,7 @@ jest.unstable_mockModule('../../server/application/logger.js', () => ({
 const {
   createUpdateManager,
 } = await import('../../server/services/update-manager/createUpdateManager.js');
+const {resolveInstallUpdateCommand} = await import('../../server/services/update-manager/resolveInstallUpdateCommand.js');
 
 function createServices({
   config = {updateCheck: {enabled: true}},
@@ -274,9 +283,87 @@ describe('createUpdateManager', () => {
 });
 
 describe('buildNpmGlobalUpdateCommand', () => {
-  it('marks npm updates as daemon-triggered for the postinstall migration', () => {
-    expect(buildNpmGlobalUpdateCommand('@velor/remote-mouse')).toBe(
-      "REMOTE_MOUSE_DAEMON=1 npm update -g '@velor/remote-mouse'",
-    );
+  it('returns a structured invocation and daemon environment marker', () => {
+    expect(buildNpmGlobalUpdateCommand('@velor/remote-mouse', {platform: 'linux'})).toEqual({
+      executable: 'npm',
+      args: ['update', '-g', '@velor/remote-mouse'],
+      env: {REMOTE_MOUSE_DAEMON: '1'},
+      shell: false,
+      displayCommand: "npm update -g '@velor/remote-mouse' (REMOTE_MOUSE_DAEMON=1)",
+    });
+  });
+
+  it('rejects package names that could become shell syntax', () => {
+    expect(buildNpmGlobalUpdateCommand('remote-mouse && whoami', {platform: 'win32'})).toBeNull();
+  });
+});
+
+describe('resolveInstallUpdateCommand', () => {
+  const getSystemConfig = (updateCheck = {}) => ({updateCheck: {
+    packageName: '@velor/remote-mouse',
+    installTimeoutSec: 45,
+    ...updateCheck,
+  }});
+
+  beforeEach(() => {
+    execFileAsync.mockReset().mockResolvedValue({ok: true, stdout: '', stderr: ''});
+    execShell.mockReset().mockResolvedValue({ok: true, stdout: '', stderr: ''});
+  });
+
+  it('runs automatic npm updates without a shell on Linux', async () => {
+    const install = resolveInstallUpdateCommand({getSystemConfig, platform: 'linux'});
+
+    await expect(install()).resolves.toMatchObject({ok: true, status: 'completed'});
+    expect(execFileAsync).toHaveBeenCalledWith('npm', ['update', '-g', '@velor/remote-mouse'], {
+      timeout: 45_000,
+      env: expect.objectContaining({REMOTE_MOUSE_DAEMON: '1'}),
+      shell: false,
+    });
+    expect(execShell).not.toHaveBeenCalled();
+  });
+
+  it('invokes the npm command shim through cmd.exe without enabling an implicit shell', async () => {
+    const install = resolveInstallUpdateCommand({getSystemConfig, platform: 'win32'});
+
+    await expect(install()).resolves.toMatchObject({ok: true, status: 'completed'});
+    expect(execFileAsync).toHaveBeenCalledWith('cmd.exe', ['/d', '/s', '/c', 'npm update -g @velor/remote-mouse'], {
+      timeout: 45_000,
+      env: expect.objectContaining({REMOTE_MOUSE_DAEMON: '1'}),
+      shell: false,
+    });
+    expect(execShell).not.toHaveBeenCalled();
+  });
+
+  it('keeps explicitly configured installation commands on the custom shell path', async () => {
+    const install = resolveInstallUpdateCommand({
+      getSystemConfig: () => getSystemConfig({installCommand: 'npm update -g custom-package'}),
+      platform: 'win32',
+    });
+
+    await expect(install()).resolves.toMatchObject({ok: true, status: 'completed'});
+    expect(execShell).toHaveBeenCalledWith('npm update -g custom-package', 45_000);
+    expect(execFileAsync).not.toHaveBeenCalled();
+  });
+
+  it('fails clearly when the configured package name is not safe to invoke', async () => {
+    const install = resolveInstallUpdateCommand({
+      getSystemConfig: () => getSystemConfig({packageName: 'remote-mouse & whoami'}),
+      platform: 'win32',
+    });
+
+    await expect(install()).resolves.toMatchObject({ok: false, status: 'invalid-package-name'});
+    expect(execFileAsync).not.toHaveBeenCalled();
+    expect(execShell).not.toHaveBeenCalled();
+  });
+
+  it('returns process failures with diagnostic output', async () => {
+    execFileAsync.mockResolvedValue({ok: false, stdout: '', stderr: 'registry unavailable'});
+    const install = resolveInstallUpdateCommand({getSystemConfig, platform: 'win32'});
+
+    await expect(install()).resolves.toMatchObject({
+      ok: false,
+      status: 'failed',
+      details: 'registry unavailable',
+    });
   });
 });

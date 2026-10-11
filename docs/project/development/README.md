@@ -28,6 +28,8 @@ l'itération et devient append-only dès sa clôture.
 
 ## Historique existant
 
+- [Plateformes — PLAT-002b](./platforms-PLAT-002b-2026-10-11.md): exécution
+  de l'update npm avec environnement séparé, shim Windows et arguments validés.
 - [Plateformes — PLAT-002a](./platforms-PLAT-002a-2026-10-10.md): tests de
   préservation de la configuration Windows et du cycle des tâches planifiées.
 - [Plateformes — PLAT-001h](./platforms-PLAT-001h-2026-10-10.md): extraction

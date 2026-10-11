@@ -84,6 +84,13 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   persistés dans la tâche; création/exécution, désactivation, suppression et
   gestion des échecs `schtasks`. Simuler les commandes système et ne pas
   présenter ces tests comme une validation sur un hôte Windows réel.
+- [x] PLAT-002b — exécuter la mise à jour npm automatique sans syntaxe shell
+  POSIX : représenter la commande comme un exécutable, des arguments et un
+  environnement distincts, en préservant `REMOTE_MOUSE_DAEMON=1` pour le
+  `postinstall`. Utiliser l'exécution nécessaire au shim npm Windows, valider
+  le nom du paquet avant de l'envoyer au shell, conserver les commandes
+  personnalisées configurées et leur exécution shell; tester les variantes
+  Linux/Windows, les erreurs et la commande diagnostique sans hôte réel.
 - [ ] PLAT-003 — créer l'installation macOS et guider les permissions Accessibilité.
 - [ ] PLAT-004 — intégrer le contrôle et la capture Wayland selon le
   [plan dédié](./05-PLAT-004-wayland.md).
