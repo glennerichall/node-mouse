@@ -16,30 +16,32 @@ entraîner de renommage.
 
 | Priorité | Axe | Résultat visé | État actuel |
 | ---: | --- | --- | --- |
-| 1 | [05 — PLAT — Plateformes](./axes/05-PLAT-plateformes.md) | Contrôle fiable sur les systèmes officiellement pris en charge | En cours — laboratoire QEMU, Wayland et installation |
+| 1 | [05 — PLAT — Plateformes](./axes/05-PLAT-plateformes.md) | Contrôle fiable sur les systèmes officiellement pris en charge | En cours — installation Linux et Wayland; volet VM suspendu |
 | 2 | [04 — UX — Expérience utilisateur](./axes/04-UX-experience-utilisateur.md) | Association, contrôle et diagnostic compréhensibles | En cours — UX-006d terminée; UX-004/005 non démarrées |
 | 3 | [07 — OPS — Exploitation](./axes/07-OPS-exploitation.md) | Installation, mise à jour et diagnostic récupérables | En cours — journaux et messages techniques |
 | 4 | [01 — SEC — Sécurité](./axes/01-SEC-securite.md) | Accès authentifiés, autorisations cohérentes et révocables | À jour — SEC-011 terminée |
 | 5 | [02 — ARCH — Architecture](./axes/02-ARCH-architecture-modulaire.md) | Services métier indépendants des transports et adaptateurs | ARCH-046 terminée |
 | 6 | [03 — REL — Fiabilité](./axes/03-REL-fiabilite.md) | Commandes et prévisualisation prévisibles sous charge | En cours — REL-007 terminée |
 | 7 | [06 — PWA — Application web](./axes/06-PWA-application-web.md) | Installation web et transports optionnels sécurisés | Planifié |
-| 8 | [09 — CODE — Qualité du code](./axes/09-CODE-qualite-et-uniformite.md) | Style cohérent, conventions explicites et dette mesurée | À jour — CODE-008 terminée |
+| 8 | [09 — CODE — Qualité du code](./axes/09-CODE-qualite-et-uniformite.md) | Style cohérent, conventions explicites et dette mesurée | À jour — CODE-009 terminée |
 | 9 | [08 — QUA — Qualité](./axes/08-QUA-qualite.md) | Changements vérifiés et versions reproductibles | Continu |
 | 99 | [BACK — Backlog transversal](./axes/99-BACK-backlog-transversal.md) | Idées à promouvoir dans un axe avant implantation | Exploration |
 
 ## Ordre de livraison actuel
 
-1. Déployer vers les machines de test fournies par les développeurs au moyen
-   des scripts SSH/rsync de `dev/deploy/`.
-2. Terminer avec ce laboratoire la validation de l'installation Linux et de
-   l'entrée et de l'overlay sous X11 et Wayland, puis valider le cycle
-   d'installation Windows 11.
-3. Améliorer la consultation des journaux et uniformiser leurs messages dans
-   l'axe `OPS`.
-4. Auditer la qualité et l'uniformité du style dans `CODE-001`, puis normaliser
-   les routeurs Express sans changement fonctionnel.
-5. Reprendre ensuite les travaux structurants des axes `ARCH` et `REL`, puis
-   les autres itérations UX.
+Les travaux impliquant une VM (création, provisionnement, démarrage, déploiement
+ou validation) sont reportés jusqu'à indication contraire de l'utilisateur.
+Les tâches correspondantes restent dans leurs axes comme contexte, mais ne font
+pas partie de l'ordre actif.
+
+1. Poursuivre les travaux PLAT non liés aux VM : installation Linux et
+   intégration Wayland/XWayland, avec validation sur systèmes disponibles sans
+   créer ni démarrer de VM.
+2. Reprendre les éléments restants d'installation récupérable et de diagnostic
+   de l'axe `OPS`.
+3. Continuer les itérations UX planifiées (`UX-004`/`UX-005`), puis les travaux
+   `REL` dont les seuils et critères sont définis dans leur axe.
+4. Traiter les autres axes selon leur ordre et leur état dans ce document.
 
 Cet ordre n'est pas une seconde liste de tâches. Les documents d'axes restent
 les seules sources de vérité sur le contenu et l'avancement des itérations.

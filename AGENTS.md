@@ -4,6 +4,8 @@ Use progressive disclosure: inspect the task and affected files first, then read
 only the instructions and project documents relevant to that work.
 
 - Project-wide conventions and architecture map: [project guide](docs/project/README.md).
+- Version changes follow [SemVer policy](docs/project/VERSIONING.md): no bump
+  for documentation-only, test-only, or internal tooling/CI-only changes.
 - For a planned change, use its owning document in `docs/project/axes/` as the
   source of tasks and acceptance criteria. Add an item there before
   implementation when needed.
@@ -18,3 +20,10 @@ only the instructions and project documents relevant to that work.
 Before editing, inspect `git status` and preserve unrelated user changes. Run
 the narrowest relevant checks, then broader checks when risk warrants them.
 Never mark roadmap work complete before its acceptance criteria are verified.
+
+## Current scope constraint
+
+All work that creates, provisions, starts, or validates virtual machines is
+deferred until the user explicitly says otherwise. Do not run VM workflows or
+include VM work in the active delivery order. Preserve existing scripts and
+roadmap history unless the user requests their removal.

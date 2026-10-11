@@ -1,6 +1,9 @@
 import os from 'node:os';
 import path from 'node:path';
-import {createInitialConfig, resolveSetupConfigDir} from './setup/configuration.js';
+import {
+    createInitialConfig,
+    resolveSetupConfigDir
+} from './setup/configuration.js';
 import {installLocalService} from './setup/installService.js';
 import {validateSetupPrerequisites} from './setup/prerequisites.js';
 import {askYesNo} from './setup/prompts.js';
@@ -23,6 +26,7 @@ export async function runSetup(
     } = {}) {
     const strategy = dependencies.setupStrategy || await createSetupStrategy(platform, {dependencies});
     const prerequisiteError = validateSetupPrerequisites({platform, nodeVersion, strategy});
+   
     if (prerequisiteError) {
         errorOutput.write(`${prerequisiteError}\n`);
         return {ok: false, message: prerequisiteError};
@@ -41,12 +45,18 @@ export async function runSetup(
         explicitConfigDir: explicitConfigDir || options.configDir,
         strategy,
     });
+    
     const envFile = path.join(configDir, '.env');
     try {
         strategy.prepareConfigDir(configDir);
         const configResult = createInitialConfig({envFile, configDir, port, strategy});
-        const configEnv = {CONFIG_DIR: configDir, ENV_FILE_PATH: envFile};
-        output.write(`Configuration ready: ${envFile}${configResult.created ? ' (created or updated)' : ' (existing settings preserved)'}\n`);
+        const configEnv = {
+            CONFIG_DIR: configDir,
+            ENV_FILE_PATH: envFile
+        };
+        output.write(`Configuration ready: ${envFile}${configResult.created ?
+            ' (created or updated)' :
+            ' (existing settings preserved)'}\n`);
 
         const hostResult = await strategy.configureHost({options, env, input, output});
         if (!hostResult?.ok) return hostResult;
@@ -55,10 +65,10 @@ export async function runSetup(
         const shouldInstallService = options.noService
             ? false
             : options.yes || await askYesNo('Install and start the Remote Mouse service now?', {
-                input,
-                output,
-                defaultValue: true,
-            });
+            input,
+            output,
+            defaultValue: true,
+        });
         if (!shouldInstallService) {
             output.write('Service not installed. To install it later, run: remote-mouse service install\n');
             return {ok: true, configDir, serviceInstalled: false};

@@ -10,11 +10,15 @@ leur audit et l'uniformisation du code appartiennent à l'[axe CODE](./09-CODE-q
 
 ## Plan de travail
 
-- [ ] CI pour tests unitaires et Playwright.
-- [ ] Renforcer progressivement les tests des zones critiques.
-- [ ] Tests sécurité sessions/rôles/proxies et contrats transport.
-- [ ] Tests d'installation Linux, Windows et macOS; appareils réels pour PWA.
-- [ ] Déclarer versions Node supportées et automatiser audit dépendances.
-- [ ] Générer changelog, artefacts, checksums et documenter compatibilité.
+- [ ] QUA-001 — exécuter les tests unitaires et Playwright dans la CI.
+- [ ] QUA-002 — renforcer progressivement les tests des zones critiques.
+- [ ] QUA-003 — couvrir sessions, rôles, proxies et contrats de transport par
+  des tests de sécurité.
+- [ ] QUA-004 — tester les installations Linux, Windows et macOS, ainsi que la
+  PWA sur des appareils réels.
+- [ ] QUA-005 — déclarer les versions Node.js prises en charge et automatiser
+  l'audit des dépendances.
+- [ ] QUA-006 — générer le changelog, les artefacts et checksums, et documenter
+  la compatibilité.
 
 La Definition of Done commune est dans la [roadmap](../ROADMAP.md).

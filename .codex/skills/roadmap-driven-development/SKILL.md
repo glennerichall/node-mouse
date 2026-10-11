@@ -19,6 +19,9 @@ pour le routage et le chargement progressif.
   modifier ou semble la contredire.
 - `docs/project/development/`: décisions réalisées; rechercher l'identifiant
   ou le sujet touché et lire uniquement les résultats pertinents.
+- `docs/project/VERSIONING.md`: niveau SemVer lors d'une préparation de
+  publication ou demande de changement de version; aucun bump pour une
+  itération documentaire seule.
 
 ## Workflow
 
@@ -33,3 +36,6 @@ pour le routage et le chargement progressif.
 5. À la clôture, créer un journal daté selon la convention de
    `docs/project/development/README.md`. Les journaux terminés sont immuables.
    Modifier la roadmap globale uniquement si l'ordre ou l'état d'un axe change.
+   Ne pas déduire un bump de version de la clôture; appliquer la politique
+   SemVer seulement si le paquet livré change ou si une publication/version est
+   explicitement préparée.

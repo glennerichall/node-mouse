@@ -11,14 +11,16 @@ considérer le LAN comme une frontière de confiance.
 
 ## Plan de travail
 
-- [x] Résolution d'adresse cliente et proxies de confiance explicites.
-- [x] Orchestration de sécurité commune HTTP/Socket.IO.
-- [x] Secret de session robuste et dépendances de production examinées.
-- [x] Séparer jeton d'association et session d'appareil; rôles controller/admin.
-- [x] Limites de taille/débit, vérification Origin/CSRF et expurgation des logs.
-- [x] **SEC-008:** lister les appareils associés et leurs métadonnées.
-- [x] **SEC-008:** révoquer une session ou toutes les sessions via API admin.
-- [x] **SEC-008:** conserver un historique local des associations/révocations.
+- [x] SEC-001 — résolution d'adresse cliente et proxies de confiance explicites.
+- [x] SEC-002 — orchestration de sécurité commune HTTP/Socket.IO.
+- [x] SEC-003 — garantir un secret de session robuste.
+- [x] SEC-004 — examiner et mettre à jour les dépendances de production.
+- [x] SEC-005 — séparer jeton d'association et session d'appareil.
+- [x] SEC-006 — introduire les rôles controller/admin.
+- [x] SEC-007 — limiter taille/débit, vérifier Origin/CSRF et expurger les logs.
+- [x] **SEC-008a:** lister les appareils associés et leurs métadonnées.
+- [x] **SEC-008b:** révoquer une session ou toutes les sessions via API admin.
+- [x] **SEC-008c:** conserver un historique local des associations/révocations.
 - [x] **SEC-009:** séparer les lectures nécessaires à la télécommande des
   ressources administrateur afin qu'une session `controller` issue du QR puisse
   charger son état sans recevoir de droits d'écriture ni de données sensibles.

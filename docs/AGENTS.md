@@ -18,3 +18,5 @@ Keep documentation discoverable without making every task load every source.
   task plan in the global roadmap or journal.
 - Preserve the language and conventions of the document being edited. Keep
   links relative and verify changed links.
+- Documentation-only changes do not bump the package version; follow the
+  [project SemVer policy](project/VERSIONING.md) for mixed or release work.

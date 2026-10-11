@@ -130,7 +130,7 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
 - [ ] PLAT-004r — éviter la boucle active du probe hover lorsque le pointeur
   reste dans la zone QR et ne pas retarder l'initialisation HTTP par l'attente
   de l'ACK initial du helper; tester les deux scénarios.
-- [ ] PLAT-004s — ne masquer l'overlay QR que si la position réelle du pointeur
+- [x] PLAT-004s — ne masquer l'overlay QR que si la position réelle du pointeur
   est dans ses limites lors d'un `EnterNotify`; ignorer les événements d'entrée
   parasites déclenchés par les remappages X11/XWayland et ajouter un test de
   régression pour un mouvement du pointeur hors de la zone QR.
@@ -154,7 +154,9 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
 - [ ] PLAT-005 — fournir dans `dev/` un laboratoire de développement et de
   validation reproductible, exécuté depuis un hôte Linux avec Vagrant,
   `vagrant-libvirt` et QEMU/KVM, sans ajouter de dépendance ni d'artéfact de
-  machine virtuelle au produit livré.
+  machine virtuelle au produit livré. **En attente** : tous les travaux liés
+  aux machines virtuelles sont suspendus jusqu'à indication contraire de
+  l'utilisateur.
 - [x] PLAT-005a — créer le socle Vagrant du laboratoire : `Vagrantfile`, commande
   commune, vérification explicite et documentée des versions de Vagrant,
   `vagrant-libvirt`, libvirt et QEMU/KVM, configuration locale non versionnée,
@@ -261,25 +263,31 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   toolchain croisé et les en-têtes X11/libpng cibles après confirmation, puis
   générer les deux jeux d'artefacts. Le mode `--check` doit signaler les
   prérequis et artefacts manquants sans modifier le système.
-- [ ] Renforcer diagnostics VLC, navigateurs et Samsung TV.
-- [ ] Définir un contrat d'adaptateur avant de multiplier les intégrations.
+- [x] **PLAT-005h — suspendre les travaux liés aux machines virtuelles:**
+  consigner que toute création, tout provisionnement ou toute validation
+  nécessitant une VM est reporté jusqu'à indication contraire; conserver les
+  tâches et décisions existantes sans les supprimer ni exécuter les scripts de
+  déploiement VM. Critères : la roadmap globale et cet axe signalent clairement
+  la suspension; aucune tâche VM n'apparaît dans l'ordre de livraison actif;
+  les travaux non liés aux VM restent planifiables.
+- [ ] PLAT-006 — renforcer les diagnostics VLC, navigateurs et Samsung TV.
+- [ ] PLAT-007 — définir un contrat d'adaptateur avant de multiplier les
+  intégrations.
 
 Pour chaque tâche, lister les versions OS testées, prérequis et limitations
 observées; distinguer capacités simulées et vérifiées sur machine réelle.
 
-## Laboratoire de développement
+## Laboratoire de développement (en attente)
 
-Le laboratoire `PLAT-005` est un outil de développement de l'axe, pas une
-nouvelle dépendance d'exécution. Le poste hôte officiellement retenu est Linux.
-Vagrant décrit les machines et leur provisionnement, le provider communautaire
-`vagrant-libvirt` gère leur cycle de vie par libvirt, et QEMU/KVM demeure le
-backend de virtualisation. Les versions compatibles de cette chaîne doivent
-être contrôlées avant le démarrage plutôt que laissées implicites. Les images,
-instantanés, ISO, clés et secrets restent hors du dépôt.
+Le travail sur le laboratoire et toute utilisation de VM sont suspendus jusqu'à
+indication contraire de l'utilisateur. Les tâches et notes ci-dessous
+conservent le contexte historique; elles n'autorisent pas à créer, provisionner,
+démarrer ou tester une VM. Les scripts existants ne doivent pas être supprimés
+ni exécutés dans le cadre d'autres itérations sans demande explicite.
 
-Les profils Linux doivent couvrir une vraie session X11 et une vraie session
-Wayland plutôt que de considérer XWayland comme une validation des deux. Le
-profil Windows cible Windows 11 et accepte un média obtenu par le développeur.
+Si le travail reprend, les environnements seront fournis par les développeurs;
+le dépôt ne reprendra pas leur création ou leur gestion sans nouvelle décision.
+Les profils prévus distinguent toujours X11, Wayland et Windows.
 
 macOS demeure une plateforme visée par `PLAT-003`, mais ne fait pas partie du
 laboratoire QEMU exécuté sur un hôte Linux. Sa validation exigera du matériel

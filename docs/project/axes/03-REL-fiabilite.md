@@ -35,10 +35,13 @@ et assurer un cycle de vie robuste du serveur et des connexions.
   applicatives et SQLite après le drainage HTTP, signaler immédiatement un
   port déjà occupé, et valider l'intégrité SQLite au démarrage après un arrêt
   brutal. Ajouter des tests ciblés du démarrage, de l'arrêt et de la reprise.
-- [ ] Rendre délais et heartbeats configurables par transport.
-- [ ] Adapter résolution/fréquence/compression de la prévisualisation.
-- [ ] Suspendre les captures inutilisées et éviter les frames périmées.
-- [ ] Distinguer contrôles de santé internes et externes.
+- [ ] **REL-008 — configuration des transports:** rendre délais et heartbeats
+  configurables par transport.
+- [ ] **REL-009 — qualité de prévisualisation:** adapter résolution,
+  fréquence et compression.
+- [ ] **REL-010 — cycle de capture:** suspendre les captures inutilisées et
+  éviter les frames périmées.
+- [ ] **REL-011 — état de santé:** distinguer contrôles internes et externes.
 
 Les critères quantitatifs (latence, charge, stabilité) sont à établir dans la
 tâche avant toute optimisation.
