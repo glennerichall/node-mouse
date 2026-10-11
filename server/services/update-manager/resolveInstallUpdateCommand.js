@@ -1,9 +1,15 @@
+import path from 'node:path';
 import {execShell} from '../../utils/process.js';
 import {truncateText} from '../../utils/truncateText.js';
 import {buildNpmGlobalUpdatePlan} from './buildNpmGlobalUpdatePlan.js';
 import {installVerifiedNpmPackage} from './installVerifiedNpmPackage.js';
+import {CONFIG_DIR} from '../config/bootstrapConfig.js';
 
-export function resolveInstallUpdateCommand({getSystemConfig, platform = process.platform}) {
+export function resolveInstallUpdateCommand({
+  getSystemConfig,
+  platform = process.platform,
+  rollbackDirectory = path.join(CONFIG_DIR, 'update-rollback'),
+}) {
   const updateConfig = getSystemConfig().updateCheck || {};
   const customCommand = String(updateConfig.installCommand || '').trim();
   const packageName = String(updateConfig.packageName || '').trim();
@@ -11,7 +17,7 @@ export function resolveInstallUpdateCommand({getSystemConfig, platform = process
   const displayCommand = customCommand || npmUpdate?.displayCommand || '';
   const timeoutMs = Math.max(10_000, Number(updateConfig.installTimeoutSec || 0) * 1000);
 
-  const runInstall = async ({targetVersion = '', onStage} = {}) => {
+  const runInstall = async ({targetVersion = '', currentVersion = '', onStage} = {}) => {
     if (!displayCommand) {
       return {
         ok: false,
@@ -30,6 +36,8 @@ export function resolveInstallUpdateCommand({getSystemConfig, platform = process
       : await installVerifiedNpmPackage({
           packageName,
           targetVersion,
+          currentVersion,
+          rollbackDirectory,
           platform,
           timeout: timeoutMs,
           env: process.env,
@@ -43,6 +51,7 @@ export function resolveInstallUpdateCommand({getSystemConfig, platform = process
         message: result.message || 'Installation completed.',
         command: displayCommand,
         ...(result.targetVersion ? {targetVersion: result.targetVersion, integrity: result.integrity} : {}),
+        ...(result.previousVersion ? {previousVersion: result.previousVersion} : {}),
       };
     }
 
@@ -53,6 +62,9 @@ export function resolveInstallUpdateCommand({getSystemConfig, platform = process
       message: result.message || `Installation failed: ${details}`,
       details,
       command: displayCommand,
+      ...(result.rollbackSucceeded !== undefined ? {rollbackSucceeded: result.rollbackSucceeded} : {}),
+      ...(result.rolledBackVersion ? {rolledBackVersion: result.rolledBackVersion} : {}),
+      ...(result.rollbackDetails ? {rollbackDetails: result.rollbackDetails} : {}),
     };
   };
 

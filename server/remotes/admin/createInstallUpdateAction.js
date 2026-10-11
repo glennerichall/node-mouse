@@ -54,6 +54,23 @@ export function createInstallUpdateAction(services) {
       };
     }
 
+    if (result?.rollbackSucceeded) {
+      const restartResult = await restartService({clientId});
+      const restartMessage = restartResult?.ok
+        ? 'Service restart requested.'
+        : `Service restart failed: ${restartResult?.message || 'unknown error'}`;
+      events.publishEvent(PUBSUB_SERVICE_ADMIN_INSTALL_UPDATE, PUBSUB_EVENT_ADMIN_FAILED, {
+        clientId,
+        details: result?.details,
+        rollbackSucceeded: true,
+        rolledBackVersion: result.rolledBackVersion,
+      });
+      return {
+        ok: false,
+        message: `Update failed; version ${result.rolledBackVersion} was restored. ${restartMessage}`,
+      };
+    }
+
     events.publishEvent(PUBSUB_SERVICE_ADMIN_INSTALL_UPDATE, PUBSUB_EVENT_ADMIN_FAILED, {
       clientId,
       details: result?.details,

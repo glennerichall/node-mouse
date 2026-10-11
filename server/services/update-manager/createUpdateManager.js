@@ -127,6 +127,7 @@ export function createUpdateManager(services) {
         log.info({...versionFields, installCommand: lastInstallCommand}, 'Executing update install command');
         const result = await install({
             targetVersion: lastLatestVersion,
+            currentVersion: versionFields.currentVersion,
             onStage: (stage) => log.info({...versionFields, ...stage}, `Update install: ${stage.stage}`),
         });
         log.debug({ result }, 'Install update: source returned');

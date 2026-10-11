@@ -423,6 +423,14 @@ verification, and activation; the temporary archive is removed afterward.
 These checks trust the configured registry and its TLS connection. An
 administrator-supplied `UPDATE_INSTALL_COMMAND` is an explicit custom path: it
 runs as configured and does not receive the automatic npm artifact checks.
+Before activation, automatic npm updates also retain one SHA-512-verified copy
+of the currently installed package under the configuration directory. If the
+new package cannot be activated, the previous package is restored and the
+service restart is requested. To manually restore the last saved package, run
+`remote-mouse service rollback-update` on the server. This operation replaces
+application package files only; it does not roll back `.env`, persisted
+configuration, or the local database. Custom `UPDATE_INSTALL_COMMAND` updates
+are not snapshotted by this mechanism.
 
 Useful server pages:
 
@@ -445,6 +453,8 @@ Useful CLI commands:
 - `service disable` disables the local daemon/service
 - `service uninstall` uninstalls the local daemon/service
 - `service restart` restarts the local daemon/service
+- `service rollback-update` restores the previous verified npm package and
+  requests a service restart
 - `tasks` prints the task manager snapshot
 - `task-manager` is an alias of `tasks`
 - `update-events` prints persisted update-manager events

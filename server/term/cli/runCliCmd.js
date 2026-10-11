@@ -8,7 +8,7 @@ import {runSetup} from './setupCommand.js';
 
 function isLocalServiceCommand(command) {
     return command?.name === 'service'
-        && ['install', 'disable', 'uninstall', 'restart'].includes(String(command.args?.action || '').trim());
+        && ['install', 'disable', 'uninstall', 'restart', 'rollback-update'].includes(String(command.args?.action || '').trim());
 }
 
 export async function runCliCmd(args) {
@@ -42,6 +42,7 @@ export async function runCliCmd(args) {
         console.log('  remote-mouse service disable Desactive le daemon/service local');
         console.log('  remote-mouse service uninstall Desinstalle le daemon/service local');
         console.log('  remote-mouse service restart Redemarre le daemon/service local');
+        console.log('  remote-mouse service rollback-update Restore the previous verified package version');
         console.log('  remote-mouse tasks        Affiche les informations du task manager');
         console.log('  remote-mouse task-manager Alias de tasks');
         console.log('  remote-mouse update-events Affiche les evenements persistés du update-manager');

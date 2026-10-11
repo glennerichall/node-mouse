@@ -1,6 +1,7 @@
 import {jest} from '@jest/globals';
 import {createHash} from 'node:crypto';
 import fs from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import {buildNpmGlobalUpdatePlan} from '../../server/services/update-manager/buildNpmGlobalUpdatePlan.js';
 
@@ -37,6 +38,8 @@ const {
   createUpdateManager,
 } = await import('../../server/services/update-manager/createUpdateManager.js');
 const {resolveInstallUpdateCommand} = await import('../../server/services/update-manager/resolveInstallUpdateCommand.js');
+const {rollbackVerifiedNpmPackage} = await import('../../server/services/update-manager/installVerifiedNpmPackage.js');
+const {saveUpdateRollbackArtifact} = await import('../../server/services/update-manager/updateRollbackStore.js');
 
 function createServices({
   config = {updateCheck: {enabled: true}},
@@ -321,73 +324,92 @@ describe('resolveInstallUpdateCommand', () => {
     execShell.mockReset().mockResolvedValue({ok: true, stdout: '', stderr: ''});
   });
 
-  it('downloads, verifies, then activates a pinned npm artifact on Linux', async () => {
-    const archive = Buffer.from('verified package archive');
-    const integrity = `sha512-${createHash('sha512').update(archive).digest('base64')}`;
-    const filename = 'velor-remote-mouse-6.20.0.tgz';
-    const stages = [];
-    execFileAsync.mockImplementation(async (command, args, options) => {
-      if (args[0] === 'config') return {ok: true, stdout: 'https://registry.npmjs.org/\n', stderr: ''};
-      if (args[0] === 'view') {
-        return {ok: true, stdout: JSON.stringify({version: '6.20.0', dist: {
-          integrity,
-          tarball: 'https://registry.npmjs.org/@velor/remote-mouse/-/remote-mouse-6.20.0.tgz',
+  async function createRollbackDirectory() {
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), 'remote-mouse-update-test-'));
+    return {root, rollbackDirectory: path.join(root, 'rollback')};
+  }
+
+  function mockVerifiedPackages({platform = 'linux', failActivation = false} = {}) {
+    const packages = {
+      '6.19.89': Buffer.from('previous verified package'),
+      '6.20.0': Buffer.from('candidate verified package'),
+    };
+    execFileAsync.mockImplementation(async (_command, args, options) => {
+      const npmArgs = platform === 'win32' ? args[3].split(' ').slice(1) : args;
+      if (npmArgs[0] === 'config') return {ok: true, stdout: 'https://registry.npmjs.org/\n', stderr: ''};
+      if (npmArgs[0] === 'view') {
+        const version = npmArgs[1].split('@').at(-1);
+        const archive = packages[version];
+        return {ok: true, stdout: JSON.stringify({version, dist: {
+          integrity: `sha512-${createHash('sha512').update(archive).digest('base64')}`,
+          tarball: `https://registry.npmjs.org/@velor/remote-mouse/-/remote-mouse-${version}.tgz`,
         }}), stderr: ''};
       }
-      if (args[0] === 'pack') {
-        await fs.writeFile(path.join(options.cwd, filename), archive);
-        return {ok: true, stdout: JSON.stringify([{name: '@velor/remote-mouse', version: '6.20.0', filename}]), stderr: ''};
+      if (npmArgs[0] === 'pack') {
+        const version = npmArgs[1].split('@').at(-1);
+        const filename = `velor-remote-mouse-${version}.tgz`;
+        await fs.writeFile(path.join(options.cwd, filename), packages[version]);
+        return {ok: true, stdout: JSON.stringify([{name: '@velor/remote-mouse', version, filename}]), stderr: ''};
+      }
+      if (npmArgs[0] === 'install' && failActivation && !mockVerifiedPackages.activationFailed) {
+        mockVerifiedPackages.activationFailed = true;
+        return {ok: false, stdout: '', stderr: 'activation failed'};
       }
       return {ok: true, stdout: '', stderr: ''};
     });
-    const install = resolveInstallUpdateCommand({getSystemConfig, platform: 'linux'});
+  }
 
-    await expect(install({targetVersion: '6.20.0', onStage: (stage) => stages.push(stage.stage)})).resolves.toMatchObject({
-      ok: true, status: 'completed', targetVersion: '6.20.0', integrity: 'sha512',
-    });
-    const calls = execFileAsync.mock.calls;
-    expect(calls.map(([, args]) => args)).toEqual([
-      ['config', 'get', 'registry'],
-      ['view', '@velor/remote-mouse@6.20.0', 'version', 'dist.integrity', 'dist.tarball', '--json', '--registry=https://registry.npmjs.org/'],
-      ['pack', '@velor/remote-mouse@6.20.0', '--json', '--registry=https://registry.npmjs.org/'],
-      ['install', '-g', filename, '--registry=https://registry.npmjs.org/'],
-    ]);
-    expect(calls[1][2].cwd).toBe(calls[2][2].cwd);
-    expect(calls[2][2].cwd).toBe(calls[3][2].cwd);
-    expect(calls[3][2].env.REMOTE_MOUSE_DAEMON).toBe('1');
-    expect(stages).toEqual(['resolving-registry', 'resolving', 'downloading', 'verified', 'activating', 'activated']);
-    expect(execShell).not.toHaveBeenCalled();
+  it('downloads, verifies, then activates a pinned npm artifact on Linux', async () => {
+    const {root, rollbackDirectory} = await createRollbackDirectory();
+    mockVerifiedPackages();
+    const stages = [];
+    const install = resolveInstallUpdateCommand({getSystemConfig, platform: 'linux', rollbackDirectory});
+
+    try {
+      await expect(install({targetVersion: '6.20.0', currentVersion: '6.19.89', onStage: (stage) => stages.push(stage.stage)})).resolves.toMatchObject({
+        ok: true, status: 'completed', targetVersion: '6.20.0', previousVersion: '6.19.89', integrity: 'sha512',
+      });
+      const calls = execFileAsync.mock.calls;
+      expect(calls.map(([, args]) => args)).toEqual([
+        ['config', 'get', 'registry'],
+        ['view', '@velor/remote-mouse@6.20.0', 'version', 'dist.integrity', 'dist.tarball', '--json', '--registry=https://registry.npmjs.org/'],
+        ['pack', '@velor/remote-mouse@6.20.0', '--json', '--registry=https://registry.npmjs.org/'],
+        ['view', '@velor/remote-mouse@6.19.89', 'version', 'dist.integrity', 'dist.tarball', '--json', '--registry=https://registry.npmjs.org/'],
+        ['pack', '@velor/remote-mouse@6.19.89', '--json', '--registry=https://registry.npmjs.org/'],
+        ['install', '-g', 'velor-remote-mouse-6.20.0.tgz', '--registry=https://registry.npmjs.org/'],
+      ]);
+      expect(calls[1][2].cwd).toBe(calls[2][2].cwd);
+      expect(calls[2][2].cwd).toBe(calls[3][2].cwd);
+      expect(calls[5][2].env.REMOTE_MOUSE_DAEMON).toBe('1');
+      expect(stages).toContain('rollback-ready');
+      expect(stages).toContain('activated');
+      await expect(fs.readFile(path.join(rollbackDirectory, 'previous-update.json'), 'utf8')).resolves.toContain('6.19.89');
+      expect(execShell).not.toHaveBeenCalled();
+    } finally {
+      await fs.rm(root, {recursive: true, force: true});
+    }
   });
 
   it('uses cmd.exe for the verified npm stages on Windows', async () => {
-    const archive = Buffer.from('verified package archive');
-    const integrity = `sha512-${createHash('sha512').update(archive).digest('base64')}`;
-    const filename = 'velor-remote-mouse-6.20.0.tgz';
-    execFileAsync.mockImplementation(async (_command, args, options) => {
-      const npmArgs = args[3].split(' ');
-      if (npmArgs[0] === 'npm' && npmArgs[1] === 'config') {
-        return {ok: true, stdout: 'https://registry.npmjs.org/\n', stderr: ''};
-      }
-      if (npmArgs[0] === 'npm' && npmArgs[1] === 'view') {
-        return {ok: true, stdout: JSON.stringify({version: '6.20.0', 'dist.integrity': integrity, 'dist.tarball': 'https://registry.npmjs.org/@velor/remote-mouse/-/remote-mouse-6.20.0.tgz'}), stderr: ''};
-      }
-      if (npmArgs[0] === 'npm' && npmArgs[1] === 'pack') {
-        await fs.writeFile(path.join(options.cwd, filename), archive);
-        return {ok: true, stdout: JSON.stringify([{name: '@velor/remote-mouse', version: '6.20.0', filename}]), stderr: ''};
-      }
-      return {ok: true, stdout: '', stderr: ''};
-    });
-    const install = resolveInstallUpdateCommand({getSystemConfig, platform: 'win32'});
+    const {root, rollbackDirectory} = await createRollbackDirectory();
+    mockVerifiedPackages({platform: 'win32'});
+    const install = resolveInstallUpdateCommand({getSystemConfig, platform: 'win32', rollbackDirectory});
 
-    await expect(install({targetVersion: '6.20.0'})).resolves.toMatchObject({ok: true, status: 'completed'});
-    expect(execFileAsync.mock.calls.map(([command]) => command)).toEqual(['cmd.exe', 'cmd.exe', 'cmd.exe', 'cmd.exe']);
-    expect(execFileAsync.mock.calls.map(([, args]) => args[3])).toEqual([
-      'npm config get registry',
-      'npm view @velor/remote-mouse@6.20.0 version dist.integrity dist.tarball --json --registry=https://registry.npmjs.org/',
-      'npm pack @velor/remote-mouse@6.20.0 --json --registry=https://registry.npmjs.org/',
-      `npm install -g ${filename} --registry=https://registry.npmjs.org/`,
-    ]);
-    expect(execShell).not.toHaveBeenCalled();
+    try {
+      await expect(install({targetVersion: '6.20.0', currentVersion: '6.19.89'})).resolves.toMatchObject({ok: true, status: 'completed'});
+      expect(execFileAsync.mock.calls.map(([command]) => command)).toEqual(Array(6).fill('cmd.exe'));
+      expect(execFileAsync.mock.calls.map(([, args]) => args[3])).toEqual([
+        'npm config get registry',
+        'npm view @velor/remote-mouse@6.20.0 version dist.integrity dist.tarball --json --registry=https://registry.npmjs.org/',
+        'npm pack @velor/remote-mouse@6.20.0 --json --registry=https://registry.npmjs.org/',
+        'npm view @velor/remote-mouse@6.19.89 version dist.integrity dist.tarball --json --registry=https://registry.npmjs.org/',
+        'npm pack @velor/remote-mouse@6.19.89 --json --registry=https://registry.npmjs.org/',
+        'npm install -g velor-remote-mouse-6.20.0.tgz --registry=https://registry.npmjs.org/',
+      ]);
+      expect(execShell).not.toHaveBeenCalled();
+    } finally {
+      await fs.rm(root, {recursive: true, force: true});
+    }
   });
 
   it('keeps explicitly configured installation commands on the custom shell path', async () => {
@@ -412,11 +434,63 @@ describe('resolveInstallUpdateCommand', () => {
     expect(execShell).not.toHaveBeenCalled();
   });
 
+  it('does not activate a package when the current installed version cannot be snapshotted', async () => {
+    const install = resolveInstallUpdateCommand({getSystemConfig, platform: 'linux'});
+
+    await expect(install({targetVersion: '6.20.0'})).resolves.toMatchObject({
+      ok: false,
+      status: 'rollback-source-unavailable',
+    });
+    expect(execFileAsync).not.toHaveBeenCalled();
+  });
+
+  it('reports when no verified rollback package is available', async () => {
+    const {root, rollbackDirectory} = await createRollbackDirectory();
+
+    try {
+      await expect(rollbackVerifiedNpmPackage({
+        packageName: '@velor/remote-mouse',
+        rollbackDirectory,
+        platform: 'linux',
+      })).resolves.toMatchObject({ok: false, status: 'no-rollback'});
+      expect(execFileAsync).not.toHaveBeenCalled();
+    } finally {
+      await fs.rm(root, {recursive: true, force: true});
+    }
+  });
+
+  it('refuses to install a rollback archive whose saved integrity no longer matches', async () => {
+    const {root, rollbackDirectory} = await createRollbackDirectory();
+    const archive = Buffer.from('previous package');
+    const integrity = `sha512-${createHash('sha512').update(archive).digest('base64')}`;
+    const metadata = await saveUpdateRollbackArtifact({
+      rollbackDirectory,
+      packageName: '@velor/remote-mouse',
+      version: '6.19.89',
+      archive,
+      integrity,
+      registryUrl: 'https://registry.npmjs.org/',
+      registryOrigin: 'https://registry.npmjs.org',
+    });
+    await fs.writeFile(path.join(rollbackDirectory, metadata.filename), 'altered archive');
+
+    try {
+      await expect(rollbackVerifiedNpmPackage({
+        packageName: '@velor/remote-mouse',
+        rollbackDirectory,
+        platform: 'linux',
+      })).resolves.toMatchObject({ok: false, status: 'rollback-integrity-failed'});
+      expect(execFileAsync).not.toHaveBeenCalled();
+    } finally {
+      await fs.rm(root, {recursive: true, force: true});
+    }
+  });
+
   it('returns process failures with diagnostic output', async () => {
     execFileAsync.mockResolvedValue({ok: false, stdout: '', stderr: 'registry unavailable'});
     const install = resolveInstallUpdateCommand({getSystemConfig, platform: 'win32'});
 
-    await expect(install()).resolves.toMatchObject({
+    await expect(install({currentVersion: '6.19.89'})).resolves.toMatchObject({
       ok: false,
       status: 'registry-resolution-failed',
       details: 'registry unavailable',
@@ -440,10 +514,10 @@ describe('resolveInstallUpdateCommand', () => {
     });
     const install = resolveInstallUpdateCommand({getSystemConfig, platform: 'linux'});
 
-    await expect(install({targetVersion: '6.20.0'})).resolves.toMatchObject({
+    await expect(install({targetVersion: '6.20.0', currentVersion: '6.19.89'})).resolves.toMatchObject({
       ok: false,
       status: 'integrity-failed',
-      message: 'The downloaded package failed its registry SHA-512 integrity check.',
+      message: 'The downloaded candidate package failed its registry SHA-512 integrity check.',
     });
     expect(execFileAsync).toHaveBeenCalledTimes(3);
   });
@@ -458,7 +532,7 @@ describe('resolveInstallUpdateCommand', () => {
     });
     const install = resolveInstallUpdateCommand({getSystemConfig, platform: 'linux'});
 
-    await expect(install({targetVersion: '6.20.0'})).resolves.toMatchObject({
+    await expect(install({targetVersion: '6.20.0', currentVersion: '6.19.89'})).resolves.toMatchObject({
       ok: false,
       status: 'artifact-origin-mismatch',
     });
@@ -469,11 +543,32 @@ describe('resolveInstallUpdateCommand', () => {
     execFileAsync.mockResolvedValue({ok: true, stdout: 'http://registry.example.invalid/', stderr: ''});
     const install = resolveInstallUpdateCommand({getSystemConfig, platform: 'linux'});
 
-    await expect(install({targetVersion: '6.20.0'})).resolves.toMatchObject({
+    await expect(install({targetVersion: '6.20.0', currentVersion: '6.19.89'})).resolves.toMatchObject({
       ok: false,
       status: 'resolve-failed',
       message: 'npm returned an unsupported configured registry URL.',
     });
     expect(execFileAsync).toHaveBeenCalledTimes(1);
+  });
+
+  it('automatically restores the verified previous version if candidate activation fails', async () => {
+    const {root, rollbackDirectory} = await createRollbackDirectory();
+    mockVerifiedPackages({failActivation: true});
+    const install = resolveInstallUpdateCommand({getSystemConfig, platform: 'linux', rollbackDirectory});
+
+    try {
+      await expect(install({targetVersion: '6.20.0', currentVersion: '6.19.89'})).resolves.toMatchObject({
+        ok: false,
+        status: 'activation-failed-rolled-back',
+        rollbackSucceeded: true,
+        rolledBackVersion: '6.19.89',
+      });
+      const installCalls = execFileAsync.mock.calls.filter(([, args]) => args[0] === 'install');
+      expect(installCalls).toHaveLength(2);
+      expect(installCalls[0][1].slice(0, 3)).toEqual(['install', '-g', 'velor-remote-mouse-6.20.0.tgz']);
+      expect(installCalls[1][1][2]).toMatch(/^rollback-6\.19\.89-.+\.tgz$/);
+    } finally {
+      await fs.rm(root, {recursive: true, force: true});
+    }
   });
 });
