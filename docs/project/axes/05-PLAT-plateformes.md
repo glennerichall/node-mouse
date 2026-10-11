@@ -7,7 +7,14 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
 
 ## Plan de travail
 
-- [ ] PLAT-001 — consolider installation et service Linux; documenter X11/Wayland.
+- [x] PLAT-001 — clôturer le parcours Linux après les sous-tâches setup : tester
+  la génération et le cycle de vie du service `systemd --user` sans toucher au
+  service de l'hôte; documenter l'installation, le démarrage lié à la session,
+  les commandes de diagnostic et de retrait, ainsi que les capacités et
+  permissions propres à X11 et Wayland. Distinguer le contrôle souris/clavier,
+  l'overlay QR et l'aperçu; ne pas promettre de capture Wayland non implantée.
+  Aucun script de cette clôture ne doit créer, provisionner, démarrer ou valider
+  une VM.
 - [x] PLAT-001a — rendre l'installation uinput autonome et idempotente; migrer
   une installation existante sans remplacer sa configuration, ses secrets ni
   sa base de données.

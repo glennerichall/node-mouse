@@ -297,8 +297,19 @@ The application can manage its own `systemd --user` service.
 Typical setup:
 
 1. Install the package globally with npm.
-2. Run `remote-mouse setup` and accept service installation.
-4. Use `remote-mouse service restart`, `remote-mouse service disable`, or `remote-mouse service uninstall` as needed.
+2. From the desktop account that will run Remote Mouse, run
+   `remote-mouse setup` and accept service installation.
+3. Check the service with `systemctl --user status remote-mouse.service`; follow
+   its logs with `journalctl --user -u remote-mouse.service -f`.
+4. Use `remote-mouse service restart`, `remote-mouse service disable`, or
+   `remote-mouse service uninstall` as needed. Disabling stops the service;
+   uninstalling removes its unit file. Neither command deletes application
+   configuration or database files.
+
+This is a per-user service managed by that account's systemd user manager, not
+a system-wide daemon. Install it from the intended user session; desktop input,
+QR overlay, and browser integrations need access to that session. Do not assume
+they are available when the user manager runs without a logged-in desktop.
 
 The generated unit is equivalent to the following:
 
@@ -321,14 +332,27 @@ PassEnvironment=DISPLAY WAYLAND_DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS
 WantedBy=default.target
 ```
 
-Depending on the graphical environment, passing the user session environment may be necessary for UI-related integrations.
+The unit passes through `DISPLAY`, `WAYLAND_DISPLAY`, `XAUTHORITY`, and the
+session D-Bus address. If UI integrations cannot find the active desktop, verify
+that the service was installed from the desktop user's session and inspect the
+user-manager environment with `systemctl --user show-environment`.
 
-X11 control continues through RobotJS. Under Wayland, mouse and keyboard input
-use uinput by default, independently of the desktop portal backend. The portal
-implementation remains selectable with `REMOTE_MOUSE_WAYLAND_INPUT=portal`.
-Cursor preview is still disabled under Wayland to prevent the native
-`X_GetImage` failure; native capture remains planned through ScreenCast and
-PipeWire.
+Display-session behavior:
+
+- **X11:** mouse/keyboard control and desktop capture use RobotJS. The QR
+  overlay uses the native X11 helper and needs its runtime X11/libpng
+  libraries.
+- **Wayland:** mouse/keyboard input uses `/dev/uinput` by default. Run
+  `remote-mouse setup --configure-uinput` (or accept the interactive setup
+  prompt) to grant the desktop account access through the restricted
+  `remote-mouse-uinput` group and udev rule. Reconnect the desktop session for
+  the group membership to take effect; do not add the account to the general
+  `input` group. The optional portal backend is selected with
+  `REMOTE_MOUSE_WAYLAND_INPUT=portal` and requires a local desktop consent flow.
+- **Wayland limitations:** cursor preview/capture is not available. The QR
+  overlay is an X11/XWayland integration and is not guaranteed on a compositor
+  without a compatible XWayland display. These limitations do not change the
+  separate HTTP `/qr` page, which can be opened in a browser.
 
 #### Windows Deployment
 
@@ -338,7 +362,8 @@ Typical setup:
 
 1. Install the package globally with npm.
 2. Run `remote-mouse setup` and accept service installation.
-4. Use `remote-mouse service restart`, `remote-mouse service disable`, or `remote-mouse service uninstall` as needed.
+3. Use `remote-mouse service restart`, `remote-mouse service disable`, or
+   `remote-mouse service uninstall` as needed.
 
 The generated scheduled task follows this model:
 
