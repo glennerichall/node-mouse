@@ -8,6 +8,7 @@ export function execFileAsync(command, args = [], options = {}) {
       env: options.env,
       shell: options.shell,
       maxBuffer: options.maxBuffer,
+      ...(options.cwd ? {cwd: options.cwd} : {}),
     }, (error, stdout = '', stderr = '') => {
       resolve({
         ok: !error,

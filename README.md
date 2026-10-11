@@ -415,6 +415,15 @@ the existing `.env`, restart the service, rescan the QR if necessary, and use
 the password field in the left drawer. Later updates can then be installed from
 the authenticated mobile administration controls.
 
+Automatic npm updates resolve a target version from the configured npm
+registry, download its tarball into a temporary directory, and verify the
+package name/version, registry origin, and SHA-512 integrity before installing
+that local tarball globally. Logs distinguish registry resolution, download,
+verification, and activation; the temporary archive is removed afterward.
+These checks trust the configured registry and its TLS connection. An
+administrator-supplied `UPDATE_INSTALL_COMMAND` is an explicit custom path: it
+runs as configured and does not receive the automatic npm artifact checks.
+
 Useful server pages:
 
 - `/qr` displays the entry QR code

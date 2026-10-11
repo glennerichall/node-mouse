@@ -125,15 +125,23 @@ export function createUpdateManager(services) {
         };
         log.debug({ installCommand: lastInstallCommand }, 'Install update: source resolved');
         log.info({...versionFields, installCommand: lastInstallCommand}, 'Executing update install command');
-        const result = await install();
+        const result = await install({
+            targetVersion: lastLatestVersion,
+            onStage: (stage) => log.info({...versionFields, ...stage}, `Update install: ${stage.stage}`),
+        });
         log.debug({ result }, 'Install update: source returned');
         const installedVersion = readPackageVersion(packageJsonPath);
         if (result.ok) {
             log.info({...versionFields, installedVersion}, 'Update install completed successfully');
             return result;
         }
-        if (result?.status === 'failed') {
-            log.error({...versionFields, installedVersion, details: result.details}, 'Update install failed');
+        if (!result?.ok) {
+            log.error({
+                ...versionFields,
+                installedVersion,
+                updateStatus: result?.status || 'failed',
+                details: result?.details || result?.message,
+            }, 'Update install failed');
         }
         return result;
     }
