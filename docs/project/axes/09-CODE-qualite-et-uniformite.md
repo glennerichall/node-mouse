@@ -1,6 +1,6 @@
 # 09 — CODE — Qualité et uniformité du code
 
-**État:** à jour; CODE-001 à CODE-008 terminées.
+**État:** à jour; CODE-001 à CODE-009 terminées.
 
 ## Résultat visé
 
@@ -70,6 +70,14 @@ découpage des responsabilités et des contrats entre composants.
   de `scripts/` et les commandes npm; supprimer les alias réellement redondants,
   retirer les scripts sans appel actif démontré et clarifier les noms qui ne
   décrivent plus leur rôle, sans casser les points d'entrée documentés.
+- [x] **CODE-009 — Documentation à chargement progressif pour les agents:**
+  créer des points d'entrée `AGENTS.md` concis à la racine et dans `docs/`,
+  supprimer les consignes dupliquées ou globalement coûteuses, remplacer
+  l'index exhaustif des journaux par une méthode de recherche ciblée et
+  préserver les documents détaillés comme sources de vérité. Critères :
+  l'agent identifie le document propriétaire sans charger l'historique complet;
+  les règles projet et la méthode roadmap ne se contredisent pas; aucun journal
+  clôturé n'est modifié; les liens et le routage documentaire sont vérifiés.
 
 ## Critères d'acceptation de l'axe
 
