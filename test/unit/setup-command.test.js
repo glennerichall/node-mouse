@@ -4,6 +4,8 @@ import path from 'node:path';
 import {runSetup} from '../../server/term/cli/setupCommand.js';
 import {parseCliArgs} from '../../server/term/cli/parseCliArgs.js';
 import {createSetupStrategy} from '../../server/term/cli/setup/strategies/index.js';
+import {createLinuxSetupStrategy} from '../../server/term/cli/setup/strategies/linux.js';
+import {createWindowsSetupStrategy} from '../../server/term/cli/setup/strategies/windows.js';
 
 function createOutput() {
   let value = '';
@@ -86,6 +88,68 @@ describe('remote-mouse setup command', () => {
     expect(fs.readFileSync(envFile, 'utf8')).toBe(initial);
   });
 
+  it('repeats the full Linux setup without changing config and passes stable service inputs', async () => {
+    const configDir = path.join(root, 'config');
+    const envFile = path.join(configDir, '.env');
+    const serviceInstalls = [];
+    const setupOptions = {
+      platform: 'linux',
+      nodeVersion: '24.1.0',
+      homeDir: root,
+      env: {CONFIG_DIR: configDir, USER: 'dev'},
+      options: {yes: true},
+      output: createOutput().stream,
+      errorOutput: createOutput().stream,
+      dependencies: {
+        runPrerequisiteCommand: async () => ({ok: true}),
+        runServiceInstall: async (configEnv) => {
+          serviceInstalls.push(configEnv);
+          return {ok: true};
+        },
+      },
+    };
+
+    const first = await runSetup(setupOptions);
+    const initialConfig = fs.readFileSync(envFile, 'utf8');
+    const second = await runSetup(setupOptions);
+
+    expect(first).toMatchObject({ok: true, serviceInstalled: true});
+    expect(second).toMatchObject({ok: true, serviceInstalled: true});
+    expect(fs.readFileSync(envFile, 'utf8')).toBe(initialConfig);
+    expect(initialConfig.match(/^SESSION_COOKIE_SECRET=.+$/m)?.[0]).toBeTruthy();
+    expect(serviceInstalls).toEqual([
+      {CONFIG_DIR: configDir, ENV_FILE_PATH: envFile},
+      {CONFIG_DIR: configDir, ENV_FILE_PATH: envFile},
+    ]);
+  });
+
+  it('prepares configuration but declines optional host changes without a TTY', async () => {
+    const configDir = path.join(root, 'config');
+    let serviceInstallCount = 0;
+    let uinputSetupCount = 0;
+    const output = createOutput();
+    const result = await runSetup({
+      platform: 'linux',
+      nodeVersion: '24.1.0',
+      homeDir: root,
+      env: {CONFIG_DIR: configDir, XDG_SESSION_TYPE: 'wayland', USER: 'dev'},
+      options: {},
+      input: {isTTY: false},
+      output: output.stream,
+      errorOutput: output.stream,
+      dependencies: {
+        runServiceInstall: async () => { serviceInstallCount += 1; return {ok: true}; },
+        runUinputSetup: () => { uinputSetupCount += 1; return {ok: true}; },
+      },
+    });
+
+    expect(result).toMatchObject({ok: true, serviceInstalled: false});
+    expect(fs.existsSync(path.join(configDir, '.env'))).toBe(true);
+    expect(serviceInstallCount).toBe(0);
+    expect(uinputSetupCount).toBe(0);
+    expect(output.value()).toContain('Service not installed.');
+  });
+
   it('adds only missing defaults to an existing config and installs service with its config path', async () => {
     const configDir = path.join(root, 'config');
     const envFile = path.join(configDir, '.env');
@@ -102,6 +166,7 @@ describe('remote-mouse setup command', () => {
       output: createOutput().stream,
       errorOutput: createOutput().stream,
       dependencies: {
+        runPrerequisiteCommand: async () => ({ok: true}),
         runServiceInstall: async (configEnv) => {
           installedWith = configEnv;
           return {ok: true};
@@ -146,6 +211,7 @@ describe('remote-mouse setup command', () => {
       output: createOutput().stream,
       errorOutput: createOutput().stream,
       dependencies: {
+        runPrerequisiteCommand: async () => ({ok: true}),
         runServiceInstall: async (configEnv) => {
           installCalls.push(configEnv);
           return {ok: true};
@@ -218,6 +284,7 @@ describe('remote-mouse setup command', () => {
       output: output.stream,
       errorOutput: output.stream,
       dependencies: {
+        runPrerequisiteCommand: async () => ({ok: true}),
         runUinputSetup: () => { permissionSetupCount += 1; return {ok: true}; },
         runServiceInstall: async () => ({ok: true}),
       },
@@ -233,6 +300,7 @@ describe('remote-mouse setup command', () => {
       output: output.stream,
       errorOutput: output.stream,
       dependencies: {
+        runPrerequisiteCommand: async () => ({ok: true}),
         runUinputSetup: (username) => {
           permissionSetupCount += 1;
           expect(username).toBe('dev');
@@ -257,6 +325,115 @@ describe('remote-mouse setup command', () => {
     expect(result.ok).toBe(false);
     expect(fs.existsSync(path.join(root, 'config'))).toBe(false);
     expect(output.value()).toContain('Node.js 20');
+  });
+
+  it('rejects an invalid configuration target before host changes or writes', async () => {
+    const configPath = path.join(root, 'not-a-directory');
+    fs.writeFileSync(configPath, 'keep me');
+    const calls = [];
+    const strategy = {
+      name: 'test-host',
+      prepareConfigDir: () => calls.push('prepare-config'),
+      validatePrerequisites: async () => { calls.push('validate-host'); return ''; },
+      configureHost: async () => { calls.push('configure-host'); return {ok: true}; },
+    };
+    const output = createOutput();
+
+    const result = await runSetup({
+      platform: 'custom',
+      nodeVersion: '24.1.0',
+      homeDir: root,
+      configDir: configPath,
+      options: {yes: true},
+      dependencies: {setupStrategy: strategy},
+      output: output.stream,
+      errorOutput: output.stream,
+    });
+
+    expect(result).toMatchObject({ok: false, message: expect.stringContaining('not a directory')});
+    expect(calls).toEqual([]);
+    expect(fs.readFileSync(configPath, 'utf8')).toBe('keep me');
+  });
+
+  it('rejects an invalid explicit port before creating configuration', async () => {
+    const configDir = path.join(root, 'config');
+    const output = createOutput();
+    const result = await runSetup({
+      platform: 'linux',
+      nodeVersion: '24.1.0',
+      homeDir: root,
+      options: {port: 0, noService: true},
+      dependencies: {runPrerequisiteCommand: async () => ({ok: true})},
+      output: output.stream,
+      errorOutput: output.stream,
+    });
+
+    expect(result).toMatchObject({ok: false, message: 'Port must be an integer between 1 and 65535.'});
+    expect(fs.existsSync(configDir)).toBe(false);
+  });
+
+  it('checks requested host capabilities before writing initial configuration', async () => {
+    const configDir = path.join(root, 'config');
+    const calls = [];
+    const strategy = {
+      name: 'test-host',
+      getDefaultConfigDir: () => configDir,
+      validatePrerequisites: async (request) => {
+        calls.push(request);
+        return 'The requested host service manager is unavailable.';
+      },
+      prepareConfigDir: () => calls.push('prepare-config'),
+      configureHost: async () => { calls.push('configure-host'); return {ok: true}; },
+    };
+    const output = createOutput();
+
+    const result = await runSetup({
+      platform: 'custom',
+      nodeVersion: '24.1.0',
+      homeDir: root,
+      options: {yes: true},
+      dependencies: {setupStrategy: strategy},
+      output: output.stream,
+      errorOutput: output.stream,
+    });
+
+    expect(result).toMatchObject({ok: false, message: expect.stringContaining('service manager')});
+    expect(calls).toEqual([{installService: true, configureUinput: false, env: process.env}]);
+    expect(fs.existsSync(configDir)).toBe(false);
+    expect(output.value()).toContain('service manager is unavailable');
+  });
+
+  it('validates Linux service and uinput capabilities only when requested', async () => {
+    const commandCalls = [];
+    const linux = createLinuxSetupStrategy({dependencies: {
+      runPrerequisiteCommand: async (command, args) => {
+        commandCalls.push([command, args]);
+        return {ok: true};
+      },
+    }});
+    const env = {XDG_SESSION_TYPE: 'wayland', USER: 'dev'};
+
+    expect(await linux.validatePrerequisites({installService: false, configureUinput: false, env})).toBe('');
+    expect(commandCalls).toEqual([]);
+    expect(await linux.validatePrerequisites({installService: true, configureUinput: true, env})).toBe('');
+    expect(commandCalls).toEqual([
+      ['systemctl', ['--user', 'show-environment']],
+      ['pkexec', ['--version']],
+    ]);
+  });
+
+  it('validates Windows Task Scheduler before a requested service installation', async () => {
+    const commandCalls = [];
+    const windows = createWindowsSetupStrategy({dependencies: {
+      runPrerequisiteCommand: async (command, args) => {
+        commandCalls.push([command, args]);
+        return {ok: false};
+      },
+    }});
+
+    expect(await windows.validatePrerequisites({installService: false})).toBe('');
+    expect(await windows.validatePrerequisites({installService: true})).toContain('Task Scheduler');
+    expect(commandCalls).toEqual([['schtasks', ['/Query', '/FO', 'LIST']]]);
   });
 
   it('parses setup choices as local CLI options', () => {

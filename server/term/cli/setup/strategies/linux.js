@@ -1,6 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 import {configureUinputPermission} from '../../../../os/linux/setup.js';
+import {execFileAsync} from '../../../../utils/process.js';
 import {installLocalService} from '../installService.js';
 import {askYesNo} from '../prompts.js';
 
@@ -24,17 +26,46 @@ export function createLinuxSetupStrategy({dependencies = {}} = {}) {
         secureConfigFile(envFile) {
             fs.chmodSync(envFile, 0o600);
         },
-        async configureHost({options, env, input, output}) {
-            const requested = env.XDG_SESSION_TYPE === 'wayland'
+        async selectHostChanges({options, env, input, output}) {
+            const configureUinput = env.XDG_SESSION_TYPE === 'wayland'
                 && (options.configureUinput || (!options.yes && await askYesNo(
                     'Explicitly configure restricted /dev/uinput access for Wayland input?',
                     {input, output},
                 )));
-            if (!requested) return {ok: true};
+            return {...options, configureUinput: Boolean(configureUinput)};
+        },
+        async validatePrerequisites({installService, configureUinput, env}) {
+            if (installService) {
+                const result = await (dependencies.runPrerequisiteCommand || execFileAsync)(
+                    'systemctl', ['--user', 'show-environment'], {timeout: 3000},
+                );
+                if (!result.ok) {
+                    return 'The systemd user service manager is unavailable. Run setup from an active user session.';
+                }
+            }
+            if (!configureUinput) return '';
+
+            if (env.XDG_SESSION_TYPE !== 'wayland') {
+                return 'uinput permissions can only be configured from a Wayland session.';
+            }
             const username = String(env.SUDO_USER || env.USER || '').trim();
             if (!username) {
-                return {ok: false, message: 'Unable to determine the desktop-session user for uinput setup.'};
+                return 'Unable to determine the desktop-session user for uinput setup.';
             }
+            const scriptPath = path.resolve(
+                path.dirname(fileURLToPath(import.meta.url)),
+                '../../../../../scripts/configure-uinput-access.sh',
+            );
+            if (!fs.existsSync(scriptPath)) return 'The uinput setup helper is missing from this installation.';
+            const result = await (dependencies.runPrerequisiteCommand || execFileAsync)(
+                'pkexec', ['--version'], {timeout: 3000},
+            );
+            if (!result.ok) return 'The pkexec command is required to configure uinput permissions.';
+            return '';
+        },
+        async configureHost({options, env}) {
+            if (!options.configureUinput) return {ok: true};
+            const username = String(env.SUDO_USER || env.USER || '').trim();
             const setupUinput = dependencies.runUinputSetup || configureUinputPermission;
             return setupUinput(username);
         },

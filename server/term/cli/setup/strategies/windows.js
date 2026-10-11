@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {execFileAsync} from '../../../../utils/process.js';
 import {installLocalService} from '../installService.js';
 
 export function createWindowsSetupStrategy({dependencies = {}} = {}) {
@@ -18,6 +19,13 @@ export function createWindowsSetupStrategy({dependencies = {}} = {}) {
         secureConfigFile() {},
         async configureHost() {
             return {ok: true};
+        },
+        async validatePrerequisites({installService}) {
+            if (!installService) return '';
+            const result = await (dependencies.runPrerequisiteCommand || execFileAsync)(
+                'schtasks', ['/Query', '/FO', 'LIST'], {timeout: 5000},
+            );
+            return result.ok ? '' : 'Windows Task Scheduler is unavailable or cannot be queried by this user.';
         },
         installService: dependencies.runServiceInstall || installLocalService,
     };

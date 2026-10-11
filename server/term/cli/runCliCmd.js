@@ -33,7 +33,12 @@ export async function runCliCmd(args) {
         console.log('  remote-mouse sys-config   Affiche la configuration systeme');
         console.log('  remote-mouse system-config Alias de sys-config');
         console.log('  remote-mouse service install Installe le daemon/service local');
-        console.log('  remote-mouse setup [--yes] [--no-service] [--configure-uinput] Configure the app and local service');
+        console.log('  remote-mouse setup [--yes] [--no-service] [--configure-uinput] [--config-dir <path>] [--port <number>]');
+        console.log('    --yes              Install and start the service without prompting; does not enable uinput permissions');
+        console.log('    --no-service       Create or update configuration without installing or starting the service');
+        console.log('    --configure-uinput Explicitly configure restricted /dev/uinput access in a Linux Wayland session');
+        console.log('    --config-dir       Use this configuration directory instead of CONFIG_DIR or the platform default');
+        console.log('    --port             Set PORT when creating configuration; existing PORT values are preserved');
         console.log('  remote-mouse service disable Desactive le daemon/service local');
         console.log('  remote-mouse service uninstall Desinstalle le daemon/service local');
         console.log('  remote-mouse service restart Redemarre le daemon/service local');

@@ -5,7 +5,10 @@ import {
     resolveSetupConfigDir
 } from './setup/configuration.js';
 import {installLocalService} from './setup/installService.js';
-import {validateSetupPrerequisites} from './setup/prerequisites.js';
+import {
+    validateSetupOperationPrerequisites,
+    validateSetupPrerequisites,
+} from './setup/prerequisites.js';
 import {askYesNo} from './setup/prompts.js';
 import {createSetupStrategy} from './setup/strategies/index.js';
 
@@ -32,7 +35,7 @@ export async function runSetup(
         return {ok: false, message: prerequisiteError};
     }
 
-    const port = Number(options.port || env.REMOTE_MOUSE_PORT || 3000);
+    const port = Number(options.port ?? env.REMOTE_MOUSE_PORT ?? 3000);
     if (!Number.isInteger(port) || port < 1 || port > 65535) {
         const message = 'Port must be an integer between 1 and 65535.';
         errorOutput.write(`${message}\n`);
@@ -47,6 +50,37 @@ export async function runSetup(
     });
     
     const envFile = path.join(configDir, '.env');
+    let shouldInstallService;
+    let setupOptions;
+    let operationPrerequisiteError;
+    try {
+        shouldInstallService = options.noService
+            ? false
+            : options.yes || await askYesNo('Install and start the Remote Mouse service now?', {
+            input,
+            output,
+            defaultValue: true,
+        });
+        setupOptions = strategy.selectHostChanges
+            ? await strategy.selectHostChanges({options, env, input, output})
+            : options;
+        operationPrerequisiteError = await validateSetupOperationPrerequisites({
+            configDir,
+            envFile,
+            port,
+            strategy,
+            installService: Boolean(shouldInstallService),
+            configureUinput: Boolean(setupOptions.configureUinput),
+            env,
+        });
+    } catch (error) {
+        operationPrerequisiteError = `Unable to validate setup prerequisites: ${error.message}`;
+    }
+    if (operationPrerequisiteError) {
+        errorOutput.write(`${operationPrerequisiteError}\n`);
+        return {ok: false, message: operationPrerequisiteError};
+    }
+
     try {
         strategy.prepareConfigDir(configDir);
         const configResult = createInitialConfig({envFile, configDir, port, strategy});
@@ -58,24 +92,17 @@ export async function runSetup(
             ' (created or updated)' :
             ' (existing settings preserved)'}\n`);
 
-        const hostResult = await strategy.configureHost({options, env, input, output});
+        const hostResult = await strategy.configureHost({options: setupOptions, env, input, output});
         if (!hostResult?.ok) return hostResult;
         if (hostResult.message) output.write(`${hostResult.message}\n`);
 
-        const shouldInstallService = options.noService
-            ? false
-            : options.yes || await askYesNo('Install and start the Remote Mouse service now?', {
-            input,
-            output,
-            defaultValue: true,
-        });
         if (!shouldInstallService) {
             output.write('Service not installed. To install it later, run: remote-mouse service install\n');
             return {ok: true, configDir, serviceInstalled: false};
         }
 
-        const installService = dependencies.runServiceInstall || strategy.installService || installLocalService;
-        const serviceResult = await installService(configEnv);
+        const runServiceInstall = dependencies.runServiceInstall || strategy.installService || installLocalService;
+        const serviceResult = await runServiceInstall(configEnv);
         if (!serviceResult?.ok) {
             const message = serviceResult?.message || 'Service installation failed.';
             errorOutput.write(`${message}\n`);

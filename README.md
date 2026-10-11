@@ -43,10 +43,34 @@ remote-mouse setup
 
 On Windows, run the same npm command from an elevated terminal only if npm
 requires it; the scheduled task itself runs in the current user's desktop
-session. `remote-mouse setup --yes` accepts the service-install prompt, while
-`--no-service` creates configuration without registering the service. Under
-Wayland, setup asks separately before changing the restricted `/dev/uinput`
-permission; `--configure-uinput` explicitly requests that change.
+session. Setup can be rerun: it adds missing defaults, replaces only an empty
+or `change-me` session secret, preserves existing values/comments, and
+re-applies the service installation so a missing or stopped service can be
+repaired.
+
+By default, setup asks whether to install and start the local service. The
+options are:
+
+- `--yes` (or `-y`) skips prompts and installs/starts the service. It does not
+  grant privileged `/dev/uinput` access.
+- `--no-service` writes or updates configuration but does not install or start
+  the service. It takes precedence over `--yes`.
+- `--configure-uinput` explicitly requests the privileged Linux Wayland
+  `/dev/uinput` permission setup. Without this option, interactive Wayland
+  setup asks separately; in non-interactive mode it is skipped. This is an
+  explicit host change and may require administrator authentication.
+- `--config-dir <path>` selects the configuration directory. `CONFIG_DIR` is
+  used when the option is omitted. The default is `~/.config/remote-mouse` on
+  Linux and `%APPDATA%/remote-mouse` on Windows.
+- `--port <number>` sets `PORT` when it is first added to the configuration;
+  otherwise `REMOTE_MOUSE_PORT` or `3000` is used. An existing `PORT` value is
+  preserved. Valid ports are 1–65535.
+
+When stdin or stdout is not a TTY, prompts are declined. Consequently plain
+`remote-mouse setup` in a script still prepares configuration, but does not
+install the service or change uinput permissions. Use `--yes` to request
+service installation in automation, or `--no-service` to explicitly prepare
+configuration only. `--yes --no-service` still skips service installation.
 
 Setup creates a private configuration directory and a unique session secret,
 preserves existing settings and data, and offers to install/start the local
@@ -73,7 +97,8 @@ The setup command handles:
 - Node.js version and supported-platform validation
 - initial `.env` creation
 - optional local service installation
-- explicit opt-in for Linux Wayland uinput permissions
+- explicit opt-in for Linux Wayland uinput permissions; `--yes` alone never
+  grants this privileged access
 
 ### Custom
 
