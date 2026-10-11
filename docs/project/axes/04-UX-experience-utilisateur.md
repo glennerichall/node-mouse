@@ -45,9 +45,14 @@ compréhensibles sur mobile et desktop.
 - [x] UX-007 — nommer explicitement la commande d'affichage du QR comme une
   bascule et traduire son libellé et son intitulé accessible dans toutes les
   langues prises en charge.
-- [ ] UX-008 — ajouter le retour haptique et les commandes configurables.
+- [x] UX-008 — appliquer aux boutons de raccourcis clavier du bas le même
+  auto-masquage visuel que les remotes pendant un mouvement de souris; rétablir
+  leur opacité à la fin de l'interaction ou dès que l'option est désactivée.
 - [ ] UX-009 — tester navigation clavier, lecteurs d'écran, contrastes et
   traductions.
+- [ ] UX-010 — ajouter un retour haptique aux interactions tactiles, avec une
+  dégradation sans erreur lorsque le navigateur ou l'appareil ne le prend pas
+  en charge.
 
 UX-001/002 dépendent de SEC-008, terminé : l'API admin fournit la liste des
 sessions, leur rôle, leur état, leur dernière activité et la révocation

@@ -174,11 +174,12 @@ export function bindTouchpad(services, dom) {
 
     const showRemotesImmediately = () => {
         dom.remoteStack?.classList.remove('is-hidden');
+        dom.remotes.keyboard?.keyboardShortcutsBar?.classList.remove('is-hidden');
         dom.scrollZoneIndicator?.classList.remove('is-hidden');
     };
 
     const hideRemotes = (interactionKind = 'move') => {
-        if (!dom.remoteStack || interactionKind !== 'move') {
+        if (interactionKind !== 'move') {
             return;
         }
         if (!appState.get(APP_STATE_REMOTE_AUTO_HIDE)) {
@@ -190,16 +191,14 @@ export function bindTouchpad(services, dom) {
         }
         clearShowTimer();
         hideRemoteTimer = window.setTimeout(() => {
-            dom.remoteStack.classList.add('is-hidden');
+            dom.remoteStack?.classList.add('is-hidden');
+            dom.remotes.keyboard?.keyboardShortcutsBar?.classList.add('is-hidden');
             dom.scrollZoneIndicator?.classList.add('is-hidden');
             hideRemoteTimer = null;
         }, REMOTE_HIDE_DELAY_MS);
     };
 
     const showRemotes = () => {
-        if (!dom.remoteStack) {
-            return;
-        }
         clearHideTimer();
         clearShowTimer();
         showRemoteTimer = window.setTimeout(() => {

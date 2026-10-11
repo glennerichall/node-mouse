@@ -324,7 +324,7 @@ describe('remote-mouse setup command', () => {
     });
     expect(result.ok).toBe(false);
     expect(fs.existsSync(path.join(root, 'config'))).toBe(false);
-    expect(output.value()).toContain('Node.js 20');
+      expect(output.value()).toContain('Node.js 22.14.0');
   });
 
   it('rejects an invalid configuration target before host changes or writes', async () => {

@@ -1,6 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import Database from 'better-sqlite3';
+import {assertSupportedNodeRuntime} from './assertSupportedNodeRuntime.js';
+
+// Check the Node-API floor before loading better-sqlite3: incompatible native
+// addons can crash the process during module registration instead of throwing.
+assertSupportedNodeRuntime();
+const {default: Database} = await import('better-sqlite3');
 
 export function createDatabaseProvider({getDatabasePath}) {
     let database = null;

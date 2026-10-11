@@ -33,7 +33,7 @@ The application includes:
 
 ### Linux and Windows
 
-Install Node.js 20 or newer and npm, then install the package and run its
+Install Node.js 22.14.0 or newer and npm, then install the package and run its
 first-run setup:
 
 ```bash
@@ -106,7 +106,7 @@ Use the custom installation path when you want to install each dependency yourse
 
 #### Node.js
 
-Install an active Node.js LTS release before installing Remote Mouse. The application uses npm scripts and native Node.js modules, so both `node` and `npm` must be available in your terminal.
+Install Node.js 22.14.0 or newer before installing Remote Mouse. This minimum is required by the Node-API 10 build of `better-sqlite3`; both `node` and `npm` must be available in your terminal.
 
 ##### Linux and macOS
 
@@ -255,10 +255,11 @@ Use this path when working from a checked-out repository:
 
 ```bash
 npm install
-npm start
+npm run dev
 ```
 
 On startup, the server prints the client access URL and the corresponding QR code.
+`npm start` remains available as the standard start command.
 
 #### Self-Signed HTTPS Certificate
 

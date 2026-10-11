@@ -1,9 +1,17 @@
-import { startServer } from './server/index.js';
-import { createLogger } from './server/application/logger.js';
+import {assertSupportedNodeRuntime} from './server/services/persistence/assertSupportedNodeRuntime.js';
 
-const log = createLogger('bootstrap');
-
-startServer().catch((error) => {
-  log.error({ err: error }, 'Erreur au démarrage');
-  process.exit(1);
-});
+try {
+  assertSupportedNodeRuntime();
+  const [{startServer}, {createLogger}] = await Promise.all([
+    import('./server/index.js'),
+    import('./server/application/logger.js'),
+  ]);
+  const log = createLogger('bootstrap');
+  await startServer().catch((error) => {
+    log.error({err: error}, 'Server startup failed');
+    process.exitCode = 1;
+  });
+} catch (error) {
+  console.error(`Server startup failed: ${error.message}`);
+  process.exitCode = 1;
+}

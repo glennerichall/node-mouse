@@ -1,6 +1,9 @@
 {
   "name": "@velor/remote-mouse",
   "version": "6.19.89",
+  "engines": {
+    "node": ">=22.14.0"
+  },
   "type": "module",
   "description": "Remote mouse and keyboard with mobile client",
   "homepage": "https://github.com/glennerichall/node-mouse#readme",
@@ -36,6 +39,7 @@
   ],
   "scripts": {
     "start": "node index.js",
+    "dev": "node index.js",
     "build:wayland": "bash scripts/build-wayland-helper.sh",
     "build:xwayland-pointer": "bash scripts/build-xwayland-pointer-bridge.sh",
     "build:xwayland-overlay": "bash scripts/build-xwayland-overlay.sh",

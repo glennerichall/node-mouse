@@ -4,6 +4,8 @@ async function main() {
     const args = process.argv.slice(2);
 
     if (args.length === 0) {
+        const {assertSupportedNodeRuntime} = await import('../server/services/persistence/assertSupportedNodeRuntime.js');
+        assertSupportedNodeRuntime();
         const {startServer} = await import('../server/index.js');
         await startServer();
     } else {

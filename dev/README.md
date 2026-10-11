@@ -7,7 +7,7 @@ développement avec :
 npm run setup:dev:linux
 ```
 
-Le script vérifie Node.js 22 ou plus récent, demande confirmation avant
+Le script vérifie Node.js 22.14.0 ou plus récent, demande confirmation avant
 d'installer les paquets système de compilation X11/libpng, exécute `npm ci`,
 puis compile les bridges uinput/XWayland et l'overlay QR. Sur un hôte amd64, il
 active aussi les paquets ARM64 requis, installe le toolchain croisé et génère

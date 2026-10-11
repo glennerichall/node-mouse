@@ -7,12 +7,25 @@ les détails de RobotJS et des intégrations externes hors des contrôleurs.
 
 ## Plan de travail
 
-- [ ] ARCH-001 — définir un dispatcher de commandes partagé.
-- [ ] ARCH-002 — extraire la logique métier des handlers Socket.IO.
-- [ ] ARCH-003 — définir et versionner le protocole client/serveur.
-- [ ] ARCH-004 — introduire un contrat de transport client.
-- [ ] ARCH-005 — adapter Socket.IO sans régression.
-- [ ] ARCH-006 — tests de contrat pour chaque transport.
+- [x] ARCH-001 — décision remplacée : ne pas introduire de dispatcher métier
+  central; partager les routeurs Express par domaine entre les frontières de
+  transport, conformément à ARCH-032 et ARCH-046.
+- [x] ARCH-002 — extraire la logique métier des handlers Socket.IO dans des
+  routeurs par domaine; le handler Socket.IO adapte la requête et fournit les
+  services via `request.services`.
+- [ ] ARCH-003 — spécifier et versionner explicitement le protocole
+  client/serveur `route:request` (forme, règles de validation, compatibilité et
+  stratégie de version); le nom d'événement et le payload actuels ne suffisent
+  pas à établir une version de protocole.
+- [ ] ARCH-004 — définir un contrat de transport client indépendant de
+  Socket.IO et vérifier qu'au moins un second transport concret peut
+  l'implémenter; le service client actuel reste spécifique à Socket.IO.
+- [x] ARCH-005 — adapter Socket.IO au protocole `route:request` sans régression
+  connue; couvrir le transport client, la réception serveur et le routage par
+  les tests ciblés.
+- [ ] ARCH-006 — établir des tests de contrat réutilisables et les exécuter
+  pour chaque transport concret; les tests Express actuels valident le montage
+  des routeurs, mais ne remplacent pas les tests d'un second transport.
 - [x] ARCH-007 — clarifier LISTEN_HOST, PUBLIC_BASE_URL et proxies fiables.
 - [x] ARCH-008 — uniformiser les routeurs API client avec des handlers nommés
   et exportés, en laissant au routeur uniquement la composition des chemins et

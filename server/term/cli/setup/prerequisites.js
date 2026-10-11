@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import {isSupportedNodeVersion, MINIMUM_NODE_VERSION} from '../../../services/persistence/assertSupportedNodeRuntime.js';
 
 function validateWritablePath(configDir, envFile) {
     let currentPath = configDir;
@@ -35,9 +36,8 @@ function validateWritablePath(configDir, envFile) {
 }
 
 export function validateSetupPrerequisites({platform, nodeVersion, strategy}) {
-    const major = Number.parseInt(String(nodeVersion).replace(/^v/, '').split('.')[0], 10);
-    if (!Number.isFinite(major) || major < 20) {
-        return `Node.js 20 or newer is required (detected version: ${nodeVersion}).`;
+    if (!isSupportedNodeVersion(nodeVersion)) {
+        return `Node.js ${MINIMUM_NODE_VERSION} or newer is required (detected version: ${nodeVersion}).`;
     }
     if (!strategy) {
         return `Setup currently supports Linux and Windows, not ${platform}.`;

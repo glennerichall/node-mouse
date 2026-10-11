@@ -51,14 +51,15 @@ if [[ "${ID:-}" != ubuntu && "${ID:-}" != debian ]]; then
 fi
 
 if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
-  echo "Node.js 22 or newer and npm are required. Install Node.js (nvm is documented in README.md), then rerun this script." >&2
+  echo "Node.js 22.14.0 or newer and npm are required. Install Node.js (nvm is documented in README.md), then rerun this script." >&2
   exit 1
 fi
 
 node_version="$(node --version | sed 's/^v//')"
-node_major="${node_version%%.*}"
-if [[ ! "$node_major" =~ ^[0-9]+$ ]] || ((node_major < 22)); then
-  printf 'Node.js %s is too old; this development setup requires Node.js 22 or newer.\n' "$node_version" >&2
+IFS=. read -r node_major node_minor node_patch <<< "$node_version"
+if [[ ! "$node_major" =~ ^[0-9]+$ || ! "$node_minor" =~ ^[0-9]+$ || ! "$node_patch" =~ ^[0-9]+$ ]] \
+  || ((node_major < 22 || (node_major == 22 && (node_minor < 14 || (node_minor == 14 && node_patch < 0))))); then
+  printf 'Node.js %s is too old; this development setup requires Node.js 22.14.0 or newer.\n' "$node_version" >&2
   exit 1
 fi
 

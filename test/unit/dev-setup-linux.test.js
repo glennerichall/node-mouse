@@ -36,10 +36,10 @@ describe('Linux development setup', () => {
     expect(result.stdout).toContain('ARM64');
   });
 
-  test('rejects Node.js older than the supported minimum', () => {
+  test('rejects Node.js below the supported patch-level minimum', () => {
     const fakeBin = mkdtempSync(path.join(os.tmpdir(), 'remote-mouse-dev-setup-'));
     const fakeNode = path.join(fakeBin, 'node');
-    writeFileSync(fakeNode, '#!/bin/sh\nprintf "v20.0.0\\n"\n');
+    writeFileSync(fakeNode, '#!/bin/sh\nprintf "v22.13.0\\n"\n');
     chmodSync(fakeNode, 0o755);
 
     try {
@@ -49,7 +49,7 @@ describe('Linux development setup', () => {
       });
 
       expect(result.status).toBe(1);
-      expect(result.stderr).toContain('requires Node.js 22 or newer');
+      expect(result.stderr).toContain('requires Node.js 22.14.0 or newer');
     } finally {
       rmSync(fakeBin, {recursive: true, force: true});
     }
@@ -58,6 +58,7 @@ describe('Linux development setup', () => {
   test('installs npm dependencies and builds local helpers when prerequisites exist', () => {
     const fakeBin = mkdtempSync(path.join(os.tmpdir(), 'remote-mouse-dev-setup-'));
     const logFile = path.join(fakeBin, 'commands.log');
+    createCommandStub(fakeBin, 'node', 'printf "v22.14.0\\n"');
     createCommandStub(fakeBin, 'dpkg-query', 'printf "ii 1.0\\n"');
     createDpkgStub(fakeBin);
     createTeeStub(fakeBin);
@@ -95,6 +96,7 @@ describe('Linux development setup', () => {
   test('installs declared prerequisites and configures the ARM64 cross-build', () => {
     const fakeBin = mkdtempSync(path.join(os.tmpdir(), 'remote-mouse-dev-setup-'));
     const logFile = path.join(fakeBin, 'commands.log');
+    createCommandStub(fakeBin, 'node', 'printf "v22.14.0\\n"');
     createCommandStub(
       fakeBin,
       'dpkg-query',
@@ -147,6 +149,7 @@ describe('Linux development setup', () => {
     const fakeBin = mkdtempSync(path.join(os.tmpdir(), 'remote-mouse-dev-setup-'));
     const logFile = path.join(fakeBin, 'commands.log');
     writeFileSync(logFile, '');
+    createCommandStub(fakeBin, 'node', 'printf "v22.14.0\\n"');
     createCommandStub(fakeBin, 'dpkg-query', 'printf "ii 1.0\\n"');
     createDpkgStub(fakeBin, '');
     createCommandStub(fakeBin, 'sudo', 'printf "sudo called\\n" >> "$REMOTE_MOUSE_TEST_LOG"');

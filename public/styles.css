@@ -863,6 +863,12 @@ html[data-theme="light"] #keyboard-shortcuts-bar button[aria-pressed="true"]:act
   padding: 0 8px 8px;
   background: color-mix(in srgb, var(--bg-2) 85%, black);
   border-top: 1px solid rgba(255, 255, 255, 0.12);
+  transition: opacity 180ms ease;
+}
+
+#keyboard-shortcuts-bar.is-hidden {
+  opacity: 0.16;
+  pointer-events: none;
 }
 
 #keyboard-panel-preview {

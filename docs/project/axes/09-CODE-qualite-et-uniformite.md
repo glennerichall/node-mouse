@@ -1,6 +1,6 @@
 # 09 — CODE — Qualité et uniformité du code
 
-**État:** à jour; CODE-001 à CODE-009 terminées.
+**État:** à jour; CODE-001 à CODE-010 terminées.
 
 ## Résultat visé
 
@@ -78,6 +78,11 @@ découpage des responsabilités et des contrats entre composants.
   l'agent identifie le document propriétaire sans charger l'historique complet;
   les règles projet et la méthode roadmap ne se contredisent pas; aucun journal
   clôturé n'est modifié; les liens et le routage documentaire sont vérifiés.
+- [x] **CODE-010 — Rétablir l'entrée de développement npm:** restaurer
+  `npm run dev` comme commande explicite pour lancer le serveur depuis le dépôt,
+  documenter son usage dans le parcours d'installation source et ajouter un
+  test de manifeste qui protège cette commande contre une suppression
+  involontaire. Garder `npm start` comme entrée de lancement standard.
 
 ## Critères d'acceptation de l'axe
 
