@@ -65,15 +65,18 @@ if (!runtime) {
 const workspace = process.cwd();
 const containerScript = `
 set -euo pipefail
-rm -rf /tmp/remote-mouse-package
-mkdir -p /tmp/remote-mouse-package
-tar --exclude=.git --exclude=node_modules -C /workspace -cf - . | tar -C /tmp/remote-mouse-package -xf -
-npm install -g /tmp/remote-mouse-package
+apt-get update
+DEBIAN_FRONTEND=noninteractive apt-get install --yes build-essential libpng-dev libx11-dev libxtst-dev
+tarball=$(npm pack --pack-destination /tmp --silent /workspace)
+npm install -g "/tmp/$tarball"
 remote-mouse setup --yes --no-service --config-dir /tmp/remote-mouse-config --port 3987
 remote-mouse help
 test -f /tmp/remote-mouse-config/.env
-grep -q '^PORT=3987$' /tmp/remote-mouse-config/.env
-grep -Eq '^SESSION_COOKIE_SECRET=.{$64,}$' /tmp/remote-mouse-config/.env
+port=$(sed -n 's/^PORT=//p' /tmp/remote-mouse-config/.env | tail -n 1)
+test "$port" = 3987 || { echo "Unexpected configured port: $port" >&2; exit 1; }
+secret=$(sed -n 's/^SESSION_COOKIE_SECRET=//p' /tmp/remote-mouse-config/.env | tail -n 1)
+test "\${#secret}" -ge 64 || { echo "Generated session secret is too short: \${#secret}" >&2; exit 1; }
+remote-mouse version
 `;
 
 const result = await run(runtime, [

@@ -31,7 +31,7 @@ jobs:
           node-version: 22.14.0
           cache: npm
       - name: Install X11 runtime and build dependencies
-        run: sudo apt-get update && sudo apt-get install --yes libpng-dev libx11-dev xvfb x11-utils xdotool
+        run: sudo apt-get update && sudo apt-get install --yes build-essential libpng-dev libx11-dev libxtst-dev xvfb x11-utils xdotool
       - run: npm ci
       - name: Install the packed npm artifact
         shell: bash
@@ -51,7 +51,7 @@ jobs:
           node-version: 22.14.0
           cache: npm
       - name: Install Wayland runtime and build dependencies
-        run: sudo apt-get update && sudo apt-get install --yes dbus-x11 libpng-dev libx11-dev weston xwayland
+        run: sudo apt-get update && sudo apt-get install --yes build-essential dbus-x11 libpng-dev libx11-dev libxtst-dev weston xwayland
       - run: npm ci
       - name: Install the packed npm artifact
         shell: bash
