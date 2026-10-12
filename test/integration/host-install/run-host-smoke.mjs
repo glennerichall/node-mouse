@@ -49,11 +49,35 @@ function stopProcess(child) {
       return;
     }
     child.once('close', finish);
+    if (process.platform === 'win32') {
+      const killer = spawn('taskkill', ['/PID', String(child.pid), '/T', '/F'], {
+        stdio: 'ignore',
+        windowsHide: true,
+      });
+      killer.once('close', () => {
+        timer = setTimeout(() => {
+          if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
+        }, 5_000);
+      });
+      return;
+    }
     child.kill('SIGTERM');
     timer = setTimeout(() => {
       if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
     }, 5_000);
   });
+}
+
+async function removeTemporaryDirectory(directory) {
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    try {
+      await rm(directory, {recursive: true, force: true});
+      return;
+    } catch (error) {
+      if (error.code !== 'EBUSY' || attempt === 19) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+  }
 }
 
 let server;
@@ -82,5 +106,5 @@ try {
   console.log(`Installed server is healthy (${health.version}).`);
 } finally {
   if (server) await stopProcess(server);
-  await rm(root, {recursive: true, force: true});
+  await removeTemporaryDirectory(root);
 }
