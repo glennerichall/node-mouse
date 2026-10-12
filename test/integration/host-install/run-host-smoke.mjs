@@ -16,6 +16,7 @@ function run(args, options = {}) {
       env: {...process.env, ...(options.env || {})},
       stdio: options.stdio || 'inherit',
       windowsHide: true,
+      shell: process.platform === 'win32',
     });
     let stderr = '';
     child.stderr?.on('data', (chunk) => { stderr += chunk; });
@@ -53,6 +54,7 @@ try {
     },
     stdio: 'inherit',
     windowsHide: true,
+    shell: process.platform === 'win32',
   });
   const health = await waitForHealth();
   if (health.ok !== true || health.version !== expectedVersion) {
