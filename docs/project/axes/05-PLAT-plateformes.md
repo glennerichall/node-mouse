@@ -90,6 +90,10 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   publication. Couvrir le choix explicite du résolveur par des tests et vérifier
   que le helper QR recompilé est celui lancé en développement.
 - [ ] PLAT-002 — tester installation, service, mise à jour et désinstallation Windows.
+- [ ] PLAT-002c — rendre le script `test:install` indépendant de la syntaxe
+  d'affectation d'environnement POSIX afin qu'il soit exécutable par npm sur
+  Linux et Windows; conserver l'option Jest nécessaire aux modules ESM et
+  ajouter une vérification anti-régression des scripts npm.
 - [x] PLAT-002a — ajouter des tests automatisés de la stratégie de setup
   Windows et de ses tâches planifiées : réexécution idempotente de la
   configuration, préservation des réglages existants et chemins de configuration
