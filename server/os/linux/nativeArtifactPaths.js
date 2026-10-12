@@ -46,6 +46,7 @@ export function getLinuxNativeArtifactPath(name, {
   root = projectRoot,
   exists = existsSync,
   isCompatible = isLinuxNativeArtifactCompatible,
+  preferLocalBuild = process.env.REMOTE_MOUSE_NATIVE_ARTIFACT_SOURCE === 'local',
 } = {}) {
   const component = COMPONENTS[name];
   if (!component) {
@@ -54,6 +55,13 @@ export function getLinuxNativeArtifactPath(name, {
 
   const localBuildPath = path.join(root, 'build', component.buildDirectory, component.file);
   if (platform !== 'linux') {
+    return localBuildPath;
+  }
+
+  // `npm run dev` recompiles native helpers from this checkout. Prefer those
+  // fresh outputs over packaged prebuilds which may belong to an older source
+  // revision but still match the host architecture.
+  if (preferLocalBuild && exists(localBuildPath) && isCompatible(localBuildPath, arch)) {
     return localBuildPath;
   }
 

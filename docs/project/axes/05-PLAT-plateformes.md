@@ -84,6 +84,11 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   dans l'algorithme générique. Tester la sélection des stratégies, leurs
   différences de configuration/permissions et le parcours commun avec des
   stratégies simulées; préserver l'idempotence et le comportement actuel.
+- [x] PLAT-001i — faire utiliser par `npm run dev` les artefacts natifs compilés
+  depuis le checkout courant, même si un prébuild plus ancien est présent;
+  conserver la priorité du prébuild compatible pour les installations et la
+  publication. Couvrir le choix explicite du résolveur par des tests et vérifier
+  que le helper QR recompilé est celui lancé en développement.
 - [ ] PLAT-002 — tester installation, service, mise à jour et désinstallation Windows.
 - [x] PLAT-002a — ajouter des tests automatisés de la stratégie de setup
   Windows et de ses tâches planifiées : réexécution idempotente de la

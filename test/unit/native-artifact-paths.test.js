@@ -40,6 +40,20 @@ describe('Linux native artifact paths', () => {
     })).toBe('/package/build/wayland/remote-mouse-xwayland-overlay');
   });
 
+  it('prefers the freshly compiled local artifact in development when a prebuild also exists', () => {
+    const localBuildPath = '/package/build/wayland/remote-mouse-xwayland-overlay';
+    const prebuildPath = '/package/prebuilds/linux-x64/remote-mouse-xwayland-overlay';
+
+    expect(getLinuxNativeArtifactPath('xwaylandOverlay', {
+      root: '/package',
+      arch: 'x64',
+      platform: 'linux',
+      exists: (candidate) => [localBuildPath, prebuildPath].includes(candidate),
+      isCompatible: () => true,
+      preferLocalBuild: true,
+    })).toBe(localBuildPath);
+  });
+
   it('never selects a prebuild or local artifact incompatible with the target architecture', () => {
     const prebuildPath = '/package/prebuilds/linux-arm64/remote-mouse-uinput.node';
     const buildPath = '/package/build/uinput/remote-mouse-uinput.node';

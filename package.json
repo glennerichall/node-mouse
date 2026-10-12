@@ -39,7 +39,7 @@
   "scripts": {
     "predev": "node scripts/build-dev-native.mjs",
     "start": "node index.js",
-    "dev": "node index.js",
+    "dev": "node scripts/start-dev.mjs",
     "build:wayland": "bash scripts/build-wayland-helper.sh",
     "build:xwayland-overlay": "bash scripts/build-xwayland-overlay.sh",
     "build:uinput": "bash scripts/build-uinput-bridge.sh",
