@@ -1,6 +1,7 @@
 import {jest} from '@jest/globals';
 
 import {createWaylandDesktopController} from '../../server/services/desktop/wayland/createWaylandDesktopController.js';
+import {loadUInput} from '../../server/services/desktop/wayland/loadUInput.js';
 
 describe('Wayland desktop controller', () => {
   function createBackend(status = {status: 'ready'}) {
@@ -25,26 +26,20 @@ describe('Wayland desktop controller', () => {
     expect(desktop.getMousePos()).toEqual({x: 4.5, y: -2});
   });
 
-  it('uses the observed XWayland pointer instead of the synthetic uinput position', () => {
-    const backend = createBackend();
-    const getPointerPosition = jest.fn(() => ({x: 1870, y: 42}));
-    const desktop = createWaylandDesktopController(backend, {getPointerPosition});
-
-    expect(desktop.getHoverMousePos()).toBeNull();
-    desktop.moveMouseRelative(4, 3);
-
-    expect(desktop.getHoverMousePos()).toEqual({x: 1874, y: 45});
-    expect(getPointerPosition).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not invent a hover coordinate when XWayland cannot observe the pointer', () => {
-    const desktop = createWaylandDesktopController(createBackend(), {
-      getPointerPosition: () => null,
+  it('tracks only movements emitted through uinput, without a global pointer reader', async () => {
+    const bridge = {
+      open: jest.fn(), close: jest.fn(), moveRelative: jest.fn(), button: jest.fn(),
+      scroll: jest.fn(), key: jest.fn(),
+    };
+    const desktop = await loadUInput({
+      bridgeLoader: () => bridge,
     });
 
-    desktop.moveMouseRelative(1870, 42);
+    expect(desktop.getMousePos()).toEqual({x: 0, y: 0});
+    desktop.moveMouseRelative(1, 2);
+    expect(desktop.getMousePos()).toEqual({x: 1, y: 2});
 
-    expect(desktop.getMousePos()).toBeNull();
+    desktop.close();
   });
 
   it('starts portal consent only after explicit authorization', () => {

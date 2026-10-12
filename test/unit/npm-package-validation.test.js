@@ -9,17 +9,15 @@ const requiredFiles = [
   'index.js',
   'native/uinput/remote-mouse-uinput.c',
   'native/wayland/remote-mouse-xwayland-overlay.c',
-  'native/wayland/remote-mouse-xwayland-pointer.c',
   'package.json',
   'public/index.html',
   'scripts/build-uinput-bridge.sh',
   'scripts/build-xwayland-overlay.sh',
-  'scripts/build-xwayland-pointer-bridge.sh',
   'scripts/postinstall-linux.mjs',
+  'server/term/cli/setupCommand.js',
   'server/term/cli/versionCommand.js',
   ...['x64', 'arm64'].flatMap((arch) => [
     `prebuilds/linux-${arch}/remote-mouse-uinput.node`,
-    `prebuilds/linux-${arch}/remote-mouse-xwayland-pointer.node`,
     `prebuilds/linux-${arch}/remote-mouse-xwayland-overlay`,
   ]),
 ];
@@ -51,10 +49,8 @@ describe('npm package manifest validation', () => {
     const fallbackFiles = new Set([
       'native/uinput/remote-mouse-uinput.c',
       'native/wayland/remote-mouse-xwayland-overlay.c',
-      'native/wayland/remote-mouse-xwayland-pointer.c',
       'scripts/build-uinput-bridge.sh',
       'scripts/build-xwayland-overlay.sh',
-      'scripts/build-xwayland-pointer-bridge.sh',
       'scripts/postinstall-linux.mjs',
     ]);
     const errors = validatePackageManifest({

@@ -5,5 +5,6 @@ const packageJson = JSON.parse(fs.readFileSync(new URL('../../package.json', imp
 describe('npm scripts', () => {
   it('keeps a development entry point for running the checked-out application', () => {
     expect(packageJson.scripts.dev).toBe('node index.js');
+    expect(packageJson.scripts.predev).toBe('node scripts/build-dev-native.mjs');
   });
 });

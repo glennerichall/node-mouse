@@ -31,17 +31,16 @@
     "scripts/build-uinput-bridge.sh",
     "scripts/build-wayland-helper.sh",
     "scripts/build-xwayland-overlay.sh",
-    "scripts/build-xwayland-pointer-bridge.sh",
     "scripts/configure-uinput-access.sh",
     "scripts/configure-uinput-after-update.mjs",
     "scripts/postinstall-linux.mjs",
     "utils/"
   ],
   "scripts": {
+    "predev": "node scripts/build-dev-native.mjs",
     "start": "node index.js",
     "dev": "node index.js",
     "build:wayland": "bash scripts/build-wayland-helper.sh",
-    "build:xwayland-pointer": "bash scripts/build-xwayland-pointer-bridge.sh",
     "build:xwayland-overlay": "bash scripts/build-xwayland-overlay.sh",
     "build:uinput": "bash scripts/build-uinput-bridge.sh",
     "build:native:prebuild": "node scripts/build-native-prebuilds.mjs",

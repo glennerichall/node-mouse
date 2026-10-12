@@ -11,7 +11,6 @@ export function createWin32QrOverlayAdapter(dependencies = {}) {
     || path.join(os.tmpdir(), `remote-mouse-qr-overlay-${process.pid}.ps1`);
 
   return {
-    managesHover: false,
     isAvailable: async () => true,
     getBounds({screen, size, config}) {
       return {
@@ -40,6 +39,5 @@ export function createWin32QrOverlayAdapter(dependencies = {}) {
     close(handle) {
       if (handle && !handle.killed) handle.kill('SIGTERM');
     },
-    isSuppressed: () => false,
   };
 }

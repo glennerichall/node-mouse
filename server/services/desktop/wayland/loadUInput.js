@@ -38,7 +38,5 @@ export async function loadUInput({
             status = {status: 'stopped'};
         },
     };
-    return createWaylandDesktopController(backend, {
-        adapter: 'wayland-uinput',
-    });
+    return createWaylandDesktopController(backend, {adapter: 'wayland-uinput'});
 }

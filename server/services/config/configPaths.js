@@ -49,8 +49,4 @@ export const CONFIG_PATHS = [
     'qrOverlay.size',
     'qrOverlay.margin',
     'qrOverlay.topOffsetPx',
-    'qrOverlay.autoHideOnHover',
-    'qrOverlay.hoverEntryMarginPx',
-    'qrOverlay.hoverExitMarginPx',
-    'qrOverlay.hoverShowDelayMs',
 ];

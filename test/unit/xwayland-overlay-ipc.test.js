@@ -15,17 +15,9 @@ describe('XWayland overlay helper IPC', () => {
     expect(source).toMatch(/setvbuf\(stdin, NULL, _IONBF, 0\)/);
   });
 
-  it('resets the hover deadline when a probe still finds the pointer inside', () => {
+  it('does not inspect or react to pointer position or hover events', () => {
     const source = readFileSync(sourcePath, 'utf8');
-    const insideBranch = source.match(/if \(inside\) \{([\s\S]*?)\n    \}/)?.[1] || '';
-    expect(insideBranch).toMatch(/hidden_at_ms\s*=\s*monotonic_ms\(\)/);
-  });
-
-  it('hides on EnterNotify only when the pointer is inside the QR window', () => {
-    const source = readFileSync(sourcePath, 'utf8');
-    const enterBranch = source.match(/event\.type == EnterNotify([\s\S]*?)\n            \}/)?.[1] || '';
-    expect(enterBranch).toMatch(/pointer_inside\(&overlay\)/);
-    expect(enterBranch).toMatch(/hide_overlay\(&overlay, true\)/);
+    expect(source).not.toMatch(/XQueryPointer|EnterWindowMask|LeaveWindowMask|hover|auto_hide/i);
   });
 
   const integrationTest = hasXvfb ? it : it.skip;
@@ -41,7 +33,7 @@ describe('XWayland overlay helper IPC', () => {
         '-lX11', '-lpng', '-o', helperPath]);
       await QRCode.toFile(qrPath, 'https://example.test/');
 
-      child = spawn('xvfb-run', ['-a', helperPath, qrPath, '10', '10', '128', '900', '1'], {
+      child = spawn('xvfb-run', ['-a', helperPath, qrPath, '10', '10', '128'], {
         stdio: ['pipe', 'pipe', 'pipe'],
       });
       let output = '';

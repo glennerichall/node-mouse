@@ -19,7 +19,6 @@ export async function createQrOverlay(services, dependencies = {}) {
   let handle = null;
   let visible = Boolean(services.getConfig()?.qrOverlay?.enabled);
   let closed = false;
-  let suppressed = false;
   let bounds = null;
   let operation = Promise.resolve();
   let toggleOperation = null;
@@ -44,14 +43,12 @@ export async function createQrOverlay(services, dependencies = {}) {
       x: bounds.x,
       y: bounds.y,
       size,
-      showDelayMs: config.hoverShowDelayMs,
-      autoHide: config.autoHideOnHover,
       onError: (error) => log.warn({err: error}, 'Failed to start QR overlay'),
     };
   }
 
   async function updateNow() {
-    if (closed || !visible || suppressed) return;
+    if (closed || !visible) return;
     const context = await prepareContext();
     if (closed) return;
     handle = await adapter.refresh(handle, context);
@@ -82,34 +79,28 @@ export async function createQrOverlay(services, dependencies = {}) {
   async function showNow() {
     if (closed) return false;
     visible = true;
-    if (!suppressed) {
-      const context = await prepareContext();
+    const context = await prepareContext();
+    if (closed) return false;
+    handle = await adapter.refresh(handle, context);
+    if (closed) {
+      adapter.close(handle);
+      handle = null;
+      return false;
+    }
+    const shown = await adapter.show(handle);
+    if (closed) return false;
+    if (shown === false) {
+      adapter.close(handle);
+      handle = await adapter.refresh(null, context);
       if (closed) return false;
-      handle = await adapter.refresh(handle, context);
-      if (closed) {
+      const retriedShow = await adapter.show(handle);
+      if (closed) return false;
+      if (retriedShow === false) {
         adapter.close(handle);
         handle = null;
+        visible = false;
+        log.warn('QR overlay helper rejected the show command twice');
         return false;
-      }
-      const shown = await adapter.show(handle);
-      if (closed) return false;
-      if (shown === false) {
-        adapter.close(handle);
-        handle = await adapter.refresh(null, context);
-        if (closed) {
-          adapter.close(handle);
-          handle = null;
-          return false;
-        }
-        const retriedShow = await adapter.show(handle);
-        if (closed) return false;
-        if (retriedShow === false) {
-          adapter.close(handle);
-          handle = null;
-          visible = false;
-          log.warn('QR overlay helper rejected the show command twice');
-          return false;
-        }
       }
     }
     return true;
@@ -123,29 +114,18 @@ export async function createQrOverlay(services, dependencies = {}) {
     return queue(showNow);
   }
 
-  function setSuppressed(nextSuppressed) {
-    if (adapter.managesHover) return adapter.isSuppressed(handle);
-    const normalized = Boolean(nextSuppressed);
-    if (suppressed === normalized) return suppressed;
-    suppressed = normalized;
-    if (suppressed) adapter.hide(handle);
-    else void queue(updateNow);
-    return suppressed;
-  }
-
   function scheduleToggleDrain() {
     if (!toggleOperation) {
       toggleOperation = queue(async () => {
         while (pendingToggleCount > 0 && !closed) {
           const count = pendingToggleCount;
           pendingToggleCount = 0;
-          const hiddenByHover = adapter.managesHover && adapter.isSuppressed(handle);
-          const currentlyVisible = visible && !hiddenByHover;
-          const shouldBeVisible = count % 2 === 0
-            ? currentlyVisible
-            : !currentlyVisible;
-          if (shouldBeVisible) await showNow();
-          else await hideNow();
+          const shouldBeVisible = count % 2 === 0 ? visible : !visible;
+          if (shouldBeVisible) {
+            await showNow();
+          } else {
+            await hideNow();
+          }
         }
         return visible;
       }).finally(() => {
@@ -167,11 +147,7 @@ export async function createQrOverlay(services, dependencies = {}) {
     show,
     hide,
     update: () => queue(updateNow),
-    setSuppressed,
     toggle,
     isVisible: () => visible,
-    isSuppressed: () => adapter.managesHover ? adapter.isSuppressed(handle) : suppressed,
-    getBounds: () => bounds,
-    managesHover: adapter.managesHover,
   };
 }

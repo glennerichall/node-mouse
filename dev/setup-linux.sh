@@ -66,7 +66,7 @@ fi
 host_arch="$(dpkg --print-architecture)"
 apt_sources_dir="${REMOTE_MOUSE_APT_SOURCES_DIR:-/etc/apt/sources.list.d}"
 ubuntu_arm64_source="$apt_sources_dir/remote-mouse-arm64.sources"
-system_packages=(build-essential pkg-config libx11-dev libxtst-dev libpng-dev wmctrl)
+system_packages=(build-essential pkg-config libx11-dev libpng-dev wmctrl)
 if [[ "$host_arch" == amd64 ]]; then
   system_packages+=(crossbuild-essential-arm64 libx11-dev:arm64 libpng-dev:arm64)
 fi
@@ -116,7 +116,6 @@ fi
 
 native_outputs=(
   build/uinput/remote-mouse-uinput.node
-  build/wayland/remote-mouse-xwayland-pointer.node
   build/wayland/remote-mouse-xwayland-overlay
 )
 missing_native=()
@@ -146,10 +145,8 @@ if ((check_only)); then
     local_missing_prebuilds=0
     for output in \
       prebuilds/linux-x64/remote-mouse-uinput.node \
-      prebuilds/linux-x64/remote-mouse-xwayland-pointer.node \
       prebuilds/linux-x64/remote-mouse-xwayland-overlay \
       prebuilds/linux-arm64/remote-mouse-uinput.node \
-      prebuilds/linux-arm64/remote-mouse-xwayland-pointer.node \
       prebuilds/linux-arm64/remote-mouse-xwayland-overlay; do
       if [[ ! -f "$project_dir/$output" ]]; then
         printf 'Missing native prebuild: %s\n' "$output"
@@ -216,7 +213,6 @@ fi
 cd "$project_dir"
 npm ci
 npm run build:uinput
-npm run build:xwayland-pointer
 npm run build:xwayland-overlay
 if [[ "$host_arch" == amd64 ]]; then
   npm run build:native:prebuild

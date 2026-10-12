@@ -11,7 +11,6 @@ export function ensureApplicationLifecycleState(services) {
       stopUpdateManagerLogObserver: () => {},
       stopDisplaySizeObserver: () => {},
       stopQrOverlayRefreshObserver: () => {},
-      stopQrOverlayHoverObserver: () => {},
       startupQrOverlayPromise: null,
       shutdown: null,
     };

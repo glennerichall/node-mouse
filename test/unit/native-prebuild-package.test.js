@@ -8,7 +8,7 @@ describe('native prebuild package verification', () => {
   it('reports missing architecture-specific native files', () => {
     const missing = getMissingNativePrebuilds({root: '/package', exists: () => false});
 
-    expect(missing).toHaveLength(6);
+    expect(missing).toHaveLength(4);
     expect(missing).toContain('/package/prebuilds/linux-x64/remote-mouse-uinput.node');
     expect(missing).toContain('/package/prebuilds/linux-arm64/remote-mouse-xwayland-overlay');
   });
@@ -30,7 +30,6 @@ describe('native prebuild package verification', () => {
   it('confirms that the npm tarball contains all required binaries', () => {
     const componentFiles = [
       'remote-mouse-uinput.node',
-      'remote-mouse-xwayland-pointer.node',
       'remote-mouse-xwayland-overlay',
     ];
     const files = ['x64', 'arm64'].flatMap((arch) => componentFiles.map((file) => ({

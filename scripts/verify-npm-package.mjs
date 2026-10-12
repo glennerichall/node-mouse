@@ -11,7 +11,6 @@ const scriptPath = fileURLToPath(import.meta.url);
 const projectRoot = path.resolve(path.dirname(scriptPath), '..');
 const nativeFiles = [
   'remote-mouse-uinput.node',
-  'remote-mouse-xwayland-pointer.node',
   'remote-mouse-xwayland-overlay',
 ];
 const supportedArchitectures = ['x64', 'arm64'];
@@ -22,12 +21,10 @@ const requiredFiles = [
   'index.js',
   'native/uinput/remote-mouse-uinput.c',
   'native/wayland/remote-mouse-xwayland-overlay.c',
-  'native/wayland/remote-mouse-xwayland-pointer.c',
   'package.json',
   'public/index.html',
   'scripts/build-uinput-bridge.sh',
   'scripts/build-xwayland-overlay.sh',
-  'scripts/build-xwayland-pointer-bridge.sh',
   'scripts/postinstall-linux.mjs',
   'server/term/cli/setupCommand.js',
   'server/term/cli/versionCommand.js',
@@ -125,15 +122,12 @@ function verifyInstalledNativeArtifacts(packageRoot) {
   const nativePathModule = pathToFileURL(path.join(packageRoot, 'server/os/linux/nativeArtifactPaths.js'));
   return import(nativePathModule.href).then(({getLinuxNativeArtifactPath}) => {
     const uinputPath = getLinuxNativeArtifactPath('uinput', {root: packageRoot});
-    const pointerPath = getLinuxNativeArtifactPath('xwaylandPointer', {root: packageRoot});
     const overlayPath = getLinuxNativeArtifactPath('xwaylandOverlay', {root: packageRoot});
     const uinput = packageRequire(uinputPath);
-    const pointer = packageRequire(pointerPath);
 
     for (const method of ['open', 'moveRelative', 'scroll', 'button', 'key', 'close']) {
       assert.equal(typeof uinput[method], 'function', `uinput native export '${method}' is missing`);
     }
-    assert.equal(typeof pointer.getPosition, 'function', 'XWayland pointer native export is missing');
     assert.ok(statSync(overlayPath).mode & 0o111, 'XWayland overlay helper must be executable');
     const overlayProbe = spawnSync(overlayPath, [], {encoding: 'utf8'});
     assert.equal(overlayProbe.error, undefined, 'XWayland overlay executable must load.');

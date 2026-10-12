@@ -47,7 +47,6 @@ export function createApplicationShutdown(services) {
       runShutdownStep('Failed to stop update-manager observer', () => state.stopUpdateManagerLogObserver()),
       runShutdownStep('Failed to stop screen resolution observer', () => state.stopDisplaySizeObserver()),
       runShutdownStep('Failed to stop QR overlay observer', () => state.stopQrOverlayRefreshObserver()),
-      runShutdownStep('Failed to stop QR hover observer', () => state.stopQrOverlayHoverObserver()),
       runShutdownStep('Failed to close CLI socket', () => state.cliServer?.close()),
       runShutdownStep('Failed to close QR overlay', () => qrOverlay.close()),
       runShutdownStep('Failed to close desktop controller', () => services.getDesktopController()?.close?.()),

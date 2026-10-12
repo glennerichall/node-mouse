@@ -82,7 +82,6 @@ describe('Linux development setup', () => {
       expect(loggedCommands.filter((line) => line.startsWith('npm '))).toEqual([
         'npm ci',
         'npm run build:uinput',
-        'npm run build:xwayland-pointer',
         'npm run build:xwayland-overlay',
         'npm run build:native:prebuild',
         'npm run build:native:prebuild -- --arch arm64',
@@ -114,7 +113,7 @@ describe('Linux development setup', () => {
           ...process.env,
           PATH: `${fakeBin}:${process.env.PATH}`,
           REMOTE_MOUSE_TEST_LOG: logFile,
-          REMOTE_MOUSE_TEST_MISSING: 'libxtst-dev crossbuild-essential-arm64 libx11-dev:arm64 libpng-dev:arm64',
+          REMOTE_MOUSE_TEST_MISSING: 'crossbuild-essential-arm64 libx11-dev:arm64 libpng-dev:arm64',
           REMOTE_MOUSE_APT_SOURCES_DIR: path.join(fakeBin, 'apt-sources'),
         },
       });
@@ -122,7 +121,7 @@ describe('Linux development setup', () => {
       expect(result.status).toBe(0);
       const loggedCommands = readFileSync(logFile, 'utf8');
       expect(loggedCommands).toContain('sudo dpkg --add-architecture arm64');
-      expect(loggedCommands).toContain('sudo apt-get install -y --no-install-recommends libxtst-dev crossbuild-essential-arm64 libx11-dev:arm64 libpng-dev:arm64');
+      expect(loggedCommands).toContain('sudo apt-get install -y --no-install-recommends crossbuild-essential-arm64 libx11-dev:arm64 libpng-dev:arm64');
       expect(loggedCommands).toContain('sudo apt-get update');
       expect(result.stdout).toContain('crossbuild-essential-arm64');
     } finally {
@@ -137,10 +136,8 @@ describe('Linux development setup', () => {
     expect(packageJson.scripts['setup:dev:linux']).toBe('bash dev/setup-linux.sh');
     expect(script).toContain('npm ci');
     expect(script).toContain('npm run build:uinput');
-    expect(script).toContain('npm run build:xwayland-pointer');
     expect(script).toContain('npm run build:xwayland-overlay');
     expect(script).toContain('build/uinput/remote-mouse-uinput.node');
-    expect(script).toContain('build/wayland/remote-mouse-xwayland-pointer.node');
     expect(script).toContain('crossbuild-essential-arm64');
     expect(script).toContain('npm run build:native:prebuild -- --arch arm64');
   });

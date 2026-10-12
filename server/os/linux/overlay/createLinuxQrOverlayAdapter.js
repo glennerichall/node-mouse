@@ -16,7 +16,6 @@ export function createLinuxQrOverlayAdapter(dependencies = {}) {
   }
 
   return {
-    managesHover: true,
     async isAvailable() {
       try {
         await accessFile(helperPath);
@@ -46,7 +45,6 @@ export function createLinuxQrOverlayAdapter(dependencies = {}) {
     show: async (handle) => handle?.show(),
     hide: async (handle) => handle?.hide(),
     close: (handle) => handle?.close(),
-    isSuppressed: (handle) => handle?.getState() === 'hover-hidden',
     unavailableMessage: 'Native QR overlay unavailable; run npm run build:xwayland-overlay',
   };
 }

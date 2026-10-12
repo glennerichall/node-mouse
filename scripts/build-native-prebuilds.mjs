@@ -6,11 +6,10 @@ import {fileURLToPath} from 'node:url';
 import {getLinuxNativeBuildPath, getLinuxNativePrebuildPath} from '../server/os/linux/nativeArtifactPaths.js';
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const REQUIRED_COMPONENTS = ['uinput', 'xwaylandPointer', 'xwaylandOverlay'];
+const REQUIRED_COMPONENTS = ['uinput', 'xwaylandOverlay'];
 const OPTIONAL_COMPONENTS = ['waylandPortal'];
 const BUILD_COMMANDS = {
   uinput: 'scripts/build-uinput-bridge.sh',
-  xwaylandPointer: 'scripts/build-xwayland-pointer-bridge.sh',
   xwaylandOverlay: 'scripts/build-xwayland-overlay.sh',
   waylandPortal: 'scripts/build-wayland-helper.sh',
 };

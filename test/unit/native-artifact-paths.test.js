@@ -70,13 +70,6 @@ describe('Linux native artifact paths', () => {
     })).toBe('/package/build/uinput/remote-mouse-uinput.node');
   });
 
-  it('resolves prebuild paths by architecture for the packaging step', () => {
-    expect(getLinuxNativePrebuildPath('xwaylandPointer', {
-      root: '/package',
-      arch: 'arm64',
-    })).toBe('/package/prebuilds/linux-arm64/remote-mouse-xwayland-pointer.node');
-  });
-
   it('rejects unknown native components instead of silently returning a bad path', () => {
     expect(() => getLinuxNativeArtifactPath('unknown')).toThrow('Unknown Linux native component');
   });

@@ -11,10 +11,9 @@ import {
 } from '../server/os/linux/nativeArtifactPaths.js';
 import {configureUInputAfterAppUpdate} from './configure-uinput-after-update.mjs';
 
-const REQUIRED_COMPONENTS = ['uinput', 'xwaylandPointer', 'xwaylandOverlay'];
+const REQUIRED_COMPONENTS = ['uinput', 'xwaylandOverlay'];
 const BUILD_SCRIPTS = Object.freeze({
   uinput: 'build-uinput-bridge.sh',
-  xwaylandPointer: 'build-xwayland-pointer-bridge.sh',
   xwaylandOverlay: 'build-xwayland-overlay.sh',
 });
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');

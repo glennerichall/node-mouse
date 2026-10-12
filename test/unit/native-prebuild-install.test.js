@@ -40,9 +40,9 @@ describe('native prebuild installation', () => {
       migrateUInput: jest.fn(),
     });
 
-    expect(result.built).toEqual(['uinput', 'xwaylandPointer', 'xwaylandOverlay']);
+    expect(result.built).toEqual(['uinput', 'xwaylandOverlay']);
     expect(result.skipped).toEqual(['waylandPortal']);
-    expect(compile.mock.calls.map(([name]) => name)).toEqual(['uinput', 'xwaylandPointer', 'xwaylandOverlay']);
+    expect(compile.mock.calls.map(([name]) => name)).toEqual(['uinput', 'xwaylandOverlay']);
     expect(stderr.write).not.toHaveBeenCalled();
   });
 
@@ -50,7 +50,7 @@ describe('native prebuild installation', () => {
     const prebuilt = new Set([getLinuxNativePrebuildPath('uinput', {root: '/package', arch: 'x64'})]);
     const builtPaths = new Set();
     const compile = jest.fn((name, {root}) => builtPaths.add(getLinuxNativeBuildPath(name, {root})));
-    const incompatible = getLinuxNativePrebuildPath('xwaylandPointer', {root: '/package', arch: 'x64'});
+    const incompatible = getLinuxNativePrebuildPath('xwaylandOverlay', {root: '/package', arch: 'x64'});
     prebuilt.add(incompatible);
 
     const result = prepareLinuxNativeRuntime({
@@ -59,15 +59,15 @@ describe('native prebuild installation', () => {
       root: '/package',
       exists: (filePath) => prebuilt.has(filePath) || builtPaths.has(filePath),
       isCompatible: (filePath) => filePath !== incompatible || builtPaths.has(
-        getLinuxNativeBuildPath('xwaylandPointer', {root: '/package'}),
+        getLinuxNativeBuildPath('xwaylandOverlay', {root: '/package'}),
       ),
       compile,
       stderr: {write: jest.fn()},
       migrateUInput: jest.fn(),
     });
 
-    expect(result.built).toEqual(['xwaylandPointer', 'xwaylandOverlay']);
-    expect(compile.mock.calls.map(([name]) => name)).toEqual(['xwaylandPointer', 'xwaylandOverlay']);
+    expect(result.built).toEqual(['xwaylandOverlay']);
+    expect(compile.mock.calls.map(([name]) => name)).toEqual(['xwaylandOverlay']);
   });
 
   it('continues installation with a diagnostic when compilation is unavailable', () => {
@@ -83,8 +83,8 @@ describe('native prebuild installation', () => {
     });
 
     expect(result.built).toEqual([]);
-    expect(result.skipped).toEqual(['uinput', 'xwaylandPointer', 'xwaylandOverlay', 'waylandPortal']);
-    expect(stderr.write).toHaveBeenCalledTimes(3);
+    expect(result.skipped).toEqual(['uinput', 'xwaylandOverlay', 'waylandPortal']);
+    expect(stderr.write).toHaveBeenCalledTimes(2);
     expect(stderr.write).toHaveBeenCalledWith(expect.stringContaining('npm install continues without it'));
   });
 
@@ -124,9 +124,9 @@ describe('native prebuild installation', () => {
       stdout: {write: jest.fn()},
     });
 
-    expect(result.components).toEqual(['uinput', 'xwaylandPointer', 'xwaylandOverlay']);
-    expect(build).toHaveBeenCalledTimes(3);
-    expect(copy).toHaveBeenCalledTimes(3);
+    expect(result.components).toEqual(['uinput', 'xwaylandOverlay']);
+    expect(build).toHaveBeenCalledTimes(2);
+    expect(copy).toHaveBeenCalledTimes(2);
     expect(copy.mock.calls[0][1]).toBe('/workspace/prebuilds/linux-arm64/remote-mouse-uinput.node');
     expect(setMode).toHaveBeenCalledWith('/workspace/prebuilds/linux-arm64/remote-mouse-xwayland-overlay', 0o755);
   });
@@ -152,7 +152,7 @@ describe('native prebuild installation', () => {
     });
 
     expect(probe).toHaveBeenCalledWith('aarch64-linux-gnu-gcc', ['--version']);
-    expect(build).toHaveBeenCalledTimes(3);
+    expect(build).toHaveBeenCalledTimes(2);
     expect(build.mock.calls[0][1].env.CC).toBe('aarch64-linux-gnu-gcc');
   });
 

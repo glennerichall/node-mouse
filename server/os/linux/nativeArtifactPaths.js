@@ -9,10 +9,6 @@ const COMPONENTS = Object.freeze({
     file: 'remote-mouse-uinput.node',
     buildDirectory: 'uinput',
   },
-  xwaylandPointer: {
-    file: 'remote-mouse-xwayland-pointer.node',
-    buildDirectory: 'wayland',
-  },
   xwaylandOverlay: {
     file: 'remote-mouse-xwayland-overlay',
     buildDirectory: 'wayland',

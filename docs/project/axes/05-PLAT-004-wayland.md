@@ -156,24 +156,22 @@ stratégie configurable et non supprimée.
 **Sortie:** Linux reçoit une souris et un clavier virtuels correctement séparés,
 sans élargissement des privilèges ni prétention de corriger la vitesse perçue.
 
-### PLAT-004j — Masquage au survol de l'overlay QR
+### PLAT-004j — Retrait du masquage automatique du QR
 
-- Reproduire la perte du masquage au survol lorsque YAD est exécuté par
-  XWayland dans une session Wayland.
-- Vérifier que la position du pointeur et la géométrie de la fenêtre sont
-  comparées dans le même référentiel de coordonnées, y compris avec mise à
-  l'échelle et plusieurs écrans.
-- Masquer temporairement l'overlay tant que le pointeur occupe sa zone, puis le
-  réafficher après sa sortie sans boucle de masquage/réaffichage ni perte du
-  processus YAD.
-- Ajouter des tests anti-régression de la décision de survol et conserver le
-  comportement actuel sous une vraie session X11.
-- Valider le parcours sur Ubuntu 26.04 Wayland avec l'overlay positionné dans
-  plusieurs coins de l'écran.
+- Retirer l'observateur de survol et le suivi du pointeur utilisés uniquement
+  pour masquer/réafficher automatiquement l'overlay QR.
+- Retirer aussi le masquage au survol du helper natif X11/XWayland; le QR reste
+  affiché jusqu'à l'action explicite Toggle QR ou sa désactivation de
+  configuration.
+- Conserver le placement de l'overlay et les opérations explicites `show`,
+  `hide`, `update` et `close` sur Linux et Windows.
+- Supprimer les paramètres d'auto-hide devenus sans effet dans le schéma,
+  l'interface de configuration et les adaptateurs.
+- Tester que le survol ne change jamais la visibilité et que Toggle QR
+  continue d'alterner correctement l'affichage sur toutes les plateformes.
 
-**Sortie:** le QR ne bloque pas la zone située sous l'overlay lors du survol,
-et revient automatiquement lorsque le pointeur quitte cette zone sous Wayland
-comme sous X11.
+**Sortie:** l'overlay QR n'observe plus le pointeur et ne se masque jamais
+automatiquement; son bouton Toggle reste l'autorité de visibilité.
 
 ### PLAT-004l — Helper natif d’overlay QR X11/XWayland
 
@@ -182,31 +180,25 @@ comme sous X11.
 - Conserver la génération du QR en PNG avec le module Node.js existant; le
   helper reçoit le chemin de l’image, la géométrie et les commandes
   `show`, `hide`, `update` et `close` par un protocole IPC minimal.
-- Couvrir X11 et GNOME Wayland avec un même adaptateur X11/XWayland capable de
-  positionner la fenêtre, afficher le PNG et traiter directement les événements
-  locaux `EnterNotify` et `LeaveNotify`.
-- Lorsque le contenu est masqué, sonder la présence du pointeur par remappage
-  transparent et borné de la fenêtre, sans dépendre d’une position globale
-  Wayland ni conserver une surface plein écran qui intercepte le bureau.
-- Garantir que la zone située sous le QR redevient cliquable pendant le
-  masquage; mesurer et borner toute interception transitoire causée par une
-  sonde de présence.
-- Supprimer de ce parcours YAD, `wmctrl`, le polling `XQueryPointer` global, le
-  worker de position et le suivi hybride des deltas `uinput`; conserver ces
-  dépendances seulement si un autre usage documenté les exige encore.
+- Utiliser l'adaptateur X11/XWayland pour positionner la fenêtre et afficher le
+  PNG; ne pas traiter d'événements de survol ni sonder la position du pointeur.
+- Laisser le helper mappé tant que le QR est visible; une commande explicite
+  `hide` démonte la fenêtre et libère la zone sous-jacente.
+- Supprimer de ce parcours YAD et `wmctrl`; le helper ne dépend d'aucune
+  position globale du pointeur, de worker XWayland ni des deltas uinput.
 - Charger et superviser le helper paresseusement, publier une erreur
   actionnable lorsqu’il manque et laisser le serveur fonctionner sans overlay
   en cas de panne ou de plateforme non prise en charge.
 - Tester le protocole, les transitions d’état, les redémarrages et les courses
   de mapping; valider sur une vraie session X11 et sur Ubuntu 26.04 GNOME
-  Wayland/XWayland, avec souris distante et souris physique.
+  Wayland/XWayland.
 - Traiter un futur overlay Wayland réellement natif comme un adaptateur séparé
   par famille de compositeurs; ne pas présenter ce helper XWayland comme une
   solution Wayland universelle.
 
 **Sortie:** l’overlay QR ne dépend plus de YAD ni d’une lecture globale du
-pointeur; il se masque et revient sans oscillation sous X11 et XWayland, libère
-la zone sous-jacente et reste isolé du serveur principal.
+pointeur; sa visibilité est contrôlée uniquement par les commandes explicites
+et le helper reste isolé du serveur principal.
 
 ### PLAT-004k — Normalisation de la souris par système — abandonnée
 

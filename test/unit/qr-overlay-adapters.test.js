@@ -6,13 +6,12 @@ import {createWin32QrOverlayAdapter} from '../../server/os/win32/overlay/createW
 
 function createServices() {
   return {
+    getDesktopController: jest.fn(),
     getConfig: () => ({qrOverlay: {
       enabled: true,
       size: 175,
       margin: 12,
       topOffsetPx: 8,
-      hoverShowDelayMs: 900,
-      autoHideOnHover: true,
     }}),
     getSystem: () => ({getScreenInfo: async () => ({width: 1920, height: 1080})}),
     getUrls: () => ({entryUrl: 'http://example.test/session'}),
@@ -59,7 +58,8 @@ describe('QR overlay OS adapters', () => {
     const createClient = jest.fn()
       .mockReturnValueOnce(failedClient)
       .mockReturnValueOnce(replacementClient);
-    const overlay = await createQrOverlay(createServices(), {
+    const services = createServices();
+    const overlay = await createQrOverlay(services, {
       adapter: createLinuxQrOverlayAdapter({
         access: async () => {}, helperPath: '/app/overlay', createClient,
       }),
@@ -74,7 +74,7 @@ describe('QR overlay OS adapters', () => {
     expect(replacementClient.show).toHaveBeenCalledTimes(1);
   });
 
-  it('re-shows the QR when toggle is called while hover has temporarily hidden it', async () => {
+  it('toggles QR visibility explicitly without hover suppression state', async () => {
     let helperState = 'starting';
     const client = {
       show: jest.fn(() => { helperState = 'visible'; }),
@@ -89,7 +89,8 @@ describe('QR overlay OS adapters', () => {
       helperPath: '/app/overlay',
       createClient: () => client,
     });
-    const overlay = await createQrOverlay(createServices(), {
+    const services = createServices();
+    const overlay = await createQrOverlay(services, {
       adapter,
       qrPath: '/tmp/qr.png',
       writeQr: jest.fn(async () => {}),
@@ -97,11 +98,13 @@ describe('QR overlay OS adapters', () => {
     });
 
     await overlay.show();
-    helperState = 'hover-hidden';
-
-    await expect(overlay.toggle()).resolves.toBe(true);
+    expect(await overlay.toggle()).toBe(false);
+    expect(await overlay.toggle()).toBe(true);
     expect(client.show).toHaveBeenCalledTimes(2);
-    expect(client.hide).not.toHaveBeenCalled();
+    expect(client.hide).toHaveBeenCalledTimes(1);
+    expect(helperState).toBe('visible');
+    expect(overlay).not.toHaveProperty('setSuppressed');
+    expect(services.getDesktopController).not.toHaveBeenCalled();
   });
 
   it('coalesces toggles that arrive while the helper is acknowledging a transition', async () => {
@@ -208,15 +211,14 @@ describe('QR overlay OS adapters', () => {
     });
 
     await overlay.show();
-    expect(overlay.managesHover).toBe(true);
-    expect(overlay.getBounds()).toEqual({x: 1733, y: 20, width: 175, height: 175});
+    expect(overlay).not.toHaveProperty('setSuppressed');
     expect(createClient).toHaveBeenCalledWith(expect.objectContaining({
-      x: 1733, y: 20, size: 175, showDelayMs: 900, autoHide: true,
+      x: 1733, y: 20, size: 175,
     }), {helperPath: '/app/overlay'});
 
     await overlay.update();
     expect(client.update).toHaveBeenCalledWith(expect.objectContaining({
-      x: 1733, y: 20, size: 175, showDelayMs: 900, autoHide: true,
+      x: 1733, y: 20, size: 175,
     }));
   });
 
@@ -239,8 +241,6 @@ describe('QR overlay OS adapters', () => {
     });
 
     await overlay.show();
-    expect(overlay.managesHover).toBe(false);
-    expect(overlay.getBounds()).toEqual({x: 1733, y: 12, width: 175, height: 175});
     expect(writeFile).toHaveBeenCalledWith(
       'C:\\Temp\\remote-mouse-overlay.ps1',
       expect.stringContaining('$form.ClientSize = New-Object System.Drawing.Size(175, 175)'),

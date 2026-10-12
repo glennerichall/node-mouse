@@ -27,32 +27,32 @@ function createChild() {
 describe('X11/XWayland QR overlay helper client', () => {
   it('builds the stable startup protocol', () => {
     expect(buildXWaylandOverlayArgs({
-      qrPath: '/tmp/qr.png', x: 100, y: 20, size: 175, showDelayMs: 1200, autoHide: true,
-    })).toEqual(['/tmp/qr.png', '100', '20', '175', '1200', '1']);
+      qrPath: '/tmp/qr.png', x: 100, y: 20, size: 175,
+    })).toEqual(['/tmp/qr.png', '100', '20', '175']);
   });
 
-  it('sends acknowledged lifecycle commands and tracks helper hover state', async () => {
+  it('sends acknowledged lifecycle commands and tracks helper lifecycle state', async () => {
     const child = createChild();
     const spawnProcess = jest.fn(() => child);
     const client = createXWaylandOverlayClient({
-      qrPath: '/tmp/qr.png', x: 100, y: 20, size: 175, showDelayMs: 1200, autoHide: true,
+      qrPath: '/tmp/qr.png', x: 100, y: 20, size: 175,
     }, {spawnProcess, helperPath: '/app/overlay'});
 
     child.stdout.emit('data', 'STATE rea');
-    child.stdout.emit('data', 'dy\nSTATE hover-hidden\n');
-    expect(client.getState()).toBe('hover-hidden');
+    child.stdout.emit('data', 'dy\nSTATE visible\n');
+    expect(client.getState()).toBe('visible');
 
     await expect(client.hide()).resolves.toBe(true);
     await expect(client.show()).resolves.toBe(true);
     await expect(client.update({
-      qrPath: '/tmp/qr.png', x: 10, y: 15, size: 200, showDelayMs: 800, autoHide: false,
+      qrPath: '/tmp/qr.png', x: 10, y: 15, size: 200,
     })).resolves.toBe(true);
     client.close();
 
     expect(child.stdin.write.mock.calls.map(([value]) => value)).toEqual([
       '1 HIDE\n',
       '2 SHOW\n',
-      '3 UPDATE /tmp/qr.png 10 15 200 800 0\n',
+      '3 UPDATE /tmp/qr.png 10 15 200\n',
     ]);
     expect(child.kill).toHaveBeenCalledWith('SIGTERM');
   });
@@ -63,7 +63,7 @@ describe('X11/XWayland QR overlay helper client', () => {
       child.stdin.emit('error', Object.assign(new Error('write EPIPE'), {code: 'EPIPE'}));
     });
     const client = createXWaylandOverlayClient({
-      qrPath: '/tmp/qr.png', x: 100, y: 20, size: 175, showDelayMs: 1200, autoHide: true,
+      qrPath: '/tmp/qr.png', x: 100, y: 20, size: 175,
     }, {spawnProcess: () => child, helperPath: '/app/overlay'});
 
     expect(() => client.close()).not.toThrow();
@@ -75,7 +75,7 @@ describe('X11/XWayland QR overlay helper client', () => {
   it('marks the client closed when commands can no longer be written', async () => {
     const child = createChild();
     const client = createXWaylandOverlayClient({
-      qrPath: '/tmp/qr.png', x: 100, y: 20, size: 175, showDelayMs: 1200, autoHide: true,
+      qrPath: '/tmp/qr.png', x: 100, y: 20, size: 175,
     }, {spawnProcess: () => child, helperPath: '/app/overlay'});
     child.stdin.writable = false;
 
@@ -87,7 +87,7 @@ describe('X11/XWayland QR overlay helper client', () => {
     const child = createChild();
     child.stdin.write.mockImplementation(jest.fn());
     const client = createXWaylandOverlayClient({
-      qrPath: '/tmp/qr.png', x: 100, y: 20, size: 175, showDelayMs: 1200, autoHide: true,
+      qrPath: '/tmp/qr.png', x: 100, y: 20, size: 175,
     }, {spawnProcess: () => child, helperPath: '/app/overlay'});
     let completed = false;
     const showing = client.show().then((result) => {
@@ -105,7 +105,7 @@ describe('X11/XWayland QR overlay helper client', () => {
     const child = createChild();
     child.stdin.write.mockImplementation(jest.fn());
     const client = createXWaylandOverlayClient({
-      qrPath: '/tmp/qr.png', x: 100, y: 20, size: 175, showDelayMs: 1200, autoHide: true,
+      qrPath: '/tmp/qr.png', x: 100, y: 20, size: 175,
     }, {spawnProcess: () => child, helperPath: '/app/overlay', commandTimeoutMs: 10_000});
     const showing = client.show();
 
@@ -121,7 +121,7 @@ describe('X11/XWayland QR overlay helper client', () => {
     const child = createChild();
     child.stdin.write.mockImplementation(jest.fn());
     const client = createXWaylandOverlayClient({
-      qrPath: '/tmp/qr.png', x: 100, y: 20, size: 175, showDelayMs: 1200, autoHide: true,
+      qrPath: '/tmp/qr.png', x: 100, y: 20, size: 175,
     }, {spawnProcess: () => child, helperPath: '/app/overlay', commandTimeoutMs: 20});
 
     await expect(client.show()).resolves.toBe(false);

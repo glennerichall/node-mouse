@@ -131,12 +131,10 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   commande `SHOW` après un rafraîchissement pourtant accepté.
 - [ ] PLAT-004q — rendre les commandes du helper QR acquittées avec un
   identifiant de requête et un délai borné; ne confirmer une transition au
-  service qu'après son accusé de réception; garder le QR visible lorsqu'un
-  `SHOW` le remappe sous un pointeur déjà présent; valider le protocole et ce
-  cas de survol sous Xvfb ou sur un bureau réel.
-- [ ] PLAT-004r — éviter la boucle active du probe hover lorsque le pointeur
-  reste dans la zone QR et ne pas retarder l'initialisation HTTP par l'attente
-  de l'ACK initial du helper; tester les deux scénarios.
+  service qu'après son accusé de réception; vérifier que les commandes
+  explicites `SHOW` et `HIDE` ne dépendent pas de l'état du pointeur.
+- [ ] PLAT-004r — ne pas retarder l'initialisation HTTP par l'attente de l'ACK
+  initial du helper QR; tester le démarrage du serveur lorsque cet ACK tarde.
 - [x] PLAT-004s — ne masquer l'overlay QR que si la position réelle du pointeur
   est dans ses limites lors d'un `EnterNotify`; ignorer les événements d'entrée
   parasites déclenchés par les remappages X11/XWayland et ajouter un test de
@@ -145,15 +143,13 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   les demandes successives, annuler les opérations QR lors de la fermeture et
   terminer immédiatement le helper natif pendant SIGINT/SIGTERM; couvrir les
   bascules concurrentes et l'arrêt pendant une commande sans ACK.
-- [ ] PLAT-004j — rétablir sous Wayland/XWayland le masquage temporaire de
-  l'overlay QR lorsque le pointeur le survole, puis son réaffichage après la
-  sortie du pointeur, sans oscillation, perte permanente de la fenêtre ni
-  régression du comportement X11; couvrir la logique de coordonnées par des
-  tests et valider le résultat sur Ubuntu 26.04 Wayland réel.
-- [ ] PLAT-004l — remplacer l’overlay QR YAD et les contournements de position
-  globale par un helper natif X11/XWayland spécialisé, événementiel et isolé;
-  conserver la génération du PNG dans Node.js, libérer la zone masquée pour les
-  clics et valider affichage, survol et retour du QR sous X11 et GNOME Wayland.
+- [x] PLAT-004j — retirer le suivi de souris utilisé par le masquage
+  automatique du QR sous toutes les plateformes; conserver sa visibilité
+  jusqu'à Toggle QR ou désactivation de configuration, et vérifier que le
+  survol ne modifie jamais l'état.
+- [ ] PLAT-004l — remplacer l’overlay QR YAD par un helper natif X11/XWayland
+  spécialisé et isolé; conserver la génération du PNG dans Node.js et valider
+  ses commandes explicites d'affichage, masquage et fermeture.
 - [x] PLAT-004k — abandonnée : ne pas déduire la sensation du pointeur à partir
   du système d'exploitation ni imposer une correction propre à Wayland. La
   vitesse et l'accélération deviennent des préférences locales du client dans

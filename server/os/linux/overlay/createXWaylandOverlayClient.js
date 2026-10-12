@@ -9,8 +9,8 @@ export function getXWaylandOverlayHelperPath() {
   return getLinuxNativeArtifactPath('xwaylandOverlay', {root: projectRoot});
 }
 
-export function buildXWaylandOverlayArgs({qrPath, x, y, size, showDelayMs, autoHide}) {
-  return [qrPath, String(x), String(y), String(size), String(showDelayMs), autoHide ? '1' : '0'];
+export function buildXWaylandOverlayArgs({qrPath, x, y, size}) {
+  return [qrPath, String(x), String(y), String(size)];
 }
 
 export function createXWaylandOverlayClient(options, dependencies = {}) {
@@ -97,8 +97,8 @@ export function createXWaylandOverlayClient(options, dependencies = {}) {
   return {
     show: () => send('SHOW', 'visible'),
     hide: () => send('HIDE', 'hidden'),
-    update: ({qrPath, x, y, size, showDelayMs, autoHide}) => send(
-      `UPDATE ${qrPath} ${x} ${y} ${size} ${showDelayMs} ${autoHide ? 1 : 0}`,
+    update: ({qrPath, x, y, size}) => send(
+      `UPDATE ${qrPath} ${x} ${y} ${size}`,
       'updated',
     ),
     close: () => {

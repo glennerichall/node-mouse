@@ -35,11 +35,8 @@ const MODIFIER_CODES = Object.freeze({
 
 export function createWaylandDesktopController(backend, {
     adapter = 'wayland',
-    getPointerPosition = null,
 } = {}) {
     const pointer = {x: 0, y: 0};
-    let hoverPointerInitialized = !getPointerPosition;
-    let hasRemotePointerMotion = false;
 
     function ensureBackendReady() {
         if (backend.getStatus?.().status === 'ready') {
@@ -91,26 +88,11 @@ export function createWaylandDesktopController(backend, {
         const y = Number(dy) || 0;
         pointer.x += x;
         pointer.y += y;
-        hasRemotePointerMotion = true;
         backend.moveRelative(x, y);
     }
 
     function getMousePos() {
-        const observedPointer = getPointerPosition?.();
-        if (observedPointer && Number.isFinite(observedPointer.x) && Number.isFinite(observedPointer.y)) {
-            pointer.x = observedPointer.x;
-            pointer.y = observedPointer.y;
-            return {...pointer};
-        }
-        return getPointerPosition ? null : {...pointer};
-    }
-
-    function getHoverMousePos() {
-        if (!hoverPointerInitialized) {
-            hoverPointerInitialized = Boolean(getMousePos());
-            return null;
-        }
-        return hasRemotePointerMotion || !getPointerPosition ? {...pointer} : null;
+        return {...pointer};
     }
 
     function buttonCode(button) {
@@ -138,7 +120,6 @@ export function createWaylandDesktopController(backend, {
             };
         },
         getMousePos,
-        getHoverMousePos,
         moveMouseRelative,
         moveMouse(x, y) {
             moveMouseRelative(Number(x) - pointer.x, Number(y) - pointer.y);
@@ -166,7 +147,6 @@ export function createWaylandDesktopController(backend, {
             },
         },
         close() {
-            getPointerPosition?.close?.();
             backend.close();
         },
     };

@@ -8,7 +8,6 @@ const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '
 const ARCHITECTURES = ['x64', 'arm64'];
 const COMPONENT_FILES = [
   'remote-mouse-uinput.node',
-  'remote-mouse-xwayland-pointer.node',
   'remote-mouse-xwayland-overlay',
 ];
 export function getMissingNativePrebuilds({root = projectRoot, exists = existsSync} = {}) {
