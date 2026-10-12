@@ -79,7 +79,9 @@ jobs:
 
   windows:
     name: Windows installation and startup
-    runs-on: windows-latest
+    # Pin the runner while node-gyp catches up with the newer VS toolset used
+    # by windows-latest; better-sqlite3 needs the C++ build environment here.
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
