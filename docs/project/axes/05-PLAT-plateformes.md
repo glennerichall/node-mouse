@@ -221,6 +221,12 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   et assertions métier restent communs, seuls les observateurs système
   diffèrent. Réduire Vagrant à la préparation de la cible et au lancement de
   cette commande, sans dupliquer les tests ni leur orchestration.
+- [ ] PLAT-005b6 — ajouter une validation GitHub Actions sans Vagrant pour
+  l'installation depuis le tarball npm et le démarrage du serveur sur des
+  runners Ubuntu X11, Ubuntu Wayland headless et Windows. Vérifier la santé
+  HTTP et la version exposée par chaque installation; conserver les tests
+  d'entrée physique, de capture et de service dans leurs suites spécialisées
+  tant que le provider natif correspondant n'est pas disponible.
 - [ ] PLAT-005c — ajouter un profil Windows 11 avec UEFI, TPM virtuel et média
   d'installation fourni localement par le développeur; automatiser le
   bootstrap nécessaire aux tests d'installation, de mise à jour et de

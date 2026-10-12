@@ -1,0 +1,97 @@
+name: Platform installation smoke tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux-install:
+    name: Linux package installation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: npm
+      - run: npm ci
+      - run: npm run test:install:integration
+
+  linux-x11:
+    name: Linux X11 installation and startup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: npm
+      - name: Install X11 runtime and build dependencies
+        run: sudo apt-get update && sudo apt-get install --yes libpng-dev libx11-dev xvfb x11-utils xdotool
+      - run: npm ci
+      - name: Install the packed npm artifact
+        shell: bash
+        run: |
+          tarball=$(npm pack --pack-destination "$RUNNER_TEMP" --silent)
+          npm install --global "$RUNNER_TEMP/$tarball"
+      - name: Start and probe the installed server
+        run: xvfb-run --auto-servernum --server-args='-screen 0 1280x720x24' node test/integration/host-install/run-host-smoke.mjs
+
+  linux-wayland:
+    name: Linux Wayland installation and startup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: npm
+      - name: Install Wayland runtime and build dependencies
+        run: sudo apt-get update && sudo apt-get install --yes dbus-x11 libpng-dev libx11-dev weston xwayland
+      - run: npm ci
+      - name: Install the packed npm artifact
+        shell: bash
+        run: |
+          tarball=$(npm pack --pack-destination "$RUNNER_TEMP" --silent)
+          npm install --global "$RUNNER_TEMP/$tarball"
+      - name: Start a headless Wayland compositor and probe the installation
+        shell: bash
+        run: |
+          runtime_dir=$(mktemp -d)
+          chmod 700 "$runtime_dir"
+          export XDG_RUNTIME_DIR="$runtime_dir"
+          dbus-run-session -- bash -euo pipefail -c '
+            weston --backend=headless-backend.so --socket=wayland-1 --xwayland --idle-time=0 >/tmp/remote-mouse-weston.log 2>&1 &
+            compositor=$!
+            trap "kill $compositor 2>/dev/null || true" EXIT
+            for attempt in {1..30}; do
+              test -S "$XDG_RUNTIME_DIR/wayland-1" && break
+              sleep 1
+            done
+            test -S "$XDG_RUNTIME_DIR/wayland-1"
+            export WAYLAND_DISPLAY=wayland-1
+            node test/integration/host-install/run-host-smoke.mjs
+          '
+
+  windows:
+    name: Windows installation and startup
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: npm
+      - run: npm ci
+      - run: npm run test:install
+      - name: Install the packed npm artifact
+        shell: pwsh
+        run: |
+          $tarball = npm pack --pack-destination $env:RUNNER_TEMP --silent | Select-Object -Last 1
+          npm install --global (Join-Path $env:RUNNER_TEMP $tarball.Trim())
+      - name: Start and probe the installed server
+        run: node test/integration/host-install/run-host-smoke.mjs
