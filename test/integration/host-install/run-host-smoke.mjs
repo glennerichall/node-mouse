@@ -37,6 +37,25 @@ async function waitForHealth() {
   throw new Error('The installed Remote Mouse server did not become healthy.');
 }
 
+function stopProcess(child) {
+  return new Promise((resolve) => {
+    let timer;
+    const finish = () => {
+      clearTimeout(timer);
+      resolve();
+    };
+    if (child.exitCode !== null || child.signalCode !== null) {
+      finish();
+      return;
+    }
+    child.once('close', finish);
+    child.kill('SIGTERM');
+    timer = setTimeout(() => {
+      if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
+    }, 5_000);
+  });
+}
+
 let server;
 try {
   const setup = await run([
@@ -62,6 +81,6 @@ try {
   }
   console.log(`Installed server is healthy (${health.version}).`);
 } finally {
-  if (server && !server.killed) server.kill('SIGTERM');
+  if (server) await stopProcess(server);
   await rm(root, {recursive: true, force: true});
 }
