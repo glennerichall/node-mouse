@@ -81,8 +81,12 @@ describe('remote-mouse setup command', () => {
     expect(secret).toHaveLength(64);
     expect(initial).toContain(`PERSISTENCE_DB_PATH=${path.join(root, 'config', 'remote-mouse.sqlite3')}`);
     expect(initial).toContain('REMOTE_MOUSE_WAYLAND_INPUT=uinput');
-    expect(fs.statSync(envFile).mode & 0o777).toBe(0o600);
-    expect(fs.statSync(path.dirname(envFile)).mode & 0o777).toBe(0o700);
+    // Windows does not expose POSIX mode bits through statSync; the Linux
+    // strategy's private permissions are asserted on POSIX runners only.
+    if (process.platform !== 'win32') {
+      expect(fs.statSync(envFile).mode & 0o777).toBe(0o600);
+      expect(fs.statSync(path.dirname(envFile)).mode & 0o777).toBe(0o700);
+    }
 
     await runSetup(options);
     expect(fs.readFileSync(envFile, 'utf8')).toBe(initial);
