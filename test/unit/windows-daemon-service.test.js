@@ -54,6 +54,7 @@ describe('Windows scheduled-task service adapter', () => {
             'utf8',
         );
         expect(writeFileSync.mock.calls[0][1]).toContain('set "REMOTE_MOUSE_DAEMON=1"');
+        expect(writeFileSync.mock.calls[0][1]).toContain('remote-mouse-service.log');
         expect(execFileAsync.mock.calls[1]).toEqual(['schtasks', ['/Run', '/TN', 'remote-mouse'], {timeout: 10000}]);
     });
 

@@ -28,7 +28,7 @@ function writeWindowsTaskLauncher() {
     configDir ? `set "CONFIG_DIR=${configDir}"` : '',
     envFilePath ? `set "ENV_FILE_PATH=${envFilePath}"` : '',
     'set "REMOTE_MOUSE_DAEMON=1"',
-    `"${nodePath}" "${entrypoint}" %*`,
+    `"${nodePath}" "${entrypoint}" %* >> "%~dp0remote-mouse-service.log" 2>&1`,
     '',
   ].filter(Boolean);
   fs.writeFileSync(launcherPath, `${lines.join('\r\n')}\r\n`, 'utf8');

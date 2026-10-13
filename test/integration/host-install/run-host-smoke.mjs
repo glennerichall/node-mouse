@@ -163,6 +163,12 @@ try {
   }
   console.log(`Installed server is healthy (${health.version}).`);
 } finally {
+  if (process.platform === 'win32' && serviceInstalled) {
+    try {
+      const serviceLog = await readFile(path.join(configDir, 'remote-mouse-service.log'), 'utf8');
+      if (serviceLog.trim()) console.error(`Windows service log:\n${serviceLog}`);
+    } catch {}
+  }
   if (server) await stopProcess(server);
   if (serviceInstalled) {
     const serviceRemoval = await run(['service', 'uninstall'], {env: runtimeEnv});
