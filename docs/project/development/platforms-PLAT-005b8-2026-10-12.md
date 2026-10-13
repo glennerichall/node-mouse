@@ -24,6 +24,10 @@ Le serveur CLI ignore aussi les fermetures concurrentes normales (`EPIPE`,
 `ECONNRESET`) lorsqu'un client Windows quitte avant la réponse. Ces erreurs ne
 doivent pas arrêter le daemon.
 
+Le harnais historique de validation par VM et déploiement SSH a été retiré
+après l'adoption des jobs GitHub Actions natifs. Les tests d'installation,
+smoke tests et E2E actifs ne dépendent plus de ces profils.
+
 Le protocole CLI délimite maintenant la requête par une nouvelle ligne et garde
 la connexion ouverte jusqu'à la réponse. Cela évite que `socket.end()` côté
 client ferme prématurément un named pipe Windows et produise une réponse vide.

@@ -302,6 +302,10 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   déploiement VM. Critères : la roadmap globale et cet axe signalent clairement
   la suspension; aucune tâche VM n'apparaît dans l'ordre de livraison actif;
   les travaux non liés aux VM restent planifiables.
+- [x] PLAT-005i — retirer le harnais VM et son déploiement SSH devenus
+  obsolètes après l'ajout des validations natives GitHub Actions; supprimer les
+  profils Jest/Playwright, le `DesktopProbe`, le runner distant et les scripts
+  `dev/deploy/`, sans retirer les smoke tests multiplateformes actifs.
 - [ ] PLAT-006 — renforcer les diagnostics VLC, navigateurs et Samsung TV.
 - [ ] PLAT-007 — définir un contrat d'adaptateur avant de multiplier les
   intégrations.
@@ -314,8 +318,8 @@ observées; distinguer capacités simulées et vérifiées sur machine réelle.
 Le travail sur le laboratoire et toute utilisation de VM sont suspendus jusqu'à
 indication contraire de l'utilisateur. Les tâches et notes ci-dessous
 conservent le contexte historique; elles n'autorisent pas à créer, provisionner,
-démarrer ou tester une VM. Les scripts existants ne doivent pas être supprimés
-ni exécutés dans le cadre d'autres itérations sans demande explicite.
+démarrer ou tester une VM. Le harnais VM et les scripts de déploiement SSH
+obsolètes ont été retirés dans PLAT-005i à la demande de l'utilisateur.
 
 Si le travail reprend, les environnements seront fournis par les développeurs;
 le dépôt ne reprendra pas leur création ou leur gestion sans nouvelle décision.

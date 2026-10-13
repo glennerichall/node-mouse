@@ -39,11 +39,6 @@ const forbiddenPathPrefixes = [
   'test/',
 ];
 const forbiddenFiles = [
-  'jest.integration.config.js',
-  'jest.vm.config.js',
-  'jest.wayland.config.js',
-  'jest.x11.config.js',
-  'playwright.vm.config.js',
   'playwright.x11.config.js',
   'playwright.wayland.config.js',
   'scripts/check-package-version.mjs',
