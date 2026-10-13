@@ -5,9 +5,19 @@ export function installLocalService(configEnv, entrypoint = process.argv[1]) {
     // Run a fresh CLI process so its configuration loader sees the new .env path.
     const result = spawnSync(process.execPath, [entrypoint, 'service', 'install'], {
         env: {...process.env, ...configEnv},
-        stdio: 'ignore',
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
     });
+    const output = [result.stdout, result.stderr]
+        .map((value) => String(value || '').trim())
+        .filter(Boolean)
+        .join('\n');
     return result.error || result.status !== 0
-        ? {ok: false, message: result.error?.message || `Service installation failed (exit code ${result.status}).`}
+        ? {
+            ok: false,
+            message: result.error?.message
+                || output
+                || `Service installation failed (exit code ${result.status}).`,
+        }
         : {ok: true, message: 'Service installed and started.'};
 }

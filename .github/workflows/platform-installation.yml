@@ -32,12 +32,13 @@ jobs:
         with:
           node-version: 22.14.0
           cache: npm
-      - name: Install native build dependencies
-        run: sudo apt-get update && sudo apt-get install --yes build-essential libpng-dev libx11-dev libxtst-dev
+      - name: Install native build dependencies and virtual display
+        run: sudo apt-get update && sudo apt-get install --yes build-essential libpng-dev libx11-dev libxtst-dev xvfb
       - run: npm ci
       - name: Install Chromium and browser dependencies
         run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - name: Run Playwright E2E under X11
+        run: xvfb-run --auto-servernum --server-args='-screen 0 1280x720x24' npm run test:e2e
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
