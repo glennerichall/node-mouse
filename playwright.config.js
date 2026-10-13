@@ -4,13 +4,17 @@ import {tmpdir} from 'node:os';
 
 const port = Number(process.env.PLAYWRIGHT_PORT || 3210);
 const baseURL = `http://127.0.0.1:${port}`;
-const databasePath = path.join(tmpdir(), 'remote-mouse-playwright', 'remote-mouse.sqlite');
+const databasePath = path.join(tmpdir(), 'remote-mouse-playwright', `remote-mouse-${port}.sqlite`);
 
 export default defineConfig({
   testDir: './test/e2e',
   fullyParallel: false,
   workers: 1,
-  reporter: [['list'], ['html', {open: 'never'}]],
+  reporter: [['list'], ['html', {
+    open: 'never',
+    outputFolder: process.env.PLAYWRIGHT_REPORT_DIR || 'playwright-report',
+  }]],
+  outputDir: process.env.PLAYWRIGHT_OUTPUT_DIR || 'test-results',
   use: {
     baseURL,
     trace: 'on-first-retry',

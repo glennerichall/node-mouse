@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import {
     getEntrypoint,
     getPlatformKind,
@@ -8,16 +10,34 @@ import {
     spawnDetached
 } from "../../utils/process.js";
 
-function buildWindowsTaskCommand() {
-    const nodePath = process.execPath.replace(/'/g, "''");
-    const entrypoint = getEntrypoint().replace(/'/g, "''");
-  const configDir = String(process.env.CONFIG_DIR || '').replace(/'/g, "''");
-  const envFilePath = String(process.env.ENV_FILE_PATH || '').replace(/'/g, "''");
-  const configuration = [
-    configDir ? `$env:CONFIG_DIR='${configDir}';` : '',
-    envFilePath ? `$env:ENV_FILE_PATH='${envFilePath}';` : '',
-  ].join('');
-  return `powershell -NoProfile -WindowStyle Hidden -Command "$env:REMOTE_MOUSE_DAEMON='1'; ${configuration} & '${nodePath}' '${entrypoint}'"`;
+function getWindowsTaskLauncherPath() {
+  const configDir = String(process.env.CONFIG_DIR || '').trim();
+  const envFilePath = String(process.env.ENV_FILE_PATH || '').trim();
+  const launcherDir = configDir || (envFilePath ? path.dirname(envFilePath) : process.cwd());
+  return path.win32.join(launcherDir, 'remote-mouse-service.cmd');
+}
+
+function writeWindowsTaskLauncher() {
+  const launcherPath = getWindowsTaskLauncherPath();
+  const nodePath = process.execPath.replace(/%/g, '%%').replace(/"/g, '""');
+  const entrypoint = getEntrypoint().replace(/%/g, '%%').replace(/"/g, '""');
+  const configDir = String(process.env.CONFIG_DIR || '').replace(/%/g, '%%').replace(/"/g, '""');
+  const envFilePath = String(process.env.ENV_FILE_PATH || '').replace(/%/g, '%%').replace(/"/g, '""');
+  const lines = [
+    '@echo off',
+    configDir ? `set "CONFIG_DIR=${configDir}"` : '',
+    envFilePath ? `set "ENV_FILE_PATH=${envFilePath}"` : '',
+    'set "REMOTE_MOUSE_DAEMON=1"',
+    `"${nodePath}" "${entrypoint}" %*`,
+    '',
+  ].filter(Boolean);
+  fs.writeFileSync(launcherPath, `${lines.join('\r\n')}\r\n`, 'utf8');
+  return launcherPath;
+}
+
+function buildWindowsTaskCommand(launcherPath = writeWindowsTaskLauncher()) {
+  const launcher = String(launcherPath).replace(/"/g, '""');
+  return `cmd.exe /d /c ""${launcher}""`;
 }
 
 export async function installWindowsDaemon(serviceName) {

@@ -38,7 +38,12 @@ jobs:
       - name: Install Chromium and browser dependencies
         run: npx playwright install --with-deps chromium
       - name: Run Playwright E2E under X11
-        run: xvfb-run --auto-servernum --server-args='-screen 0 1280x720x24' npm run test:e2e
+        run: >-
+          xvfb-run --auto-servernum --server-args='-screen 0 1280x720x24'
+          bash -c 'PLAYWRIGHT_PORT=3210 PLAYWRIGHT_REPORT_DIR=playwright-report/chromium
+          PLAYWRIGHT_OUTPUT_DIR=test-results/chromium npx playwright test --project=chromium
+          && PLAYWRIGHT_PORT=3220 PLAYWRIGHT_REPORT_DIR=playwright-report/mobile-chrome
+          PLAYWRIGHT_OUTPUT_DIR=test-results/mobile-chrome npx playwright test --project=mobile-chrome'
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4

@@ -107,6 +107,10 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   le nom du paquet avant de l'envoyer au shell, conserver les commandes
   personnalisées configurées et leur exécution shell; tester les variantes
   Linux/Windows, les erreurs et la commande diagnostique sans hôte réel.
+- [ ] PLAT-002d — maintenir la commande `/TR` du service Windows sous la limite
+  de `schtasks` en déportant les chemins et variables de configuration dans un
+  launcher local court; vérifier que l'installation et le démarrage conservent
+  le répertoire de configuration persistant.
 - [ ] PLAT-003 — créer l'installation macOS et guider les permissions Accessibilité.
 - [ ] PLAT-004 — intégrer le contrôle et la capture Wayland selon le
   [plan dédié](./05-PLAT-004-wayland.md).
@@ -238,8 +242,9 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   de VM ou de daemon externe pour fabriquer cette capacité.
 - [ ] PLAT-005b8 — exécuter les suites unitaires et Playwright E2E dans GitHub
   Actions sur les runners Ubuntu existants; installer les navigateurs requis,
-  publier les rapports d’échec utiles et garder ces contrôles distincts des
-  smoke tests d’installation et des validations VM suspendues.
+  publier les rapports d’échec utiles, isoler les projets Playwright dans des
+  processus, ports et bases SQLite séparés, et garder ces contrôles distincts
+  des smoke tests d’installation et des validations VM suspendues.
 - [ ] PLAT-005c — ajouter un profil Windows 11 avec UEFI, TPM virtuel et média
   d'installation fourni localement par le développeur; automatiser le
   bootstrap nécessaire aux tests d'installation, de mise à jour et de

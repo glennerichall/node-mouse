@@ -1,6 +1,9 @@
 import {jest} from '@jest/globals';
 
 const execFileAsync = jest.fn();
+const writeFileSync = jest.fn();
+
+jest.unstable_mockModule('node:fs', () => ({default: {writeFileSync}, writeFileSync}));
 
 jest.unstable_mockModule('../../server/utils/process.js', () => ({
     execFileAsync,
@@ -19,6 +22,7 @@ describe('Windows scheduled-task service adapter', () => {
 
     beforeEach(() => {
         execFileAsync.mockReset().mockResolvedValue({ok: true});
+        writeFileSync.mockReset();
         process.env.CONFIG_DIR = 'C:\\Users\\dev\\AppData\\Roaming\\remote-mouse';
         process.env.ENV_FILE_PATH = 'C:\\Users\\dev\\AppData\\Roaming\\remote-mouse\\.env';
     });
@@ -43,9 +47,13 @@ describe('Windows scheduled-task service adapter', () => {
             '/Create', '/F', '/SC', 'ONLOGON', '/TN', 'remote-mouse',
         ]));
         const taskCommand = createCall[1][createCall[1].indexOf('/TR') + 1];
-        expect(taskCommand).toContain("$env:CONFIG_DIR='C:\\Users\\dev\\AppData\\Roaming\\remote-mouse';");
-        expect(taskCommand).toContain("$env:ENV_FILE_PATH='C:\\Users\\dev\\AppData\\Roaming\\remote-mouse\\.env';");
-        expect(taskCommand).toContain("$env:REMOTE_MOUSE_DAEMON='1'");
+        expect(taskCommand).toBe('cmd.exe /d /c ""C:\\Users\\dev\\AppData\\Roaming\\remote-mouse\\remote-mouse-service.cmd""');
+        expect(writeFileSync).toHaveBeenCalledWith(
+            'C:\\Users\\dev\\AppData\\Roaming\\remote-mouse\\remote-mouse-service.cmd',
+            expect.stringContaining('set "CONFIG_DIR=C:\\Users\\dev\\AppData\\Roaming\\remote-mouse"'),
+            'utf8',
+        );
+        expect(writeFileSync.mock.calls[0][1]).toContain('set "REMOTE_MOUSE_DAEMON=1"');
         expect(execFileAsync.mock.calls[1]).toEqual(['schtasks', ['/Run', '/TN', 'remote-mouse'], {timeout: 10000}]);
     });
 
