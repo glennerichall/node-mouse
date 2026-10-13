@@ -121,6 +121,95 @@ body {
   color: var(--text);
 }
 
+.mouse-tuning-summary,
+.mouse-tuning-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.mouse-tuning-summary span {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  color: var(--muted);
+}
+
+.mouse-tuning-summary strong {
+  color: var(--text);
+}
+
+.mouse-tuning-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.mouse-tuning-card {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.mouse-tuning-card h2,
+.mouse-tuning-card p {
+  margin: 0;
+}
+
+.mouse-tuning-card p,
+.mouse-tuning-card output,
+.mouse-tuning-actions p {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.mouse-tuning-track {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 150px;
+  gap: 20px;
+}
+
+.mouse-tuning-modes {
+  display: flex;
+  gap: 8px;
+}
+
+.mouse-tuning-modes button {
+  min-height: 36px;
+  padding-inline: 12px;
+  font-size: 0.85rem;
+}
+
+.mouse-tuning-modes button[aria-pressed="true"] {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.mouse-tuning-track-medium {
+  padding-inline: 25%;
+}
+
+.mouse-tuning-track-short {
+  justify-content: center;
+  gap: 12px;
+}
+
+.mouse-tuning-track button:last-child {
+  background: linear-gradient(180deg, rgba(117, 93, 45, 0.95), rgba(83, 63, 28, 0.98));
+}
+
+@media (max-width: 700px) {
+  .mouse-tuning-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .config-page {
   width: min(1200px, 100%);
   margin: 0 auto;

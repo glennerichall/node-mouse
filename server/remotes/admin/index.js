@@ -2,6 +2,7 @@ import {createForceUpdateCheckAction} from './createForceUpdateCheckAction.js';
 import {createInstallUpdateAction} from './createInstallUpdateAction.js';
 import {createRestartServiceAction} from './createRestartServiceAction.js';
 import {createOpenServerInfoBrowserAction} from './createOpenServerInfoBrowserAction.js';
+import {createOpenMouseTuningBrowserAction} from './createOpenMouseTuningBrowserAction.js';
 import {notifyIfRestarted} from './notifyIfRestarted.js';
 
 export {notifyIfRestarted};
@@ -21,5 +22,6 @@ export function createAdminActions(services) {
         restartService: createRestartServiceAction(services),
         openServerInfoBrowserServer: createOpenServerInfoBrowserAction(services, {browser, target: NOTIFIER_TARGET_SERVER}),
         openServerInfoBrowserClient: createOpenServerInfoBrowserAction(services, {browser, target: NOTIFIER_TARGET_CLIENT}),
+        openMouseTuningBrowserServer: createOpenMouseTuningBrowserAction(services, {browser}),
     };
 }

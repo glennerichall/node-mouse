@@ -89,8 +89,8 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   conserver la priorité du prébuild compatible pour les installations et la
   publication. Couvrir le choix explicite du résolveur par des tests et vérifier
   que le helper QR recompilé est celui lancé en développement.
-- [ ] PLAT-002 — tester installation, service, mise à jour et désinstallation Windows.
-- [ ] PLAT-002c — rendre le script `test:install` indépendant de la syntaxe
+- [x] PLAT-002 — tester installation, service, mise à jour et désinstallation Windows.
+- [x] PLAT-002c — rendre le script `test:install` indépendant de la syntaxe
   d'affectation d'environnement POSIX afin qu'il soit exécutable par npm sur
   Linux et Windows; conserver l'option Jest nécessaire aux modules ESM et
   ajouter une vérification anti-régression des scripts npm.
@@ -107,15 +107,15 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   le nom du paquet avant de l'envoyer au shell, conserver les commandes
   personnalisées configurées et leur exécution shell; tester les variantes
   Linux/Windows, les erreurs et la commande diagnostique sans hôte réel.
-- [ ] PLAT-002d — maintenir la commande `/TR` du service Windows sous la limite
+- [x] PLAT-002d — maintenir la commande `/TR` du service Windows sous la limite
   de `schtasks` en déportant les chemins et variables de configuration dans un
   launcher local court; vérifier que l'installation et le démarrage conservent
   le répertoire de configuration persistant.
-- [ ] PLAT-002e — étendre le smoke test Windows pour interroger explicitement
+- [x] PLAT-002e — étendre le smoke test Windows pour interroger explicitement
   la tâche planifiée après installation, vérifier santé/version et commandes CLI,
   puis confirmer après désinstallation que la tâche n'existe plus; conserver le
   nettoyage même lorsqu'une assertion échoue.
-- [ ] PLAT-002f — exécuter dans le job Windows une réinstallation du tarball
+- [x] PLAT-002f — exécuter dans le job Windows une réinstallation du tarball
   npm courant après création de la configuration et de la base; arrêter puis
   recréer la tâche, vérifier la conservation de `.env`, des données et de la
   santé HTTP, puis nettoyer le service.

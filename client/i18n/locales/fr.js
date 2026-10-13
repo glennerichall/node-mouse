@@ -346,6 +346,8 @@ export const fr = {
   'preferences.pointer.fastSpeed': 'Vitesse rapide',
   'preferences.pointer.acceleration': 'Acceleration',
   'preferences.pointer.reset': 'Reinitialiser',
+  'preferences.pointer.tuneHost': 'Calibrer le pointeur sur l’hôte',
+  'preferences.pointer.tuneHostTitle': 'Ouvrir la calibration dans le navigateur de l’hôte',
   'preferences.section.remotes.key': 'Telecommandes',
   'preferences.section.remotes.title': 'Affichage des remotes',
   'preferences.section.remotes.description': 'Choisissez quelles remotes locales doivent etre affichees dans l interface principale.',

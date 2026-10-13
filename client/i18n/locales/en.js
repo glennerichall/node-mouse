@@ -346,6 +346,8 @@ export const en = {
   'preferences.pointer.fastSpeed': 'Fast speed',
   'preferences.pointer.acceleration': 'Acceleration',
   'preferences.pointer.reset': 'Reset',
+  'preferences.pointer.tuneHost': 'Calibrate pointer on host',
+  'preferences.pointer.tuneHostTitle': 'Open pointer calibration in the host browser',
   'preferences.section.remotes.key': 'Remotes',
   'preferences.section.remotes.title': 'Remote visibility',
   'preferences.section.remotes.description': 'Choose which local remotes should be shown in the main interface.',

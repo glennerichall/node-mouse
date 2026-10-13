@@ -18,4 +18,8 @@ export const adminUiRouter = express.Router()
 
     .get('/preferences', (_req, res) => {
         res.sendFile(path.join(publicDir, 'preferences.html'));
+    })
+
+    .get('/mouse-tuning', (_req, res) => {
+        res.sendFile(path.join(publicDir, 'mouse-tuning.html'));
     });

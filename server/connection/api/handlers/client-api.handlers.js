@@ -47,6 +47,12 @@ export async function getClientConfig(req, res) {
   });
 }
 
+export async function openMouseTuningBrowser(req, res) {
+  const result = await req.services.getRemotes().adminActions
+    .openMouseTuningBrowserServer({clientId: req.securityContext?.deviceSessionId});
+  res.status(result.ok ? 200 : 502).json({ok: Boolean(result.ok), message: result.message});
+}
+
 export function createClientConfigSubscription(req, res) {
   const id = req.services.getSseService().createSubscription({
     filters: {service: PUBSUB_SERVICE_CLIENT_CONFIG},

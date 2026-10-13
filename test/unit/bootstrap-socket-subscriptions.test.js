@@ -16,7 +16,9 @@ describe('bootstrapSocket route builders', () => {
       getInputController: () => ({mouse: {click: jest.fn()}, keyboard: {}, updateConfig: jest.fn()}),
       getRemotes: () => ({
         browser: {},
-        adminActions: {forceUpdateCheck: jest.fn().mockResolvedValue({ok: true, message: 'done'})},
+        adminActions: {
+          forceUpdateCheck: jest.fn().mockResolvedValue({ok: true, message: 'done'}),
+        },
         qrActions: {},
         preview: {},
         samsung: {},

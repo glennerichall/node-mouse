@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Calibration du pointeur — Remote Mouse</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/admin-config.css?v=20260405a" />
+</head>
+<body>
+  <main class="config-page mouse-tuning-page">
+    <header class="config-hero">
+      <div>
+        <p class="eyebrow">Pointeur</p>
+        <h1>Calibration du pointeur</h1>
+        <p class="hero-copy">Utilisez la remote sur le téléphone. Pour chaque distance, sélectionnez une vitesse lente ou rapide, cliquez Départ, déplacez le pointeur jusqu'à Arrivée, puis cliquez.</p>
+      </div>
+      <div class="hero-actions">
+        <a class="secondary-link" href="/ui/admin/preferences">Préférences</a>
+        <a class="secondary-link" href="/">Retour remote</a>
+      </div>
+    </header>
+
+    <section class="config-section">
+      <div class="section-heading-copy">
+        <p class="section-key">Méthode</p>
+        <h2>Mesurer l'effet réel</h2>
+        <p class="section-description">Les boutons indiquent trois distances de déplacement : longue, moyenne et courte. Les mesures correspondent au déplacement reçu par cette page.</p>
+      </div>
+      <div class="mouse-tuning-summary">
+        <span>Vitesse lente actuelle <strong id="current-slow-speed">—</strong></span>
+        <span>Vitesse rapide actuelle <strong id="current-fast-speed">—</strong></span>
+        <span id="tuning-status" role="status">En attente d'une mesure.</span>
+      </div>
+    </section>
+
+    <section class="config-section">
+      <div class="mouse-tuning-grid">
+        <article class="mouse-tuning-card" data-distance="long"><h2>Distance longue</h2><p>Déplacement sur la plus grande distance.</p><div class="mouse-tuning-modes"><button type="button" data-mode="slow" aria-pressed="true">Vitesse lente</button><button type="button" data-mode="fast" aria-pressed="false">Vitesse rapide</button></div><div class="mouse-tuning-track mouse-tuning-track-long"><button type="button" data-side="start">Départ</button><button type="button" data-side="end">Arrivée</button></div><output data-result-slow>Vitesse lente : pas encore mesurée.</output><output data-result-fast>Vitesse rapide : pas encore mesurée.</output></article>
+        <article class="mouse-tuning-card" data-distance="medium"><h2>Distance moyenne</h2><p>Déplacement sur une distance intermédiaire.</p><div class="mouse-tuning-modes"><button type="button" data-mode="slow" aria-pressed="true">Vitesse lente</button><button type="button" data-mode="fast" aria-pressed="false">Vitesse rapide</button></div><div class="mouse-tuning-track mouse-tuning-track-medium"><button type="button" data-side="start">Départ</button><button type="button" data-side="end">Arrivée</button></div><output data-result-slow>Vitesse lente : pas encore mesurée.</output><output data-result-fast>Vitesse rapide : pas encore mesurée.</output></article>
+        <article class="mouse-tuning-card" data-distance="short"><h2>Distance courte</h2><p>Déplacement sur une courte distance.</p><div class="mouse-tuning-modes"><button type="button" data-mode="slow" aria-pressed="true">Vitesse lente</button><button type="button" data-mode="fast" aria-pressed="false">Vitesse rapide</button></div><div class="mouse-tuning-track mouse-tuning-track-short"><button type="button" data-side="start">Départ</button><button type="button" data-side="end">Arrivée</button></div><output data-result-slow>Vitesse lente : pas encore mesurée.</output><output data-result-fast>Vitesse rapide : pas encore mesurée.</output></article>
+      </div>
+    </section>
+
+    <section class="config-section mouse-tuning-actions">
+      <p id="tuning-recommendation">Mesurez les trois distances en vitesse lente et rapide pour obtenir une proposition.</p>
+      <button id="apply-tuning" type="button" disabled>Appliquer la proposition</button>
+      <button id="reset-tuning" type="button">Effacer les mesures</button>
+    </section>
+  </main>
+  <script type="module" src="/client/ui/mouse-tuning/page.js?v=20261013a"></script>
+</body>
+</html>

@@ -4,6 +4,7 @@ import {
   createClientConfigSubscription,
   deleteClientSubscription,
   getClientConfig,
+  openMouseTuningBrowser,
 } from '../../server/connection/api/handlers/client-api.handlers.js';
 
 function createResponse() {
@@ -161,5 +162,22 @@ describe('client config subscriptions API', () => {
 
     expect(deleteSubscription).toHaveBeenCalledWith('subscription-1');
     expect(res.json).toHaveBeenCalledWith({ok: true});
+  });
+});
+
+describe('mouse tuning API', () => {
+  it('opens host calibration for a regular controller session', async () => {
+    const openMouseTuningBrowserServer = jest.fn().mockResolvedValue({ok: true, message: 'opened'});
+    const req = {
+      securityContext: {role: 'controller', deviceSessionId: 'device-1'},
+      services: {getRemotes: () => ({adminActions: {openMouseTuningBrowserServer}})},
+    };
+    const res = createResponse();
+
+    await openMouseTuningBrowser(req, res);
+
+    expect(openMouseTuningBrowserServer).toHaveBeenCalledWith({clientId: 'device-1'});
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ok: true, message: 'opened'});
   });
 });

@@ -56,6 +56,10 @@ compréhensibles sur mobile et desktop.
 - [x] UX-010a — déclencher aussi le retour haptique lorsqu'un tap reconnu sur
   le touchpad émet un clic souris, sans vibration pour les mouvements ou
   contacts qui ne produisent pas de clic.
+- [ ] UX-011 — fournir une page de calibration du pointeur Remote Mouse ouverte
+  dans le navigateur de l'hôte, qui mesure le déplacement réellement reçu sur
+  des parcours courts, moyens et longs, compare les mouvements lents et
+  rapides, puis propose et peut appliquer des valeurs de vitesse locales.
 
 UX-001/002 dépendent de SEC-008, terminé : l'API admin fournit la liste des
 sessions, leur rôle, leur état, leur dernière activité et la révocation

@@ -64,4 +64,17 @@ describe('admin browser actions', () => {
       clientId: 'client-1',
     });
   });
+
+  it('opens mouse tuning on the host browser', async () => {
+    const {createOpenMouseTuningBrowserAction} = await import('../../server/remotes/admin/createOpenMouseTuningBrowserAction.js');
+    const browser = {openUrlOnHost: jest.fn().mockResolvedValue(true)};
+    const openMouseTuningBrowser = createOpenMouseTuningBrowserAction({
+      getSystemConfig: () => ({protocol: 'http', port: 3000}),
+    }, {browser});
+
+    const result = await openMouseTuningBrowser();
+
+    expect(result.ok).toBe(true);
+    expect(browser.openUrlOnHost).toHaveBeenCalledWith('http://127.0.0.1:3000/ui/admin/mouse-tuning');
+  });
 });

@@ -32,31 +32,22 @@ function formatSpeed(value) {
 
 function syncPointerPreferences() {
   const slowSpeed = pointerState.get(APP_STATE_POINTER_SLOW_SPEED);
-  const fastSpeed = Math.max(slowSpeed, pointerState.get(APP_STATE_POINTER_FAST_SPEED));
-  if (fastSpeed !== pointerState.get(APP_STATE_POINTER_FAST_SPEED)) {
-    pointerState.set(APP_STATE_POINTER_FAST_SPEED, fastSpeed);
-  }
+  const fastSpeed = pointerState.get(APP_STATE_POINTER_FAST_SPEED);
   pointerSlowSpeed.value = String(slowSpeed);
   pointerFastSpeed.value = String(fastSpeed);
   pointerAcceleration.checked = pointerState.get(APP_STATE_POINTER_ACCELERATION);
   pointerFastSpeed.disabled = !pointerAcceleration.checked;
-  pointerSlowSpeed.max = pointerFastSpeed.value;
-  pointerFastSpeed.min = pointerSlowSpeed.value;
+  pointerSlowSpeed.max = '5';
+  pointerFastSpeed.min = '0.25';
   pointerSlowSpeedValue.value = formatSpeed(pointerSlowSpeed.value);
   pointerFastSpeedValue.value = formatSpeed(pointerFastSpeed.value);
 }
 pointerSlowSpeed.addEventListener('input', () => {
   pointerState.set(APP_STATE_POINTER_SLOW_SPEED, pointerSlowSpeed.value);
-  if (Number(pointerSlowSpeed.value) > Number(pointerFastSpeed.value)) {
-    pointerState.set(APP_STATE_POINTER_FAST_SPEED, pointerSlowSpeed.value);
-  }
   syncPointerPreferences();
 });
 pointerFastSpeed.addEventListener('input', () => {
   pointerState.set(APP_STATE_POINTER_FAST_SPEED, pointerFastSpeed.value);
-  if (Number(pointerFastSpeed.value) < Number(pointerSlowSpeed.value)) {
-    pointerState.set(APP_STATE_POINTER_SLOW_SPEED, pointerFastSpeed.value);
-  }
   syncPointerPreferences();
 });
 pointerAcceleration.addEventListener('change', () => {
@@ -68,6 +59,23 @@ document.getElementById('pointer-preferences-reset').addEventListener('click', (
   pointerState.set(APP_STATE_POINTER_FAST_SPEED, 3);
   pointerState.set(APP_STATE_POINTER_ACCELERATION, true);
   syncPointerPreferences();
+});
+document.getElementById('pointer-tuning-host').addEventListener('click', () => {
+  const button = document.getElementById('pointer-tuning-host');
+  button.disabled = true;
+  fetch('/api/client/mouse-tuning/browser', {method: 'POST'})
+    .then(async (response) => {
+      const result = await response.json();
+      if (!response.ok || !result.ok) throw new Error(result.message || 'Impossible d’ouvrir la calibration.');
+      document.getElementById('pointer-tuning-status').textContent = 'Calibration ouverte sur l’hôte.';
+      window.location.assign('/');
+    })
+    .catch((error) => {
+      document.getElementById('pointer-tuning-status').textContent = error.message;
+    })
+    .finally(() => {
+      button.disabled = false;
+    });
 });
 syncPointerPreferences();
 

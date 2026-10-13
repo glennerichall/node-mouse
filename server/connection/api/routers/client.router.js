@@ -5,6 +5,7 @@ import {
   createClientConfigSubscription,
   deleteClientSubscription,
   getClientConfig,
+  openMouseTuningBrowser,
 } from '../handlers/client-api.handlers.js';
 import {listBrowsers, listRemotes} from '../handlers/admin-remotes.handlers.js';
 import {getRemoteStatus} from '../handlers/remotes.handlers.js';
@@ -25,6 +26,7 @@ const remotesCatalogRouter = express.Router()
 
 export const clientApiRouter = express.Router()
   .get('/config', getClientConfig)
+  .post('/mouse-tuning/browser', openMouseTuningBrowser)
   .use('/subs', clientSubsRouter)
   .use('/remotes', remotesCatalogRouter);
 
