@@ -14,14 +14,16 @@ function execute(executable, args, options = {}) {
     const child = spawn(executable, args, {
       cwd: process.cwd(),
       env: {...process.env, ...(options.env || {})},
-      stdio: options.stdio || 'inherit',
+      stdio: options.captureOutput ? ['ignore', 'pipe', 'pipe'] : (options.stdio || 'inherit'),
       windowsHide: true,
       shell: process.platform === 'win32',
     });
+    let stdout = '';
     let stderr = '';
+    child.stdout?.on('data', (chunk) => { stdout += chunk; });
     child.stderr?.on('data', (chunk) => { stderr += chunk; });
     child.once('error', reject);
-    child.once('close', (code) => resolve({code, stderr}));
+    child.once('close', (code) => resolve({code, stdout, stderr}));
   });
 }
 
@@ -155,10 +157,10 @@ try {
   }
   for (const args of [['version'], ['help'], ['config'], ['info']]) {
     const result = ['config', 'info'].includes(args[0])
-      ? await runWhenReady(args, {env: runtimeEnv})
+      ? await runWhenReady(args, {env: runtimeEnv, captureOutput: true})
       : await run(args, {env: runtimeEnv});
     if (result.code !== 0) {
-      throw new Error(`remote-mouse ${args[0]} failed with exit code ${result.code}. ${result.stderr}`);
+      throw new Error(`remote-mouse ${args[0]} failed with exit code ${result.code}. ${result.stdout || ''}${result.stderr || ''}`);
     }
   }
   console.log(`Installed server is healthy (${health.version}).`);
