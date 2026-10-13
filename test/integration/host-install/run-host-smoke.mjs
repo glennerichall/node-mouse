@@ -9,9 +9,9 @@ const configDir = path.join(root, 'config');
 const port = 3987;
 const expectedVersion = JSON.parse(await readFile(path.resolve('package.json'), 'utf8')).version;
 
-function run(args, options = {}) {
+function execute(executable, args, options = {}) {
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args, {
+    const child = spawn(executable, args, {
       cwd: process.cwd(),
       env: {...process.env, ...(options.env || {})},
       stdio: options.stdio || 'inherit',
@@ -23,6 +23,10 @@ function run(args, options = {}) {
     child.once('error', reject);
     child.once('close', (code) => resolve({code, stderr}));
   });
+}
+
+function run(args, options = {}) {
+  return execute(command, args, options);
 }
 
 async function waitForHealth() {
@@ -81,30 +85,78 @@ async function removeTemporaryDirectory(directory) {
 }
 
 let server;
+let serviceInstalled = false;
+let runtimeEnv;
 try {
   const setup = await run([
     'setup', '--yes', '--no-service', '--config-dir', configDir, '--port', String(port),
   ]);
   if (setup.code !== 0) throw new Error(`remote-mouse setup failed with exit code ${setup.code}. ${setup.stderr}`);
+  const initialConfig = await readFile(path.join(configDir, '.env'), 'utf8');
+  const rerunSetup = await run([
+    'setup', '--yes', '--no-service', '--config-dir', configDir, '--port', String(port),
+  ]);
+  if (rerunSetup.code !== 0) throw new Error(`second remote-mouse setup failed with exit code ${rerunSetup.code}. ${rerunSetup.stderr}`);
+  const rerunConfig = await readFile(path.join(configDir, '.env'), 'utf8');
+  if (rerunConfig !== initialConfig) throw new Error('Repeated setup changed the existing configuration.');
 
-  server = spawn(command, [], {
-    cwd: process.cwd(),
-    env: {
-      ...process.env,
-      CONFIG_DIR: configDir,
-      ENV_FILE_PATH: path.join(configDir, '.env'),
-      PORT: String(port),
-    },
-    stdio: 'inherit',
-    windowsHide: true,
-    shell: process.platform === 'win32',
-  });
+  runtimeEnv = {
+    ...process.env,
+    CONFIG_DIR: configDir,
+    ENV_FILE_PATH: path.join(configDir, '.env'),
+    PORT: String(port),
+  };
+
+  let systemd = {code: 1};
+  if (process.platform === 'linux') {
+    try {
+      systemd = await execute('systemctl', ['--user', 'show-environment'], {
+        env: runtimeEnv,
+        stdio: 'ignore',
+      });
+    } catch {
+      systemd = {code: 1};
+    }
+  }
+  const useService = process.platform === 'win32' || systemd.code === 0;
+
+  if (useService) {
+    const serviceSetup = await run([
+      'setup', '--yes', '--config-dir', configDir, '--port', String(port),
+    ], {env: runtimeEnv});
+    if (serviceSetup.code !== 0) {
+      throw new Error(`Windows service setup failed with exit code ${serviceSetup.code}. ${serviceSetup.stderr}`);
+    }
+    serviceInstalled = true;
+    if (process.platform === 'linux') console.log('systemd --user service is available and active validation is enabled.');
+  } else {
+    if (process.platform === 'linux') console.log('systemd --user unavailable; service validation skipped.');
+    server = spawn(command, [], {
+      cwd: process.cwd(),
+      env: runtimeEnv,
+      stdio: 'inherit',
+      windowsHide: true,
+      shell: process.platform === 'win32',
+    });
+  }
   const health = await waitForHealth();
   if (health.ok !== true || health.version !== expectedVersion) {
     throw new Error(`Unexpected health response: ${JSON.stringify(health)}`);
   }
+  for (const args of [['version'], ['help'], ['config'], ['info']]) {
+    const result = await run(args, {env: runtimeEnv});
+    if (result.code !== 0) {
+      throw new Error(`remote-mouse ${args[0]} failed with exit code ${result.code}. ${result.stderr}`);
+    }
+  }
   console.log(`Installed server is healthy (${health.version}).`);
 } finally {
   if (server) await stopProcess(server);
+  if (serviceInstalled) {
+    const serviceRemoval = await run(['service', 'uninstall'], {env: runtimeEnv});
+    if (serviceRemoval.code !== 0) {
+      console.error(`Windows service cleanup failed with exit code ${serviceRemoval.code}. ${serviceRemoval.stderr}`);
+    }
+  }
   await removeTemporaryDirectory(root);
 }

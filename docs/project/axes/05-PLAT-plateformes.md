@@ -231,6 +231,15 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   HTTP et la version exposée par chaque installation; conserver les tests
   d'entrée physique, de capture et de service dans leurs suites spécialisées
   tant que le provider natif correspondant n'est pas disponible.
+- [ ] PLAT-005b7 — faire sélectionner au smoke test le service natif seulement
+  lorsque `systemd --user` est réellement disponible sur le runner; vérifier
+  alors installation, état actif, santé et désinstallation, sinon signaler un
+  contrôle systemd ignoré et conserver le démarrage direct. Ne pas provisionner
+  de VM ou de daemon externe pour fabriquer cette capacité.
+- [ ] PLAT-005b8 — exécuter les suites unitaires et Playwright E2E dans GitHub
+  Actions sur les runners Ubuntu existants; installer les navigateurs requis,
+  publier les rapports d’échec utiles et garder ces contrôles distincts des
+  smoke tests d’installation et des validations VM suspendues.
 - [ ] PLAT-005c — ajouter un profil Windows 11 avec UEFI, TPM virtuel et média
   d'installation fourni localement par le développeur; automatiser le
   bootstrap nécessaire aux tests d'installation, de mise à jour et de
