@@ -1,5 +1,5 @@
 import {spawn} from 'node:child_process';
-import {mkdtemp, readFile, rm} from 'node:fs/promises';
+import {access, mkdtemp, readFile, rm} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -8,6 +8,7 @@ const root = await mkdtemp(path.join(os.tmpdir(), 'remote-mouse-ci-'));
 const configDir = path.join(root, 'config');
 const port = 3987;
 const expectedVersion = JSON.parse(await readFile(path.resolve('package.json'), 'utf8')).version;
+const updateTarball = process.env.REMOTE_MOUSE_UPDATE_TARBALL || '';
 
 function execute(executable, args, options = {}) {
   return new Promise((resolve, reject) => {
@@ -176,6 +177,31 @@ try {
     if (result.code !== 0) {
       throw new Error(`remote-mouse ${args[0]} failed with exit code ${result.code}. ${result.stdout || ''}${result.stderr || ''}`);
     }
+  }
+
+  if (process.platform === 'win32' && updateTarball) {
+    const beforeConfig = await readFile(path.join(configDir, '.env'), 'utf8');
+    await access(path.join(configDir, 'remote-mouse.sqlite3'));
+    const disable = await run(['service', 'disable'], {env: runtimeEnv});
+    if (disable.code !== 0) throw new Error(`remote-mouse service disable failed with exit code ${disable.code}. ${disable.stderr}`);
+
+    const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+    const update = await execute(npmCommand, ['install', '--global', updateTarball], {
+      env: runtimeEnv,
+      stdio: 'inherit',
+    });
+    if (update.code !== 0) throw new Error(`Windows package update failed with exit code ${update.code}. ${update.stderr}`);
+
+    const reinstall = await run(['service', 'install'], {env: runtimeEnv});
+    if (reinstall.code !== 0) throw new Error(`Windows service restart after update failed with exit code ${reinstall.code}. ${reinstall.stderr}`);
+    serviceInstalled = true;
+    const afterConfig = await readFile(path.join(configDir, '.env'), 'utf8');
+    if (afterConfig !== beforeConfig) throw new Error('Windows package update changed the existing configuration.');
+    await waitForHealth();
+    const updatedVersion = await run(['version'], {env: runtimeEnv});
+    if (updatedVersion.code !== 0) throw new Error(`remote-mouse version after update failed with exit code ${updatedVersion.code}. ${updatedVersion.stderr}`);
+    await access(path.join(configDir, 'remote-mouse.sqlite3'));
+    console.log('Windows package reinstallation preserved configuration, data and service health.');
   }
   console.log(`Installed server is healthy (${health.version}).`);
 } finally {

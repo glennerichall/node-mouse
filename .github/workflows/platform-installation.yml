@@ -139,6 +139,7 @@ jobs:
         shell: pwsh
         run: |
           $tarball = npm pack --pack-destination $env:RUNNER_TEMP --silent | Select-Object -Last 1
+          "REMOTE_MOUSE_UPDATE_TARBALL=$(Join-Path $env:RUNNER_TEMP $tarball.Trim())" >> $env:GITHUB_ENV
           npm install --global (Join-Path $env:RUNNER_TEMP $tarball.Trim())
       - name: Start and probe the installed server
         run: node test/integration/host-install/run-host-smoke.mjs

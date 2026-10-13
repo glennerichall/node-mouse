@@ -115,6 +115,10 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   la tâche planifiée après installation, vérifier santé/version et commandes CLI,
   puis confirmer après désinstallation que la tâche n'existe plus; conserver le
   nettoyage même lorsqu'une assertion échoue.
+- [ ] PLAT-002f — exécuter dans le job Windows une réinstallation du tarball
+  npm courant après création de la configuration et de la base; arrêter puis
+  recréer la tâche, vérifier la conservation de `.env`, des données et de la
+  santé HTTP, puis nettoyer le service.
 - [ ] PLAT-003 — créer l'installation macOS et guider les permissions Accessibilité.
 - [ ] PLAT-004 — intégrer le contrôle et la capture Wayland selon le
   [plan dédié](./05-PLAT-004-wayland.md).
