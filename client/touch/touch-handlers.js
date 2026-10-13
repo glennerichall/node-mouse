@@ -1,6 +1,7 @@
 import { getScrollZoneLayout } from './gesture-zone.js';
 import {
   applyPointerSpeedCurve,
+  applyPointerTransfer,
   distance2D,
   scaleSigned,
 } from '../../utils/math.js';
@@ -22,6 +23,9 @@ function adjustPointer(handler, dx, dy, elapsed) {
   const preferences = handler.getPointerPreferences?.() || {};
   const slowSpeed = Number(preferences.slowSpeed) || 1.3;
   const fastSpeed = Math.max(slowSpeed, Number(preferences.fastSpeed) || 3);
+  if (Array.isArray(preferences.transferFunction) && preferences.transferFunction.length >= 2) {
+    return applyPointerTransfer(dx, dy, elapsed, preferences.transferFunction);
+  }
   return preferences.acceleration === false
     ? {dx: dx * slowSpeed, dy: dy * slowSpeed}
     : applyPointerSpeedCurve(dx, dy, elapsed, slowSpeed, fastSpeed);
@@ -138,11 +142,13 @@ export function handleTouchMove(event, { state, handler }) {
         state.moved = true;
         const adjusted = adjustPointer(handler, dx, dy, elapsed);
         handler.move(adjusted.dx, adjusted.dy);
+        handler.calibrationMove?.({rawDx: dx, rawDy: dy, adjustedDx: adjusted.dx, adjustedDy: adjusted.dy, elapsedMs: elapsed});
       }
     } else if (Math.abs(dx) + Math.abs(dy) > 0.5) {
       state.moved = true;
       const adjusted = adjustPointer(handler, dx, dy, elapsed);
       handler.move(adjusted.dx, adjusted.dy);
+      handler.calibrationMove?.({rawDx: dx, rawDy: dy, adjustedDx: adjusted.dx, adjustedDy: adjusted.dy, elapsedMs: elapsed});
     }
 
     state.oneFinger = { x: t.clientX, y: t.clientY };

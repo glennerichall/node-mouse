@@ -12,6 +12,7 @@ import {initializeCoreServices} from '../../services/createServicesContainer.js'
 import {bindPreferenceSwitchers} from './bindPreferenceSwitchers.js';
 import {
   APP_STATE_POINTER_SLOW_SPEED, APP_STATE_POINTER_FAST_SPEED, APP_STATE_POINTER_ACCELERATION,
+  APP_STATE_POINTER_TRANSFER,
 } from '../../services/app-state/createAppStateService.js';
 
 const services = createServicesRegistry();
@@ -58,6 +59,7 @@ document.getElementById('pointer-preferences-reset').addEventListener('click', (
   pointerState.set(APP_STATE_POINTER_SLOW_SPEED, 1.3);
   pointerState.set(APP_STATE_POINTER_FAST_SPEED, 3);
   pointerState.set(APP_STATE_POINTER_ACCELERATION, true);
+  pointerState.set(APP_STATE_POINTER_TRANSFER, []);
   syncPointerPreferences();
 });
 document.getElementById('pointer-tuning-host').addEventListener('click', () => {

@@ -234,14 +234,17 @@ test('preferences persist the pointer speed curve locally', async ({page}) => {
   await expect(page.locator('#pointer-acceleration')).toBeChecked();
 });
 
-test('pointer tuning page exposes the three distances and six measurements', async ({page}) => {
+test('pointer tuning page exposes the two calibration targets', async ({page}) => {
   await page.goto('/ui/admin/mouse-tuning');
   await expect(page.getByRole('heading', {name: /Calibration du pointeur|Pointer calibration/i})).toBeVisible();
-  await expect(page.locator('.mouse-tuning-card')).toHaveCount(3);
-  await expect(page.locator('.mouse-tuning-track-long')).toHaveCount(1);
-  await expect(page.locator('.mouse-tuning-track-medium')).toHaveCount(1);
-  await expect(page.locator('.mouse-tuning-track-short')).toHaveCount(1);
-  await expect(page.locator('#apply-tuning')).toBeDisabled();
+  await expect(page.locator('#tuning-stage')).toBeVisible();
+  await expect(page.locator('#tuning-start')).toBeVisible();
+  await expect(page.locator('#tuning-end')).toBeVisible();
+  await expect(page.locator('#tuning-start')).toBeEnabled();
+  await expect(page.locator('#tuning-end')).toBeDisabled();
+  await page.locator('#tuning-start').click();
+  await expect(page.locator('#tuning-start')).toBeDisabled();
+  await expect(page.locator('#tuning-end')).toBeEnabled();
 });
 
 test('drawer content stays inside its viewport and acceleration aligns left', async ({page}) => {

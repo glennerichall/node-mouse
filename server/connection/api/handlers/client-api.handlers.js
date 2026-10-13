@@ -53,6 +53,25 @@ export async function openMouseTuningBrowser(req, res) {
   res.status(result.ok ? 200 : 502).json({ok: Boolean(result.ok), message: result.message});
 }
 
+export function getMouseTuningSession(req, res) {
+  const session = req.services.getMouseTuning().getSessionForDevice(req.securityContext?.deviceSessionId);
+  res.json({active: Boolean(session), sessionId: session?.id || null, transferFunction: session?.transferFunction || []});
+}
+
+export function applyMouseTuning(req, res) {
+  const applied = req.services.getMouseTuning().setTransferFunction(req.body?.sessionId, req.body?.coefficients);
+  res.status(applied ? 200 : 400).json({ok: applied});
+}
+
+export function getMouseTuningEvents(req, res) {
+  const result = req.services.getMouseTuning().readEvents(req.query.session, req.query.after);
+  if (!result) {
+    res.status(404).json({ok: false, message: 'Calibration session not found.'});
+    return;
+  }
+  res.json({ok: true, ...result});
+}
+
 export function createClientConfigSubscription(req, res) {
   const id = req.services.getSseService().createSubscription({
     filters: {service: PUBSUB_SERVICE_CLIENT_CONFIG},

@@ -58,8 +58,9 @@ compréhensibles sur mobile et desktop.
   contacts qui ne produisent pas de clic.
 - [ ] UX-011 — fournir une page de calibration du pointeur Remote Mouse ouverte
   dans le navigateur de l'hôte, qui mesure le déplacement réellement reçu sur
-  des parcours courts, moyens et longs, compare les mouvements lents et
-  rapides, puis propose et peut appliquer des valeurs de vitesse locales.
+  des cibles aléatoires à distances variables, recueille les deltas bruts et
+  ajustés, ajuste une fonction de transfert polynomiale bornée, puis propose et
+  peut appliquer la calibration à la remote cliente.
 
 UX-001/002 dépendent de SEC-008, terminé : l'API admin fournit la liste des
 sessions, leur rôle, leur état, leur dernière activité et la révocation

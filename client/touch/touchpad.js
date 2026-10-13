@@ -3,6 +3,7 @@ import {triggerHapticFeedback} from './haptic-feedback.js';
 import {emitWithTimestamp} from '../core/socket-emit.js';
 import {
     REMOTE_EVENT_MOUSE_BUTTON,
+    REMOTE_EVENT_MOUSE_CALIBRATION,
     REMOTE_EVENT_MOUSE_CLICK,
     REMOTE_EVENT_MOUSE_MOVE,
     REMOTE_EVENT_MOUSE_SCROLL,
@@ -19,6 +20,7 @@ import {
     APP_STATE_POINTER_SLOW_SPEED,
     APP_STATE_POINTER_FAST_SPEED,
     APP_STATE_POINTER_ACCELERATION,
+    APP_STATE_POINTER_TRANSFER,
 } from '../services/app-state/createAppStateService.js';
 
 const REMOTE_HIDE_DELAY_MS = 300;
@@ -38,6 +40,7 @@ function createNoopTouchHandler() {
         },
         click: () => {
         },
+        calibrationMove: () => {},
         flush: () => {
         },
     };
@@ -91,6 +94,8 @@ export function createSocketTouchHandler(socket, options = {}) {
     const onHapticFeedback = typeof options.onHapticFeedback === 'function'
         ? options.onHapticFeedback
         : triggerHapticFeedback;
+    const getCalibrationSession = typeof options.getCalibrationSession === 'function'
+        ? options.getCalibrationSession : () => null;
 
     const moveEmitter = createAccumulatedThrottle(
         (payload) => {
@@ -118,6 +123,14 @@ export function createSocketTouchHandler(socket, options = {}) {
         },
         move: (dx, dy) => {
             moveEmitter.addDelta(dx, dy);
+        },
+        calibrationMove: (movement) => {
+            const session = getCalibrationSession();
+            if (!session?.sessionId) return;
+            emitWithTimestamp(socket, REMOTE_EVENT_MOUSE_CALIBRATION, {
+                sessionId: session.sessionId,
+                ...movement,
+            });
         },
         scroll: (dy) => {
             scrollEmitter.addDelta(0, dy);
@@ -160,6 +173,21 @@ export function bindTouchpad(services, dom) {
     const socket = services.getTransport();
     const appState = services.getAppState();
     const touchpad = dom.remotes.mouse.touchpad;
+  let calibrationSession = null;
+  const refreshCalibrationSession = () => fetch('/api/client/mouse-tuning/session', {cache: 'no-store'})
+      .then((response) => response.ok ? response.json() : null)
+      .then((result) => {
+          calibrationSession = result?.active ? result : null;
+          if (calibrationSession?.transferFunction?.length >= 2) {
+              const currentTransfer = appState.get(APP_STATE_POINTER_TRANSFER);
+              if (JSON.stringify(currentTransfer) !== JSON.stringify(calibrationSession.transferFunction)) {
+                  appState.set(APP_STATE_POINTER_TRANSFER, calibrationSession.transferFunction);
+              }
+          }
+      })
+      .catch(() => {});
+  void refreshCalibrationSession();
+  window.setInterval(refreshCalibrationSession, 750);
     let hideRemoteTimer = null;
     let showRemoteTimer = null;
 
@@ -238,7 +266,9 @@ export function bindTouchpad(services, dom) {
             slowSpeed: appState.get(APP_STATE_POINTER_SLOW_SPEED),
             fastSpeed: appState.get(APP_STATE_POINTER_FAST_SPEED),
             acceleration: appState.get(APP_STATE_POINTER_ACCELERATION),
+            transferFunction: appState.get(APP_STATE_POINTER_TRANSFER),
         }),
+        getCalibrationSession: () => calibrationSession,
     });
 
     appState.subscribeProperty(APP_STATE_REMOTE_AUTO_HIDE, applyRemoteAutoHideState);

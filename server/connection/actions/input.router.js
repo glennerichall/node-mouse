@@ -17,6 +17,13 @@ export const mouseRouter = Router()
         getMove(request, mouse)(request.body);
         response.send({ok: true});
     })
+    .post('/calibration', (request, response) => {
+        request.services.getMouseTuning().recordMovement({
+            ...request.body,
+            deviceSessionId: request.securityContext?.deviceSessionId,
+        });
+        response.send({ok: true});
+    })
     .post('/clicks', (request, response) => {
         getInput(request).mouse.click(request.body.button);
         response.send({ok: true});

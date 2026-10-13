@@ -1,4 +1,5 @@
 export const REMOTE_EVENT_MOUSE_MOVE = 'mouse/movements';
+export const REMOTE_EVENT_MOUSE_CALIBRATION = 'mouse/calibration';
 export const REMOTE_EVENT_MOUSE_CLICK = 'mouse/clicks';
 export const REMOTE_EVENT_MOUSE_BUTTON = 'mouse/buttons';
 export const REMOTE_EVENT_MOUSE_SCROLL = 'mouse/scrolls';

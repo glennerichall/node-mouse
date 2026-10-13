@@ -5,6 +5,7 @@ import {
   deleteClientSubscription,
   getClientConfig,
   openMouseTuningBrowser,
+  getMouseTuningSession,
 } from '../../server/connection/api/handlers/client-api.handlers.js';
 
 function createResponse() {
@@ -179,5 +180,15 @@ describe('mouse tuning API', () => {
     expect(openMouseTuningBrowserServer).toHaveBeenCalledWith({clientId: 'device-1'});
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith({ok: true, message: 'opened'});
+  });
+
+  it('returns the active calibration session for the current device', () => {
+    const req = {
+      securityContext: {deviceSessionId: 'device-1'},
+      services: {getMouseTuning: () => ({getSessionForDevice: jest.fn(() => ({id: 'calibration-1'}))})},
+    };
+    const res = createResponse();
+    getMouseTuningSession(req, res);
+    expect(res.json).toHaveBeenCalledWith({active: true, sessionId: 'calibration-1', transferFunction: []});
   });
 });

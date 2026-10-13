@@ -6,6 +6,9 @@ import {
   deleteClientSubscription,
   getClientConfig,
   openMouseTuningBrowser,
+  getMouseTuningSession,
+  getMouseTuningEvents,
+  applyMouseTuning,
 } from '../handlers/client-api.handlers.js';
 import {listBrowsers, listRemotes} from '../handlers/admin-remotes.handlers.js';
 import {getRemoteStatus} from '../handlers/remotes.handlers.js';
@@ -27,6 +30,9 @@ const remotesCatalogRouter = express.Router()
 export const clientApiRouter = express.Router()
   .get('/config', getClientConfig)
   .post('/mouse-tuning/browser', openMouseTuningBrowser)
+  .get('/mouse-tuning/session', getMouseTuningSession)
+  .get('/mouse-tuning/events', getMouseTuningEvents)
+  .post('/mouse-tuning/apply', applyMouseTuning)
   .use('/subs', clientSubsRouter)
   .use('/remotes', remotesCatalogRouter);
 

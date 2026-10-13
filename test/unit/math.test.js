@@ -1,4 +1,4 @@
-import {applyPointerSpeedCurve} from '../../utils/math.js';
+import {applyPointerSpeedCurve, applyPointerTransfer} from '../../utils/math.js';
 
 describe('pointer speed curve', () => {
   it('uses the slow-speed endpoint for slow movement', () => {
@@ -18,5 +18,10 @@ describe('pointer speed curve', () => {
 
   it('never lets the fast endpoint fall below the slow endpoint', () => {
     expect(applyPointerSpeedCurve(10, 0, 10, 4, 1)).toEqual({dx: 40, dy: 0});
+  });
+
+  it('applies a bounded polynomial transfer function to the raw movement', () => {
+    expect(applyPointerTransfer(10, 0, 10, [1, 2])).toEqual({dx: 30, dy: 0});
+    expect(applyPointerTransfer(10, 0, 10, [20])).toEqual({dx: 80, dy: 0});
   });
 });

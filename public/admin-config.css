@@ -146,6 +146,34 @@ body {
   gap: 14px;
 }
 
+.mouse-tuning-stage {
+  position: relative;
+  min-height: min(55vh, 520px);
+  border: 1px dashed var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.mouse-tuning-target {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  min-width: 96px;
+}
+
+.mouse-tuning-controls,
+.mouse-tuning-results {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.mouse-tuning-results {
+  color: var(--muted);
+}
+
 .mouse-tuning-card {
   display: grid;
   gap: 8px;

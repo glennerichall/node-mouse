@@ -53,6 +53,7 @@ export async function createServicesContainer({
                                                   createApplicationDaemonService,
                                                   createServer,
                                                   createInputController,
+                                                  createMouseTuningService,
                                                   createRemotes,
                                               }) {
     let desktopControllerInstance;
@@ -83,6 +84,7 @@ export async function createServicesContainer({
         getApplicationDaemonService: createLazy(() => createApplicationDaemonService(container)),
         getUrls: () => urlFactory(container),
         getInputController: createLazy(() => createInputController(container)),
+        getMouseTuning: createLazy(() => createMouseTuningService(container)),
         getRemotes: createLazy(() => createRemotes(container)),
         getDesktopController: () => desktopControllerInstance,
     };
