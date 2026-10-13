@@ -15,3 +15,7 @@ les mêmes tests et assertions.
 Le smoke test Windows utilise aussi un launcher `.cmd` court pour la tâche
 `schtasks`. Les chemins Node et de configuration restent dans ce launcher afin
 de respecter la limite de 261 caractères de l'option `/TR`.
+
+Le smoke test attend désormais la disponibilité effective du canal CLI avant
+les commandes `config` et `info`. Le serveur HTTP peut répondre sainement avant
+que le named pipe Windows ne soit créé.

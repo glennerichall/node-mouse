@@ -29,6 +29,16 @@ function run(args, options = {}) {
   return execute(command, args, options);
 }
 
+async function runWhenReady(args, options = {}) {
+  let result;
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    result = await run(args, options);
+    if (result.code === 0) return result;
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+  return result;
+}
+
 async function waitForHealth() {
   const deadline = Date.now() + 30_000;
   while (Date.now() < deadline) {
@@ -144,7 +154,9 @@ try {
     throw new Error(`Unexpected health response: ${JSON.stringify(health)}`);
   }
   for (const args of [['version'], ['help'], ['config'], ['info']]) {
-    const result = await run(args, {env: runtimeEnv});
+    const result = ['config', 'info'].includes(args[0])
+      ? await runWhenReady(args, {env: runtimeEnv})
+      : await run(args, {env: runtimeEnv});
     if (result.code !== 0) {
       throw new Error(`remote-mouse ${args[0]} failed with exit code ${result.code}. ${result.stderr}`);
     }
