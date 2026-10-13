@@ -77,6 +77,14 @@ describe('Windows CLI transport', () => {
     expect(server.close).toHaveBeenCalledTimes(1);
   });
 
+  it('ignores a client closing the pipe before the response is written', async () => {
+    const {isExpectedCliSocketError} = await import('../../server/term/srv/startCliServer.js');
+
+    expect(isExpectedCliSocketError({code: 'EPIPE'})).toBe(true);
+    expect(isExpectedCliSocketError({code: 'ECONNRESET'})).toBe(true);
+    expect(isExpectedCliSocketError({code: 'EACCES'})).toBe(false);
+  });
+
   it('connects CLI commands to the Windows named pipe', async () => {
     setPlatform('win32');
 

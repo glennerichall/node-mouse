@@ -3,7 +3,12 @@ import {getCliSocketAdapter} from '../cliSocket.js';
 import {executeCliRequest} from './executeCliRequest.js';
 import {createLogger} from '../../application/logger.js';
 
+export function isExpectedCliSocketError(error) {
+  return ['EPIPE', 'ECONNRESET', 'ERR_STREAM_DESTROYED'].includes(error?.code);
+}
+
 function writeResponse(socket, payload) {
+  if (socket.destroyed || socket.writableEnded) return;
   socket.end(`${JSON.stringify(payload)}\n`);
 }
 
@@ -12,6 +17,7 @@ function normalizeVerbosity(options = {}) {
 }
 
 function writeFrame(socket, payload) {
+  if (socket.destroyed || socket.writableEnded) return;
   socket.write(`${JSON.stringify(payload)}\n`);
 }
 
@@ -70,6 +76,11 @@ export async function startCliServer(services) {
     let handled = false;
     socket.setEncoding('utf8');
     log.trace('CLI connection opened');
+    socket.on('error', (error) => {
+      if (!isExpectedCliSocketError(error)) {
+        log.error({err: error}, 'CLI socket error');
+      }
+    });
 
     async function handleCommand() {
       if (handled) {

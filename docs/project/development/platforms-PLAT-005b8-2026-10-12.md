@@ -19,3 +19,7 @@ de respecter la limite de 261 caractères de l'option `/TR`.
 Le smoke test attend désormais la disponibilité effective du canal CLI avant
 les commandes `config` et `info`. Le serveur HTTP peut répondre sainement avant
 que le named pipe Windows ne soit créé.
+
+Le serveur CLI ignore aussi les fermetures concurrentes normales (`EPIPE`,
+`ECONNRESET`) lorsqu'un client Windows quitte avant la réponse. Ces erreurs ne
+doivent pas arrêter le daemon.
