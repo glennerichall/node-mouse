@@ -23,3 +23,7 @@ que le named pipe Windows ne soit créé.
 Le serveur CLI ignore aussi les fermetures concurrentes normales (`EPIPE`,
 `ECONNRESET`) lorsqu'un client Windows quitte avant la réponse. Ces erreurs ne
 doivent pas arrêter le daemon.
+
+Le protocole CLI délimite maintenant la requête par une nouvelle ligne et garde
+la connexion ouverte jusqu'à la réponse. Cela évite que `socket.end()` côté
+client ferme prématurément un named pipe Windows et produise une réponse vide.

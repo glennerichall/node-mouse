@@ -32,10 +32,10 @@ export async function sendCliCommand(command, options = {}, {onLog = null} = {})
     socket.setEncoding('utf8');
 
     socket.on('connect', () => {
-      socket.end(JSON.stringify({
+      socket.write(`${JSON.stringify({
         command,
         options,
-      }));
+      })}\n`);
     });
 
     socket.on('data', (chunk) => {

@@ -117,6 +117,9 @@ export async function startCliServer(services) {
 
     socket.on('data', (chunk) => {
       input += chunk;
+      if (input.includes('\n')) {
+        void handleCommand();
+      }
     });
 
     socket.on('end', () => {

@@ -91,6 +91,7 @@ describe('Windows CLI transport', () => {
     const handlers = {};
     const socket = {
       end: jest.fn(),
+      write: jest.fn(),
       on: jest.fn((event, handler) => {
         handlers[event] = handler;
       }),
@@ -123,10 +124,11 @@ describe('Windows CLI transport', () => {
 
     expect(createConnection).toHaveBeenCalledWith('\\\\.\\pipe\\remote-mouse');
     expect(socket.setEncoding).toHaveBeenCalledWith('utf8');
-    expect(socket.end).toHaveBeenCalledWith(JSON.stringify({
+    expect(socket.end).not.toHaveBeenCalled();
+    expect(socket.write).toHaveBeenCalledWith(`${JSON.stringify({
       command: {name: 'info'},
       options: {verbosity: 1},
-    }));
+    })}\n`);
     expect(unlinkSync).not.toHaveBeenCalled();
     expect(result).toEqual({ok: true, message: 'ok'});
   });
