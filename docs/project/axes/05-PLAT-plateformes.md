@@ -111,6 +111,10 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   de `schtasks` en déportant les chemins et variables de configuration dans un
   launcher local court; vérifier que l'installation et le démarrage conservent
   le répertoire de configuration persistant.
+- [ ] PLAT-002e — étendre le smoke test Windows pour interroger explicitement
+  la tâche planifiée après installation, vérifier santé/version et commandes CLI,
+  puis confirmer après désinstallation que la tâche n'existe plus; conserver le
+  nettoyage même lorsqu'une assertion échoue.
 - [ ] PLAT-003 — créer l'installation macOS et guider les permissions Accessibilité.
 - [ ] PLAT-004 — intégrer le contrôle et la capture Wayland selon le
   [plan dédié](./05-PLAT-004-wayland.md).

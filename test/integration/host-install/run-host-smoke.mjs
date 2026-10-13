@@ -99,6 +99,7 @@ async function removeTemporaryDirectory(directory) {
 let server;
 let serviceInstalled = false;
 let runtimeEnv;
+let cleanupError;
 try {
   const setup = await run([
     'setup', '--yes', '--no-service', '--config-dir', configDir, '--port', String(port),
@@ -140,6 +141,19 @@ try {
       throw new Error(`Windows service setup failed with exit code ${serviceSetup.code}. ${serviceSetup.stderr}`);
     }
     serviceInstalled = true;
+    if (process.platform === 'win32') {
+      const task = await execute('schtasks', ['/Query', '/TN', 'remote-mouse', '/FO', 'LIST'], {
+        env: runtimeEnv,
+        captureOutput: true,
+      });
+      if (task.code !== 0) {
+        throw new Error(`Windows scheduled task query failed with exit code ${task.code}. ${task.stdout || ''}${task.stderr || ''}`);
+      }
+      const status = task.stdout.match(/^\s*Status:\s*(.+)$/im)?.[1]?.trim();
+      if (status && !/running/i.test(status)) {
+        throw new Error(`Windows scheduled task is not running: ${status}`);
+      }
+    }
     if (process.platform === 'linux') console.log('systemd --user service is available and active validation is enabled.');
   } else {
     if (process.platform === 'linux') console.log('systemd --user unavailable; service validation skipped.');
@@ -176,7 +190,16 @@ try {
     const serviceRemoval = await run(['service', 'uninstall'], {env: runtimeEnv});
     if (serviceRemoval.code !== 0) {
       console.error(`Windows service cleanup failed with exit code ${serviceRemoval.code}. ${serviceRemoval.stderr}`);
+    } else if (process.platform === 'win32') {
+      const remainingTask = await execute('schtasks', ['/Query', '/TN', 'remote-mouse'], {
+        env: runtimeEnv,
+        stdio: 'ignore',
+      });
+      if (remainingTask.code === 0) {
+        cleanupError = new Error('Windows scheduled task still exists after uninstall.');
+      }
     }
   }
   await removeTemporaryDirectory(root);
+  if (cleanupError) throw cleanupError;
 }
