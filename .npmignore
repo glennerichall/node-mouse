@@ -35,3 +35,11 @@ scripts/verify-npm-package.mjs
 .artifacts/
 build/
 docs/project/
+
+# Native release artifacts are generated locally and ignored by Git, but must
+# remain in the published tarball.
+!prebuilds/
+!prebuilds/linux-x64/
+!prebuilds/linux-x64/*
+!prebuilds/linux-arm64/
+!prebuilds/linux-arm64/*

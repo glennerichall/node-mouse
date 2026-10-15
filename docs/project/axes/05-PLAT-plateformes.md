@@ -89,6 +89,10 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   conserver la priorité du prébuild compatible pour les installations et la
   publication. Couvrir le choix explicite du résolveur par des tests et vérifier
   que le helper QR recompilé est celui lancé en développement.
+- [x] PLAT-001j — corriger l'inclusion des prébuilds Linux générés dans le
+  tarball npm lorsque ces artéfacts restent ignorés par Git; aligner les règles
+  `.gitignore`, `.npmignore` et l'allowlist `files` sur chaque fichier natif,
+  puis vérifier la chaîne réelle de `npm publish --dry-run`.
 - [x] PLAT-002 — tester installation, service, mise à jour et désinstallation Windows.
 - [x] PLAT-002c — rendre le script `test:install` indépendant de la syntaxe
   d'affectation d'environnement POSIX afin qu'il soit exécutable par npm sur

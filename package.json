@@ -1,6 +1,6 @@
 {
   "name": "@velor/remote-mouse",
-  "version": "6.19.89",
+  "version": "6.19.90",
   "engines": {
     "node": ">=22.14.0"
   },
@@ -24,7 +24,10 @@
     "client/",
     "index.js",
     "native/",
-    "prebuilds/",
+    "prebuilds/linux-x64/remote-mouse-uinput.node",
+    "prebuilds/linux-x64/remote-mouse-xwayland-overlay",
+    "prebuilds/linux-arm64/remote-mouse-uinput.node",
+    "prebuilds/linux-arm64/remote-mouse-xwayland-overlay",
     "public/",
     "server/",
     "scripts/build-native-prebuilds.mjs",

@@ -13,28 +13,21 @@ describe('native prebuild package verification', () => {
     expect(missing).toContain('/package/prebuilds/linux-arm64/remote-mouse-xwayland-overlay');
   });
 
-  it('does not run npm pack until both architecture sets are complete', () => {
-    const pack = jest.fn();
+  it('does not inspect ELF files until both architecture sets are complete', () => {
+    const inspect = jest.fn();
     const stderr = {write: jest.fn()};
 
     expect(verifyNativePrebuildPackage({
       root: '/package',
       exists: () => false,
-      pack,
+      inspect,
       stderr,
     })).toBe(false);
-    expect(pack).not.toHaveBeenCalled();
+    expect(inspect).not.toHaveBeenCalled();
     expect(stderr.write).toHaveBeenCalledWith(expect.stringContaining('Missing project native prebuilds'));
   });
 
-  it('confirms that the npm tarball contains all required binaries', () => {
-    const componentFiles = [
-      'remote-mouse-uinput.node',
-      'remote-mouse-xwayland-overlay',
-    ];
-    const files = ['x64', 'arm64'].flatMap((arch) => componentFiles.map((file) => ({
-      path: `prebuilds/linux-${arch}/${file}`,
-    })));
+  it('confirms matching ELF architectures for both native builds', () => {
     const stderr = {write: jest.fn()};
 
     expect(verifyNativePrebuildPackage({
@@ -44,40 +37,20 @@ describe('native prebuild package verification', () => {
         status: 0,
         stdout: `  Machine:                           ${filePath.includes('linux-x64') ? 'Advanced Micro Devices X86-64' : 'AArch64'}\n`,
       }),
-      pack: () => ({status: 0, stdout: JSON.stringify([{files}]), stderr: ''}),
       stderr,
     })).toBe(true);
     expect(stderr.write).not.toHaveBeenCalled();
   });
 
-  it('fails when npm ignores a prebuild despite it existing in the workspace', () => {
-    const stderr = {write: jest.fn()};
-
-    expect(verifyNativePrebuildPackage({
-      root: '/package',
-      exists: () => true,
-      inspect: (filePath) => ({
-        status: 0,
-        stdout: `  Machine:                           ${filePath.includes('linux-x64') ? 'Advanced Micro Devices X86-64' : 'AArch64'}\n`,
-      }),
-      pack: () => ({status: 0, stdout: JSON.stringify([{files: []}]), stderr: ''}),
-      stderr,
-    })).toBe(false);
-    expect(stderr.write).toHaveBeenCalledWith(expect.stringContaining('not included in the npm package'));
-  });
-
   it('rejects binaries whose ELF machine does not match their prebuild directory', () => {
-    const pack = jest.fn();
     const stderr = {write: jest.fn()};
 
     expect(verifyNativePrebuildPackage({
       root: '/package',
       exists: () => true,
       inspect: () => ({status: 0, stdout: '  Machine:                           Advanced Micro Devices X86-64\n'}),
-      pack,
       stderr,
     })).toBe(false);
-    expect(pack).not.toHaveBeenCalled();
     expect(stderr.write).toHaveBeenCalledWith(expect.stringContaining('expected arm64'));
   });
 });

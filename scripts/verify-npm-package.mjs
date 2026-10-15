@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
 import {createRequire} from 'node:module';
-import {mkdirSync, mkdtempSync, readFileSync, rmSync, statSync} from 'node:fs';
+import {mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync} from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
@@ -98,17 +98,36 @@ function run(command, args, {cwd = projectRoot, env = process.env, label = comma
   return result.stdout;
 }
 
-function parsePackMetadata(output) {
+function parsePackMetadata(output, {packDestination, name, version} = {}) {
   let metadata;
   try {
-    metadata = JSON.parse(output)?.[0];
-  } catch (cause) {
-    throw new Error('Could not parse npm pack metadata.', {cause});
+    const parsed = JSON.parse(output);
+    metadata = Array.isArray(parsed) ? parsed[0] : parsed;
+  } catch {
+    metadata = undefined;
   }
-  if (!metadata?.filename || !Array.isArray(metadata.files)) {
-    throw new Error('npm pack did not return package file metadata.');
+
+  if (metadata?.filename && Array.isArray(metadata.files)) return metadata;
+
+  const filename = packDestination && readdirSync(packDestination)
+    .find((entry) => entry.endsWith('.tgz'));
+  if (filename) {
+    const listing = spawnSync('tar', ['-tzf', path.join(packDestination, filename)], {encoding: 'utf8'});
+    if (listing.status === 0) {
+      const files = listing.stdout.split('\n')
+        .filter((entry) => entry.startsWith('package/') && entry !== 'package/')
+        .map((entry) => entry.slice('package/'.length));
+      return {
+        name,
+        version,
+        filename,
+        files: files.map((filePath) => ({path: filePath})),
+        entryCount: files.length,
+      };
+    }
   }
-  return metadata;
+
+  throw new Error('npm pack did not return package file metadata or a readable tarball.');
 }
 
 function verifyInstalledNativeArtifacts(packageRoot) {
@@ -142,18 +161,26 @@ export async function verifyNpmPackage({root = projectRoot} = {}) {
   const prefixPath = path.join(temporaryRoot, 'global-prefix');
   mkdirSync(path.join(prefixPath, 'lib/node_modules'), {recursive: true});
   mkdirSync(path.join(prefixPath, 'bin'), {recursive: true});
-  const env = {...process.env, npm_config_cache: cachePath};
+  const env = {...process.env};
+  for (const key of Object.keys(env)) {
+    if (/^(npm_config_|NPM_CONFIG_)/.test(key)) delete env[key];
+  }
+  env.npm_config_cache = cachePath;
+  env.npm_config_dry_run = 'false';
   // `npm publish --dry-run` passes this setting to lifecycle scripts. Do not
   // let it turn the verifier's pack/install steps into dry-runs as well.
-  delete env.npm_config_dry_run;
-  delete env.NPM_CONFIG_DRY_RUN;
   delete env.REMOTE_MOUSE_DAEMON;
 
   try {
-    const metadata = parsePackMetadata(run('npm', [
-      'pack', '--json', '--pack-destination', temporaryRoot, '--ignore-scripts',
-    ], {cwd: root, env, label: 'npm pack'}));
     const manifest = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8'));
+    const packOutput = run('npm', [
+      'pack', '--json', '--pack-destination', temporaryRoot, '--ignore-scripts',
+    ], {cwd: root, env, label: 'npm pack'});
+    const metadata = parsePackMetadata(packOutput, {
+      packDestination: temporaryRoot,
+      name: manifest.name,
+      version: manifest.version,
+    });
     assert.equal(metadata.name, manifest.name, 'Packed package name must match package.json.');
     assert.equal(metadata.version, manifest.version, 'Packed package version must match package.json.');
     const files = metadata.files.map(({path: filePath}) => filePath);
