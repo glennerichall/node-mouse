@@ -20,8 +20,9 @@ pour le routage et le chargement progressif.
 - `docs/project/development/`: décisions réalisées; rechercher l'identifiant
   ou le sujet touché et lire uniquement les résultats pertinents.
 - `docs/project/VERSIONING.md`: niveau SemVer lors d'une préparation de
-  publication ou demande de changement de version; aucun bump pour une
-  itération documentaire seule.
+  publication ou d'une itération livrant du code; aucun bump pour une
+  itération documentaire, de tests seuls ou d'outillage interne sans effet sur
+  le paquet.
 
 ## Workflow
 
@@ -36,6 +37,12 @@ pour le routage et le chargement progressif.
 5. À la clôture, créer un journal daté selon la convention de
    `docs/project/development/README.md`. Les journaux terminés sont immuables.
    Modifier la roadmap globale uniquement si l'ordre ou l'état d'un axe change.
-   Ne pas déduire un bump de version de la clôture; appliquer la politique
-   SemVer seulement si le paquet livré change ou si une publication/version est
-   explicitement préparée.
+6. Pour toute itération qui modifie le paquet livré, incrémenter la version
+   `PATCH` par défaut et synchroniser `package.json` et `package-lock.json`.
+   Utiliser `MINOR` ou `MAJOR` seulement si la nature du changement l'impose
+   ou si l'utilisateur le demande explicitement. Une itération documentaire,
+   de tests seuls ou d'outillage interne conserve la version et doit le dire
+   explicitement dans le journal.
+7. Avant la réponse finale, lancer `npm run check:version` dès qu'un bump est
+   requis, puis fournir obligatoirement un message de commit court et précis.
+   Ne jamais créer le commit sans demande explicite de l'utilisateur.

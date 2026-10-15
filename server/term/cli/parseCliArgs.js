@@ -106,6 +106,9 @@ export function parseCliArgs(args) {
     .command('update-events', false, () => {}, () => {
       command = {name: 'update-events', args: {}};
     })
+    .command('diagnostic', false, () => {}, () => {
+      command = {name: 'diagnostic', args: {}};
+    })
     .command('update-check', false, () => {}, () => {
       command = {name: 'update-check', args: {}};
     })

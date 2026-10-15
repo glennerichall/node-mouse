@@ -487,6 +487,7 @@ Useful CLI commands:
 - `tasks` prints the task manager snapshot
 - `task-manager` is an alias of `tasks`
 - `update-events` prints persisted update-manager events
+- `diagnostic` creates a redacted gzip diagnostic archive under the configuration directory and retains the five newest archives
 - `update-check` forces an update check through the running local daemon
 - `update` installs the detected update through the running local daemon
 - `security` lists paired sessions; use `security revoke <sessionId>` or

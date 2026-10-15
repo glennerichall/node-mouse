@@ -342,7 +342,7 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   D-Bus ciblée pour rechercher et activer une fenêtre navigateur via Mutter;
   conserver l'installation explicite et le repli si l'extension n'est pas
   activée.
-- [ ] PLAT-006d — vérifier dans GitHub Actions le bundle GNOME et l'exécution
+- [x] PLAT-006d — vérifier dans GitHub Actions le bundle GNOME et l'exécution
   GJS de l'extension, avec un test de sélection et d'activation d'une fenêtre;
   ne pas présenter ce test comme une validation d'une session Mutter réelle.
 - [x] PLAT-006d1 — installer le paquet `gnome-shell` dans le job GNOME afin

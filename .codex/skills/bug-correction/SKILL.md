@@ -68,6 +68,13 @@ Demander ou utiliser :
       connues.
     - Ne pas créer le commit sauf si l'utilisateur le demande explicitement.
 
+8. **Clôturer la version livrée**
+    - Si la correction modifie le paquet livré, incrémenter systématiquement la
+      version `PATCH` dans `package.json` et `package-lock.json`.
+    - Lancer `npm run check:version` après la synchronisation.
+    - Si seuls la documentation, les tests ou l'outillage interne changent,
+      conserver la version et expliquer cette décision.
+
 ## Format de réponse recommandé
 
 ### Problème identifié
@@ -83,3 +90,7 @@ Indiquer les tests exécutés ou la commande à lancer.
 
 ### Commit suggéré
 Proposer un message court et précis.
+
+### Version
+Indiquer la version avant/après, le niveau SemVer choisi et le résultat de
+`npm run check:version` lorsque le paquet livré a changé.

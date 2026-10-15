@@ -8,6 +8,7 @@ import {executeSystemConfigCommand} from './commands/systemConfigCommand.js';
 import {executeTasksCommand} from './commands/tasksCommand.js';
 import {executeTokensCommand} from './commands/tokensCommand.js';
 import {executeUpdateEventsCommand} from './commands/updateEventsCommand.js';
+import {executeDiagnosticCommand} from './commands/diagnosticCommand.js';
 import {executeWaylandCommand} from './commands/waylandCommand.js';
 import {executeAdminCommand} from './commands/adminCommand.js';
 import {formatCliCommand} from '../cli/parseCliArgs.js';
@@ -25,6 +26,7 @@ const commandHandlers = {
   tasks: executeTasksCommand,
   'task-manager': executeTasksCommand,
   'update-events': executeUpdateEventsCommand,
+  diagnostic: executeDiagnosticCommand,
   'update-check': (services) => executeAdminCommand(services, {action: 'update-check'}),
   update: (services) => executeAdminCommand(services, {action: 'update'}),
   security: executeAdminCommand,

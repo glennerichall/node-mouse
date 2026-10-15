@@ -18,6 +18,7 @@ describe('cli args parser', () => {
     [['security'], {command: {name: 'security', args: {action: 'list', sessionId: ''}}, options: {verbosity: 0}}],
     [['security', 'revoke', 'session-1'], {command: {name: 'security', args: {action: 'revoke', sessionId: 'session-1'}}, options: {verbosity: 0}}],
     [['rotate-token'], {command: {name: 'rotate-token', args: {}} , options: {verbosity: 0}}],
+    [['diagnostic'], {command: {name: 'diagnostic', args: {}}, options: {verbosity: 0}}],
   ])('parses %j', (args, expected) => {
     expect(parseCliArgs(args)).toEqual(expected);
   });

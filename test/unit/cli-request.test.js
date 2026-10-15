@@ -14,9 +14,11 @@ const createLogger = jest.fn(() => ({
   debug: jest.fn(),
   trace: jest.fn(),
 }));
+const getRecentLogs = jest.fn(() => []);
 
 jest.unstable_mockModule('../../server/application/logger.js', () => ({
   createLogger,
+  getRecentLogs,
   withCliLogStream,
 }));
 

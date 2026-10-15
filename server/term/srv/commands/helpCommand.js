@@ -16,6 +16,7 @@ export async function executeHelpCommand() {
       'remote-mouse tasks',
       'remote-mouse task-manager',
       'remote-mouse update-events',
+      'remote-mouse diagnostic      Cree une archive de diagnostic expurgee',
       'remote-mouse update-check    Force une verification de mise a jour',
       'remote-mouse update          Installe la mise a jour disponible',
       'remote-mouse security [list|revoke <sessionId>|revoke-all]',
