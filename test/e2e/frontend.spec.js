@@ -222,8 +222,10 @@ test('preferences persist the pointer speed curve locally', async ({page}) => {
   await expect(page.locator('#pointer-fast-speed')).toBeDisabled();
   await expect(page.locator('#pointer-acceleration')).not.toBeChecked();
   await expect(page.locator('#pointer-tuning-host')).toHaveCount(0);
+  await page.locator('#pointer-acceleration').check();
+  await expect(page.locator('#pointer-fast-speed')).toBeEnabled();
   await page.locator('#pointer-slow-speed').fill('4.5');
-  await page.locator('#pointer-fast-speed').fill('1.0');
+  await page.locator('#pointer-fast-speed').fill('1');
   await expect(page.locator('#pointer-slow-speed')).toHaveValue('4.5');
   await expect(page.locator('#pointer-fast-speed')).toHaveValue('1');
   await expect(page.locator('#pointer-slow-speed')).toHaveAttribute('max', '5');

@@ -253,6 +253,10 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   publier les rapports d’échec utiles, isoler les projets Playwright dans des
   processus, ports et bases SQLite séparés, et garder ces contrôles distincts
   des smoke tests d’installation et des validations VM suspendues.
+- [x] PLAT-005b8a — corriger le scénario Playwright des préférences de vitesse
+  pour ne modifier le curseur rapide qu'après réactivation de l'accélération;
+  le test doit vérifier séparément l'état désactivé et la modification
+  ultérieure des deux valeurs.
 - [ ] PLAT-005c — ajouter un profil Windows 11 avec UEFI, TPM virtuel et média
   d'installation fourni localement par le développeur; automatiser le
   bootstrap nécessaire aux tests d'installation, de mise à jour et de
