@@ -71,4 +71,68 @@ describe('XWayland overlay helper IPC', () => {
       await rm(tempDir, {recursive: true, force: true});
     }
   }, 10000);
+
+  integrationTest('acknowledges every native overlay transition', async () => {
+    const tempDir = await mkdtemp(path.join(os.tmpdir(), 'remote-mouse-overlay-ack-'));
+    const helperPath = path.join(tempDir, 'overlay');
+    const firstQrPath = path.join(tempDir, 'first.png');
+    const secondQrPath = path.join(tempDir, 'second.png');
+    let child;
+
+    try {
+      execFileSync('cc', ['-std=c11', '-Wall', '-Wextra', '-Werror', '-O2', sourcePath,
+        '-lX11', '-lpng', '-o', helperPath]);
+      await QRCode.toFile(firstQrPath, 'https://example.test/first');
+      await QRCode.toFile(secondQrPath, 'https://example.test/second');
+
+      child = spawn('xvfb-run', ['-a', helperPath, firstQrPath, '10', '10', '128'], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+      });
+      let output = '';
+      child.stdout.setEncoding('utf8');
+      child.stdout.on('data', (chunk) => { output += chunk; });
+      child.stdin.write([
+        '1 SHOW',
+        `2 UPDATE ${secondQrPath} 20 30 96`,
+        '3 HIDE',
+        '4 SHOW',
+        '5 CLOSE',
+      ].join('\n') + '\n');
+
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error(`Helper ACKs: ${output}`)), 3000);
+        const expectedAcks = [
+          'ACK 1 visible',
+          'ACK 2 updated',
+          'ACK 3 hidden',
+          'ACK 4 visible',
+          'ACK 5 closed',
+        ];
+        const checkOutput = () => {
+          if (expectedAcks.every((ack) => output.includes(ack))) {
+            clearTimeout(timeout);
+            resolve();
+          }
+        };
+        child.stdout.on('data', checkOutput);
+        child.once('error', (error) => {
+          clearTimeout(timeout);
+          reject(error);
+        });
+        child.once('exit', (code) => {
+          if (code !== 0 && !expectedAcks.every((ack) => output.includes(ack))) {
+            clearTimeout(timeout);
+            reject(new Error(`Overlay helper exited (${code}); ACKs: ${output}`));
+          }
+        });
+        checkOutput();
+      });
+    } finally {
+      if (child && child.exitCode === null) {
+        child.stdin.end();
+        child.kill('SIGTERM');
+      }
+      await rm(tempDir, {recursive: true, force: true});
+    }
+  }, 10000);
 });

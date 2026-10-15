@@ -147,7 +147,7 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   XWayland lors de sa fermeture concurrente, afin que l'arrêt normal du service
   après une mise à jour ne fasse pas planter le processus Node.js; couvrir le
   scénario de pipe cassé par un test unitaire.
-- [ ] PLAT-004n — garantir le traitement ordonné de commandes IPC rapprochées
+- [x] PLAT-004n — garantir le traitement ordonné de commandes IPC rapprochées
   du helper QR XWayland (notamment masquer puis réafficher), sans perte de
   commande liée à la lecture tamponnée de stdin; couvrir le cycle par un test
   d'intégration avec un serveur X virtuel lorsque disponible.
