@@ -40,7 +40,7 @@ export function buildSystemdUnit({entrypoint, nodePath}) {
         'Environment=NODE_ENV=production',
         'Environment=REMOTE_MOUSE_DAEMON=1',
         ...configEnvironment,
-        'PassEnvironment=DISPLAY WAYLAND_DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS',
+        'PassEnvironment=DISPLAY WAYLAND_DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS XDG_SESSION_TYPE XDG_CURRENT_DESKTOP DESKTOP_SESSION',
         '',
         '[Install]',
         'WantedBy=default.target',

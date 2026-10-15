@@ -26,6 +26,7 @@ const requiredFiles = [
   'scripts/build-uinput-bridge.sh',
   'scripts/build-xwayland-overlay.sh',
   'scripts/postinstall-linux.mjs',
+  'scripts/configure-gnome-focus-after-update.mjs',
   'server/term/cli/setupCommand.js',
   'server/term/cli/versionCommand.js',
 ];

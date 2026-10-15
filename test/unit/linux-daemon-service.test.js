@@ -49,7 +49,7 @@ describe('Linux user daemon service', () => {
       'Restart=on-failure',
       'Environment=PATH=/opt/node/bin:/usr/local/bin:/usr/bin:/bin',
       'Environment=REMOTE_MOUSE_DAEMON=1',
-      'PassEnvironment=DISPLAY WAYLAND_DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS',
+      'PassEnvironment=DISPLAY WAYLAND_DISPLAY XAUTHORITY DBUS_SESSION_BUS_ADDRESS XDG_SESSION_TYPE XDG_CURRENT_DESKTOP DESKTOP_SESSION',
       'WantedBy=default.target',
     ]) {
       expect(unit).toContain(line);

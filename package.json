@@ -35,6 +35,7 @@
     "scripts/build-wayland-helper.sh",
     "scripts/build-xwayland-overlay.sh",
     "scripts/install-gnome-focus-extension.sh",
+    "scripts/configure-gnome-focus-after-update.mjs",
     "scripts/configure-uinput-access.sh",
     "scripts/configure-uinput-after-update.mjs",
     "scripts/postinstall-linux.mjs",

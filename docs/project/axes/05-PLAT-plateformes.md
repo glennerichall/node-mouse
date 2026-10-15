@@ -347,6 +347,14 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   ne pas présenter ce test comme une validation d'une session Mutter réelle.
 - [x] PLAT-006d1 — installer le paquet `gnome-shell` dans le job GNOME afin
   de fournir la commande `gnome-extensions` utilisée pour fabriquer le bundle.
+- [x] PLAT-006e — préserver le contexte du compositeur GNOME dans le service
+  `systemd --user` après une mise à jour; conserver le repli documenté vers la
+  commande du navigateur lorsque l'activation Wayland échoue, et couvrir la
+  transmission des variables de session.
+- [x] PLAT-006f — réinstaller et réactiver l'extension GNOME de focus pendant
+  le `postinstall` d'une mise à jour lancée par le daemon sous GNOME Wayland;
+  conserver une migration non bloquante avec diagnostic et la réserver à ce
+  contexte.
 - [ ] PLAT-007 — définir un contrat d'adaptateur avant de multiplier les
   intégrations.
 

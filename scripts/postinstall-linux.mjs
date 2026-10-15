@@ -10,6 +10,7 @@ import {
   LINUX_NATIVE_COMPONENTS,
 } from '../server/os/linux/nativeArtifactPaths.js';
 import {configureUInputAfterAppUpdate} from './configure-uinput-after-update.mjs';
+import {configureGnomeFocusAfterAppUpdate} from './configure-gnome-focus-after-update.mjs';
 
 const REQUIRED_COMPONENTS = ['uinput', 'xwaylandOverlay'];
 const BUILD_SCRIPTS = Object.freeze({
@@ -34,7 +35,7 @@ function compileNativeComponent(name, {root = projectRoot, env = process.env} = 
  * Prefer packaged target binaries, but compile missing project-owned Linux
  * components locally when a compatible compiler toolchain is available.
  */
-export function prepareLinuxNativeRuntime({
+export async function prepareLinuxNativeRuntime({
   platform = process.platform,
   arch = process.arch,
   exists = existsSync,
@@ -44,6 +45,7 @@ export function prepareLinuxNativeRuntime({
   env = process.env,
   stderr = process.stderr,
   migrateUInput = configureUInputAfterAppUpdate,
+  migrateGnomeFocus = configureGnomeFocusAfterAppUpdate,
 } = {}) {
   if (platform !== 'linux') {
     return {built: [], skipped: LINUX_NATIVE_COMPONENTS};
@@ -84,9 +86,10 @@ export function prepareLinuxNativeRuntime({
   }
 
   migrateUInput();
+  await migrateGnomeFocus({env, platform, stderr});
   return {built, skipped: unavailable};
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  prepareLinuxNativeRuntime();
+  await prepareLinuxNativeRuntime();
 }
