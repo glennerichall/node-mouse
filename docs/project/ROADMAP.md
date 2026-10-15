@@ -17,7 +17,7 @@ entraîner de renommage.
 | Priorité | Axe | Résultat visé | État actuel |
 | ---: | --- | --- | --- |
 | 1 | [05 — PLAT — Plateformes](./axes/05-PLAT-plateformes.md) | Contrôle fiable sur les systèmes officiellement pris en charge | En cours — installation Linux et Wayland; volet VM suspendu |
-| 2 | [04 — UX — Expérience utilisateur](./axes/04-UX-experience-utilisateur.md) | Association, contrôle et diagnostic compréhensibles | En cours — UX-006d terminée; UX-004/005 non démarrées |
+| 2 | [04 — UX — Expérience utilisateur](./axes/04-UX-experience-utilisateur.md) | Association, contrôle et diagnostic compréhensibles | En cours — UX-004 en attente; UX-005 non démarrée |
 | 3 | [07 — OPS — Exploitation](./axes/07-OPS-exploitation.md) | Installation, mise à jour et diagnostic récupérables | En cours — journaux et messages techniques |
 | 4 | [01 — SEC — Sécurité](./axes/01-SEC-securite.md) | Accès authentifiés, autorisations cohérentes et révocables | À jour — SEC-011 terminée |
 | 5 | [02 — ARCH — Architecture](./axes/02-ARCH-architecture-modulaire.md) | Services métier indépendants des transports et adaptateurs | ARCH-046 terminée |
@@ -39,8 +39,10 @@ pas partie de l'ordre actif.
    créer ni démarrer de VM.
 2. Reprendre les éléments restants d'installation récupérable et de diagnostic
    de l'axe `OPS`.
-3. Continuer les itérations UX planifiées (`UX-004`/`UX-005`), puis les travaux
-   `REL` dont les seuils et critères sont définis dans leur axe.
+3. Continuer les itérations UX qui servent le scénario HTPC à écran unique,
+   notamment `UX-005`; `UX-004` et ses sous-itérations restent en attente
+   jusqu'à ce que le multi-écran devienne un besoin prioritaire, puis traiter
+   les travaux `REL` dont les seuils et critères sont définis dans leur axe.
 4. Traiter les autres axes selon leur ordre et leur état dans ce document.
 
 Cet ordre n'est pas une seconde liste de tâches. Les documents d'axes restent

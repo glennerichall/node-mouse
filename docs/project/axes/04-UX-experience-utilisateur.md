@@ -21,7 +21,16 @@ compréhensibles sur mobile et desktop.
   panneau latéral ni dans la page de configuration, et compacter les
   informations des appareils révoqués.
 - [x] UX-003 — améliorer les diagnostics de connexion et afficher le transport.
-- [ ] UX-004 — sélection multi-écrans.
+- [ ] UX-004 — sélection multi-écrans. **En attente** : le scénario central
+  reste une télécommande souris pour HTPC à écran unique; ne pas engager cette
+  extension tant que ce besoin ne devient pas prioritaire.
+  - [ ] UX-004a — définir le contrat `screens[]` et les adaptateurs de
+    détection par plateforme, avec repli explicite vers l'écran logique unique.
+  - [ ] UX-004b — ajouter la sélection et la persistance locales de l'écran
+    choisi dans l'interface du client.
+  - [ ] UX-004c — appliquer l'écran choisi au pointeur, à l'aperçu et aux
+    overlays, gérer la disparition d'un écran et couvrir les parcours API,
+    unitaires et navigateur.
 - [ ] UX-005 — profils de contrôle.
 - [x] UX-006 — permettre à chaque client de régler localement la vitesse et
   l'accélération du pointeur sur son appareil, indépendamment du système du
