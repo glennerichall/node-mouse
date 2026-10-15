@@ -1,6 +1,6 @@
 {
   "name": "@velor/remote-mouse",
-  "version": "6.20.0",
+  "version": "6.20.1",
   "engines": {
     "node": ">=22.14.0"
   },
