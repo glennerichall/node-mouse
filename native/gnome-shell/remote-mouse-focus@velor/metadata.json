@@ -1,0 +1,7 @@
+{
+  "uuid": "remote-mouse-focus@velor",
+  "name": "Remote Mouse Focus",
+  "description": "Activates browser windows for Remote Mouse through Mutter.",
+  "version": 1,
+  "shell-version": ["45", "46", "47", "48", "49", "50", "51"]
+}

@@ -5,6 +5,7 @@ import {configureUinputPermission} from '../../../../os/linux/setup.js';
 import {execFileAsync} from '../../../../utils/process.js';
 import {installLocalService} from '../installService.js';
 import {askYesNo} from '../prompts.js';
+import {installGnomeFocusExtension, isGnomeWaylandSession} from '../gnomeFocusExtension.js';
 
 export function createLinuxSetupStrategy({dependencies = {}} = {}) {
     return {
@@ -32,9 +33,18 @@ export function createLinuxSetupStrategy({dependencies = {}} = {}) {
                     'Explicitly configure restricted /dev/uinput access for Wayland input?',
                     {input, output},
                 )));
-            return {...options, configureUinput: Boolean(configureUinput)};
+            const configureGnomeFocus = isGnomeWaylandSession(env)
+                && (options.configureGnomeFocus || options.yes || (!options.yes && await askYesNo(
+                    'Install the GNOME browser window focus extension?',
+                    {input, output},
+                )));
+            return {
+                ...options,
+                configureUinput: Boolean(configureUinput),
+                configureGnomeFocus: Boolean(configureGnomeFocus),
+            };
         },
-        async validatePrerequisites({installService, configureUinput, env}) {
+        async validatePrerequisites({installService, configureUinput, configureGnomeFocus, env}) {
             if (installService) {
                 const result = await (dependencies.runPrerequisiteCommand || execFileAsync)(
                     'systemctl', ['--user', 'show-environment'], {timeout: 3000},
@@ -42,6 +52,12 @@ export function createLinuxSetupStrategy({dependencies = {}} = {}) {
                 if (!result.ok) {
                     return 'The systemd user service manager is unavailable. Run setup from an active user session.';
                 }
+            }
+            if (configureGnomeFocus) {
+                const gnomeExtensions = await (dependencies.runPrerequisiteCommand || execFileAsync)(
+                    'gnome-extensions', ['--version'], {timeout: 3000},
+                );
+                if (!gnomeExtensions.ok) return 'The gnome-extensions command is required for GNOME browser focus.';
             }
             if (!configureUinput) return '';
 
@@ -63,11 +79,18 @@ export function createLinuxSetupStrategy({dependencies = {}} = {}) {
             if (!result.ok) return 'The pkexec command is required to configure uinput permissions.';
             return '';
         },
-        async configureHost({options, env}) {
-            if (!options.configureUinput) return {ok: true};
-            const username = String(env.SUDO_USER || env.USER || '').trim();
-            const setupUinput = dependencies.runUinputSetup || configureUinputPermission;
-            return setupUinput(username);
+        async configureHost({options, env, homeDir}) {
+            if (options.configureUinput) {
+                const username = String(env.SUDO_USER || env.USER || '').trim();
+                const setupUinput = dependencies.runUinputSetup || configureUinputPermission;
+                const result = await setupUinput(username);
+                if (!result?.ok) return result;
+            }
+            if (options.configureGnomeFocus) {
+                const installExtension = dependencies.runGnomeFocusInstall || installGnomeFocusExtension;
+                return installExtension({homeDir, env});
+            }
+            return {ok: true};
         },
         installService: dependencies.runServiceInstall || installLocalService,
     };

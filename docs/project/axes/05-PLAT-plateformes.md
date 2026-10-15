@@ -326,6 +326,10 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
 - [x] PLAT-006b — séparer la gestion des fenêtres X11 et Wayland pour l'action
   navigateur; détecter le compositeur Wayland et utiliser son IPC lorsqu'il
   expose une activation ciblée, avec repli sur le mécanisme X11 existant.
+- [x] PLAT-006c — fournir une extension GNOME minimale exposant une méthode
+  D-Bus ciblée pour rechercher et activer une fenêtre navigateur via Mutter;
+  conserver l'installation explicite et le repli si l'extension n'est pas
+  activée.
 - [ ] PLAT-007 — définir un contrat d'adaptateur avant de multiplier les
   intégrations.
 

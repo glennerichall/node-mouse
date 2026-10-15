@@ -316,6 +316,34 @@ describe('remote-mouse setup command', () => {
     expect(permissionSetupCount).toBe(1);
   });
 
+  it('installs the GNOME focus extension during setup on GNOME Wayland', async () => {
+    const extensionInstalls = [];
+    const result = await runSetup({
+      platform: 'linux',
+      nodeVersion: '24.1.0',
+      homeDir: root,
+      env: {
+        CONFIG_DIR: path.join(root, 'config'),
+        XDG_SESSION_TYPE: 'wayland',
+        XDG_CURRENT_DESKTOP: 'GNOME',
+        USER: 'dev',
+      },
+      options: {yes: true, noService: true},
+      output: createOutput().stream,
+      errorOutput: createOutput().stream,
+      dependencies: {
+        runPrerequisiteCommand: async () => ({ok: true}),
+        runGnomeFocusInstall: async (request) => {
+          extensionInstalls.push(request);
+          return {ok: true, message: 'GNOME focus enabled.'};
+        },
+      },
+    });
+
+    expect(result).toMatchObject({ok: true, serviceInstalled: false});
+    expect(extensionInstalls).toEqual([{homeDir: root, env: expect.objectContaining({XDG_CURRENT_DESKTOP: 'GNOME'})}]);
+  });
+
   it('rejects unsupported runtimes before writing configuration', async () => {
     const output = createOutput();
     const result = await runSetup({
@@ -402,7 +430,7 @@ describe('remote-mouse setup command', () => {
     });
 
     expect(result).toMatchObject({ok: false, message: expect.stringContaining('service manager')});
-    expect(calls).toEqual([{installService: true, configureUinput: false, env: process.env}]);
+    expect(calls).toEqual([{installService: true, configureUinput: false, configureGnomeFocus: false, env: process.env}]);
     expect(fs.existsSync(configDir)).toBe(false);
     expect(output.value()).toContain('service manager is unavailable');
   });

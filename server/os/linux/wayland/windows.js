@@ -5,6 +5,8 @@ export function detectLinuxDisplayServer(env = process.env) {
   const sessionType = String(env.XDG_SESSION_TYPE || '').trim().toLowerCase();
   if (sessionType === 'wayland') return 'wayland';
   if (sessionType === 'x11') return 'x11';
+  if (env.WAYLAND_DISPLAY) return 'wayland';
+  if (env.DISPLAY) return 'x11';
   return 'unknown';
 }
 
@@ -84,9 +86,29 @@ async function focusHyprlandWindow(query) {
   return (await execFileAsync('hyprctl', ['dispatch', 'focuswindow', `address:${client.address}`])).ok;
 }
 
+async function focusMutterWindow(query) {
+  if (!await commandExists('gdbus')) return false;
+  const patterns = [...(query.classes || []), ...(query.names || [])];
+
+  for (const pattern of patterns) {
+    const result = await execFileAsync('gdbus', [
+      'call',
+      '--session',
+      '--dest', 'org.gnome.Shell',
+      '--object-path', '/com/velor/RemoteMouseFocus',
+      '--method', 'com.velor.RemoteMouseFocus.ActivateByClass',
+      pattern,
+    ]);
+    if (result.ok && /true/i.test(result.stdout)) return true;
+  }
+
+  return false;
+}
+
 export async function focusWaylandWindow(query, env = process.env) {
   const compositor = detectWaylandCompositor(env);
   if (compositor === 'sway') return focusSwayWindow(query);
   if (compositor === 'hyprland') return focusHyprlandWindow(query);
+  if (compositor === 'mutter') return focusMutterWindow(query);
   return false;
 }

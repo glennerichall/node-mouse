@@ -52,6 +52,7 @@ export async function validateSetupOperationPrerequisites({
     strategy,
     installService,
     configureUinput,
+    configureGnomeFocus,
     env,
 }) {
     if (!Number.isInteger(port) || port < 1 || port > 65535) {
@@ -63,7 +64,7 @@ export async function validateSetupOperationPrerequisites({
 
     if (!strategy.validatePrerequisites) return '';
     try {
-        return await strategy.validatePrerequisites({installService, configureUinput, env});
+        return await strategy.validatePrerequisites({installService, configureUinput, configureGnomeFocus, env});
     } catch (error) {
         return `Unable to validate host prerequisites: ${error.message}`;
     }

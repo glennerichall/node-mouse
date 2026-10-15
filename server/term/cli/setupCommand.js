@@ -62,7 +62,7 @@ export async function runSetup(
             defaultValue: true,
         });
         setupOptions = strategy.selectHostChanges
-            ? await strategy.selectHostChanges({options, env, input, output})
+            ? await strategy.selectHostChanges({options, env, input, output, homeDir})
             : options;
         operationPrerequisiteError = await validateSetupOperationPrerequisites({
             configDir,
@@ -71,6 +71,7 @@ export async function runSetup(
             strategy,
             installService: Boolean(shouldInstallService),
             configureUinput: Boolean(setupOptions.configureUinput),
+            configureGnomeFocus: Boolean(setupOptions.configureGnomeFocus),
             env,
         });
     } catch (error) {
@@ -92,7 +93,7 @@ export async function runSetup(
             ' (created or updated)' :
             ' (existing settings preserved)'}\n`);
 
-        const hostResult = await strategy.configureHost({options: setupOptions, env, input, output});
+        const hostResult = await strategy.configureHost({options: setupOptions, env, input, output, homeDir});
         if (!hostResult?.ok) return hostResult;
         if (hostResult.message) output.write(`${hostResult.message}\n`);
 

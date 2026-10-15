@@ -84,6 +84,7 @@ export function parseCliArgs(args) {
       .option('yes', {alias: 'y', type: 'boolean', default: false})
       .option('service', {type: 'boolean', default: true})
       .option('configure-uinput', {type: 'boolean', default: false})
+      .option('configure-gnome-focus', {type: 'boolean', default: false})
       .option('config-dir', {type: 'string'})
       .option('port', {type: 'number'}), (argv) => {
       command = {name: 'setup', args: {}};
@@ -91,6 +92,7 @@ export function parseCliArgs(args) {
         yes: Boolean(argv.yes),
         noService: argv.service === false,
         configureUinput: Boolean(argv['configure-uinput']),
+        configureGnomeFocus: Boolean(argv['configure-gnome-focus']),
         configDir: String(argv['config-dir'] || '').trim(),
         port: argv.port,
       };
