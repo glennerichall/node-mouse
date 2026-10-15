@@ -319,6 +319,10 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   l'absence d'élévation en session X11, rendre l'opération idempotente et
   signaler en mode `--check` lorsqu'une reconnexion de session est nécessaire.
 - [ ] PLAT-006 — renforcer les diagnostics VLC, navigateurs et Samsung TV.
+- [x] PLAT-006a — n'afficher dans la télécommande navigateur que les
+  navigateurs réellement installés sur l'hôte; vérifier l'application Flatpak
+  associée lorsque la commande `flatpak` existe, et couvrir le cas où Brave est
+  absent malgré la présence de Flatpak.
 - [ ] PLAT-007 — définir un contrat d'adaptateur avant de multiplier les
   intégrations.
 

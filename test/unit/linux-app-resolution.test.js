@@ -106,4 +106,75 @@ describe('linux app resolution', () => {
       }
     }
   });
+
+  it('does not resolve an uninstalled Flatpak application', async () => {
+    const execFileAsync = jest.fn(async (command, args) => {
+      if (command === 'which' && args[0] === 'flatpak') {
+        return {ok: true, stdout: '/usr/bin/flatpak\n', stderr: ''};
+      }
+      if (command === '/usr/bin/flatpak' && args[0] === 'info') {
+        return {ok: false, stdout: '', stderr: 'error: app/com.brave.Browser/x86_64/stable not installed'};
+      }
+      return {ok: false, stdout: '', stderr: ''};
+    });
+
+    jest.unstable_mockModule('../../server/utils/process.js', () => ({
+      execFileAsync,
+      spawnDetached: jest.fn(),
+    }));
+    jest.unstable_mockModule('../../server/application/logger.js', () => ({
+      createLogger: () => ({
+        debug: jest.fn(),
+        trace: jest.fn(),
+      }),
+    }));
+
+    const {resolveLinuxApp} = await import('../../server/os/linux/app.js');
+    const resolved = await resolveLinuxApp({
+      linux: {
+        commands: ['brave-browser', 'brave'],
+        flatpakAppId: 'com.brave.Browser',
+      },
+    });
+
+    expect(resolved).toBeNull();
+    expect(execFileAsync).toHaveBeenCalledWith(
+      '/usr/bin/flatpak',
+      ['info', 'com.brave.Browser'],
+      expect.objectContaining({timeout: 2000}),
+    );
+  });
+
+  it('prefers a browser executable installed outside Flatpak', async () => {
+    const execFileAsync = jest.fn(async (command, args) => {
+      if (command === 'which' && args[0] === 'brave-browser') {
+        return {ok: true, stdout: '/usr/bin/brave-browser\n', stderr: ''};
+      }
+      throw new Error(`Unexpected command: ${command} ${args.join(' ')}`);
+    });
+
+    jest.unstable_mockModule('../../server/utils/process.js', () => ({
+      execFileAsync,
+      spawnDetached: jest.fn(),
+    }));
+    jest.unstable_mockModule('../../server/application/logger.js', () => ({
+      createLogger: () => ({
+        debug: jest.fn(),
+        trace: jest.fn(),
+      }),
+    }));
+
+    const {resolveLinuxApp} = await import('../../server/os/linux/app.js');
+    const resolved = await resolveLinuxApp({
+      linux: {
+        commands: ['brave-browser', 'brave'],
+        flatpakAppId: 'com.brave.Browser',
+      },
+    });
+
+    expect(resolved).toEqual(expect.objectContaining({
+      launchCommand: '/usr/bin/brave-browser',
+      launchArgs: [],
+    }));
+  });
 });

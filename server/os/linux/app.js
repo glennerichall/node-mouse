@@ -38,7 +38,10 @@ export async function resolveLinuxApp(spec = {}) {
   }
 
   const flatpakCommand = linux.flatpakAppId ? await resolveLinuxCommand('flatpak') : '';
-  if (linux.flatpakAppId && flatpakCommand) {
+  const flatpakAppInstalled = linux.flatpakAppId && flatpakCommand
+    ? await isFlatpakAppInstalled(flatpakCommand, linux.flatpakAppId)
+    : false;
+  if (flatpakAppInstalled) {
     return {
       launchCommand: flatpakCommand,
       launchArgs: ['run', linux.flatpakAppId],
@@ -51,6 +54,13 @@ export async function resolveLinuxApp(spec = {}) {
   }
 
   return null;
+}
+
+async function isFlatpakAppInstalled(flatpakCommand, appId) {
+  const result = await execFileAsync(flatpakCommand, ['info', appId], {
+    timeout: 2000,
+  });
+  return result.ok;
 }
 
 export async function openOrFocusLinuxApp(spec, {maximize = false} = {}) {
