@@ -99,9 +99,22 @@ describe('Linux user daemon service', () => {
 
   it('requests restart asynchronously to avoid terminating the command caller', async () => {
     await expect(restartLinuxDaemon('remote-mouse.service')).resolves.toMatchObject({ok: true});
+    expect(execFileAsync).toHaveBeenCalledWith('systemctl', [
+      '--user', 'enable', 'remote-mouse.service',
+    ], {timeout: 15000});
     expect(spawnDetached).toHaveBeenCalledWith('bash', [
       '-lc', "sleep 0.8; systemctl --user restart 'remote-mouse.service'",
     ]);
+  });
+
+  it('does not request a restart when re-enabling the service fails', async () => {
+    execFileAsync.mockResolvedValueOnce({ok: false, stdout: '', stderr: 'unit not found'});
+
+    await expect(restartLinuxDaemon('remote-mouse.service')).resolves.toEqual({
+      ok: false,
+      message: 'unit not found',
+    });
+    expect(spawnDetached).not.toHaveBeenCalled();
   });
 
   it('reports service state from the user systemd manager', async () => {

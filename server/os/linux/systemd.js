@@ -115,6 +115,14 @@ export async function uninstallLinuxDaemon(serviceName) {
 }
 
 export async function restartLinuxDaemon(serviceName) {
+    const enable = await execFileAsync('systemctl', ['--user', 'enable', serviceName], {timeout: 15000});
+    if (!enable.ok) {
+        return {
+            ok: false,
+            message: enable.stderr || `Impossible d'activer ${serviceName}.`,
+        };
+    }
+
     const spawned = await spawnDetached(
         'bash',
         ['-lc', `sleep 0.8; systemctl --user restart ${shellQuote(serviceName)}`],
