@@ -1,6 +1,7 @@
 import Router from 'router';
 import {createLogger} from '../../application/logger.js';
 import {getClientLabel} from '../client-channel.js';
+import {NOTIFIER_LEVEL_WARNING, NOTIFIER_TARGET_CLIENT} from '../../services/notifier/createNotifierComposite.js';
 
 let log;
 
@@ -29,7 +30,16 @@ export const browserRouter = Router()
             }
 
             eventLog.info({client, browserId}, `Demande open`);
-            await browser.focusOrLaunchBrowser(browserId);
+            const opened = await browser.focusOrLaunchBrowser(browserId);
+            if (opened === false) {
+                request.services.getNotifier().target(NOTIFIER_TARGET_CLIENT).notify({
+                    titleKey: 'notification.browser.title',
+                    messageKey: 'notification.browser.windowUnavailable',
+                    level: NOTIFIER_LEVEL_WARNING,
+                }, {clientId: request.socket.id});
+                response.status(409).send({ok: false});
+                return;
+            }
 
             response.status(201).send({ok: true});
         });

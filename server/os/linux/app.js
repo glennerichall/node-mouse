@@ -83,6 +83,10 @@ export async function openOrFocusLinuxApp(spec, {maximize = false} = {}) {
       }
       await sleep(250);
     }
+
+    // Do not create a second browser instance when the existing process has
+    // no window that the current desktop adapter can activate.
+    return false;
   }
 
   const launched = await spawnLinuxDesktopProcess(resolved.launchCommand, resolved.launchArgs);

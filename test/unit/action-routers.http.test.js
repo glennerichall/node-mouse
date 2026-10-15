@@ -3,7 +3,12 @@ import {jest} from '@jest/globals';
 import {socketRouter} from '../../server/init/routers/socket.router.js';
 
 function createTestServices() {
+    const browser = {focusOrLaunchBrowser: jest.fn().mockResolvedValue(true)};
+    const notify = jest.fn();
     return {
+        browser,
+        notify,
+        getNotifier: () => ({target: () => ({notify})}),
         getConfig: () => ({browser: {enabled: true}, preview: {enabled: true}, vlc: {enabled: true}}),
         getSystemConfig: () => ({adminActionsEnabled: true}),
         getAuthorization: () => ({authorize: () => ({allowed: true})}),
@@ -25,7 +30,7 @@ function createTestServices() {
                 restartService: jest.fn().mockResolvedValue({ok: true, message: 'restarted'}),
                 openServerInfoBrowserServer: jest.fn().mockResolvedValue({ok: true, message: 'opened'}),
             },
-            browser: {focusOrLaunchBrowser: jest.fn().mockResolvedValue(true)},
+            browser,
             preview: {
                 isAvailable: jest.fn(() => true),
                 startForSocket: jest.fn(() => ({stop: jest.fn()})),
@@ -61,6 +66,7 @@ function createTestServices() {
 
 describe('action routers over HTTP transport', () => {
     let app;
+    let services;
 
     function createResponse(resolve) {
         const response = {
@@ -123,7 +129,7 @@ describe('action routers over HTTP transport', () => {
 
     beforeAll(() => {
         app = express();
-        const services = createTestServices();
+        services = createTestServices();
         app.use((request, _response, next) => {
             request.services = services;
             request.socket = {id: 'http-client', securityContext: {}};
@@ -132,6 +138,21 @@ describe('action routers over HTTP transport', () => {
         });
         app.use('/transport', socketRouter);
         app.use((_request, response) => response.status(404).end());
+    });
+
+    it('notifies the client when the browser process cannot expose an activatable window', async () => {
+        const browser = services.getRemotes().browser;
+        browser.focusOrLaunchBrowser.mockResolvedValueOnce(false);
+
+        const response = await request('POST', '/browser/sessions', {browserId: 'chrome'});
+
+        expect(response.statusCode).toBe(409);
+        expect(response.body).toEqual({ok: false});
+        expect(services.notify).toHaveBeenCalledWith(expect.objectContaining({
+            titleKey: 'notification.browser.title',
+            messageKey: 'notification.browser.windowUnavailable',
+            level: 'warning',
+        }), {clientId: 'http-client'});
     });
 
     it.each([

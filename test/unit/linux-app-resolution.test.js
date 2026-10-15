@@ -107,6 +107,47 @@ describe('linux app resolution', () => {
     }
   });
 
+  it('activates an existing browser window instead of launching another one', async () => {
+    const activateWindow = jest.fn(async () => true);
+    const spawnDetached = jest.fn(async () => true);
+    const execFileAsync = jest.fn(async (command, args) => {
+      if (command === 'which' && args[0] === 'chrome') {
+        return {ok: true, stdout: '/usr/bin/google-chrome\n', stderr: ''};
+      }
+      return {ok: false, stdout: '', stderr: ''};
+    });
+
+    jest.unstable_mockModule('../../server/utils/process.js', () => ({
+      execFileAsync,
+      spawnDetached,
+    }));
+    jest.unstable_mockModule('../../server/os/linux/windows.js', () => ({
+      activateWindow,
+      closeWindow: jest.fn(),
+      findWindows: jest.fn(async () => ['0x123']),
+      toggleWindow: jest.fn(),
+    }));
+    jest.unstable_mockModule('../../server/application/logger.js', () => ({
+      createLogger: () => ({
+        debug: jest.fn(),
+        trace: jest.fn(),
+      }),
+    }));
+
+    const {openOrFocusLinuxApp} = await import('../../server/os/linux/app.js');
+    const opened = await openOrFocusLinuxApp({
+      linux: {
+        commands: ['chrome'],
+        processNames: ['chrome'],
+        windowClasses: ['chrome'],
+      },
+    }, {maximize: true});
+
+    expect(opened).toBe(true);
+    expect(activateWindow).toHaveBeenCalledWith('0x123', {maximize: true});
+    expect(spawnDetached).not.toHaveBeenCalled();
+  });
+
   it('does not resolve an uninstalled Flatpak application', async () => {
     const execFileAsync = jest.fn(async (command, args) => {
       if (command === 'which' && args[0] === 'flatpak') {

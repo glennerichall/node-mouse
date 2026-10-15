@@ -51,6 +51,8 @@ export const en = {
   'notification.qrOverlay.title': 'QR overlay',
   'notification.qrOverlay.shown': 'QR overlay shown.',
   'notification.qrOverlay.hidden': 'QR overlay hidden.',
+  'notification.browser.title': 'Browser remote',
+  'notification.browser.windowUnavailable': 'The browser command was received, but its window could not be activated on the host.',
 
   'main.pageTitle': 'Remote Mouse',
   'main.workspaceAria': 'Remote workspace',
