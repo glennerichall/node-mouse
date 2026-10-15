@@ -12,6 +12,8 @@ leur audit et l'uniformisation du code appartiennent à l'[axe CODE](./09-CODE-q
 
 - [ ] QUA-001 — exécuter les tests unitaires et Playwright dans la CI.
 - [ ] QUA-002 — renforcer progressivement les tests des zones critiques.
+  - [x] QUA-002a — protéger la baseline de couverture Jest avec des seuils
+    globaux vérifiables et non bloquants pour les nouveaux travaux.
 - [ ] QUA-003 — couvrir sessions, rôles, proxies et contrats de transport par
   des tests de sécurité.
 - [ ] QUA-004 — tester les installations Linux, Windows et macOS, ainsi que la

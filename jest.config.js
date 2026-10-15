@@ -12,5 +12,13 @@ export default {
     'server/**/*.js',
     '!server/**/index.js',
   ],
+  coverageThreshold: {
+    global: {
+      statements: 70,
+      branches: 55,
+      functions: 70,
+      lines: 70,
+    },
+  },
   coverageReporters: ['text', 'lcov'],
 };

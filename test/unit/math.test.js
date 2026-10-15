@@ -9,6 +9,10 @@ describe('pointer speed curve', () => {
     expect(applyPointerSpeedCurve(10, 0, 10, 1.5, 4)).toEqual({dx: 40, dy: 0});
   });
 
+  it('preserves the configured fast gain of 20 for fast movement', () => {
+    expect(applyPointerSpeedCurve(10, 0, 10, 1.5, 20)).toEqual({dx: 200, dy: 0});
+  });
+
   it('interpolates monotonically between the configured endpoints', () => {
     const {dx} = applyPointerSpeedCurve(4, 0, 10, 1.5, 4);
 

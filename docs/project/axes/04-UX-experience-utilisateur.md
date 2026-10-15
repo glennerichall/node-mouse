@@ -45,6 +45,8 @@ compréhensibles sur mobile et desktop.
 - [x] UX-006e — augmenter à 20 la borne maximale de la vitesse rapide locale
   afin de couvrir les hôtes nécessitant un gain tactile supérieur à 8, sans
   modifier la valeur par défaut ni la borne de la vitesse lente.
+- [x] UX-006f — appliquer effectivement la borne de gain rapide à 20 dans la
+  courbe de déplacement tactile et protéger ce contrat par un test unitaire.
 - [x] UX-007 — nommer explicitement la commande d'affichage du QR comme une
   bascule et traduire son libellé et son intitulé accessible dans toutes les
   langues prises en charge.

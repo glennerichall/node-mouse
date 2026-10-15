@@ -16,7 +16,7 @@ export function applyPointerSpeedCurve(dx, dy, elapsedMs, slowSpeed = 1.3, fastS
   const normalized = clamp((pointerSpeed - 0.05) / 0.7, 0, 1);
   const curvePosition = normalized ** 1.65;
   const minimumGain = clamp(Number(slowSpeed) || 1.3, 0.25, 5);
-  const maximumGain = clamp(Number(fastSpeed) || 3, minimumGain, 8);
+  const maximumGain = clamp(Number(fastSpeed) || 3, minimumGain, 20);
   const gain = minimumGain + (maximumGain - minimumGain) * curvePosition;
 
   return {
