@@ -92,6 +92,47 @@ session cookies will no longer be valid, so connected clients must establish a
 new session. Back up the configuration file securely before editing it, and do
 not reuse the previous secret.
 
+### Recovery after local data loss
+
+Remote Mouse stores its local SQLite database at the path in
+`PERSISTENCE_DB_PATH`. A normal setup writes this file as
+`<CONFIG_DIR>/remote-mouse.sqlite3`; SQLite may also create adjacent
+`-wal` and `-shm` files. The `.env` file and the database are separate: moving
+or recreating the database does not recreate the session secret or the other
+environment settings.
+
+Before changing local data, stop the service and make a private backup of the
+configuration directory. Keep the `.env`, database, and any adjacent SQLite
+WAL files together. Never attach the `.env` or an unredacted database to a
+support report. If the server is still available, run
+`remote-mouse diagnostic` first; its gzip archive is designed for sharing and
+does not include session or entry tokens.
+
+On startup, the server runs a SQLite integrity check. If it reports a
+`Persistence database integrity check failed` error, keep the original files
+and move the database set to a timestamped recovery directory instead of
+deleting it. Start Remote Mouse again to create a new empty local database.
+The server configuration remains in `.env`, but paired device sessions,
+persisted application settings, update history, and restart history stored in
+SQLite must be recreated. Pair the devices again and reapply any settings that
+were stored through the web configuration page. If the backup is healthy, stop
+the service, restore the complete database set, and start it again.
+
+If the session secret is missing or invalid, restore the previous
+`SESSION_COOKIE_SECRET` from a trusted configuration backup. Otherwise run
+`openssl rand -hex 32`, replace the value in `.env`, and restart the service.
+This makes existing browser session cookies invalid; every client must open a
+new entry URL or scan the QR code again. Keep the new secret private and do not
+write it into logs, diagnostic archives, or shell history.
+
+After recovery, verify the installed version with `remote-mouse version`, check
+the service status, open `/health`, and review `remote-mouse diagnostic` for
+remaining startup errors. On Linux, inspect the user service with
+`systemctl --user status remote-mouse.service` and its logs with
+`journalctl --user -u remote-mouse.service`; on Windows, inspect the configured
+Task Scheduler entry and run the same CLI and HTTP checks from the user
+session.
+
 The setup command handles:
 
 - Node.js version and supported-platform validation
