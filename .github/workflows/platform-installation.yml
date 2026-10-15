@@ -128,7 +128,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install GNOME extension runtime
-        run: sudo apt-get update && sudo apt-get install --yes gjs gnome-shell-common
+        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends gjs gnome-shell
       - name: Pack the GNOME extension
         shell: bash
         run: |
