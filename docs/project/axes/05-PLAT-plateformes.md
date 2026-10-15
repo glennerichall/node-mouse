@@ -323,6 +323,9 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   navigateurs réellement installés sur l'hôte; vérifier l'application Flatpak
   associée lorsque la commande `flatpak` existe, et couvrir le cas où Brave est
   absent malgré la présence de Flatpak.
+- [x] PLAT-006b — séparer la gestion des fenêtres X11 et Wayland pour l'action
+  navigateur; détecter le compositeur Wayland et utiliser son IPC lorsqu'il
+  expose une activation ciblée, avec repli sur le mécanisme X11 existant.
 - [ ] PLAT-007 — définir un contrat d'adaptateur avant de multiplier les
   intégrations.
 

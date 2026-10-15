@@ -1,7 +1,12 @@
 import {execFileAsync} from '../../utils/process.js';
 import {activateWindow, closeWindow, findWindows, toggleWindow} from './windows.js';
 import {resolveLinuxCommand, spawnLinuxDesktopProcess} from './process.js';
+import {detectLinuxDisplayServer, focusWaylandWindow} from './wayland/windows.js';
 import {sleep} from "../../../utils/sync.js";
+
+function isWaylandSession() {
+  return detectLinuxDisplayServer() === 'wayland';
+}
 
 export async function isAnyProcessRunning(processNames = []) {
   const checks = [];
@@ -69,6 +74,10 @@ export async function openOrFocusLinuxApp(spec, {maximize = false} = {}) {
     return false;
   }
 
+  if (isWaylandSession() && await focusWaylandWindow(resolved.windowQuery)) {
+    return true;
+  }
+
   const windowIds = await findWindows(resolved.windowQuery);
   if (windowIds.length > 0) {
     return activateWindow(windowIds[0], {maximize});
@@ -82,6 +91,13 @@ export async function openOrFocusLinuxApp(spec, {maximize = false} = {}) {
         return activateWindow(ids[0], {maximize});
       }
       await sleep(250);
+    }
+
+    // Native Wayland windows are not discoverable through wmctrl/xdotool. The
+    // browser's own single-instance IPC can still route the command to the
+    // running instance and let the browser request activation itself.
+    if (isWaylandSession()) {
+      return spawnLinuxDesktopProcess(resolved.launchCommand, resolved.launchArgs);
     }
 
     // Do not create a second browser instance when the existing process has

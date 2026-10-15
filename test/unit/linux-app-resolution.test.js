@@ -148,6 +148,61 @@ describe('linux app resolution', () => {
     expect(spawnDetached).not.toHaveBeenCalled();
   });
 
+  it('routes focus to the running browser command when native Wayland hides its window', async () => {
+    const previousSessionType = process.env.XDG_SESSION_TYPE;
+    process.env.XDG_SESSION_TYPE = 'wayland';
+    const spawnDetached = jest.fn(async () => true);
+    const execFileAsync = jest.fn(async (command, args) => {
+      if (command === 'which' && args[0] === 'chrome') {
+        return {ok: true, stdout: '/usr/bin/google-chrome\n', stderr: ''};
+      }
+      if (command === 'pgrep') {
+        return {ok: true, stdout: '1234\n', stderr: ''};
+      }
+      return {ok: false, stdout: '', stderr: ''};
+    });
+
+    jest.unstable_mockModule('../../server/utils/process.js', () => ({
+      execFileAsync,
+      spawnDetached,
+    }));
+    jest.unstable_mockModule('../../server/os/linux/windows.js', () => ({
+      activateWindow: jest.fn(),
+      closeWindow: jest.fn(),
+      findWindows: jest.fn(async () => []),
+      toggleWindow: jest.fn(),
+    }));
+    jest.unstable_mockModule('../../utils/sync.js', () => ({
+      sleep: jest.fn(async () => {}),
+    }));
+    jest.unstable_mockModule('../../server/application/logger.js', () => ({
+      createLogger: () => ({
+        debug: jest.fn(),
+        trace: jest.fn(),
+      }),
+    }));
+
+    try {
+      const {openOrFocusLinuxApp} = await import('../../server/os/linux/app.js');
+      const opened = await openOrFocusLinuxApp({
+        linux: {
+          commands: ['chrome'],
+          processNames: ['chrome'],
+          windowClasses: ['chrome'],
+        },
+      });
+
+      expect(opened).toBe(true);
+      expect(spawnDetached).toHaveBeenCalledWith('/usr/bin/google-chrome', []);
+    } finally {
+      if (previousSessionType === undefined) {
+        delete process.env.XDG_SESSION_TYPE;
+      } else {
+        process.env.XDG_SESSION_TYPE = previousSessionType;
+      }
+    }
+  });
+
   it('does not resolve an uninstalled Flatpak application', async () => {
     const execFileAsync = jest.fn(async (command, args) => {
       if (command === 'which' && args[0] === 'flatpak') {
