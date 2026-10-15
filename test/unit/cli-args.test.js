@@ -13,6 +13,11 @@ describe('cli args parser', () => {
     [['wayland'], {command: {name: 'wayland', args: {action: 'status'}}, options: {verbosity: 0}}],
     [['open-qr'], {command: {name: 'open-qr', args: {}}, options: {verbosity: 0}}],
     [['qr'], {command: {name: 'qr', args: {}}, options: {verbosity: 0}}],
+    [['update-check'], {command: {name: 'update-check', args: {}}, options: {verbosity: 0}}],
+    [['update'], {command: {name: 'update', args: {}}, options: {verbosity: 0}}],
+    [['security'], {command: {name: 'security', args: {action: 'list', sessionId: ''}}, options: {verbosity: 0}}],
+    [['security', 'revoke', 'session-1'], {command: {name: 'security', args: {action: 'revoke', sessionId: 'session-1'}}, options: {verbosity: 0}}],
+    [['rotate-token'], {command: {name: 'rotate-token', args: {}} , options: {verbosity: 0}}],
   ])('parses %j', (args, expected) => {
     expect(parseCliArgs(args)).toEqual(expected);
   });

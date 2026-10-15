@@ -487,6 +487,11 @@ Useful CLI commands:
 - `tasks` prints the task manager snapshot
 - `task-manager` is an alias of `tasks`
 - `update-events` prints persisted update-manager events
+- `update-check` forces an update check through the running local daemon
+- `update` installs the detected update through the running local daemon
+- `security` lists paired sessions; use `security revoke <sessionId>` or
+  `security revoke-all` to revoke them from the local terminal
+- `rotate-token` rotates the entry token through the local daemon
 - `samsung-detect` detects Samsung TVs available on the network
 - `tokens` lists persisted entry tokens
 - `open-qr` opens the QR page on the server

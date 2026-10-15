@@ -454,4 +454,56 @@ describe('server cli', () => {
       },
     });
   });
+
+  it('delegates update-check and update to the existing admin actions', async () => {
+    const forceUpdateCheck = jest.fn().mockResolvedValue({ok: true, message: 'checked'});
+    const installUpdate = jest.fn().mockResolvedValue({ok: true, message: 'updated'});
+    const services = {
+      getRemotes: () => ({adminActions: {forceUpdateCheck, installUpdate}}),
+    };
+
+    await expect(executeCliCommand(services, {name: 'update-check', args: {}}))
+      .resolves.toEqual({ok: true, message: 'checked'});
+    await expect(executeCliCommand(services, {name: 'update', args: {}}))
+      .resolves.toEqual({ok: true, message: 'updated'});
+    expect(forceUpdateCheck).toHaveBeenCalledWith();
+    expect(installUpdate).toHaveBeenCalledWith();
+  });
+
+  it('delegates entry-token rotation to the QR action facade', async () => {
+    const rotateEntryToken = jest.fn().mockResolvedValue({ok: true, message: 'rotated'});
+    const result = await executeCliCommand({
+      getRemotes: () => ({qrActions: {rotateEntryToken}}),
+    }, {name: 'rotate-token', args: {}});
+
+    expect(rotateEntryToken).toHaveBeenCalledWith();
+    expect(result).toEqual({ok: true, message: 'rotated'});
+  });
+
+  it('lists and revokes security sessions through the local admin CLI', async () => {
+    const revokeSession = jest.fn(() => true);
+    const disconnect = jest.fn();
+    const services = {
+      getDeviceSessionService: () => ({
+        listSessions: () => [{id: 'session-1', state: 'active'}],
+        listHistory: () => [],
+        revokeSession,
+      }),
+      getServer: () => ({io: {of: () => ({sockets: new Map([['socket-1', {
+        securityContext: {deviceSessionId: 'session-1'},
+        disconnect,
+      }]])})}}),
+    };
+
+    await expect(executeCliCommand(services, {name: 'security', args: {action: 'list', sessionId: ''}}))
+      .resolves.toEqual({
+        ok: true,
+        message: 'Sessions de securite.',
+        data: {sessions: [{id: 'session-1', state: 'active'}], history: []},
+      });
+    await expect(executeCliCommand(services, {name: 'security', args: {action: 'revoke', sessionId: 'session-1'}}))
+      .resolves.toEqual({ok: true, message: 'Session session-1 revoquee.'});
+    expect(revokeSession).toHaveBeenCalledWith('session-1');
+    expect(disconnect).toHaveBeenCalledWith(true);
+  });
 });

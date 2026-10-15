@@ -9,6 +9,7 @@ import {executeTasksCommand} from './commands/tasksCommand.js';
 import {executeTokensCommand} from './commands/tokensCommand.js';
 import {executeUpdateEventsCommand} from './commands/updateEventsCommand.js';
 import {executeWaylandCommand} from './commands/waylandCommand.js';
+import {executeAdminCommand} from './commands/adminCommand.js';
 import {formatCliCommand} from '../cli/parseCliArgs.js';
 
 const commandHandlers = {
@@ -24,6 +25,10 @@ const commandHandlers = {
   tasks: executeTasksCommand,
   'task-manager': executeTasksCommand,
   'update-events': executeUpdateEventsCommand,
+  'update-check': (services) => executeAdminCommand(services, {action: 'update-check'}),
+  update: (services) => executeAdminCommand(services, {action: 'update'}),
+  security: executeAdminCommand,
+  'rotate-token': (services) => executeAdminCommand(services, {action: 'rotate-token'}),
   'samsung-detect': executeSamsungDetectCommand,
   tokens: executeTokensCommand,
   wayland: executeWaylandCommand,

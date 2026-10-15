@@ -106,6 +106,26 @@ export function parseCliArgs(args) {
     .command('update-events', false, () => {}, () => {
       command = {name: 'update-events', args: {}};
     })
+    .command('update-check', false, () => {}, () => {
+      command = {name: 'update-check', args: {}};
+    })
+    .command('update', false, () => {}, () => {
+      command = {name: 'update', args: {}};
+    })
+    .command('security [action] [sessionId]', false, (builder) => builder
+      .positional('action', {type: 'string', default: 'list'})
+      .positional('sessionId', {type: 'string'}), (argv) => {
+      command = {
+        name: 'security',
+        args: {
+          action: String(argv.action || 'list').trim(),
+          sessionId: String(argv.sessionId || '').trim(),
+        },
+      };
+    })
+    .command('rotate-token', false, () => {}, () => {
+      command = {name: 'rotate-token', args: {}};
+    })
     .command('samsung-detect', false, () => {}, () => {
       command = {name: 'samsung-detect', args: {}};
     })

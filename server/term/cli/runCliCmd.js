@@ -47,6 +47,10 @@ export async function runCliCmd(args) {
         console.log('  remote-mouse tasks        Affiche les informations du task manager');
         console.log('  remote-mouse task-manager Alias de tasks');
         console.log('  remote-mouse update-events Affiche les evenements persistés du update-manager');
+        console.log('  remote-mouse update-check Force une verification de mise a jour');
+        console.log('  remote-mouse update       Installe la mise a jour disponible');
+        console.log('  remote-mouse security [list|revoke <sessionId>|revoke-all] Gere les sessions de securite');
+        console.log('  remote-mouse rotate-token Fait tourner le token d entree');
         console.log('  remote-mouse info --verbosity 2 Affiche les capacites serveur avec logs detailles');
         console.log('  remote-mouse system-info  Alias de info');
         console.log('  remote-mouse tokens       Liste les tokens en base');
