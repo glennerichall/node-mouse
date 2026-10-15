@@ -93,7 +93,7 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   tarball npm lorsque ces artéfacts restent ignorés par Git; aligner les règles
   `.gitignore`, `.npmignore` et l'allowlist `files` sur chaque fichier natif,
   puis vérifier la chaîne réelle de `npm publish --dry-run`.
-- [ ] PLAT-001k — préserver l'activation du service `systemd --user` après une
+- [x] PLAT-001k — préserver l'activation du service `systemd --user` après une
   mise à jour de l'application, afin que le service actif soit aussi relancé au
   prochain démarrage; réactiver l'unité avant le redémarrage post-mise-à-jour et
   tester l'ordre des commandes sans hôte systemd réel.

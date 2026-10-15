@@ -78,6 +78,13 @@ jobs:
       - name: Install X11 runtime and build dependencies
         run: sudo apt-get update && sudo apt-get install --yes build-essential libpng-dev libx11-dev libxtst-dev xvfb x11-utils xdotool
       - run: npm ci
+      - name: Build the XWayland overlay helper
+        run: npm run build:xwayland-overlay
+      - name: Validate ordered XWayland overlay commands
+        run: >-
+          NODE_OPTIONS=--experimental-vm-modules
+          ./node_modules/.bin/jest --runInBand --coverage=false
+          test/unit/xwayland-overlay-ipc.test.js
       - name: Install the packed npm artifact
         shell: bash
         run: |
