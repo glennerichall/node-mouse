@@ -122,6 +122,23 @@ jobs:
             node test/integration/host-install/run-host-smoke.mjs
           '
 
+  gnome-extension:
+    name: GNOME Shell extension
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install GNOME extension runtime
+        run: sudo apt-get update && sudo apt-get install --yes gjs gnome-shell-common
+      - name: Pack the GNOME extension
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/gnome-extension"
+          gnome-extensions pack --force --out-dir "$RUNNER_TEMP/gnome-extension" \
+            native/gnome-shell/remote-mouse-focus@velor
+          test -f "$RUNNER_TEMP/gnome-extension/remote-mouse-focus@velor.shell-extension.zip"
+      - name: Run the extension with GJS
+        run: gjs --module test/integration/gnome-focus-extension.mjs
+
   windows:
     name: Windows installation and startup
     # Pin the runner while node-gyp catches up with the newer VS toolset used

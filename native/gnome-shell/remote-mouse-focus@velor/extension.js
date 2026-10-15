@@ -20,6 +20,23 @@ function matchesWindow(window, pattern) {
     || includesIgnoreCase(window.get_title(), pattern);
 }
 
+export function activateMatchingWindow(actors, pattern, timestamp) {
+  for (const actor of actors || []) {
+    const window = actor.get_meta_window();
+    if (!matchesWindow(window, pattern)) continue;
+
+    const workspace = window.get_workspace();
+    if (workspace) {
+      workspace.activate_with_focus(window, timestamp);
+    } else {
+      window.activate(timestamp);
+    }
+    return true;
+  }
+
+  return false;
+}
+
 export default class RemoteMouseFocus {
   enable() {
     this._dbus = Gio.DBusExportedObject.wrapJSObject(DBUS_INTERFACE, this);
@@ -32,20 +49,10 @@ export default class RemoteMouseFocus {
   }
 
   ActivateByClass(className) {
-    for (const actor of global.get_window_actors()) {
-      const window = actor.get_meta_window();
-      if (!matchesWindow(window, className)) continue;
-
-      const workspace = window.get_workspace();
-      const timestamp = global.get_current_time();
-      if (workspace) {
-        workspace.activate_with_focus(window, timestamp);
-      } else {
-        window.activate(timestamp);
-      }
-      return true;
-    }
-
-    return false;
+    return activateMatchingWindow(
+      global.get_window_actors(),
+      className,
+      global.get_current_time(),
+    );
   }
 }
