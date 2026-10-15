@@ -59,8 +59,34 @@ compréhensibles sur mobile et desktop.
 - [ ] UX-011 — fournir une page de calibration du pointeur Remote Mouse ouverte
   dans le navigateur de l'hôte, qui mesure le déplacement réellement reçu sur
   des cibles aléatoires à distances variables, recueille les deltas bruts et
-  ajustés, ajuste une fonction de transfert polynomiale bornée, puis propose et
+  ajustés, ajuste une fonction de transfert bornée, puis propose et
   peut appliquer la calibration à la remote cliente.
+- [ ] UX-011a — remplacer les durées cibles arbitraires de UX-011 par une
+  calibration expérimentale à quatre seuils de vitesse : initialiser chaque
+  gain à l'unité, placer les cibles à quatre distances normalisées, mesurer le
+  temps de réussite, puis ajuster le gain du seuil par recherche locale et
+  appliquer les quatre gains interpolés à la remote.
+- [ ] UX-011b — détecter les dépassements de la cible B pendant chaque essai,
+  diminuer prioritairement le gain du seuil concerné en cas de dépassement,
+  augmenter le gain seulement sans dépassement lorsque le temps augmente, et
+  conserver le gain lorsque la performance s'améliore sans erreur.
+- [ ] UX-011c — déterminer le dépassement à partir des deltas ajustés : vérifier
+  que le déplacement net suit le vecteur A→B, puis comparer la distance totale
+  parcourue à la distance directe entre les deux cibles.
+- [ ] UX-011d — compter les contacts tactiles distincts nécessaires pour un
+  essai, augmenter le gain lorsque l'utilisateur doit reprendre son doigt pour
+  atteindre B, et conserver la baisse prioritaire en cas de dépassement.
+- [ ] UX-011e — commencer la calibration par le seuil de plus longue distance,
+  utiliser un pas initial de gain moins conservateur et afficher explicitement
+  le seuil actuellement calibré.
+- [ ] UX-011f — répéter les essais d'un seuil jusqu'à stabiliser trois temps
+  consécutifs dans une tolérance définie, conserver l'affichage des seuils déjà
+  calibrés et ne passer au seuil suivant qu'après cette stabilisation.
+- [ ] UX-011g — isoler le gain du seuil testé en neutralisant temporairement
+  les autres gains pendant ses essais, et détecter le dépassement par la
+  progression cumulée dans la direction A→B.
+- [x] UX-011h — abandonner le parcours de calibration expérimentale et revenir
+  à la configuration locale des gains lent et rapide dans les Préférences.
 
 UX-001/002 dépendent de SEC-008, terminé : l'API admin fournit la liste des
 sessions, leur rôle, leur état, leur dernière activité et la révocation

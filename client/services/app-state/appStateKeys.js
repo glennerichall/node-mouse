@@ -13,7 +13,6 @@ export const APP_STATE_BROWSER_VISIBILITY = 'preferences.browserVisibility';
 export const APP_STATE_POINTER_SLOW_SPEED = 'preferences.pointerSlowSpeed';
 export const APP_STATE_POINTER_FAST_SPEED = 'preferences.pointerFastSpeed';
 export const APP_STATE_POINTER_ACCELERATION = 'preferences.pointerAcceleration';
-export const APP_STATE_POINTER_TRANSFER = 'preferences.pointerTransfer';
 
 export const APP_STATE_EFFECTIVE_BROWSER_REMOTE_VISIBLE = 'effective.remote.browser.visible';
 export const APP_STATE_EFFECTIVE_KEYBOARD_REMOTE_VISIBLE = 'effective.remote.keyboard.visible';

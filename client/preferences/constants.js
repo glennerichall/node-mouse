@@ -6,7 +6,6 @@ export const BROWSER_VISIBILITY_STORAGE_KEY = 'remote-mouse.browser-visibility';
 export const POINTER_SLOW_SPEED_STORAGE_KEY = 'remote-mouse.pointer-speed';
 export const POINTER_FAST_SPEED_STORAGE_KEY = 'remote-mouse.pointer-fast-speed';
 export const POINTER_ACCELERATION_STORAGE_KEY = 'remote-mouse.pointer-acceleration';
-export const POINTER_TRANSFER_STORAGE_KEY = 'remote-mouse.pointer-transfer';
 export const PREFERENCES_STORAGE_CHANGED_EVENT = 'preferences-storage:changed';
 
 export const THEME_CHANGED_EVENT = 'theme:changed';

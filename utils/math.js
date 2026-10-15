@@ -24,15 +24,3 @@ export function applyPointerSpeedCurve(dx, dy, elapsedMs, slowSpeed = 1.3, fastS
     dy: dy * gain,
   };
 }
-
-export function applyPointerTransfer(dx, dy, elapsedMs, coefficients = []) {
-  const dt = Math.max(Number(elapsedMs) || 1, 1);
-  const speed = Math.hypot(dx, dy) / dt;
-  const x = clamp(speed / 0.75, 0, 1);
-  let gain = 0;
-  for (let index = coefficients.length - 1; index >= 0; index -= 1) {
-    gain = gain * x + Number(coefficients[index] || 0);
-  }
-  const boundedGain = clamp(Number.isFinite(gain) ? gain : 1.3, 0.25, 8);
-  return {dx: dx * boundedGain, dy: dy * boundedGain};
-}

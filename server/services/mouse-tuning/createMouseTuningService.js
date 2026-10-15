@@ -47,7 +47,7 @@ export function createMouseTuningService({now = Date.now} = {}) {
     return session.transferFunction.length >= 2;
   }
 
-  function recordMovement({sessionId, deviceSessionId, rawDx, rawDy, adjustedDx, adjustedDy, elapsedMs}) {
+  function recordMovement({sessionId, deviceSessionId, rawDx, rawDy, adjustedDx, adjustedDy, elapsedMs, touchSequence}) {
     const session = getSession(sessionId);
     if (!session || session.deviceSessionId !== String(deviceSessionId || '')) return false;
     session.events.push({
@@ -59,6 +59,7 @@ export function createMouseTuningService({now = Date.now} = {}) {
       adjustedDx: Number(adjustedDx) || 0,
       adjustedDy: Number(adjustedDy) || 0,
       elapsedMs: Math.max(Number(elapsedMs) || 1, 1),
+      touchSequence: Number.isFinite(Number(touchSequence)) ? Number(touchSequence) : null,
     });
     if (session.events.length > MAX_EVENTS) session.events.splice(0, session.events.length - MAX_EVENTS);
     return true;

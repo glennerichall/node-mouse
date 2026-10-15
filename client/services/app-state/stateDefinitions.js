@@ -7,7 +7,6 @@ import {
   POINTER_SLOW_SPEED_STORAGE_KEY,
   POINTER_FAST_SPEED_STORAGE_KEY,
   POINTER_ACCELERATION_STORAGE_KEY,
-  POINTER_TRANSFER_STORAGE_KEY,
 } from '../../preferences/constants.js';
 import {LOCALE_STORAGE_KEY} from '../../i18n/constants.js';
 import {resolveLocale} from '../../i18n/core.js';
@@ -24,7 +23,6 @@ import {
   APP_STATE_POINTER_SLOW_SPEED,
   APP_STATE_POINTER_FAST_SPEED,
   APP_STATE_POINTER_ACCELERATION,
-  APP_STATE_POINTER_TRANSFER,
 } from './appStateKeys.js';
 import {
   normalizeBooleanRecord,
@@ -50,17 +48,6 @@ export const APP_STATE_DEFINITIONS = {
   [APP_STATE_POINTER_ACCELERATION]: {
     store: APP_STATE_STORE_PERSIST, storageKey: POINTER_ACCELERATION_STORAGE_KEY, defaultValue: true,
     normalize: (value) => value === true || value === 'true', serialize: String,
-  },
-  [APP_STATE_POINTER_TRANSFER]: {
-    store: APP_STATE_STORE_PERSIST, storageKey: POINTER_TRANSFER_STORAGE_KEY, defaultValue: [],
-    normalize: (value) => {
-      let parsed = value;
-      if (typeof parsed === 'string') {
-        try { parsed = JSON.parse(parsed); } catch (_error) { return []; }
-      }
-      if (!Array.isArray(parsed)) return [];
-      return parsed.slice(0, 5).map(Number).filter(Number.isFinite);
-    }, serialize: JSON.stringify,
   },
   [APP_STATE_PREVIEW_ACTIVITY_AT]: {
     store: APP_STATE_STORE_STATE,

@@ -77,6 +77,21 @@ for package in "${system_packages[@]}"; do
   fi
 done
 
+wayland_session=0
+if [[ "${XDG_SESSION_TYPE:-}" == wayland ]]; then
+  wayland_session=1
+fi
+
+uinput_rule_path="/etc/udev/rules.d/70-remote-mouse-uinput.rules"
+uinput_group_name="remote-mouse-uinput"
+uinput_access_ready=1
+if ((wayland_session)); then
+  if [[ ! -r "$uinput_rule_path" ]] || ! id -nG "$USER" 2>/dev/null | tr ' ' '\n' | grep -qx "$uinput_group_name"; then
+    uinput_access_ready=0
+  fi
+  [[ -c /dev/uinput ]] || uinput_access_ready=0
+fi
+
 arm64_arch_enabled=0
 if [[ "$host_arch" == amd64 ]] && dpkg --print-foreign-architectures | grep -qx arm64; then
   arm64_arch_enabled=1
@@ -139,6 +154,15 @@ if ((check_only)); then
   else
     echo "Project native helpers: ready"
   fi
+  if ((wayland_session)); then
+    if ((uinput_access_ready)); then
+      echo "Wayland uinput access: ready"
+    else
+      echo "Wayland uinput access: missing; run setup and reconnect the desktop session"
+    fi
+  else
+    echo "Wayland uinput access: skipped (session is not Wayland)"
+  fi
   if [[ "$host_arch" == amd64 ]]; then
     if ((arm64_arch_enabled)); then echo "ARM64 foreign architecture: ready"; else echo "ARM64 foreign architecture: missing"; fi
     if ((arm64_source_ready)); then echo "Ubuntu ARM64 package source: ready"; else echo "Ubuntu ARM64 package source: missing"; fi
@@ -156,7 +180,7 @@ if ((check_only)); then
   else
     local_missing_prebuilds=0
   fi
-  if ((${#missing_packages[@]} || ${#missing_native[@]} || local_missing_prebuilds)) \
+  if ((${#missing_packages[@]} || ${#missing_native[@]} || local_missing_prebuilds || !uinput_access_ready)) \
     || [[ ! -d "$project_dir/node_modules" ]] \
     || { [[ "$host_arch" == amd64 ]] && { ((!arm64_arch_enabled)) || ((!arm64_source_ready)); }; }; then
     exit 1
@@ -208,6 +232,14 @@ if ((${#missing_packages[@]} || apt_metadata_changed)); then
   if ((${#missing_packages[@]})); then
     sudo apt-get install -y --no-install-recommends "${missing_packages[@]}"
   fi
+fi
+
+if ((wayland_session && !uinput_access_ready)); then
+  if ! command -v sudo >/dev/null 2>&1; then
+    echo "sudo is required to configure /dev/uinput for a Wayland development session." >&2
+    exit 1
+  fi
+  sudo bash "$project_dir/scripts/configure-uinput-access.sh" "$USER"
 fi
 
 cd "$project_dir"

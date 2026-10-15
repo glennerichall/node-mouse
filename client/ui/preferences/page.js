@@ -12,7 +12,6 @@ import {initializeCoreServices} from '../../services/createServicesContainer.js'
 import {bindPreferenceSwitchers} from './bindPreferenceSwitchers.js';
 import {
   APP_STATE_POINTER_SLOW_SPEED, APP_STATE_POINTER_FAST_SPEED, APP_STATE_POINTER_ACCELERATION,
-  APP_STATE_POINTER_TRANSFER,
 } from '../../services/app-state/createAppStateService.js';
 
 const services = createServicesRegistry();
@@ -59,25 +58,7 @@ document.getElementById('pointer-preferences-reset').addEventListener('click', (
   pointerState.set(APP_STATE_POINTER_SLOW_SPEED, 1.3);
   pointerState.set(APP_STATE_POINTER_FAST_SPEED, 3);
   pointerState.set(APP_STATE_POINTER_ACCELERATION, true);
-  pointerState.set(APP_STATE_POINTER_TRANSFER, []);
   syncPointerPreferences();
-});
-document.getElementById('pointer-tuning-host').addEventListener('click', () => {
-  const button = document.getElementById('pointer-tuning-host');
-  button.disabled = true;
-  fetch('/api/client/mouse-tuning/browser', {method: 'POST'})
-    .then(async (response) => {
-      const result = await response.json();
-      if (!response.ok || !result.ok) throw new Error(result.message || 'Impossible d’ouvrir la calibration.');
-      document.getElementById('pointer-tuning-status').textContent = 'Calibration ouverte sur l’hôte.';
-      window.location.assign('/');
-    })
-    .catch((error) => {
-      document.getElementById('pointer-tuning-status').textContent = error.message;
-    })
-    .finally(() => {
-      button.disabled = false;
-    });
 });
 syncPointerPreferences();
 

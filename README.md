@@ -181,6 +181,9 @@ set `REMOTE_MOUSE_WAYLAND_INPUT=portal`.
 To prepare a distributable native artifact set, run `npm run setup:dev:linux`.
 On an x64 Debian/Ubuntu host, this installs (after confirmation) the cross
 toolchain and ARM64 X11/PNG development libraries, then builds both targets.
+When run from a Wayland session, the setup also configures the restricted
+`/dev/uinput` access required by the development server; reconnect the desktop
+session before running `npm run dev` if the dedicated group was just created.
 To build ARM64 manually after preparing the host, run:
 
 ```bash

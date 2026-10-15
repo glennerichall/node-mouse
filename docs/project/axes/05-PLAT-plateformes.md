@@ -314,6 +314,10 @@ Linux, Windows et à terme macOS, avec des intégrations système extensibles.
   obsolètes après l'ajout des validations natives GitHub Actions; supprimer les
   profils Jest/Playwright, le `DesktopProbe`, le runner distant et les scripts
   `dev/deploy/`, sans retirer les smoke tests multiplateformes actifs.
+- [x] PLAT-005j — faire préparer automatiquement l'accès `/dev/uinput` par
+  `dev/setup-linux.sh` lorsqu'il est lancé dans une session Wayland; conserver
+  l'absence d'élévation en session X11, rendre l'opération idempotente et
+  signaler en mode `--check` lorsqu'une reconnexion de session est nécessaire.
 - [ ] PLAT-006 — renforcer les diagnostics VLC, navigateurs et Samsung TV.
 - [ ] PLAT-007 — définir un contrat d'adaptateur avant de multiplier les
   intégrations.

@@ -13,7 +13,7 @@
       <div>
         <p class="eyebrow">Pointeur</p>
         <h1>Calibration du pointeur</h1>
-        <p class="hero-copy">Utilisez la remote sur le téléphone. Cliquez A, déplacez le pointeur jusqu'à B, puis cliquez B. La mesure et l'ajustement se font automatiquement.</p>
+        <p class="hero-copy">Utilisez la remote sur le téléphone. Cliquez A, déplacez le pointeur jusqu'à B, puis cliquez B. Les distances augmentent progressivement et le gain est ajusté pour chaque seuil de vitesse.</p>
       </div>
       <div class="hero-actions">
         <a class="secondary-link" href="/ui/admin/preferences">Préférences</a>
@@ -25,7 +25,7 @@
       <div class="section-heading-copy">
         <p class="section-key">Méthode</p>
         <h2>Mesurer l'effet réel</h2>
-        <p class="section-description">Les deux boutons sont placés aléatoirement. Chaque paire mesure le temps de déplacement, puis ajuste progressivement la fonction de transfert du pointeur.</p>
+        <p class="section-description">Les deux boutons sont placés à quatre distances normalisées. Chaque seuil commence avec un gain de 1, puis le gain est ajusté selon le temps nécessaire pour atteindre B.</p>
       </div>
       <div class="mouse-tuning-summary">
         <span id="tuning-status" role="status" data-i18n="mouseTuning.waiting">En attente d'une mesure.</span>
@@ -39,7 +39,9 @@
       </div>
       <div class="mouse-tuning-controls">
         <span id="tuning-distance" role="status" data-i18n="mouseTuning.randomDistance">Distance aléatoire</span>
-        <span id="tuning-trial-count" data-i18n="mouseTuning.initialTrialCount">0/16 essais</span>
+        <span id="tuning-threshold" role="status" data-i18n="mouseTuning.currentThreshold">Seuil en cours : —</span>
+        <span id="tuning-calibrated-thresholds" role="status" data-i18n="mouseTuning.calibratedThresholds">Seuils calibrés : aucun</span>
+        <span id="tuning-trial-count" data-i18n="mouseTuning.initialTrialCount">0/48 essais</span>
       </div>
       <div class="mouse-tuning-results" id="tuning-results" aria-live="polite"></div>
     </section>

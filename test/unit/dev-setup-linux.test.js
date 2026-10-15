@@ -64,7 +64,13 @@ describe('Linux development setup', () => {
     createTeeStub(fakeBin);
     createCommandStub(fakeBin, 'apt-get', 'printf "apt-get %s\\n" "$*" >> "$REMOTE_MOUSE_TEST_LOG"');
     createCommandStub(fakeBin, 'npm', 'printf "npm %s\\n" "$*" >> "$REMOTE_MOUSE_TEST_LOG"');
-    createCommandStub(fakeBin, 'sudo', 'printf "sudo %s\\n" "$*" >> "$REMOTE_MOUSE_TEST_LOG"; "$@"');
+    createCommandStub(fakeBin, 'sudo', `
+      printf "sudo %s\\n" "$*" >> "$REMOTE_MOUSE_TEST_LOG"
+      case "$*" in
+        *configure-uinput-access.sh*) exit 0 ;;
+      esac
+      "$@"
+    `);
 
     try {
       const result = spawnSync('bash', ['dev/setup-linux.sh', '--yes'], {
@@ -74,6 +80,7 @@ describe('Linux development setup', () => {
           PATH: `${fakeBin}:${process.env.PATH}`,
           REMOTE_MOUSE_TEST_LOG: logFile,
           REMOTE_MOUSE_APT_SOURCES_DIR: path.join(fakeBin, 'apt-sources'),
+          XDG_SESSION_TYPE: 'wayland',
         },
       });
 
@@ -86,6 +93,7 @@ describe('Linux development setup', () => {
         'npm run build:native:prebuild',
         'npm run build:native:prebuild -- --arch arm64',
       ]);
+      expect(loggedCommands).toContain(`sudo bash ${path.resolve('scripts/configure-uinput-access.sh')} ${process.env.USER}`);
       expect(result.stdout).toContain('Development environment ready');
     } finally {
       rmSync(fakeBin, {recursive: true, force: true});
@@ -115,6 +123,7 @@ describe('Linux development setup', () => {
           REMOTE_MOUSE_TEST_LOG: logFile,
           REMOTE_MOUSE_TEST_MISSING: 'crossbuild-essential-arm64 libx11-dev:arm64 libpng-dev:arm64',
           REMOTE_MOUSE_APT_SOURCES_DIR: path.join(fakeBin, 'apt-sources'),
+          XDG_SESSION_TYPE: 'x11',
         },
       });
 
@@ -140,6 +149,8 @@ describe('Linux development setup', () => {
     expect(script).toContain('build/uinput/remote-mouse-uinput.node');
     expect(script).toContain('crossbuild-essential-arm64');
     expect(script).toContain('npm run build:native:prebuild -- --arch arm64');
+    expect(script).toContain('configure-uinput-access.sh');
+    expect(script).toContain('XDG_SESSION_TYPE');
   });
 
   test('check mode reports missing ARM64 setup without invoking privileged commands', () => {

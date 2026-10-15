@@ -22,11 +22,11 @@ describe('mouse tuning page', () => {
     expect(source).toContain("path.join(publicDir, 'mouse-tuning.html')");
   });
 
-  it('is opened by the host action from the remote UI', () => {
+  it('is no longer exposed from the preferences UI', () => {
     const preferences = fs.readFileSync(path.resolve('public/preferences.html'), 'utf8');
     const page = fs.readFileSync(path.resolve('client/ui/preferences/page.js'), 'utf8');
-    expect(preferences).toContain('pointer-tuning-host');
-    expect(page).toContain("fetch('/api/client/mouse-tuning/browser'");
+    expect(preferences).not.toContain('pointer-tuning-host');
+    expect(page).not.toContain("fetch('/api/client/mouse-tuning/browser'");
     expect(fs.readFileSync(path.resolve('public/index.html'), 'utf8')).not.toContain('btn-open-mouse-tuning-browser-server');
   });
 
