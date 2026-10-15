@@ -43,7 +43,7 @@ export const APP_STATE_DEFINITIONS = {
   },
   [APP_STATE_POINTER_FAST_SPEED]: {
     store: APP_STATE_STORE_PERSIST, storageKey: POINTER_FAST_SPEED_STORAGE_KEY, defaultValue: 3,
-    normalize: (value) => Math.min(8, Math.max(0.25, Number(value) || 3)), serialize: String,
+    normalize: (value) => Math.min(20, Math.max(0.25, Number(value) || 3)), serialize: String,
   },
   [APP_STATE_POINTER_ACCELERATION]: {
     store: APP_STATE_STORE_PERSIST, storageKey: POINTER_ACCELERATION_STORAGE_KEY, defaultValue: true,

@@ -42,6 +42,9 @@ compréhensibles sur mobile et desktop.
   curseurs persistés localement, pour la vitesse lente et la vitesse rapide;
   interpoler entre les deux de façon bornée, utiliser la vitesse lente lorsque
   l'accélération est désactivée et inclure ces valeurs dans la remise à zéro.
+- [x] UX-006e — augmenter à 20 la borne maximale de la vitesse rapide locale
+  afin de couvrir les hôtes nécessitant un gain tactile supérieur à 8, sans
+  modifier la valeur par défaut ni la borne de la vitesse lente.
 - [x] UX-007 — nommer explicitement la commande d'affichage du QR comme une
   bascule et traduire son libellé et son intitulé accessible dans toutes les
   langues prises en charge.

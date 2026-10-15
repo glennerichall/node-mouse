@@ -230,6 +230,7 @@ test('preferences persist the pointer speed curve locally', async ({page}) => {
   await expect(page.locator('#pointer-fast-speed')).toHaveValue('1');
   await expect(page.locator('#pointer-slow-speed')).toHaveAttribute('max', '5');
   await expect(page.locator('#pointer-fast-speed')).toHaveAttribute('min', '0.25');
+  await expect(page.locator('#pointer-fast-speed')).toHaveAttribute('max', '20');
   await page.locator('#pointer-preferences-reset').click();
   await expect(page.locator('#pointer-slow-speed')).toHaveValue('1.3');
   await expect(page.locator('#pointer-fast-speed')).toHaveValue('3');
