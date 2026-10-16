@@ -113,6 +113,27 @@ function buildRemoteCapabilities({applications, config, previewAvailable = true}
   }));
 }
 
+async function getSamsungDiagnostic(services) {
+  const config = getConfigSection(services.getConfig(), 'samsungTv');
+  const samsung = services.getRemotes().samsung;
+  if (!config.enabled) {
+    return {enabled: false, status: 'disabled'};
+  }
+  if (!samsung?.getPowerState) {
+    return {enabled: true, status: 'unavailable'};
+  }
+
+  try {
+    const status = await samsung.getPowerState({maxAgeMs: 0});
+    return {
+      enabled: true,
+      status: ['on', 'off', 'unknown'].includes(status) ? status : 'unknown',
+    };
+  } catch {
+    return {enabled: true, status: 'unknown'};
+  }
+}
+
 export function createSystemService(services) {
   const log = getModuleLog();
   return {
@@ -142,6 +163,7 @@ export function createSystemService(services) {
       log.debug('Collecting server capabilities');
       const browsers = await this.listBrowsers();
       const vlcAvailable = await this.isVlcAvailable();
+      const samsungTv = await getSamsungDiagnostic(services);
       const applications = buildApplications({browsers, vlcAvailable});
       const previewAvailable = services.getRemotes().preview.isAvailable();
       const allRemotes = buildRemoteCapabilities({
@@ -167,6 +189,17 @@ export function createSystemService(services) {
         browsers,
         vlc: {
           available: vlcAvailable,
+          status: vlcAvailable ? 'available' : 'unavailable',
+        },
+        integrations: {
+          browsers: {
+            status: browsers.length > 0 ? 'available' : 'none-detected',
+            detected: browsers.map(({id, name}) => ({id, name})),
+          },
+          vlc: {
+            status: vlcAvailable ? 'available' : 'unavailable',
+          },
+          samsungTv,
         },
         applications,
         remotes: allRemotes.filter((remote) => remote.available),

@@ -570,7 +570,7 @@ values continue to take precedence over the defaults.
 #### Admin API Routes
 
 - `GET /api/admin/server-info/data` returns the current server snapshot:
-  version, uptime, connected clients, tasks, tokens, effective config, system config, and recent logs
+  version, uptime, connected clients, tasks, tokens, effective config, system config, integration diagnostics, and recent logs
 - `GET /api/admin/configs` returns the managed configuration entries, schema, defaults, and managed paths
 - `GET /api/admin/configs/:configId` returns one managed configuration entry
 - `PATCH /api/admin/configs/:configId` updates one managed configuration entry

@@ -29,6 +29,9 @@ describe('system service', () => {
         vlc: {
           isAvailable: jest.fn(async () => true),
         },
+        samsung: {
+          getPowerState: jest.fn(async () => 'on'),
+        },
         preview: {
           isAvailable: jest.fn(() => true),
         },
@@ -65,7 +68,15 @@ describe('system service', () => {
       browsers: [
         {id: 'firefox', name: 'Firefox'},
       ],
-      vlc: {available: true},
+      vlc: {available: true, status: 'available'},
+      integrations: {
+        browsers: {
+          status: 'available',
+          detected: [{id: 'firefox', name: 'Firefox'}],
+        },
+        vlc: {status: 'available'},
+        samsungTv: {enabled: false, status: 'disabled'},
+      },
       applications: expect.arrayContaining([
         expect.objectContaining({
           id: 'browser:firefox',
@@ -151,5 +162,27 @@ describe('system service', () => {
     });
 
     await expect(service.getScreenInfo()).resolves.toBeNull();
+  });
+
+  it('reports Samsung power state without failing the other diagnostics', async () => {
+    const service = createSystemService({
+      getLogger: () => createLogger(),
+      getOs: () => ({platform: 'linux'}),
+      getRemotes: () => ({
+        browser: {listBrowsers: jest.fn(async () => [])},
+        vlc: {isAvailable: jest.fn(async () => false)},
+        samsung: {getPowerState: jest.fn(async () => { throw new Error('timeout'); })},
+        preview: {isAvailable: jest.fn(() => false)},
+      }),
+      getConfig: () => ({samsungTv: {enabled: true}}),
+      getDesktopController: () => { throw new Error('desktop controller unavailable'); },
+      getSystemConfig: () => ({protocol: 'http', port: 3000, host: ''}),
+      getUrls: () => ({publicBaseUrl: 'http://127.0.0.1:3000', localBaseUrl: 'http://127.0.0.1:3000'}),
+    });
+
+    const info = await service.getInfo();
+
+    expect(info.integrations.samsungTv).toEqual({enabled: true, status: 'unknown'});
+    expect(info.vlc).toEqual({available: false, status: 'unavailable'});
   });
 });
