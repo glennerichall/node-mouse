@@ -1,4 +1,4 @@
-# PLAT — Wayland, capture et overlay
+# PLAT-004-004v — Wayland, capture et overlay
 
 Ce document regroupe les éléments liés à ce domaine. Les identifiants internes conservent la traçabilité du plan de travail.
 

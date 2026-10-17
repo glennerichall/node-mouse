@@ -1,4 +1,4 @@
-# QUA — Laboratoire et validations multiplateformes
+# QUA-007 / PLAT-005 — Laboratoire et validations multiplateformes
 
 Ce document regroupe les éléments liés à ce domaine. Les identifiants internes conservent la traçabilité du plan de travail.
 

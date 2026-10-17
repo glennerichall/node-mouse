@@ -1,4 +1,4 @@
-# SEC — Contrôles réseau, sessions et autorisations
+# SEC-001-011 — Contrôles réseau, sessions et autorisations
 
 Ce document regroupe les éléments liés à ce domaine. Les identifiants internes conservent la traçabilité du plan de travail.
 

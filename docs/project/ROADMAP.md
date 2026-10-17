@@ -80,4 +80,4 @@ ROADMAP.md
   fois clôturés.
 - Un plan spécialisé, comme Wayland, reprend l'ordinal et l'identifiant de son
   axe propriétaire :
-  [PLAT-wayland-capture-et-overlay.md](./axes/05-PLAT-plateformes/PLAT-wayland-capture-et-overlay.md).
+  [PLAT-004-004v-wayland-capture-et-overlay.md](./axes/05-PLAT-plateformes/PLAT-004-004v-wayland-capture-et-overlay.md).

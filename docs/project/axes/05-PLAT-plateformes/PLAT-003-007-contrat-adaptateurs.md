@@ -1,4 +1,4 @@
-# PLAT — Contrats d’adaptateurs et plateformes restantes
+# PLAT-003-007 — Contrats d’adaptateurs et plateformes restantes
 
 Ce document regroupe les éléments liés à ce domaine. Les identifiants internes conservent la traçabilité du plan de travail.
 

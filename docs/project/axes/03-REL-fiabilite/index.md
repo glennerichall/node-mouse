@@ -7,10 +7,14 @@ et assurer un cycle de vie robuste du serveur et des connexions.
 
 ## Plan de travail
 
-- [x] REL-001, REL-002, REL-003, REL-006 et REL-007 — commandes, reconnexion et cycle de vie.
+- [x] REL-001 — bornes des messages d'entrée.
+- [x] REL-002 — cycle de reconnexion.
+- [x] REL-003 — délais par transport.
 - [x] REL-004 — prévisualisation adaptative.
-- [ ] REL-005, REL-008 et REL-011 — télémétrie, configuration des transports et état de santé.
-- [ ] REL-009 et REL-010 — qualité et cycle de capture de la prévisualisation.
-
-Les détails sont regroupés dans `REL-commandes-et-transports.md`,
-`REL-cycle-de-vie.md` et `REL-previsualisation-et-capture.md`.
+- [ ] REL-005 — télémétrie d'entrée.
+- [x] REL-006 — reprise après veille et réseau.
+- [x] REL-007 — arrêt et reprise du serveur.
+- [ ] REL-008 — configuration des transports.
+- [ ] REL-009 — qualité de prévisualisation.
+- [ ] REL-010 — cycle de capture.
+- [ ] REL-011 — état de santé.

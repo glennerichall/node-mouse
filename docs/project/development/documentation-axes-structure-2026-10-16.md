@@ -8,7 +8,7 @@ cases à cocher. Les explications longues sont placées dans des fichiers nommé
 par identifiant directement dans le répertoire de l'axe.
 
 Le plan principal `PLAT` et le plan Wayland ne sont plus deux pages concurrentes:
-le second est devenu `05-PLAT-plateformes/PLAT-wayland-capture-et-overlay.md`.
+le second est devenu `05-PLAT-plateformes/PLAT-004-004v-wayland-capture-et-overlay.md`.
 Le laboratoire et les validations historiquement identifiés `PLAT-005*` restent
 dans `QUA-007`, qui en est désormais le propriétaire documentaire.
 

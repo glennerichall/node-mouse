@@ -1,4 +1,4 @@
-# CODE — Conventions et automatisation
+# CODE-001-006 — Conventions et automatisation
 
 Ce document regroupe les éléments liés à ce domaine. Les identifiants internes conservent la traçabilité du plan de travail.
 

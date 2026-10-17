@@ -1,4 +1,4 @@
-# PLAT — Diagnostics et intégrations desktop
+# PLAT-006-006g — Diagnostics et intégrations desktop
 
 Ce document regroupe les travaux de diagnostic et d’intégration des environnements desktop.
 
