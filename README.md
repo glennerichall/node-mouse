@@ -264,8 +264,10 @@ Notes:
   adding permissions beyond the existing restricted access to `/dev/uinput`
 - with `REMOTE_MOUSE_WAYLAND_INPUT=portal`, an interactive start opens the
   local Remote Desktop dialog; for a service, run `remote-mouse wayland authorize`
-- Wayland preview is not yet available; it remains disabled until the PipeWire
-  capture adapter is implemented
+- Wayland preview is not yet available; it remains explicitly disabled until
+  the dedicated Wayland capture helper, based on ScreenCast/PipeWire, is
+  implemented behind the cross-platform capture contract. The helper owns the
+  native capture lifecycle; the Node.js process retains transport selection.
 
 ##### Windows
 
@@ -394,7 +396,8 @@ Display-session behavior:
   the group membership to take effect; do not add the account to the general
   `input` group. The optional portal backend is selected with
   `REMOTE_MOUSE_WAYLAND_INPUT=portal` and requires a local desktop consent flow.
-- **Wayland limitations:** cursor preview/capture is not available. The QR
+- **Wayland limitations:** cursor preview/capture is not available until the
+  dedicated ScreenCast/PipeWire capture helper is implemented. The QR
   overlay is an X11/XWayland integration and is not guaranteed on a compositor
   without a compatible XWayland display. These limitations do not change the
   separate HTTP `/qr` page, which can be opened in a browser.

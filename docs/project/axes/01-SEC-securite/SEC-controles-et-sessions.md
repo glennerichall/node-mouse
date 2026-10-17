@@ -1,35 +1,23 @@
-# 01 — SEC — Sécurité et contrôle d'accès
+# SEC — Contrôles réseau, sessions et autorisations
 
-**État:** SEC-001 à SEC-011 et SEC-010d terminés; aucune tâche de sécurité planifiée.
+Ce document regroupe les éléments liés à ce domaine. Les identifiants internes conservent la traçabilité du plan de travail.
 
-## Résultat visé
+## SEC-007 — limiter taille/débit, vérifier Origin/CSRF et expurger les logs
 
-Garantir que les identités clientes ne reposent pas sur des en-têtes falsifiables,
-que les sessions et rôles sont révocables et correctement autorisés, et que les
-entrées réseau sont bornées. Le scénario LAN reste la cible immédiate, sans
-considérer le LAN comme une frontière de confiance.
+**État:** Terminé.
 
-## Plan de travail
-
-- [x] SEC-001 — résolution d'adresse cliente et proxies de confiance explicites.
-- [x] SEC-002 — orchestration de sécurité commune HTTP/Socket.IO.
-- [x] SEC-003 — garantir un secret de session robuste.
-- [x] SEC-004 — examiner et mettre à jour les dépendances de production.
-- [x] SEC-005 — séparer jeton d'association et session d'appareil.
-- [x] SEC-006 — introduire les rôles controller/admin.
-- [x] SEC-007 — limiter taille/débit, vérifier Origin/CSRF et expurger les logs.
-- [x] **SEC-008a:** lister les appareils associés et leurs métadonnées.
-- [x] **SEC-008b:** révoquer une session ou toutes les sessions via API admin.
-- [x] **SEC-008c:** conserver un historique local des associations/révocations.
-- [x] **SEC-009:** séparer les lectures nécessaires à la télécommande des
+- **Terminé —** **SEC-008a:** lister les appareils associés et leurs métadonnées.
+- **Terminé —** **SEC-008b:** révoquer une session ou toutes les sessions via API admin.
+- **Terminé —** **SEC-008c:** conserver un historique local des associations/révocations.
+- **Terminé —** **SEC-009:** séparer les lectures nécessaires à la télécommande des
   ressources administrateur afin qu'une session `controller` issue du QR puisse
   charger son état sans recevoir de droits d'écriture ni de données sensibles.
-- [x] **SEC-010:** permettre à un contrôleur de déverrouiller temporairement le
+- **Terminé —** **SEC-010:** permettre à un contrôleur de déverrouiller temporairement le
   rôle administrateur depuis le panneau latéral avec un mot de passe serveur,
   une expiration et une limitation stricte des tentatives.
-- [x] **SEC-010a:** rendre la longueur minimale du mot de passe administrateur
+- **Terminé —** **SEC-010a:** rendre la longueur minimale du mot de passe administrateur
   configurable sans divergence entre l'API d'authentification et l'interface.
-- [x] **SEC-010b:** permettre de reverrouiller explicitement l'administration
+- **Terminé —** **SEC-010b:** permettre de reverrouiller explicitement l'administration
   depuis le panneau latéral : lorsque la session courante est administrateur,
   remplacer le formulaire et le bouton « Déverrouiller » par un bouton
   « Verrouiller », révoquer immédiatement son élévation temporaire, puis
@@ -37,12 +25,12 @@ considérer le LAN comme une frontière de confiance.
   sessions associées. Le champ doit aussi offrir un contrôle accessible
   « Afficher/Masquer le mot de passe » : valeur masquée par défaut, affichable
   en clair à la demande, sans persistance ni modification de la saisie.
-- [x] **SEC-010c:** modéliser l'élévation administrateur temporaire comme une
+- **Terminé —** **SEC-010c:** modéliser l'élévation administrateur temporaire comme une
   ressource de la session courante : `POST /api/admin-auth/elevation` la crée
   ou la renouvelle et `DELETE /api/admin-auth/elevation` la supprime; retirer
   le chemin RPC `/unlock` et aligner les noms des handlers sans modifier le
   comportement de sécurité.
-- [x] **SEC-010d:** corriger le panneau latéral pour n'afficher qu'une commande
+- **Terminé —** **SEC-010d:** corriger le panneau latéral pour n'afficher qu'une commande
   d'élévation dont le libellé et l'action alternent entre « Déverrouiller » et
   « Verrouiller » selon l'état courant; intégrer le contrôle d'affichage sous
   forme d'icône œil dans le champ sans réduire sa zone de saisie; placer en haut
@@ -52,25 +40,19 @@ considérer le LAN comme une frontière de confiance.
   événements sans préfixe `admin:` pour les commandes QR, accepter
   temporairement les anciens événements protégés pour les clients déjà chargés
   et couvrir état, ordre, accessibilité et autorisations par des tests.
-- [x] **SEC-010e:** distinguer dans l'API et le panneau une administration
+- **Terminé —** **SEC-010e:** distinguer dans l'API et le panneau une administration
   verrouillée d'actions administratives désactivées par configuration; rendre le
   champ du mot de passe plus haut; sortir les événements `qr:*`, leur registrar,
   leur façade d'actions et la commande CLI du parcours admin, tout en conservant
   les anciens événements `admin:*` comme alias protégés de compatibilité.
-- [x] **SEC-011:** fixer à 120 minutes la durée de grâce par défaut des anciens
+- **Terminé —** **SEC-011:** fixer à 120 minutes la durée de grâce par défaut des anciens
   jetons d'entrée dans le code, `.env.example` et les installateurs; conserver
   la surcharge `ENTRY_PATH_GRACE_MIN`, documenter son effet et ajouter un test
   anti-régression de la valeur canonique.
-
-## Critères d'acceptation
-
 - Aucun en-tête forgé ne confère un accès privilégié.
 - Les contrôles d'accès HTTP et Socket.IO sont cohérents.
 - La révocation coupe immédiatement l'accès concerné.
 - Les limites et refus n'exposent pas de secrets; les tests anti-régression passent.
-
-## Historique
-
-Voir [journal SEC, lot A](../development/security-lot-a.md). Toute nouvelle
+Voir [journal SEC, lot A](../../development/security-lot-a.md). Toute nouvelle
 itération est consignée dans un nouveau fichier du journal, sans réécrire les
 itérations clôturées.

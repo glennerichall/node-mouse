@@ -2,7 +2,7 @@
 
 > Tableau de suivi opérationnel de Remote Mouse. Les orientations à long terme
 > restent dans [la roadmap globale](../ROADMAP.md) et les travaux PWA/TLS dans
-> [l'axe PWA](../axes/06-PWA-application-web.md). Ce fichier conserve l'état du
+> [l'axe PWA](../axes/06-PWA-application-web/index.md). Ce fichier conserve l'état du
 > lot A avant la réorganisation. Ses cases sont un instantané historique et ne
 > constituent plus un suivi actif; seules les cases des documents d'axes sont
 > canoniques.
@@ -37,7 +37,7 @@ Internet.
 | Prochaine tâche | Corriger l'écart de durée de grâce des jetons d'entrée |
 | Version | `6.10.0` — bump `minor` pour l'API de gestion SEC-008 |
 | Roadmap globale | [ROADMAP.md](../ROADMAP.md) |
-| Axe PWA | [06-PWA-application-web.md](../axes/06-PWA-application-web.md) |
+| Axe PWA | [06-PWA-application-web.md](../axes/06-PWA-application-web/index.md) |
 
 ## Travaux préparatoires terminés
 
@@ -266,7 +266,7 @@ via `node-notifier`; la correction proposée impose toujours la rupture
 - [ ] `PWA-009` — Tester l'installation sur Android, iOS et desktop.
 
 Les critères détaillés de ces tâches sont définis dans
-[l'axe PWA](../axes/06-PWA-application-web.md).
+[l'axe PWA](../axes/06-PWA-application-web/index.md).
 
 ## Vérifications obligatoires avant de cocher une tâche
 
