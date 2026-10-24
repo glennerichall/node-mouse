@@ -1,8 +1,8 @@
 ## Évolution d'architecture applicative
 
-Le frontend dépend actuellement de Socket.IO et de routes servies par le même
-serveur. Pour permettre une PWA statique publique et un transport WebRTC local,
-la logique doit être séparée en couches.
+Pour permettre une PWA statique publique et un transport WebRTC local, la
+logique de présentation, de transport et de serveur doit être séparée en
+couches.
 
 ### Contrat de transport client
 

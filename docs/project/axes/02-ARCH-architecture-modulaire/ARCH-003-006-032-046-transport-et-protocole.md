@@ -4,29 +4,21 @@ Ce document regroupe les éléments liés à ce domaine. Les identifiants intern
 
 ## ARCH-003 — spécifier et versionner explicitement le protocole
 
-**État:** À faire.
-
   client/serveur `route:request` (forme, règles de validation, compatibilité et
   stratégie de version); le nom d'événement et le payload actuels ne suffisent
   pas à établir une version de protocole.
 
 ## ARCH-004 — définir un contrat de transport client indépendant
 
-**État:** À faire.
-
   Socket.IO et vérifier qu'au moins un second transport concret peut
   l'implémenter; le service client actuel reste spécifique à Socket.IO.
 
 ## ARCH-005 — adapter Socket.IO au protocole `route:request` sans régression
 
-**État:** Terminé.
-
   connue; couvrir le transport client, la réception serveur et le routage par
   les tests ciblés.
 
 ## ARCH-006 — établir des tests de contrat réutilisables et les exécuter
-
-**État:** À faire.
 
   pour chaque transport concret; les tests Express actuels valident le montage
   des routeurs, mais ne remplacent pas les tests d'un second transport.

@@ -4,8 +4,6 @@ Ce document regroupe les éléments liés à ce domaine. Les identifiants intern
 
 ## ARCH-008 — uniformiser les routeurs API client avec des handlers nommés
 
-**État:** Terminé.
-
   et exportés, en laissant au routeur uniquement la composition des chemins et
   verbes; préserver les contrats HTTP et couvrir chaque handler directement.
 

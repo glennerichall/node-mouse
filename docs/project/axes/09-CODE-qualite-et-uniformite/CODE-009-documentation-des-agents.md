@@ -4,8 +4,6 @@ Ce document regroupe les éléments liés à ce domaine. Les identifiants intern
 
 ## CODE-009 — Documentation à chargement progressif pour les agents
 
-**État:** Terminé.
-
   créer des points d'entrée `AGENTS.md` concis à la racine et dans `docs/`,
   supprimer les consignes dupliquées ou globalement coûteuses, remplacer
   l'index exhaustif des journaux par une méthode de recherche ciblée et

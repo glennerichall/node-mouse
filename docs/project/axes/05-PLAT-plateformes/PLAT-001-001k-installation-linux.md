@@ -4,33 +4,25 @@ Ce document regroupe les éléments liés à ce domaine. Les identifiants intern
 
 ## PLAT-001 — clôturer le parcours Linux après les sous-tâches setup
 
-**État:** Terminé.
-
   la génération et le cycle de vie du service `systemd --user` sans toucher au
   service de l'hôte; documenter l'installation, le démarrage lié à la session,
   les commandes de diagnostic et de retrait, ainsi que les capacités et
   permissions propres à X11 et Wayland. Distinguer le contrôle souris/clavier,
-  l'overlay QR et l'aperçu; ne pas promettre de capture Wayland non implantée.
+  l'overlay QR et l'aperçu; ne pas inclure la capture Wayland dans ce contrat.
   Aucun script de cette clôture ne doit créer, provisionner, démarrer ou valider
   une VM.
 
 ## PLAT-001a — rendre l'installation uinput autonome et idempotente
-
-**État:** Terminé.
 
   une installation existante sans remplacer sa configuration, ses secrets ni
   sa base de données.
 
 ## PLAT-001b — rattacher la migration privilégiée uinput au `postinstall`
 
-**État:** Terminé.
-
   déclenché par la mise à jour intégrée; demander l'autorisation locale via
   Polkit seulement lorsque la configuration système manque.
 
 ## PLAT-001c — distribuer les composants natifs Linux sous forme d'artéfacts
-
-**État:** Terminé.
 
   précompilés dans le paquet npm, sélectionnés selon l'architecture; le
   `postinstall` les utilise sans exiger de compilateur ni d'en-têtes de
@@ -47,8 +39,6 @@ Ce document regroupe les éléments liés à ce domaine. Les identifiants intern
 
 ## PLAT-001d — simplifier l'installation publique autour
 
-**État:** Terminé.
-
   `npm install -g @velor/remote-mouse`, puis d'une commande explicite
   `remote-mouse setup` qui configure l'application sur Linux et Windows.
   Séparer l'installation du paquet des changements système : le setup doit
@@ -64,8 +54,6 @@ Ce document regroupe les éléments liés à ce domaine. Les identifiants intern
 
 ## PLAT-001e — définir et valider le packaging de publication npm à partir
 
-**État:** Terminé.
-
   d'un tarball reproductible : contrôler les fichiers inclus/exclus, les
   entrées CLI, les artefacts natifs précompilés et les métadonnées requises;
   exécuter `npm pack` et `npm publish --dry-run`, puis installer le tarball dans
@@ -75,8 +63,6 @@ Ce document regroupe les éléments liés à ce domaine. Les identifiants intern
   automatiquement ni nécessiter de jeton npm.
 
 ## PLAT-001f — ajouter une compilation locale de secours au `postinstall`
-
-**État:** Terminé.
 
   uniquement lorsqu'aucun prébuild correspondant à Linux et à l'architecture
   cible n'est fourni. Le résolveur natif doit sélectionner explicitement le
@@ -92,8 +78,6 @@ Ce document regroupe les éléments liés à ce domaine. Les identifiants intern
 
 ## PLAT-001g — automatiser la préparation de publication via le hook npm
 
-**État:** Terminé.
-
   `prepublishOnly` : sur un hôte Linux x64, générer les prébuilds x64 et ARM64
   au moyen de `build:native:prebuild`, vérifier les architectures et le contenu
   du tarball, puis exécuter la validation d'installation de PLAT-001e avant
@@ -105,8 +89,6 @@ Ce document regroupe les éléments liés à ce domaine. Les identifiants intern
 
 ## PLAT-001h — refactorer `remote-mouse setup` en orchestration générique
 
-**État:** Terminé.
-
   appuyée sur une stratégie sélectionnée selon l'OS hôte. Séparer validation,
   interaction, configuration persistante et installation du service en modules
   à responsabilité unique. Chaque stratégie Linux/Windows fournit les chemins,
@@ -117,8 +99,6 @@ Ce document regroupe les éléments liés à ce domaine. Les identifiants intern
 
 ## PLAT-001i — faire utiliser par `npm run dev` les artefacts natifs compilés
 
-**État:** Terminé.
-
   depuis le checkout courant, même si un prébuild plus ancien est présent;
   conserver la priorité du prébuild compatible pour les installations et la
   publication. Couvrir le choix explicite du résolveur par des tests et vérifier
@@ -126,15 +106,11 @@ Ce document regroupe les éléments liés à ce domaine. Les identifiants intern
 
 ## PLAT-001j — corriger l'inclusion des prébuilds Linux générés
 
-**État:** Terminé.
-
   tarball npm lorsque ces artéfacts restent ignorés par Git; aligner les règles
   `.gitignore`, `.npmignore` et l'allowlist `files` sur chaque fichier natif,
   puis vérifier la chaîne réelle de `npm publish --dry-run`.
 
 ## PLAT-001k — préserver l'activation du service `systemd --user` après
-
-**État:** Terminé.
 
   mise à jour de l'application, afin que le service actif soit aussi relancé au
   prochain démarrage; réactiver l'unité avant le redémarrage post-mise-à-jour et

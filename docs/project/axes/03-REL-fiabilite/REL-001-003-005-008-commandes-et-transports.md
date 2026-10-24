@@ -4,28 +4,20 @@ Ce document regroupe les éléments liés à ce domaine. Les identifiants intern
 
 ## REL-001 — bornes des messages d'entrée
 
-**État:** Terminé.
-
   impossibles ou obsolètes et garantir que le dispatcher de mouvements conserve
   au plus une contribution en attente, avec une erreur de consommation
   observable sans rejet de promesse non géré.
 
 ## REL-003 — délais par transport
 
-**État:** Terminé.
-
   reconnexion et heartbeat Socket.IO depuis la configuration serveur, exposer
   cette configuration au client et vérifier les bornes avec des tests.
 
 ## REL-005 — télémétrie d'entrée
 
-**État:** À faire.
-
   traiter les mouvements obsolètes et le backpressure uniquement lorsqu'un
   usage opérationnel et des seuils sont définis.
 
 ## REL-008 — configuration des transports
-
-**État:** À faire.
 
   configurables par transport.

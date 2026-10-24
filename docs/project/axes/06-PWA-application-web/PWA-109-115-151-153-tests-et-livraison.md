@@ -4,26 +4,18 @@ Ce document regroupe les éléments liés à ce domaine. Les identifiants intern
 
 ## PWA-114 — Ajouter des diagnostics ICE, DataChannel, certificat et permission LAN
 
-**État:** À faire.
-
   la CLI.
 
 ## PWA-115 — Documenter déploiement, mise à jour et retour arrière
-
-**État:** À faire.
 
 **Estimation :** 3 à 5 jours.
 ### Priorité haute
 
 ## PWA-152 — Aucune vulnérabilité élevée connue ne subsiste dans les dépendances
 
-**État:** À faire.
-
   production.
 
 ## PWA-153 — Les critères de confidentialité ci-dessus sont démontrés par des tests
-
-**État:** À faire.
 
 ```text
 Socle local HTTP/HTTPS et Socket.IO préservé

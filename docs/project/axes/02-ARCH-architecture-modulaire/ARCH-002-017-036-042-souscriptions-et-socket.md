@@ -4,8 +4,6 @@ Ce document regroupe les éléments liés à ce domaine. Les identifiants intern
 
 ## ARCH-002 — extraire la logique métier des handlers Socket.IO
 
-**État:** Terminé.
-
   routeurs par domaine; le handler Socket.IO adapte la requête et fournit les
   services via `request.services`.
 
@@ -40,53 +38,37 @@ ce refactoring ne doit pas modifier son comportement ni réintroduire YAD.
 
 ## ARCH-010 — séparer la garde des actions administratives de la souscription
 
-**État:** Terminé.
-
   des événements : le contexte d'autorisation est évalué au bootstrap Socket.IO,
   tandis que le registrar admin reçoit un canal et un émetteur de réponses.
 
 ## ARCH-011 — formaliser le contrat de canal (`id`, `on`, `emit`) et exposer
-
-**État:** Terminé.
 
   une orchestration nommée des souscriptions (`subscribeInput`,
   `subscribeBrowser`, etc.) sans dispatcher métier central.
 
 ## ARCH-012 — externaliser les composants d'orchestration
 
-**État:** Terminé.
-
   `bootstrapSocket` et tester séparément les guards, notifications et
   souscriptions Socket.IO.
 
 ## ARCH-013 — regrouper les composants Socket.IO et les souscriptions métier
-
-**État:** Terminé.
 
   par responsabilité, avec un fichier par orchestration ou guard et des noms
   explicites; supprimer le module fourre-tout `socketBootstrapComponents`.
 
 ## ARCH-014 — retirer l'orchestration `createEventSubscriptions`
 
-**État:** Terminé.
-
   `server/remotes` et la regrouper avec l'adaptation de canal Socket.IO.
 
 ## ARCH-015 — transformer `createEventSubscriptions` en service d'orchestration
-
-**État:** Terminé.
 
   réutilisable, construisant les subscribers une fois et exposant `subscribeAll`.
 
 ## ARCH-016 — corriger le bootstrap Socket.IO pour consommer le service
 
-**État:** Terminé.
-
   souscriptions enregistré, sans importer un handler supprimé.
 
 ## ARCH-017 — aligner le nom et l'injection du service de souscriptions,
-
-**État:** Terminé.
 
   supprimer les derniers anciens points d'entrée et vérifier les imports de
   production.

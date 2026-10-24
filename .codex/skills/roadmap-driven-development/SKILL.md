@@ -13,6 +13,17 @@ pour le routage et le chargement progressif.
 
 - `docs/project/axes/`: tâches actuelles et critères; toujours lire l'axe
   propriétaire du changement.
+- Chaque axe est un répertoire contenant un `index.md` et des fiches de
+  conception thématiques. L'index est la seule source de suivi : il porte les
+  codes, les cases à cocher et l'état d'avancement.
+- Une fiche détaillée décrit uniquement la conception à implanter : contexte,
+  périmètre, contrats, dépendances, décisions de conception et critères
+  d'acceptation. Elle ne contient ni état (`À faire`, `En cours`, `Terminé`),
+  ni case à cocher, ni compte rendu d'implantation.
+- Lorsque plusieurs éléments sont liés ou triviaux séparément, les regrouper
+  dans une fiche thématique. Le nom de la fiche conserve les codes concernés et
+  ajoute un sujet explicite, par exemple
+  `ARCH-003-006-032-046-transport-et-protocole.md`.
 - `docs/project/ROADMAP.md`: ordre global des axes; lire pour choisir ou
   reprioriser une itération, pas pour un changement local déjà cadré.
 - `docs/project/VISION.md`: intention durable; lire si la tâche peut la
@@ -36,7 +47,10 @@ pour le routage et le chargement progressif.
    terminé qu'après réussite; signaler les contrôles impossibles.
 5. À la clôture, créer un journal daté selon la convention de
    `docs/project/development/README.md`. Les journaux terminés sont immuables.
-   Modifier la roadmap globale uniquement si l'ordre ou l'état d'un axe change.
+   Modifier l'index de l'axe uniquement si l'ordre ou l'état d'une tâche
+   change. Modifier la roadmap globale uniquement si l'ordre ou l'état d'un
+   axe change. Ne pas reporter l'état ou le résultat de l'implantation dans une
+   fiche de conception.
 6. Pour toute itération qui modifie le paquet livré, incrémenter la version
    `PATCH` par défaut et synchroniser `package.json` et `package-lock.json`.
    Utiliser `MINOR` ou `MAJOR` seulement si la nature du changement l'impose

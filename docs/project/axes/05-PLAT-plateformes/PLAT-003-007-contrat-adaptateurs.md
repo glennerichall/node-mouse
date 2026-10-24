@@ -4,8 +4,6 @@ Ce document regroupe les éléments liés à ce domaine. Les identifiants intern
 
 ## PLAT-007 — définir un contrat d'adaptateur avant de multiplier
 
-**État:** Terminé.
-
   intégrations.
   Le contrat sépare la façade de capacités (`app.resolve`, actions de fenêtre,
   ouverture d'URL, overlay et bureau/capture optionnels) des implémentations

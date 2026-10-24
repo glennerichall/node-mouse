@@ -1,13 +1,13 @@
 ## Arbitrage technique
 
-| Mode | PWA installable | Transit applicatif | Infrastructure utilisateur | Statut |
-| --- | --- | --- | --- | --- |
-| Local HTTP/HTTPS | Selon le certificat | LAN uniquement | PC seulement | À conserver |
-| Service gratuit + WebRTC | Oui | Direct ou TURN explicitement choisi | Aucune | À développer |
-| VPS personnel + WebRTC | Oui | Direct ou VPS si TURN activé | VPS + domaine | À supporter |
-| VPS personnel + proxy VPN | Oui | VPS de l'utilisateur | VPS + VPN + domaine | À supporter |
-| VPS personnel + reverse WebSocket | Oui | VPS de l'utilisateur | VPS + domaine | À prototyper puis supporter |
-| HTTPS/WSS local certifié | Oui | LAN uniquement | DNS + certificat | À supporter |
+| Mode | PWA installable | Transit applicatif | Infrastructure utilisateur |
+| --- | --- | --- | --- |
+| Local HTTP/HTTPS | Selon le certificat | LAN uniquement | PC seulement |
+| Service gratuit + WebRTC | Oui | Direct ou TURN explicitement choisi | Aucune |
+| VPS personnel + WebRTC | Oui | Direct ou VPS si TURN activé | VPS + domaine |
+| VPS personnel + proxy VPN | Oui | VPS de l'utilisateur | VPS + VPN + domaine |
+| VPS personnel + reverse WebSocket | Oui | VPS de l'utilisateur | VPS + domaine |
+| HTTPS/WSS local certifié | Oui | LAN uniquement | DNS + certificat |
 
 Ces modes sont complémentaires. Le code ne doit pas en désigner un comme
 universellement supérieur : le bon choix dépend du niveau d'autonomie, de la
